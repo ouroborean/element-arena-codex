@@ -206,7 +206,7 @@
     if (!s.is_passive) meta.push(costPips(s.cost, color));
     if (s.cooldown) meta.push(h("span", { class: "meta-pill cd", title: "Cooldown" }, "CD " + s.cooldown));
     if (s.is_passive) meta.push(h("span", { class: "passive-flag" }, "PASSIVE"));
-    if (s.targeting_type) meta.push(h("span", { class: "meta-pill", title: "Targeting" + (s.targeting_type.defaulted ? " (engine default)" : "") }, "▶ " + s.targeting_type.name));
+    if (s.targeting_type) meta.push(h("span", { class: "meta-pill", title: "Targeting" }, "▶ " + s.targeting_type.name));
     if (s.hidden) meta.push(h("span", { class: "meta-pill", title: "Hidden skill" }, "hidden"));
     meta = meta.concat(classChips(s));
 
@@ -486,7 +486,6 @@
       return h("div", { class: "aug-card", style: "--el:" + color }, [
         h("div", { class: "an" }, [a.display_name || a.augment_name, " ", elChip(a.element, { sm: true })]),
         h("div", { class: "ad" }, a.description || h("em", { style: "color:var(--text-faint)" }, "No description.")),
-        h("div", { class: "ai" }, "id " + a.id + (a.deploy_mark ? " · deploy mark" : "")),
       ]);
     }));
   }
@@ -501,7 +500,7 @@
     if (mskills.length) {
       wrap.appendChild(h("div", { class: "sec-sub", style: "margin:22px 0 12px;font-weight:700;color:var(--text);font-size:15px" },
         "Minion abilities (" + mskills.length + ")"));
-      wrap.appendChild(h("div", { class: "callout" }, "The extractor keys minion abilities to the summoner, not to individual minions — so the full summoned-ability pool is listed together here."));
+      wrap.appendChild(h("div", { class: "callout" }, "Abilities used by this hero's summoned minions."));
       wrap.appendChild(skillGrid(mskills));
     }
     return wrap;
@@ -708,8 +707,7 @@
           stat("Cost", (s.cost && (s.cost.generic + s.cost.specific)) ? ((s.cost.generic ? s.cost.generic + " generic" : "") + (s.cost.generic && s.cost.specific ? " + " : "") + (s.cost.specific ? s.cost.specific + " " + e.display_name : "")) : "Free"),
           stat("Cooldown", String(s.cooldown || 0)),
           stat("Type", s.is_passive ? "Passive" : "Active"),
-          stat("Targeting", s.targeting_type ? s.targeting_type.name + (s.targeting_type.defaulted ? " (default)" : "") : "—"),
-          stat("Priority", String(s.priority)),
+          stat("Targeting", s.targeting_type ? titleCase(s.targeting_type.name) : "—"),
         ]),
         h("div", { class: "skill-desc", style: "font-size:15px;color:var(--text)" }, s.description || "No description."),
         h("div", { class: "pill-row", style: "margin-top:12px" }, classChips(s).concat(
@@ -719,23 +717,13 @@
       ]),
     ]));
 
-    // Full class map + provenance
+    // Full class-tag map (which gameplay tags apply to this skill)
     var classRows = Object.keys(s.classes).map(function (k) {
       return h("tr", null, [h("td", null, k), h("td", null, s.classes[k] ? h("span", { style: "color:var(--help)" }, "✓") : h("span", { style: "color:var(--text-faint)" }, "—"))]);
     });
     el.view.appendChild(h("div", { class: "section" }, [
-      h("h2", null, "Details"),
-      h("div", { style: "display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start" }, [
-        h("table", { class: "data-table" }, [h("tbody", null, classRows)]),
-        h("table", { class: "data-table" }, [h("tbody", null, [
-          row("Skill id", s.id),
-          row("Owner", s.owner),
-          row("Classification", JSON.stringify(s.classification)),
-          row("Minion skill", String(s.is_minion_skill)),
-          row("Source file", s.source_file),
-          row("Image", s.image),
-        ])]),
-      ]),
+      h("h2", null, "Class tags"),
+      h("table", { class: "data-table", style: "max-width:340px" }, [h("tbody", null, classRows)]),
     ]));
 
     // sibling skills of same owner
@@ -791,7 +779,7 @@
   function elCard(e) {
     var comp = "";
     if (e.components && e.components.length) comp = e.components.map(function (c) { return c.a_name + " + " + c.b_name; }).join(", ");
-    else if (e.is_base) comp = "base element" + (e.color ? " · " + e.color : "");
+    else if (e.is_base) comp = "base element";
     return h("div", { class: "el-card", style: "--el:" + elColor(e), onclick: function () { go("#/element/" + e.name); } }, [
       h("div", { class: "en" }, e.display_name),
       h("div", { class: "es" }, e.is_base ? "Base" : e.is_generic ? "Generic energy" : "Fusion"),
@@ -808,7 +796,7 @@
 
     el.view.appendChild(h("div", { class: "page-head" }, [
       h("h1", null, [h("span", { style: "display:inline-block;width:20px;height:20px;border-radius:50%;vertical-align:middle;margin-right:10px;background:" + (e.is_fusion ? elGradient(e) : color) }), e.display_name]),
-      h("div", { class: "sub" }, e.is_base ? ("Base element" + (e.color ? " · " + e.color : "")) : e.is_generic ? "Generic (any) energy used in skill costs" : "Fusion element"),
+      h("div", { class: "sub" }, e.is_base ? "Base element" : e.is_generic ? "Generic (any) energy used in skill costs" : "Fusion element"),
     ]));
 
     // components / recipes
@@ -859,7 +847,7 @@
 
   // ---------- VIEW: Minions ----------
   function viewMinions() {
-    el.view.appendChild(pageHead("Minions", IDX.minions.length + " summoned units · HP recovered heuristically from spawn code"));
+    el.view.appendChild(pageHead("Minions", IDX.minions.length + " units summoned by heroes during battle"));
     var byOwner = {};
     IDX.minions.forEach(function (m) { (byOwner[m.owner] = byOwner[m.owner] || []).push(m); });
     Object.keys(byOwner).sort().forEach(function (ownerId) {
@@ -874,7 +862,7 @@
   function minionGrid(list) {
     return h("div", { class: "minion-grid" }, list.map(function (m) {
       var color = elColor(resolveEl(m.element));
-      var hp = m.base_hp != null ? m.base_hp + " HP" : (m.hp_source === "dynamic" ? "Dynamic HP" : "HP unknown");
+      var hp = m.base_hp != null ? m.base_hp + " HP" : (m.hp_source === "dynamic" ? "Scaling HP" : "");
       return h("div", { class: "minion-card", style: "--el:" + color, onclick: function () { go("#/minion/" + m.id); }, }, [
         img(assetExists(m.image) ? m.image : null, "", m.character_name),
         h("div", { class: "mb" }, [
@@ -896,18 +884,14 @@
         h("h1", null, m.character_name || m.path_name),
         h("div", { class: "meta-row" }, [elChip(m.element), owner ? h("span", { class: "chip", style: "cursor:pointer", onclick: function () { go("#/char/" + owner.id); } }, "Summoned by " + (owner.short_name || owner.character_name)) : null]),
         h("div", { class: "statline" }, [
-          stat("Base HP", m.base_hp != null ? String(m.base_hp) : (m.hp_source === "dynamic" ? "Dynamic" : "Unknown")),
-          stat("HP source", m.hp_source || "—"),
-          stat("Owner", m.owner || "—"),
+          stat("Base HP", m.base_hp != null ? String(m.base_hp) : (m.hp_source === "dynamic" ? "Scales with summoner" : "—")),
         ]),
-        m.base_hp_candidates && m.base_hp_candidates.length > 1 ? h("div", { class: "callout" }, "HP candidates found in spawn code: " + m.base_hp_candidates.join(", ")) : null,
       ]),
     ]));
     var poolSkills = ownerMinionSkills(m.owner);
     if (poolSkills.length) {
       el.view.appendChild(h("div", { class: "section" }, [
         h("h2", null, [owner ? (owner.short_name || owner.character_name) : m.owner, "'s minion abilities ", h("span", { class: "badge" }, String(poolSkills.length))]),
-        h("div", { class: "callout" }, "Minion abilities are recorded against the summoner rather than individual minions, so this is the full pool of abilities the summoner's minions draw from."),
         skillGrid(poolSkills),
       ]));
     }
@@ -916,39 +900,36 @@
   // ---------- VIEW: About ----------
   function viewAbout() {
     var c = DB._meta.counts;
-    el.view.appendChild(pageHead("About this codex", "An offline, data-driven browser for the extracted game database."));
+    el.view.appendChild(pageHead("About this codex", "A reference for the game's heroes, fusions, skills, elements and minions."));
     el.view.appendChild(h("div", { class: "section" }, [
       h("h2", null, "What's inside"),
       h("table", { class: "data-table", style: "max-width:520px" }, [h("tbody", null, [
-        row("Characters", c.characters + " (" + c.characters_in_roster + " in roster)"),
+        row("Heroes", c.characters + " (" + c.characters_in_roster + " in the roster)"),
         row("Skills", c.skills + " (" + c.skills_character + " hero, " + c.skills_minion + " minion)"),
-        row("Augments", c.augments), row("Masteries", c.masteries),
-        row("Minions", c.minions + " (" + c.minions_with_hp + " with HP)"),
+        row("Augments", c.augments),
+        row("Minions", c.minions),
         row("Elements", c.elements + " (10 base, 55 fusion, 1 generic)"),
         row("Fusion recipes", c.fusion_recipes),
       ])]),
     ]));
     el.view.appendChild(h("div", { class: "section" }, [
-      h("h2", null, "How fusion works"),
+      h("h2", null, "How rounds work"),
       h("div", { class: "callout" }, [
-        "Each round, a hero may pick an ", h("b", null, "Augment"), " (a passive upgrade to their kit) or ",
-        h("b", null, "fuse"), " their element with a teammate's. The fusion element is looked up from the ",
-        h("b", null, "base × base"), " recipe table, and each partner gains a fusion passive + active for that element ",
-        "plus new display art. Explore any pairing in the ", h("a", { href: "#/fusions", style: "color:var(--accent-2)" }, "Fusion Lab"), ".",
+        "Draft a team of three heroes. Between rounds, each hero may take an ", h("b", null, "Augment"),
+        " — a passive upgrade to their kit — or ", h("b", null, "fuse"), " their element with a teammate's. ",
+        "The fusion element comes from combining the two heroes' base elements, and each partner gains a new ",
+        "fusion passive + active plus a new look. Try any pairing in the ",
+        h("a", { href: "#/fusions", style: "color:var(--accent-2)" }, "Fusion Lab"), ".",
       ]),
     ]));
-    var notes = (DB._meta.notes || []).concat(["Damage/heal values are only in each skill's description text (they live in GDScript, not as data fields)."]);
     el.view.appendChild(h("div", { class: "section" }, [
-      h("h2", null, "Data provenance"),
-      h("ul", { style: "color:var(--text-dim);font-size:13px;line-height:1.8" }, notes.map(function (n) { return h("li", null, n); })),
-    ]));
-    if ((DB._meta.info || []).length) el.view.appendChild(h("div", { class: "section" }, [
-      h("h2", null, ["Extractor notes ", h("span", { class: "badge" }, String(DB._meta.info.length))]),
-      h("ul", { style: "color:var(--text-faint);font-size:12px;line-height:1.7" }, DB._meta.info.map(function (n) { return h("li", null, typeof n === "string" ? n : JSON.stringify(n)); })),
-    ]));
-    el.view.appendChild(h("div", { class: "section" }, [
-      h("h2", null, "Refreshing the data"),
-      h("div", { class: "callout" }, ["Re-run the export, then ", h("code", { style: "color:var(--accent)" }, "python build_data.py"), " to rebuild ", h("code", null, "app/db.js"), ". This page reads that bundle (or ", h("code", null, "output/database.json"), " when served over HTTP)."]),
+      h("h2", null, "Reading a skill"),
+      h("div", { class: "callout" }, [
+        "A skill's exact damage and healing values are written into its ", h("b", null, "description"),
+        ". Energy cost is shown as pips — patterned pips are ", h("b", null, "generic"), " energy (any element), ",
+        "solid pips are the skill's own element. ", h("b", null, "Class tags"), " (Harmful, Control, Instant, …) ",
+        "describe how a skill behaves.",
+      ]),
     ]));
   }
 
@@ -1036,9 +1017,7 @@
     // Fallback: fetch when served over HTTP (file:// will throw → show guidance)
     fetch("output/database.json").then(function (r) { return r.json(); }).then(function (db) { boot(db, null); })
       .catch(function () {
-        el.view.innerHTML = '<div class="empty-note" style="margin:40px">Could not load the database.<br><br>' +
-          'Run <code>python build_data.py</code> to generate <code>app/db.js</code>, then reload — ' +
-          'or serve this folder with <code>python -m http.server</code> and open it via http://localhost:8000/.</div>';
+        el.view.innerHTML = '<div class="empty-note" style="margin:40px">Could not load the game data. Please reload the page.</div>';
       });
   }
   start();
