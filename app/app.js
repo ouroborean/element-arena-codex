@@ -1,6 +1,6 @@
-/* Element Arena Codex — vanilla JS, no dependencies.
-   Data source: window.GAME_DB (embedded by build_data.py) with a fetch() fallback
-   so it works both by double-click (file://) and when served over HTTP. */
+/* Element Arena Codex — game reference UI (vanilla JS, no dependencies).
+   Reads the bundled game data from window.GAME_DB, falling back to fetching
+   the data file when the bundle isn't present. */
 (function () {
   "use strict";
 
