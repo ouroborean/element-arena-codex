@@ -1,0 +1,442 @@
+[
+  {
+    "a": 0,
+    "b": 0,
+    "a_name": "fire",
+    "b_name": "fire",
+    "result": 10,
+    "result_name": "dragon"
+  },
+  {
+    "a": 0,
+    "b": 1,
+    "a_name": "fire",
+    "b_name": "ice",
+    "result": 15,
+    "result_name": "apocalypse"
+  },
+  {
+    "a": 0,
+    "b": 2,
+    "a_name": "fire",
+    "b_name": "water",
+    "result": 11,
+    "result_name": "alchemy"
+  },
+  {
+    "a": 0,
+    "b": 3,
+    "a_name": "fire",
+    "b_name": "lightning",
+    "result": 18,
+    "result_name": "plasma"
+  },
+  {
+    "a": 0,
+    "b": 4,
+    "a_name": "fire",
+    "b_name": "wind",
+    "result": 12,
+    "result_name": "mechanic"
+  },
+  {
+    "a": 0,
+    "b": 5,
+    "a_name": "fire",
+    "b_name": "poison",
+    "result": 14,
+    "result_name": "brimstone"
+  },
+  {
+    "a": 0,
+    "b": 6,
+    "a_name": "fire",
+    "b_name": "earth",
+    "result": 13,
+    "result_name": "sun"
+  },
+  {
+    "a": 0,
+    "b": 7,
+    "a_name": "fire",
+    "b_name": "holy",
+    "result": 16,
+    "result_name": "judgment"
+  },
+  {
+    "a": 0,
+    "b": 8,
+    "a_name": "fire",
+    "b_name": "unholy",
+    "result": 17,
+    "result_name": "devil"
+  },
+  {
+    "a": 0,
+    "b": 9,
+    "a_name": "fire",
+    "b_name": "shadow",
+    "result": 19,
+    "result_name": "ritual"
+  },
+  {
+    "a": 1,
+    "b": 1,
+    "a_name": "ice",
+    "b_name": "ice",
+    "result": 50,
+    "result_name": "crystal"
+  },
+  {
+    "a": 1,
+    "b": 2,
+    "a_name": "ice",
+    "b_name": "water",
+    "result": 24,
+    "result_name": "glacier"
+  },
+  {
+    "a": 1,
+    "b": 3,
+    "a_name": "ice",
+    "b_name": "lightning",
+    "result": 53,
+    "result_name": "aurora"
+  },
+  {
+    "a": 1,
+    "b": 4,
+    "a_name": "ice",
+    "b_name": "wind",
+    "result": 32,
+    "result_name": "winter"
+  },
+  {
+    "a": 1,
+    "b": 5,
+    "a_name": "ice",
+    "b_name": "poison",
+    "result": 45,
+    "result_name": "stasis"
+  },
+  {
+    "a": 1,
+    "b": 6,
+    "a_name": "ice",
+    "b_name": "earth",
+    "result": 39,
+    "result_name": "myth"
+  },
+  {
+    "a": 1,
+    "b": 7,
+    "a_name": "ice",
+    "b_name": "holy",
+    "result": 51,
+    "result_name": "prism"
+  },
+  {
+    "a": 1,
+    "b": 8,
+    "a_name": "ice",
+    "b_name": "unholy",
+    "result": 52,
+    "result_name": "lich"
+  },
+  {
+    "a": 1,
+    "b": 9,
+    "a_name": "ice",
+    "b_name": "shadow",
+    "result": 54,
+    "result_name": "night"
+  },
+  {
+    "a": 2,
+    "b": 2,
+    "a_name": "water",
+    "b_name": "water",
+    "result": 20,
+    "result_name": "ocean"
+  },
+  {
+    "a": 2,
+    "b": 3,
+    "a_name": "water",
+    "b_name": "lightning",
+    "result": 27,
+    "result_name": "current"
+  },
+  {
+    "a": 2,
+    "b": 4,
+    "a_name": "water",
+    "b_name": "wind",
+    "result": 21,
+    "result_name": "mist"
+  },
+  {
+    "a": 2,
+    "b": 5,
+    "a_name": "water",
+    "b_name": "poison",
+    "result": 23,
+    "result_name": "serum"
+  },
+  {
+    "a": 2,
+    "b": 6,
+    "a_name": "water",
+    "b_name": "earth",
+    "result": 22,
+    "result_name": "slime"
+  },
+  {
+    "a": 2,
+    "b": 7,
+    "a_name": "water",
+    "b_name": "holy",
+    "result": 25,
+    "result_name": "anointment"
+  },
+  {
+    "a": 2,
+    "b": 8,
+    "a_name": "water",
+    "b_name": "unholy",
+    "result": 26,
+    "result_name": "blood"
+  },
+  {
+    "a": 2,
+    "b": 9,
+    "a_name": "water",
+    "b_name": "shadow",
+    "result": 28,
+    "result_name": "mirror"
+  },
+  {
+    "a": 3,
+    "b": 3,
+    "a_name": "lightning",
+    "b_name": "lightning",
+    "result": 62,
+    "result_name": "thunder"
+  },
+  {
+    "a": 3,
+    "b": 4,
+    "a_name": "lightning",
+    "b_name": "wind",
+    "result": 35,
+    "result_name": "storm"
+  },
+  {
+    "a": 3,
+    "b": 5,
+    "a_name": "lightning",
+    "b_name": "poison",
+    "result": 48,
+    "result_name": "battery"
+  },
+  {
+    "a": 3,
+    "b": 6,
+    "a_name": "lightning",
+    "b_name": "earth",
+    "result": 42,
+    "result_name": "magnet"
+  },
+  {
+    "a": 3,
+    "b": 7,
+    "a_name": "lightning",
+    "b_name": "holy",
+    "result": 57,
+    "result_name": "vengeance"
+  },
+  {
+    "a": 3,
+    "b": 8,
+    "a_name": "lightning",
+    "b_name": "unholy",
+    "result": 60,
+    "result_name": "reanimation"
+  },
+  {
+    "a": 3,
+    "b": 9,
+    "a_name": "lightning",
+    "b_name": "shadow",
+    "result": 63,
+    "result_name": "ion"
+  },
+  {
+    "a": 4,
+    "b": 4,
+    "a_name": "wind",
+    "b_name": "wind",
+    "result": 29,
+    "result_name": "cloud"
+  },
+  {
+    "a": 4,
+    "b": 5,
+    "a_name": "wind",
+    "b_name": "poison",
+    "result": 31,
+    "result_name": "faerie"
+  },
+  {
+    "a": 4,
+    "b": 6,
+    "a_name": "wind",
+    "b_name": "earth",
+    "result": 30,
+    "result_name": "nomad"
+  },
+  {
+    "a": 4,
+    "b": 7,
+    "a_name": "wind",
+    "b_name": "holy",
+    "result": 33,
+    "result_name": "angel"
+  },
+  {
+    "a": 4,
+    "b": 8,
+    "a_name": "wind",
+    "b_name": "unholy",
+    "result": 34,
+    "result_name": "ghost"
+  },
+  {
+    "a": 4,
+    "b": 9,
+    "a_name": "wind",
+    "b_name": "shadow",
+    "result": 36,
+    "result_name": "ninja"
+  },
+  {
+    "a": 5,
+    "b": 5,
+    "a_name": "poison",
+    "b_name": "poison",
+    "result": 44,
+    "result_name": "evolution"
+  },
+  {
+    "a": 5,
+    "b": 6,
+    "a_name": "poison",
+    "b_name": "earth",
+    "result": 38,
+    "result_name": "spore"
+  },
+  {
+    "a": 5,
+    "b": 7,
+    "a_name": "poison",
+    "b_name": "holy",
+    "result": 46,
+    "result_name": "antidote"
+  },
+  {
+    "a": 5,
+    "b": 8,
+    "a_name": "poison",
+    "b_name": "unholy",
+    "result": 47,
+    "result_name": "blight"
+  },
+  {
+    "a": 5,
+    "b": 9,
+    "a_name": "poison",
+    "b_name": "shadow",
+    "result": 49,
+    "result_name": "assassin"
+  },
+  {
+    "a": 6,
+    "b": 6,
+    "a_name": "earth",
+    "b_name": "earth",
+    "result": 37,
+    "result_name": "life"
+  },
+  {
+    "a": 6,
+    "b": 7,
+    "a_name": "earth",
+    "b_name": "holy",
+    "result": 40,
+    "result_name": "sanctuary"
+  },
+  {
+    "a": 6,
+    "b": 8,
+    "a_name": "earth",
+    "b_name": "unholy",
+    "result": 41,
+    "result_name": "grave"
+  },
+  {
+    "a": 6,
+    "b": 9,
+    "a_name": "earth",
+    "b_name": "shadow",
+    "result": 43,
+    "result_name": "moon"
+  },
+  {
+    "a": 7,
+    "b": 7,
+    "a_name": "holy",
+    "b_name": "holy",
+    "result": 55,
+    "result_name": "divine"
+  },
+  {
+    "a": 7,
+    "b": 8,
+    "a_name": "holy",
+    "b_name": "unholy",
+    "result": 56,
+    "result_name": "zealot"
+  },
+  {
+    "a": 7,
+    "b": 9,
+    "a_name": "holy",
+    "b_name": "shadow",
+    "result": 58,
+    "result_name": "vigilante"
+  },
+  {
+    "a": 8,
+    "b": 8,
+    "a_name": "unholy",
+    "b_name": "unholy",
+    "result": 59,
+    "result_name": "evil"
+  },
+  {
+    "a": 8,
+    "b": 9,
+    "a_name": "unholy",
+    "b_name": "shadow",
+    "result": 61,
+    "result_name": "curse"
+  },
+  {
+    "a": 9,
+    "b": 9,
+    "a_name": "shadow",
+    "b_name": "shadow",
+    "result": 64,
+    "result_name": "dimension"
+  }
+]

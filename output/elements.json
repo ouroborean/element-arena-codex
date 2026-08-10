@@ -1,0 +1,1490 @@
+{
+  "elements": [
+    {
+      "id": 0,
+      "name": "fire",
+      "enum": "FIRE",
+      "display_name": "Fire",
+      "is_base": true,
+      "is_fusion": false,
+      "is_generic": false,
+      "color": "#8a3500"
+    },
+    {
+      "id": 1,
+      "name": "ice",
+      "enum": "ICE",
+      "display_name": "Ice",
+      "is_base": true,
+      "is_fusion": false,
+      "is_generic": false,
+      "color": "#4c95ba"
+    },
+    {
+      "id": 2,
+      "name": "water",
+      "enum": "WATER",
+      "display_name": "Water",
+      "is_base": true,
+      "is_fusion": false,
+      "is_generic": false,
+      "color": "#214b8b"
+    },
+    {
+      "id": 3,
+      "name": "lightning",
+      "enum": "LIGHTNING",
+      "display_name": "Lightning",
+      "is_base": true,
+      "is_fusion": false,
+      "is_generic": false,
+      "color": "#5b367c"
+    },
+    {
+      "id": 4,
+      "name": "wind",
+      "enum": "WIND",
+      "display_name": "Wind",
+      "is_base": true,
+      "is_fusion": false,
+      "is_generic": false,
+      "color": "#747678"
+    },
+    {
+      "id": 5,
+      "name": "poison",
+      "enum": "POISON",
+      "display_name": "Poison",
+      "is_base": true,
+      "is_fusion": false,
+      "is_generic": false,
+      "color": "#4f845c"
+    },
+    {
+      "id": 6,
+      "name": "earth",
+      "enum": "EARTH",
+      "display_name": "Earth",
+      "is_base": true,
+      "is_fusion": false,
+      "is_generic": false,
+      "color": "#4a2f1c"
+    },
+    {
+      "id": 7,
+      "name": "holy",
+      "enum": "HOLY",
+      "display_name": "Holy",
+      "is_base": true,
+      "is_fusion": false,
+      "is_generic": false,
+      "color": "#766c31"
+    },
+    {
+      "id": 8,
+      "name": "unholy",
+      "enum": "UNHOLY",
+      "display_name": "Unholy",
+      "is_base": true,
+      "is_fusion": false,
+      "is_generic": false,
+      "color": "#440002"
+    },
+    {
+      "id": 9,
+      "name": "shadow",
+      "enum": "SHADOW",
+      "display_name": "Shadow",
+      "is_base": true,
+      "is_fusion": false,
+      "is_generic": false,
+      "color": "#2f2d27"
+    },
+    {
+      "id": 10,
+      "name": "dragon",
+      "enum": "DRAGON",
+      "display_name": "Dragon",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 0,
+          "b": 0,
+          "a_name": "fire",
+          "b_name": "fire"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "name": "alchemy",
+      "enum": "ALCHEMY",
+      "display_name": "Alchemy",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 0,
+          "b": 2,
+          "a_name": "fire",
+          "b_name": "water"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "name": "mechanic",
+      "enum": "MECHANIC",
+      "display_name": "Mechanic",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 0,
+          "b": 4,
+          "a_name": "fire",
+          "b_name": "wind"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "name": "sun",
+      "enum": "SUN",
+      "display_name": "Sun",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 0,
+          "b": 6,
+          "a_name": "fire",
+          "b_name": "earth"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "name": "brimstone",
+      "enum": "BRIMSTONE",
+      "display_name": "Brimstone",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 0,
+          "b": 5,
+          "a_name": "fire",
+          "b_name": "poison"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "name": "apocalypse",
+      "enum": "APOCALYPSE",
+      "display_name": "Apocalypse",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 0,
+          "b": 1,
+          "a_name": "fire",
+          "b_name": "ice"
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "name": "judgment",
+      "enum": "JUDGMENT",
+      "display_name": "Judgment",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 0,
+          "b": 7,
+          "a_name": "fire",
+          "b_name": "holy"
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "name": "devil",
+      "enum": "DEVIL",
+      "display_name": "Devil",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 0,
+          "b": 8,
+          "a_name": "fire",
+          "b_name": "unholy"
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "name": "plasma",
+      "enum": "PLASMA",
+      "display_name": "Plasma",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 0,
+          "b": 3,
+          "a_name": "fire",
+          "b_name": "lightning"
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "name": "ritual",
+      "enum": "RITUAL",
+      "display_name": "Ritual",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 0,
+          "b": 9,
+          "a_name": "fire",
+          "b_name": "shadow"
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "name": "ocean",
+      "enum": "OCEAN",
+      "display_name": "Ocean",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 2,
+          "b": 2,
+          "a_name": "water",
+          "b_name": "water"
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "name": "mist",
+      "enum": "MIST",
+      "display_name": "Mist",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 2,
+          "b": 4,
+          "a_name": "water",
+          "b_name": "wind"
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "name": "slime",
+      "enum": "SLIME",
+      "display_name": "Slime",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 2,
+          "b": 6,
+          "a_name": "water",
+          "b_name": "earth"
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "name": "serum",
+      "enum": "SERUM",
+      "display_name": "Serum",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 2,
+          "b": 5,
+          "a_name": "water",
+          "b_name": "poison"
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "name": "glacier",
+      "enum": "GLACIER",
+      "display_name": "Glacier",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 1,
+          "b": 2,
+          "a_name": "ice",
+          "b_name": "water"
+        }
+      ]
+    },
+    {
+      "id": 25,
+      "name": "anointment",
+      "enum": "ANOINTMENT",
+      "display_name": "Anointment",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 2,
+          "b": 7,
+          "a_name": "water",
+          "b_name": "holy"
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "name": "blood",
+      "enum": "BLOOD",
+      "display_name": "Blood",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 2,
+          "b": 8,
+          "a_name": "water",
+          "b_name": "unholy"
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "name": "current",
+      "enum": "CURRENT",
+      "display_name": "Current",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 2,
+          "b": 3,
+          "a_name": "water",
+          "b_name": "lightning"
+        }
+      ]
+    },
+    {
+      "id": 28,
+      "name": "mirror",
+      "enum": "MIRROR",
+      "display_name": "Mirror",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 2,
+          "b": 9,
+          "a_name": "water",
+          "b_name": "shadow"
+        }
+      ]
+    },
+    {
+      "id": 29,
+      "name": "cloud",
+      "enum": "CLOUD",
+      "display_name": "Cloud",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 4,
+          "b": 4,
+          "a_name": "wind",
+          "b_name": "wind"
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "name": "nomad",
+      "enum": "NOMAD",
+      "display_name": "Nomad",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 4,
+          "b": 6,
+          "a_name": "wind",
+          "b_name": "earth"
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "name": "faerie",
+      "enum": "FAERIE",
+      "display_name": "Faerie",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 4,
+          "b": 5,
+          "a_name": "wind",
+          "b_name": "poison"
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "name": "winter",
+      "enum": "WINTER",
+      "display_name": "Winter",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 1,
+          "b": 4,
+          "a_name": "ice",
+          "b_name": "wind"
+        }
+      ]
+    },
+    {
+      "id": 33,
+      "name": "angel",
+      "enum": "ANGEL",
+      "display_name": "Angel",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 4,
+          "b": 7,
+          "a_name": "wind",
+          "b_name": "holy"
+        }
+      ]
+    },
+    {
+      "id": 34,
+      "name": "ghost",
+      "enum": "GHOST",
+      "display_name": "Ghost",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 4,
+          "b": 8,
+          "a_name": "wind",
+          "b_name": "unholy"
+        }
+      ]
+    },
+    {
+      "id": 35,
+      "name": "storm",
+      "enum": "STORM",
+      "display_name": "Storm",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 3,
+          "b": 4,
+          "a_name": "lightning",
+          "b_name": "wind"
+        }
+      ]
+    },
+    {
+      "id": 36,
+      "name": "ninja",
+      "enum": "NINJA",
+      "display_name": "Ninja",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 4,
+          "b": 9,
+          "a_name": "wind",
+          "b_name": "shadow"
+        }
+      ]
+    },
+    {
+      "id": 37,
+      "name": "life",
+      "enum": "LIFE",
+      "display_name": "Life",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 6,
+          "b": 6,
+          "a_name": "earth",
+          "b_name": "earth"
+        }
+      ]
+    },
+    {
+      "id": 38,
+      "name": "spore",
+      "enum": "SPORE",
+      "display_name": "Spore",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 5,
+          "b": 6,
+          "a_name": "poison",
+          "b_name": "earth"
+        }
+      ]
+    },
+    {
+      "id": 39,
+      "name": "myth",
+      "enum": "MYTH",
+      "display_name": "Myth",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 1,
+          "b": 6,
+          "a_name": "ice",
+          "b_name": "earth"
+        }
+      ]
+    },
+    {
+      "id": 40,
+      "name": "sanctuary",
+      "enum": "SANCTUARY",
+      "display_name": "Sanctuary",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 6,
+          "b": 7,
+          "a_name": "earth",
+          "b_name": "holy"
+        }
+      ]
+    },
+    {
+      "id": 41,
+      "name": "grave",
+      "enum": "GRAVE",
+      "display_name": "Grave",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 6,
+          "b": 8,
+          "a_name": "earth",
+          "b_name": "unholy"
+        }
+      ]
+    },
+    {
+      "id": 42,
+      "name": "magnet",
+      "enum": "MAGNET",
+      "display_name": "Magnet",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 3,
+          "b": 6,
+          "a_name": "lightning",
+          "b_name": "earth"
+        }
+      ]
+    },
+    {
+      "id": 43,
+      "name": "moon",
+      "enum": "MOON",
+      "display_name": "Moon",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 6,
+          "b": 9,
+          "a_name": "earth",
+          "b_name": "shadow"
+        }
+      ]
+    },
+    {
+      "id": 44,
+      "name": "evolution",
+      "enum": "EVOLUTION",
+      "display_name": "Evolution",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 5,
+          "b": 5,
+          "a_name": "poison",
+          "b_name": "poison"
+        }
+      ]
+    },
+    {
+      "id": 45,
+      "name": "stasis",
+      "enum": "STASIS",
+      "display_name": "Stasis",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 1,
+          "b": 5,
+          "a_name": "ice",
+          "b_name": "poison"
+        }
+      ]
+    },
+    {
+      "id": 46,
+      "name": "antidote",
+      "enum": "ANTIDOTE",
+      "display_name": "Antidote",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 5,
+          "b": 7,
+          "a_name": "poison",
+          "b_name": "holy"
+        }
+      ]
+    },
+    {
+      "id": 47,
+      "name": "blight",
+      "enum": "BLIGHT",
+      "display_name": "Blight",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 5,
+          "b": 8,
+          "a_name": "poison",
+          "b_name": "unholy"
+        }
+      ]
+    },
+    {
+      "id": 48,
+      "name": "battery",
+      "enum": "BATTERY",
+      "display_name": "Battery",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 3,
+          "b": 5,
+          "a_name": "lightning",
+          "b_name": "poison"
+        }
+      ]
+    },
+    {
+      "id": 49,
+      "name": "assassin",
+      "enum": "ASSASSIN",
+      "display_name": "Assassin",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 5,
+          "b": 9,
+          "a_name": "poison",
+          "b_name": "shadow"
+        }
+      ]
+    },
+    {
+      "id": 50,
+      "name": "crystal",
+      "enum": "CRYSTAL",
+      "display_name": "Crystal",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 1,
+          "b": 1,
+          "a_name": "ice",
+          "b_name": "ice"
+        }
+      ]
+    },
+    {
+      "id": 51,
+      "name": "prism",
+      "enum": "PRISM",
+      "display_name": "Prism",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 1,
+          "b": 7,
+          "a_name": "ice",
+          "b_name": "holy"
+        }
+      ]
+    },
+    {
+      "id": 52,
+      "name": "lich",
+      "enum": "LICH",
+      "display_name": "Lich",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 1,
+          "b": 8,
+          "a_name": "ice",
+          "b_name": "unholy"
+        }
+      ]
+    },
+    {
+      "id": 53,
+      "name": "aurora",
+      "enum": "AURORA",
+      "display_name": "Aurora",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 1,
+          "b": 3,
+          "a_name": "ice",
+          "b_name": "lightning"
+        }
+      ]
+    },
+    {
+      "id": 54,
+      "name": "night",
+      "enum": "NIGHT",
+      "display_name": "Night",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 1,
+          "b": 9,
+          "a_name": "ice",
+          "b_name": "shadow"
+        }
+      ]
+    },
+    {
+      "id": 55,
+      "name": "divine",
+      "enum": "DIVINE",
+      "display_name": "Divine",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 7,
+          "b": 7,
+          "a_name": "holy",
+          "b_name": "holy"
+        }
+      ]
+    },
+    {
+      "id": 56,
+      "name": "zealot",
+      "enum": "ZEALOT",
+      "display_name": "Zealot",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 7,
+          "b": 8,
+          "a_name": "holy",
+          "b_name": "unholy"
+        }
+      ]
+    },
+    {
+      "id": 57,
+      "name": "vengeance",
+      "enum": "VENGEANCE",
+      "display_name": "Vengeance",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 3,
+          "b": 7,
+          "a_name": "lightning",
+          "b_name": "holy"
+        }
+      ]
+    },
+    {
+      "id": 58,
+      "name": "vigilante",
+      "enum": "VIGILANTE",
+      "display_name": "Vigilante",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 7,
+          "b": 9,
+          "a_name": "holy",
+          "b_name": "shadow"
+        }
+      ]
+    },
+    {
+      "id": 59,
+      "name": "evil",
+      "enum": "EVIL",
+      "display_name": "Evil",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 8,
+          "b": 8,
+          "a_name": "unholy",
+          "b_name": "unholy"
+        }
+      ]
+    },
+    {
+      "id": 60,
+      "name": "reanimation",
+      "enum": "REANIMATION",
+      "display_name": "Reanimation",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 3,
+          "b": 8,
+          "a_name": "lightning",
+          "b_name": "unholy"
+        }
+      ]
+    },
+    {
+      "id": 61,
+      "name": "curse",
+      "enum": "CURSE",
+      "display_name": "Curse",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 8,
+          "b": 9,
+          "a_name": "unholy",
+          "b_name": "shadow"
+        }
+      ]
+    },
+    {
+      "id": 62,
+      "name": "thunder",
+      "enum": "THUNDER",
+      "display_name": "Thunder",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 3,
+          "b": 3,
+          "a_name": "lightning",
+          "b_name": "lightning"
+        }
+      ]
+    },
+    {
+      "id": 63,
+      "name": "ion",
+      "enum": "ION",
+      "display_name": "Ion",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 3,
+          "b": 9,
+          "a_name": "lightning",
+          "b_name": "shadow"
+        }
+      ]
+    },
+    {
+      "id": 64,
+      "name": "dimension",
+      "enum": "DIMENSION",
+      "display_name": "Dimension",
+      "is_base": false,
+      "is_fusion": true,
+      "is_generic": false,
+      "components": [
+        {
+          "a": 9,
+          "b": 9,
+          "a_name": "shadow",
+          "b_name": "shadow"
+        }
+      ]
+    },
+    {
+      "id": 65,
+      "name": "generic",
+      "enum": "GENERIC",
+      "display_name": "Generic",
+      "is_base": false,
+      "is_fusion": false,
+      "is_generic": true
+    }
+  ],
+  "fusion_recipes": [
+    {
+      "a": 0,
+      "b": 0,
+      "a_name": "fire",
+      "b_name": "fire",
+      "result": 10,
+      "result_name": "dragon"
+    },
+    {
+      "a": 0,
+      "b": 1,
+      "a_name": "fire",
+      "b_name": "ice",
+      "result": 15,
+      "result_name": "apocalypse"
+    },
+    {
+      "a": 0,
+      "b": 2,
+      "a_name": "fire",
+      "b_name": "water",
+      "result": 11,
+      "result_name": "alchemy"
+    },
+    {
+      "a": 0,
+      "b": 3,
+      "a_name": "fire",
+      "b_name": "lightning",
+      "result": 18,
+      "result_name": "plasma"
+    },
+    {
+      "a": 0,
+      "b": 4,
+      "a_name": "fire",
+      "b_name": "wind",
+      "result": 12,
+      "result_name": "mechanic"
+    },
+    {
+      "a": 0,
+      "b": 5,
+      "a_name": "fire",
+      "b_name": "poison",
+      "result": 14,
+      "result_name": "brimstone"
+    },
+    {
+      "a": 0,
+      "b": 6,
+      "a_name": "fire",
+      "b_name": "earth",
+      "result": 13,
+      "result_name": "sun"
+    },
+    {
+      "a": 0,
+      "b": 7,
+      "a_name": "fire",
+      "b_name": "holy",
+      "result": 16,
+      "result_name": "judgment"
+    },
+    {
+      "a": 0,
+      "b": 8,
+      "a_name": "fire",
+      "b_name": "unholy",
+      "result": 17,
+      "result_name": "devil"
+    },
+    {
+      "a": 0,
+      "b": 9,
+      "a_name": "fire",
+      "b_name": "shadow",
+      "result": 19,
+      "result_name": "ritual"
+    },
+    {
+      "a": 1,
+      "b": 1,
+      "a_name": "ice",
+      "b_name": "ice",
+      "result": 50,
+      "result_name": "crystal"
+    },
+    {
+      "a": 1,
+      "b": 2,
+      "a_name": "ice",
+      "b_name": "water",
+      "result": 24,
+      "result_name": "glacier"
+    },
+    {
+      "a": 1,
+      "b": 3,
+      "a_name": "ice",
+      "b_name": "lightning",
+      "result": 53,
+      "result_name": "aurora"
+    },
+    {
+      "a": 1,
+      "b": 4,
+      "a_name": "ice",
+      "b_name": "wind",
+      "result": 32,
+      "result_name": "winter"
+    },
+    {
+      "a": 1,
+      "b": 5,
+      "a_name": "ice",
+      "b_name": "poison",
+      "result": 45,
+      "result_name": "stasis"
+    },
+    {
+      "a": 1,
+      "b": 6,
+      "a_name": "ice",
+      "b_name": "earth",
+      "result": 39,
+      "result_name": "myth"
+    },
+    {
+      "a": 1,
+      "b": 7,
+      "a_name": "ice",
+      "b_name": "holy",
+      "result": 51,
+      "result_name": "prism"
+    },
+    {
+      "a": 1,
+      "b": 8,
+      "a_name": "ice",
+      "b_name": "unholy",
+      "result": 52,
+      "result_name": "lich"
+    },
+    {
+      "a": 1,
+      "b": 9,
+      "a_name": "ice",
+      "b_name": "shadow",
+      "result": 54,
+      "result_name": "night"
+    },
+    {
+      "a": 2,
+      "b": 2,
+      "a_name": "water",
+      "b_name": "water",
+      "result": 20,
+      "result_name": "ocean"
+    },
+    {
+      "a": 2,
+      "b": 3,
+      "a_name": "water",
+      "b_name": "lightning",
+      "result": 27,
+      "result_name": "current"
+    },
+    {
+      "a": 2,
+      "b": 4,
+      "a_name": "water",
+      "b_name": "wind",
+      "result": 21,
+      "result_name": "mist"
+    },
+    {
+      "a": 2,
+      "b": 5,
+      "a_name": "water",
+      "b_name": "poison",
+      "result": 23,
+      "result_name": "serum"
+    },
+    {
+      "a": 2,
+      "b": 6,
+      "a_name": "water",
+      "b_name": "earth",
+      "result": 22,
+      "result_name": "slime"
+    },
+    {
+      "a": 2,
+      "b": 7,
+      "a_name": "water",
+      "b_name": "holy",
+      "result": 25,
+      "result_name": "anointment"
+    },
+    {
+      "a": 2,
+      "b": 8,
+      "a_name": "water",
+      "b_name": "unholy",
+      "result": 26,
+      "result_name": "blood"
+    },
+    {
+      "a": 2,
+      "b": 9,
+      "a_name": "water",
+      "b_name": "shadow",
+      "result": 28,
+      "result_name": "mirror"
+    },
+    {
+      "a": 3,
+      "b": 3,
+      "a_name": "lightning",
+      "b_name": "lightning",
+      "result": 62,
+      "result_name": "thunder"
+    },
+    {
+      "a": 3,
+      "b": 4,
+      "a_name": "lightning",
+      "b_name": "wind",
+      "result": 35,
+      "result_name": "storm"
+    },
+    {
+      "a": 3,
+      "b": 5,
+      "a_name": "lightning",
+      "b_name": "poison",
+      "result": 48,
+      "result_name": "battery"
+    },
+    {
+      "a": 3,
+      "b": 6,
+      "a_name": "lightning",
+      "b_name": "earth",
+      "result": 42,
+      "result_name": "magnet"
+    },
+    {
+      "a": 3,
+      "b": 7,
+      "a_name": "lightning",
+      "b_name": "holy",
+      "result": 57,
+      "result_name": "vengeance"
+    },
+    {
+      "a": 3,
+      "b": 8,
+      "a_name": "lightning",
+      "b_name": "unholy",
+      "result": 60,
+      "result_name": "reanimation"
+    },
+    {
+      "a": 3,
+      "b": 9,
+      "a_name": "lightning",
+      "b_name": "shadow",
+      "result": 63,
+      "result_name": "ion"
+    },
+    {
+      "a": 4,
+      "b": 4,
+      "a_name": "wind",
+      "b_name": "wind",
+      "result": 29,
+      "result_name": "cloud"
+    },
+    {
+      "a": 4,
+      "b": 5,
+      "a_name": "wind",
+      "b_name": "poison",
+      "result": 31,
+      "result_name": "faerie"
+    },
+    {
+      "a": 4,
+      "b": 6,
+      "a_name": "wind",
+      "b_name": "earth",
+      "result": 30,
+      "result_name": "nomad"
+    },
+    {
+      "a": 4,
+      "b": 7,
+      "a_name": "wind",
+      "b_name": "holy",
+      "result": 33,
+      "result_name": "angel"
+    },
+    {
+      "a": 4,
+      "b": 8,
+      "a_name": "wind",
+      "b_name": "unholy",
+      "result": 34,
+      "result_name": "ghost"
+    },
+    {
+      "a": 4,
+      "b": 9,
+      "a_name": "wind",
+      "b_name": "shadow",
+      "result": 36,
+      "result_name": "ninja"
+    },
+    {
+      "a": 5,
+      "b": 5,
+      "a_name": "poison",
+      "b_name": "poison",
+      "result": 44,
+      "result_name": "evolution"
+    },
+    {
+      "a": 5,
+      "b": 6,
+      "a_name": "poison",
+      "b_name": "earth",
+      "result": 38,
+      "result_name": "spore"
+    },
+    {
+      "a": 5,
+      "b": 7,
+      "a_name": "poison",
+      "b_name": "holy",
+      "result": 46,
+      "result_name": "antidote"
+    },
+    {
+      "a": 5,
+      "b": 8,
+      "a_name": "poison",
+      "b_name": "unholy",
+      "result": 47,
+      "result_name": "blight"
+    },
+    {
+      "a": 5,
+      "b": 9,
+      "a_name": "poison",
+      "b_name": "shadow",
+      "result": 49,
+      "result_name": "assassin"
+    },
+    {
+      "a": 6,
+      "b": 6,
+      "a_name": "earth",
+      "b_name": "earth",
+      "result": 37,
+      "result_name": "life"
+    },
+    {
+      "a": 6,
+      "b": 7,
+      "a_name": "earth",
+      "b_name": "holy",
+      "result": 40,
+      "result_name": "sanctuary"
+    },
+    {
+      "a": 6,
+      "b": 8,
+      "a_name": "earth",
+      "b_name": "unholy",
+      "result": 41,
+      "result_name": "grave"
+    },
+    {
+      "a": 6,
+      "b": 9,
+      "a_name": "earth",
+      "b_name": "shadow",
+      "result": 43,
+      "result_name": "moon"
+    },
+    {
+      "a": 7,
+      "b": 7,
+      "a_name": "holy",
+      "b_name": "holy",
+      "result": 55,
+      "result_name": "divine"
+    },
+    {
+      "a": 7,
+      "b": 8,
+      "a_name": "holy",
+      "b_name": "unholy",
+      "result": 56,
+      "result_name": "zealot"
+    },
+    {
+      "a": 7,
+      "b": 9,
+      "a_name": "holy",
+      "b_name": "shadow",
+      "result": 58,
+      "result_name": "vigilante"
+    },
+    {
+      "a": 8,
+      "b": 8,
+      "a_name": "unholy",
+      "b_name": "unholy",
+      "result": 59,
+      "result_name": "evil"
+    },
+    {
+      "a": 8,
+      "b": 9,
+      "a_name": "unholy",
+      "b_name": "shadow",
+      "result": 61,
+      "result_name": "curse"
+    },
+    {
+      "a": 9,
+      "b": 9,
+      "a_name": "shadow",
+      "b_name": "shadow",
+      "result": 64,
+      "result_name": "dimension"
+    }
+  ]
+}

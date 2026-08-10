@@ -1,0 +1,5624 @@
+{
+  "_meta": {
+    "generator": "data_export/copy_assets.py",
+    "source": "assets/characters",
+    "dest": "assets/characters",
+    "mode": "all",
+    "counts": {
+      "copied": 1105,
+      "already_up_to_date": 0,
+      "import_sidecars_skipped": 1105,
+      "unreferenced_skipped": 0,
+      "images_total": 1105,
+      "db_image_refs": 671,
+      "db_refs_missing_file": 0,
+      "images_not_referenced_by_db": 434
+    }
+  },
+  "by_image": {
+    "assets/characters/ando/ando0.png": [
+      {
+        "type": "skill",
+        "id": "ando0",
+        "name": "Stored Charge"
+      },
+      {
+        "type": "skill",
+        "id": "andoX0",
+        "name": "Stored Charge"
+      },
+      {
+        "type": "skill",
+        "id": "andoX1",
+        "name": "Stored Charge"
+      }
+    ],
+    "assets/characters/ando/ando1.png": [
+      {
+        "type": "skill",
+        "id": "ando1",
+        "name": "Electroblade"
+      }
+    ],
+    "assets/characters/ando/ando2.png": [
+      {
+        "type": "skill",
+        "id": "ando2",
+        "name": "Flash Step"
+      }
+    ],
+    "assets/characters/ando/ando3.png": [
+      {
+        "type": "skill",
+        "id": "ando3",
+        "name": "Expel Energy"
+      }
+    ],
+    "assets/characters/ando/ando4.png": [
+      {
+        "type": "skill",
+        "id": "ando4",
+        "name": "Focus Power"
+      }
+    ],
+    "assets/characters/ando/ando5.png": [
+      {
+        "type": "skill",
+        "id": "ando5",
+        "name": "Overclock"
+      }
+    ],
+    "assets/characters/ando/ando_portrait.png": [],
+    "assets/characters/ando/andoaurora0.png": [
+      {
+        "type": "skill",
+        "id": "andoaurora0",
+        "name": "Modular Core"
+      }
+    ],
+    "assets/characters/ando/andoaurora1.png": [
+      {
+        "type": "skill",
+        "id": "andoaurora1",
+        "name": "Slicing Spectrum"
+      }
+    ],
+    "assets/characters/ando/andoaurora_portrait.png": [],
+    "assets/characters/ando/andoauroraprof.png": [],
+    "assets/characters/ando/andobattery0.png": [
+      {
+        "type": "skill",
+        "id": "andobattery0",
+        "name": "Capacitor Upgrade"
+      }
+    ],
+    "assets/characters/ando/andobattery1.png": [
+      {
+        "type": "skill",
+        "id": "andobattery1",
+        "name": "Rev"
+      }
+    ],
+    "assets/characters/ando/andobattery_portrait.png": [],
+    "assets/characters/ando/andobatteryprof.png": [],
+    "assets/characters/ando/andocurrent0.png": [
+      {
+        "type": "skill",
+        "id": "andocurrent0",
+        "name": "Conductive Combo"
+      }
+    ],
+    "assets/characters/ando/andocurrent1.png": [
+      {
+        "type": "skill",
+        "id": "andocurrent1",
+        "name": "Rising Geyser"
+      }
+    ],
+    "assets/characters/ando/andocurrent_portrait.png": [],
+    "assets/characters/ando/andocurrentprof.png": [],
+    "assets/characters/ando/andoion0.png": [
+      {
+        "type": "skill",
+        "id": "andoion0",
+        "name": "Ionic Cloaking"
+      }
+    ],
+    "assets/characters/ando/andoion1.png": [
+      {
+        "type": "skill",
+        "id": "andoion1",
+        "name": "Singularity"
+      }
+    ],
+    "assets/characters/ando/andoion_portrait.png": [],
+    "assets/characters/ando/andoionprof.png": [],
+    "assets/characters/ando/andomagnet0.png": [
+      {
+        "type": "skill",
+        "id": "andomagnet0",
+        "name": "Charge Absorption"
+      }
+    ],
+    "assets/characters/ando/andomagnet1.png": [
+      {
+        "type": "skill",
+        "id": "andomagnet1",
+        "name": "Opposites Attract"
+      }
+    ],
+    "assets/characters/ando/andomagnet_portrait.png": [],
+    "assets/characters/ando/andomagnetprof.png": [],
+    "assets/characters/ando/andoplasma0.png": [
+      {
+        "type": "skill",
+        "id": "andoplasma0",
+        "name": "Laser Edge"
+      }
+    ],
+    "assets/characters/ando/andoplasma1.png": [
+      {
+        "type": "skill",
+        "id": "andoplasma1",
+        "name": "Burning Crescent"
+      }
+    ],
+    "assets/characters/ando/andoplasma_portrait.png": [],
+    "assets/characters/ando/andoplasmaprof.png": [],
+    "assets/characters/ando/andoprof.png": [
+      {
+        "type": "character",
+        "id": "ando",
+        "name": "Ando-91"
+      }
+    ],
+    "assets/characters/ando/andoreanimation0.png": [
+      {
+        "type": "skill",
+        "id": "andoreanimation0",
+        "name": "Lightning Revenant"
+      }
+    ],
+    "assets/characters/ando/andoreanimation1.png": [
+      {
+        "type": "skill",
+        "id": "andoreanimation1",
+        "name": "Mannequin Protocol"
+      }
+    ],
+    "assets/characters/ando/andoreanimation_portrait.png": [],
+    "assets/characters/ando/andoreanimationprof.png": [],
+    "assets/characters/ando/andostorm0.png": [
+      {
+        "type": "skill",
+        "id": "andostorm0",
+        "name": "Erratic Programming"
+      }
+    ],
+    "assets/characters/ando/andostorm1.png": [
+      {
+        "type": "skill",
+        "id": "andostorm1",
+        "name": "Tempest"
+      }
+    ],
+    "assets/characters/ando/andostorm_portrait.png": [],
+    "assets/characters/ando/andostormprof.png": [],
+    "assets/characters/ando/andothunder0.png": [
+      {
+        "type": "skill",
+        "id": "andothunder0",
+        "name": "God of Thunder"
+      }
+    ],
+    "assets/characters/ando/andothunder1.png": [
+      {
+        "type": "skill",
+        "id": "andothunder1",
+        "name": "Split the Heavens"
+      }
+    ],
+    "assets/characters/ando/andothunder_portrait.png": [],
+    "assets/characters/ando/andothunderprof.png": [],
+    "assets/characters/ando/andovengeance0.png": [
+      {
+        "type": "skill",
+        "id": "andovengeance0",
+        "name": "Silent Avenger"
+      }
+    ],
+    "assets/characters/ando/andovengeance1.png": [
+      {
+        "type": "skill",
+        "id": "andovengeance1",
+        "name": "Penance"
+      }
+    ],
+    "assets/characters/ando/andovengeance_portrait.png": [],
+    "assets/characters/ando/andovengeanceprof.png": [],
+    "assets/characters/aramao/aramao0.png": [
+      {
+        "type": "skill",
+        "id": "aramao0",
+        "name": "Dune Stalker"
+      }
+    ],
+    "assets/characters/aramao/aramao1.png": [
+      {
+        "type": "skill",
+        "id": "aramao1",
+        "name": "Desert Knife"
+      }
+    ],
+    "assets/characters/aramao/aramao2.png": [
+      {
+        "type": "skill",
+        "id": "aramao2",
+        "name": "Sand Quake"
+      }
+    ],
+    "assets/characters/aramao/aramao3.png": [
+      {
+        "type": "skill",
+        "id": "aramao3",
+        "name": "Mirage Trap"
+      }
+    ],
+    "assets/characters/aramao/aramao4.png": [
+      {
+        "type": "skill",
+        "id": "aramao4",
+        "name": "Desert Veil"
+      }
+    ],
+    "assets/characters/aramao/aramao5.png": [
+      {
+        "type": "skill",
+        "id": "aramao5",
+        "name": "Heart of the Desert"
+      }
+    ],
+    "assets/characters/aramao/aramao6.png": [
+      {
+        "type": "skill",
+        "id": "aramao6",
+        "name": "Trial of the Sands"
+      }
+    ],
+    "assets/characters/aramao/aramao_portrait.png": [],
+    "assets/characters/aramao/aramaoprof.png": [
+      {
+        "type": "character",
+        "id": "aramao",
+        "name": "Aramao, Spectre of the Sands"
+      }
+    ],
+    "assets/characters/ayana/ayana0.png": [
+      {
+        "type": "skill",
+        "id": "ayana0",
+        "name": "Revered Daughter"
+      }
+    ],
+    "assets/characters/ayana/ayana1.png": [
+      {
+        "type": "skill",
+        "id": "ayana1",
+        "name": "Voice of Light"
+      }
+    ],
+    "assets/characters/ayana/ayana2.png": [
+      {
+        "type": "skill",
+        "id": "ayana2",
+        "name": "Chorus"
+      }
+    ],
+    "assets/characters/ayana/ayana3.png": [
+      {
+        "type": "skill",
+        "id": "ayana3",
+        "name": "Prayer"
+      }
+    ],
+    "assets/characters/ayana/ayana4.png": [
+      {
+        "type": "skill",
+        "id": "ayana4",
+        "name": "Cloister"
+      }
+    ],
+    "assets/characters/ayana/ayana5.png": [
+      {
+        "type": "skill",
+        "id": "ayana5",
+        "name": "Voice of Glory"
+      }
+    ],
+    "assets/characters/ayana/ayana_portrait.png": [],
+    "assets/characters/ayana/ayanaangel0.png": [
+      {
+        "type": "skill",
+        "id": "ayanaangel0",
+        "name": "Choir On High"
+      }
+    ],
+    "assets/characters/ayana/ayanaangel1.png": [
+      {
+        "type": "skill",
+        "id": "ayanaangel1",
+        "name": "Providence"
+      }
+    ],
+    "assets/characters/ayana/ayanaangel_portrait.png": [],
+    "assets/characters/ayana/ayanaangelprof.png": [],
+    "assets/characters/ayana/ayanaanointment0.png": [
+      {
+        "type": "skill",
+        "id": "ayanaanointment0",
+        "name": "Maiden of Purity"
+      }
+    ],
+    "assets/characters/ayana/ayanaanointment1.png": [
+      {
+        "type": "skill",
+        "id": "ayanaanointment1",
+        "name": "Blessed Leylines"
+      }
+    ],
+    "assets/characters/ayana/ayanaanointment_portrait.png": [],
+    "assets/characters/ayana/ayanaanointmentprof.png": [],
+    "assets/characters/ayana/ayanaantidote0.png": [
+      {
+        "type": "skill",
+        "id": "ayanaantidote0",
+        "name": "Panacea"
+      }
+    ],
+    "assets/characters/ayana/ayanaantidote1.png": [
+      {
+        "type": "skill",
+        "id": "ayanaantidote1",
+        "name": "Healing Hands"
+      }
+    ],
+    "assets/characters/ayana/ayanaantidote_portrait.png": [],
+    "assets/characters/ayana/ayanaantidoteprof.png": [],
+    "assets/characters/ayana/ayanadivine0.png": [
+      {
+        "type": "skill",
+        "id": "ayanadivine0",
+        "name": "Godly Wisdom"
+      }
+    ],
+    "assets/characters/ayana/ayanadivine1.png": [
+      {
+        "type": "skill",
+        "id": "ayanadivine1",
+        "name": "Verse of Ascension"
+      }
+    ],
+    "assets/characters/ayana/ayanadivine_portrait.png": [],
+    "assets/characters/ayana/ayanadivineprof.png": [],
+    "assets/characters/ayana/ayanafull.png": [],
+    "assets/characters/ayana/ayanajudgment0.png": [
+      {
+        "type": "skill",
+        "id": "ayanajudgment0",
+        "name": "Searing Rebuke"
+      }
+    ],
+    "assets/characters/ayana/ayanajudgment1.png": [
+      {
+        "type": "skill",
+        "id": "ayanajudgment1",
+        "name": "Final Word"
+      }
+    ],
+    "assets/characters/ayana/ayanajudgment_portrait.png": [],
+    "assets/characters/ayana/ayanajudgmentprof.png": [],
+    "assets/characters/ayana/ayanaprism0.png": [
+      {
+        "type": "skill",
+        "id": "ayanaprism0",
+        "name": "Illumination"
+      }
+    ],
+    "assets/characters/ayana/ayanaprism1.png": [
+      {
+        "type": "skill",
+        "id": "ayanaprism1",
+        "name": "Prism Sentence"
+      }
+    ],
+    "assets/characters/ayana/ayanaprism_portrait.png": [],
+    "assets/characters/ayana/ayanaprismprof.png": [],
+    "assets/characters/ayana/ayanaprof.png": [
+      {
+        "type": "character",
+        "id": "ayana",
+        "name": "Ayana, Voice of Light"
+      }
+    ],
+    "assets/characters/ayana/ayanasanctuary0.png": [
+      {
+        "type": "skill",
+        "id": "ayanasanctuary0",
+        "name": "Hallowed Footsteps"
+      }
+    ],
+    "assets/characters/ayana/ayanasanctuary1.png": [
+      {
+        "type": "skill",
+        "id": "ayanasanctuary1",
+        "name": "Consecrate"
+      }
+    ],
+    "assets/characters/ayana/ayanasanctuary_portrait.png": [],
+    "assets/characters/ayana/ayanasanctuaryprof.png": [],
+    "assets/characters/ayana/ayanavengeance0.png": [
+      {
+        "type": "skill",
+        "id": "ayanavengeance0",
+        "name": "Divine Ire"
+      }
+    ],
+    "assets/characters/ayana/ayanavengeance1.png": [
+      {
+        "type": "skill",
+        "id": "ayanavengeance1",
+        "name": "Voice of Vengeance"
+      }
+    ],
+    "assets/characters/ayana/ayanavengeance_portrait.png": [],
+    "assets/characters/ayana/ayanavengeanceprof.png": [],
+    "assets/characters/ayana/ayanavigilante0.png": [
+      {
+        "type": "skill",
+        "id": "ayanavigilante0",
+        "name": "Word of the Law"
+      }
+    ],
+    "assets/characters/ayana/ayanavigilante1.png": [
+      {
+        "type": "skill",
+        "id": "ayanavigilante1",
+        "name": "Bounty"
+      }
+    ],
+    "assets/characters/ayana/ayanavigilante_portrait.png": [],
+    "assets/characters/ayana/ayanavigilanteprof.png": [],
+    "assets/characters/ayana/ayanazealot0.png": [
+      {
+        "type": "skill",
+        "id": "ayanazealot0",
+        "name": "Inquisition"
+      }
+    ],
+    "assets/characters/ayana/ayanazealot1.png": [
+      {
+        "type": "skill",
+        "id": "ayanazealot1",
+        "name": "Purge the Wicked"
+      }
+    ],
+    "assets/characters/ayana/ayanazealot_portrait.png": [],
+    "assets/characters/ayana/ayanazealotprof.png": [],
+    "assets/characters/blackknight/base.png": [],
+    "assets/characters/blackknight/blackknight0.png": [
+      {
+        "type": "skill",
+        "id": "blackknight0",
+        "name": "Exile"
+      }
+    ],
+    "assets/characters/blackknight/blackknight1.png": [
+      {
+        "type": "skill",
+        "id": "blackknight1",
+        "name": "Oathbreaker Strike"
+      }
+    ],
+    "assets/characters/blackknight/blackknight2.png": [
+      {
+        "type": "skill",
+        "id": "blackknight2",
+        "name": "Misery"
+      }
+    ],
+    "assets/characters/blackknight/blackknight3.png": [
+      {
+        "type": "skill",
+        "id": "blackknight3",
+        "name": "Unholy Aura"
+      }
+    ],
+    "assets/characters/blackknight/blackknight4.png": [
+      {
+        "type": "skill",
+        "id": "blackknight4",
+        "name": "Dead or Alive"
+      }
+    ],
+    "assets/characters/blackknight/blackknight5.png": [
+      {
+        "type": "skill",
+        "id": "blackknight5",
+        "name": "The Nightmare Rides"
+      }
+    ],
+    "assets/characters/blackknight/blackknight_portrait.png": [],
+    "assets/characters/blackknight/blackknightblight0.png": [
+      {
+        "type": "skill",
+        "id": "blackknightblight0",
+        "name": "Plaguebringer"
+      }
+    ],
+    "assets/characters/blackknight/blackknightblight1.png": [
+      {
+        "type": "skill",
+        "id": "blackknightblight1",
+        "name": "Fester"
+      }
+    ],
+    "assets/characters/blackknight/blackknightblight_portrait.png": [],
+    "assets/characters/blackknight/blackknightblightprof.png": [],
+    "assets/characters/blackknight/blackknightblood0.png": [
+      {
+        "type": "skill",
+        "id": "blackknightblood0",
+        "name": "Lonely Thirst"
+      }
+    ],
+    "assets/characters/blackknight/blackknightblood1.png": [
+      {
+        "type": "skill",
+        "id": "blackknightblood1",
+        "name": "Bloodsoaked Strike"
+      }
+    ],
+    "assets/characters/blackknight/blackknightblood_portrait.png": [],
+    "assets/characters/blackknight/blackknightbloodprof.png": [],
+    "assets/characters/blackknight/blackknightcurse0.png": [
+      {
+        "type": "skill",
+        "id": "blackknightcurse0",
+        "name": "The Onyx Legion"
+      }
+    ],
+    "assets/characters/blackknight/blackknightcurse1.png": [
+      {
+        "type": "skill",
+        "id": "blackknightcurse1",
+        "name": "Curse of Fealty"
+      }
+    ],
+    "assets/characters/blackknight/blackknightcurse_portrait.png": [],
+    "assets/characters/blackknight/blackknightcurseprof.png": [],
+    "assets/characters/blackknight/blackknightdevil0.png": [
+      {
+        "type": "skill",
+        "id": "blackknightdevil0",
+        "name": "Hellfire"
+      }
+    ],
+    "assets/characters/blackknight/blackknightdevil1.png": [
+      {
+        "type": "skill",
+        "id": "blackknightdevil1",
+        "name": "Infernal Blow"
+      }
+    ],
+    "assets/characters/blackknight/blackknightdevil_portrait.png": [],
+    "assets/characters/blackknight/blackknightdevilprof.png": [],
+    "assets/characters/blackknight/blackknightevil0.png": [
+      {
+        "type": "skill",
+        "id": "blackknightevil0",
+        "name": "Merciless"
+      }
+    ],
+    "assets/characters/blackknight/blackknightevil1.png": [
+      {
+        "type": "skill",
+        "id": "blackknightevil1",
+        "name": "Horrify"
+      }
+    ],
+    "assets/characters/blackknight/blackknightevil_portrait.png": [],
+    "assets/characters/blackknight/blackknightevilprof.png": [],
+    "assets/characters/blackknight/blackknightghost0.png": [
+      {
+        "type": "skill",
+        "id": "blackknightghost0",
+        "name": "Ethereal Form"
+      }
+    ],
+    "assets/characters/blackknight/blackknightghost1.png": [
+      {
+        "type": "skill",
+        "id": "blackknightghost1",
+        "name": "Ghostblade"
+      }
+    ],
+    "assets/characters/blackknight/blackknightghost_portrait.png": [],
+    "assets/characters/blackknight/blackknightghostprof.png": [],
+    "assets/characters/blackknight/blackknightgrave0.png": [
+      {
+        "type": "skill",
+        "id": "blackknightgrave0",
+        "name": "Gravekeeper"
+      }
+    ],
+    "assets/characters/blackknight/blackknightgrave1.png": [
+      {
+        "type": "skill",
+        "id": "blackknightgrave1",
+        "name": "Bury"
+      }
+    ],
+    "assets/characters/blackknight/blackknightgrave_portrait.png": [],
+    "assets/characters/blackknight/blackknightgraveprof.png": [],
+    "assets/characters/blackknight/blackknightlich0.png": [
+      {
+        "type": "skill",
+        "id": "blackknightlich0",
+        "name": "Legion of the Damned"
+      }
+    ],
+    "assets/characters/blackknight/blackknightlich1.png": [
+      {
+        "type": "skill",
+        "id": "blackknightlich1",
+        "name": "Boneshape"
+      }
+    ],
+    "assets/characters/blackknight/blackknightlich_portrait.png": [],
+    "assets/characters/blackknight/blackknightlichprof.png": [],
+    "assets/characters/blackknight/blackknightprof.png": [
+      {
+        "type": "character",
+        "id": "blackknight",
+        "name": "The Black Knight"
+      }
+    ],
+    "assets/characters/blackknight/blackknightreanimation0.png": [
+      {
+        "type": "skill",
+        "id": "blackknightreanimation0",
+        "name": "Unflinching Thrall"
+      }
+    ],
+    "assets/characters/blackknight/blackknightreanimation1.png": [
+      {
+        "type": "skill",
+        "id": "blackknightreanimation1",
+        "name": "Reanimate"
+      }
+    ],
+    "assets/characters/blackknight/blackknightreanimation_portrait.png": [],
+    "assets/characters/blackknight/blackknightreanimationprof.png": [],
+    "assets/characters/blackknight/blackknightzealot0.png": [
+      {
+        "type": "skill",
+        "id": "blackknightzealot0",
+        "name": "Hunger for Battle"
+      }
+    ],
+    "assets/characters/blackknight/blackknightzealot1.png": [
+      {
+        "type": "skill",
+        "id": "blackknightzealot1",
+        "name": "Fervor"
+      }
+    ],
+    "assets/characters/blackknight/blackknightzealot_portrait.png": [],
+    "assets/characters/blackknight/blackknightzealotprof.png": [],
+    "assets/characters/darkness/darkness_portrait.png": [],
+    "assets/characters/dennis/dennis0.png": [
+      {
+        "type": "skill",
+        "id": "dennis0",
+        "name": "Pain Tolerance"
+      }
+    ],
+    "assets/characters/dennis/dennis1.png": [
+      {
+        "type": "skill",
+        "id": "dennis1",
+        "name": "Big Green Fist"
+      }
+    ],
+    "assets/characters/dennis/dennis2.png": [
+      {
+        "type": "skill",
+        "id": "dennis2",
+        "name": "HS-112 Fury Serum"
+      }
+    ],
+    "assets/characters/dennis/dennis3.png": [
+      {
+        "type": "skill",
+        "id": "dennis3",
+        "name": "HS-46 Ascendant Serum"
+      }
+    ],
+    "assets/characters/dennis/dennis4.png": [
+      {
+        "type": "skill",
+        "id": "dennis4",
+        "name": "Shared Agony"
+      }
+    ],
+    "assets/characters/dennis/dennis5.png": [
+      {
+        "type": "skill",
+        "id": "dennis5",
+        "name": "HS-88 Reconstitution Serum"
+      }
+    ],
+    "assets/characters/dennis/dennis6.png": [
+      {
+        "type": "skill",
+        "id": "dennis6",
+        "name": "End of Shift"
+      }
+    ],
+    "assets/characters/dennis/dennis_portrait.png": [],
+    "assets/characters/dennis/dennisprof.png": [
+      {
+        "type": "character",
+        "id": "dennis",
+        "name": "Dennis the Apprentice"
+      }
+    ],
+    "assets/characters/fate/fate0.png": [
+      {
+        "type": "skill",
+        "id": "fate0",
+        "name": "Dwindling Flame"
+      }
+    ],
+    "assets/characters/fate/fate1.png": [
+      {
+        "type": "skill",
+        "id": "fate1",
+        "name": "Fox Fire"
+      }
+    ],
+    "assets/characters/fate/fate2.png": [
+      {
+        "type": "skill",
+        "id": "fate2",
+        "name": "Will-o'-wisp"
+      }
+    ],
+    "assets/characters/fate/fate3.png": [
+      {
+        "type": "skill",
+        "id": "fate3",
+        "name": "Vulpus Incendia"
+      }
+    ],
+    "assets/characters/fate/fate4.png": [
+      {
+        "type": "skill",
+        "id": "fate4",
+        "name": "Vulpus Crystallia"
+      }
+    ],
+    "assets/characters/fate/fate5.png": [
+      {
+        "type": "skill",
+        "id": "fate5",
+        "name": "Fox's Cunning"
+      }
+    ],
+    "assets/characters/fate/fate6.png": [
+      {
+        "type": "skill",
+        "id": "fate6",
+        "name": "This Is Not The End"
+      }
+    ],
+    "assets/characters/fate/fate_portrait.png": [],
+    "assets/characters/fate/fateprof.png": [
+      {
+        "type": "character",
+        "id": "fate",
+        "name": "Fate, Reborn Hero"
+      }
+    ],
+    "assets/characters/gaia/gaia0.png": [
+      {
+        "type": "skill",
+        "id": "gaia0",
+        "name": "Yggdrasil's Bounty"
+      }
+    ],
+    "assets/characters/gaia/gaia1.png": [
+      {
+        "type": "skill",
+        "id": "gaia1",
+        "name": "Sprout Seedling"
+      }
+    ],
+    "assets/characters/gaia/gaia2.png": [
+      {
+        "type": "skill",
+        "id": "gaia2",
+        "name": "Worldfist"
+      }
+    ],
+    "assets/characters/gaia/gaia3.png": [
+      {
+        "type": "skill",
+        "id": "gaia3",
+        "name": "Channel Vitality"
+      }
+    ],
+    "assets/characters/gaia/gaia4.png": [
+      {
+        "type": "skill",
+        "id": "gaia4",
+        "name": "Rampart"
+      }
+    ],
+    "assets/characters/gaia/gaia5.png": [
+      {
+        "type": "skill",
+        "id": "gaia5",
+        "name": "Worldmarch"
+      }
+    ],
+    "assets/characters/gaia/gaia_portrait.png": [],
+    "assets/characters/gaia/gaiagrave0.png": [
+      {
+        "type": "skill",
+        "id": "gaiagrave0",
+        "name": "Rotten Vitality"
+      }
+    ],
+    "assets/characters/gaia/gaiagrave1.png": [
+      {
+        "type": "skill",
+        "id": "gaiagrave1",
+        "name": "Decompose"
+      }
+    ],
+    "assets/characters/gaia/gaiagrave_portrait.png": [],
+    "assets/characters/gaia/gaiagraveprof.png": [],
+    "assets/characters/gaia/gaialife0.png": [
+      {
+        "type": "skill",
+        "id": "gaialife0",
+        "name": "Roiling Life"
+      }
+    ],
+    "assets/characters/gaia/gaialife1.png": [
+      {
+        "type": "skill",
+        "id": "gaialife1",
+        "name": "Overgrowth"
+      }
+    ],
+    "assets/characters/gaia/gaialife_portrait.png": [],
+    "assets/characters/gaia/gaialifeprof.png": [],
+    "assets/characters/gaia/gaiamagnet0.png": [
+      {
+        "type": "skill",
+        "id": "gaiamagnet0",
+        "name": "Magnetic Shielding"
+      }
+    ],
+    "assets/characters/gaia/gaiamagnet1.png": [
+      {
+        "type": "skill",
+        "id": "gaiamagnet1",
+        "name": "Ancient Railgun"
+      }
+    ],
+    "assets/characters/gaia/gaiamagnet_portrait.png": [],
+    "assets/characters/gaia/gaiamagnetprof.png": [],
+    "assets/characters/gaia/gaiamoon0.png": [
+      {
+        "type": "skill",
+        "id": "gaiamoon0",
+        "name": "Rising Indignation"
+      }
+    ],
+    "assets/characters/gaia/gaiamoon1.png": [
+      {
+        "type": "skill",
+        "id": "gaiamoon1",
+        "name": "Gaia's Fury"
+      }
+    ],
+    "assets/characters/gaia/gaiamoon_portrait.png": [],
+    "assets/characters/gaia/gaiamoonprof.png": [],
+    "assets/characters/gaia/gaiamyth0.png": [
+      {
+        "type": "skill",
+        "id": "gaiamyth0",
+        "name": "Branch of the World Tree"
+      }
+    ],
+    "assets/characters/gaia/gaiamyth1.png": [
+      {
+        "type": "skill",
+        "id": "gaiamyth1",
+        "name": "Yggdrasil"
+      }
+    ],
+    "assets/characters/gaia/gaiamyth_portrait.png": [],
+    "assets/characters/gaia/gaiamythprof.png": [],
+    "assets/characters/gaia/gaianomad0.png": [
+      {
+        "type": "skill",
+        "id": "gaianomad0",
+        "name": "Oasis"
+      }
+    ],
+    "assets/characters/gaia/gaianomad1.png": [
+      {
+        "type": "skill",
+        "id": "gaianomad1",
+        "name": "Sandstorm"
+      }
+    ],
+    "assets/characters/gaia/gaianomad_portrait.png": [],
+    "assets/characters/gaia/gaianomadprof.png": [],
+    "assets/characters/gaia/gaiaprof.png": [
+      {
+        "type": "character",
+        "id": "gaia",
+        "name": "Gaia Worldsoul"
+      }
+    ],
+    "assets/characters/gaia/gaiasanctuary0.png": [
+      {
+        "type": "skill",
+        "id": "gaiasanctuary0",
+        "name": "Sacred Grove"
+      }
+    ],
+    "assets/characters/gaia/gaiasanctuary1.png": [
+      {
+        "type": "skill",
+        "id": "gaiasanctuary1",
+        "name": "Expel Intruders"
+      }
+    ],
+    "assets/characters/gaia/gaiasanctuary_portrait.png": [],
+    "assets/characters/gaia/gaiasanctuaryprof.png": [],
+    "assets/characters/gaia/gaiaslime0.png": [
+      {
+        "type": "skill",
+        "id": "gaiaslime0",
+        "name": "Nutrient Sludge"
+      }
+    ],
+    "assets/characters/gaia/gaiaslime1.png": [
+      {
+        "type": "skill",
+        "id": "gaiaslime1",
+        "name": "Life From the Loam"
+      }
+    ],
+    "assets/characters/gaia/gaiaslime_portrait.png": [],
+    "assets/characters/gaia/gaiaslimeprof.png": [],
+    "assets/characters/gaia/gaiaspore0.png": [
+      {
+        "type": "skill",
+        "id": "gaiaspore0",
+        "name": "Shroomtender"
+      }
+    ],
+    "assets/characters/gaia/gaiaspore1.png": [
+      {
+        "type": "skill",
+        "id": "gaiaspore1",
+        "name": "Sow the Spores"
+      }
+    ],
+    "assets/characters/gaia/gaiaspore_portrait.png": [],
+    "assets/characters/gaia/gaiasporeprof.png": [],
+    "assets/characters/gaia/gaiasun0.png": [
+      {
+        "type": "skill",
+        "id": "gaiasun0",
+        "name": "Nurturing Light"
+      }
+    ],
+    "assets/characters/gaia/gaiasun1.png": [
+      {
+        "type": "skill",
+        "id": "gaiasun1",
+        "name": "Sunbeam"
+      }
+    ],
+    "assets/characters/gaia/gaiasun_portrait.png": [],
+    "assets/characters/gaia/gaiasunprof.png": [],
+    "assets/characters/galazax/galazax0.png": [
+      {
+        "type": "skill",
+        "id": "galazax0",
+        "name": "The Storm Builds"
+      }
+    ],
+    "assets/characters/galazax/galazax1.png": [
+      {
+        "type": "skill",
+        "id": "galazax1",
+        "name": "The Sky Darkens"
+      }
+    ],
+    "assets/characters/galazax/galazax2.png": [
+      {
+        "type": "skill",
+        "id": "galazax2",
+        "name": "Lightning Strikes"
+      }
+    ],
+    "assets/characters/galazax/galazax3.png": [
+      {
+        "type": "skill",
+        "id": "galazax3",
+        "name": "Pressure Rises"
+      }
+    ],
+    "assets/characters/galazax/galazax4.png": [
+      {
+        "type": "skill",
+        "id": "galazax4",
+        "name": "The Heavens Speak"
+      }
+    ],
+    "assets/characters/galazax/galazax5.png": [
+      {
+        "type": "skill",
+        "id": "galazax5",
+        "name": "Thunder Deafens"
+      }
+    ],
+    "assets/characters/galazax/galazax6.png": [
+      {
+        "type": "skill",
+        "id": "galazax6",
+        "name": "The Vortex Consumes"
+      }
+    ],
+    "assets/characters/galazax/galazax_portrait.png": [],
+    "assets/characters/galazax/galazaxprof.png": [
+      {
+        "type": "character",
+        "id": "galazax",
+        "name": "Galazax, the Coming Storm"
+      }
+    ],
+    "assets/characters/gommar/gommar0.png": [
+      {
+        "type": "skill",
+        "id": "gommar0",
+        "name": "Frost-Covered"
+      }
+    ],
+    "assets/characters/gommar/gommar1.png": [
+      {
+        "type": "skill",
+        "id": "gommar1",
+        "name": "Iceblood Hammer"
+      }
+    ],
+    "assets/characters/gommar/gommar2.png": [
+      {
+        "type": "skill",
+        "id": "gommar2",
+        "name": "Foot of the Mountain"
+      }
+    ],
+    "assets/characters/gommar/gommar3.png": [
+      {
+        "type": "skill",
+        "id": "gommar3",
+        "name": "Breath of the North"
+      }
+    ],
+    "assets/characters/gommar/gommar4.png": [
+      {
+        "type": "skill",
+        "id": "gommar4",
+        "name": "Ice Body"
+      }
+    ],
+    "assets/characters/gommar/gommar5.png": [
+      {
+        "type": "skill",
+        "id": "gommar5",
+        "name": "Absolute Zero"
+      }
+    ],
+    "assets/characters/gommar/gommar_portrait.png": [],
+    "assets/characters/gommar/gommarapocalypse0.png": [
+      {
+        "type": "skill",
+        "id": "gommarapocalypse0",
+        "name": "Forced Adaptation"
+      }
+    ],
+    "assets/characters/gommar/gommarapocalypse1.png": [
+      {
+        "type": "skill",
+        "id": "gommarapocalypse1",
+        "name": "Cold Snap"
+      }
+    ],
+    "assets/characters/gommar/gommarapocalypse_portrait.png": [],
+    "assets/characters/gommar/gommarapocalypseprof.png": [],
+    "assets/characters/gommar/gommaraurora0.png": [
+      {
+        "type": "skill",
+        "id": "gommaraurora0",
+        "name": "Dazzling Lights"
+      }
+    ],
+    "assets/characters/gommar/gommaraurora1.png": [
+      {
+        "type": "skill",
+        "id": "gommaraurora1",
+        "name": "Aurora Veil"
+      }
+    ],
+    "assets/characters/gommar/gommaraurora_portrait.png": [],
+    "assets/characters/gommar/gommarauroraprof.png": [],
+    "assets/characters/gommar/gommarcrystal0.png": [
+      {
+        "type": "skill",
+        "id": "gommarcrystal0",
+        "name": "Frosted Facets"
+      }
+    ],
+    "assets/characters/gommar/gommarcrystal1.png": [
+      {
+        "type": "skill",
+        "id": "gommarcrystal1",
+        "name": "Crystalline Smash"
+      }
+    ],
+    "assets/characters/gommar/gommarcrystal_portrait.png": [],
+    "assets/characters/gommar/gommarcrystalprof.png": [],
+    "assets/characters/gommar/gommarglacier0.png": [
+      {
+        "type": "skill",
+        "id": "gommarglacier0",
+        "name": "Glacial Advance"
+      }
+    ],
+    "assets/characters/gommar/gommarglacier1.png": [
+      {
+        "type": "skill",
+        "id": "gommarglacier1",
+        "name": "Glacier Crash"
+      }
+    ],
+    "assets/characters/gommar/gommarglacier_portrait.png": [],
+    "assets/characters/gommar/gommarglacierprof.png": [],
+    "assets/characters/gommar/gommarlich0.png": [
+      {
+        "type": "skill",
+        "id": "gommarlich0",
+        "name": "Icy Blood"
+      }
+    ],
+    "assets/characters/gommar/gommarlich1.png": [
+      {
+        "type": "skill",
+        "id": "gommarlich1",
+        "name": "Frozen Heart"
+      }
+    ],
+    "assets/characters/gommar/gommarlich_portrait.png": [],
+    "assets/characters/gommar/gommarlichprof.png": [],
+    "assets/characters/gommar/gommarmyth0.png": [
+      {
+        "type": "skill",
+        "id": "gommarmyth0",
+        "name": "Two Crowns"
+      }
+    ],
+    "assets/characters/gommar/gommarmyth1.png": [
+      {
+        "type": "skill",
+        "id": "gommarmyth1",
+        "name": "King's Saddle"
+      }
+    ],
+    "assets/characters/gommar/gommarmyth_portrait.png": [],
+    "assets/characters/gommar/gommarmythprof.png": [],
+    "assets/characters/gommar/gommarnight0.png": [
+      {
+        "type": "skill",
+        "id": "gommarnight0",
+        "name": "Black Ice"
+      }
+    ],
+    "assets/characters/gommar/gommarnight1.png": [
+      {
+        "type": "skill",
+        "id": "gommarnight1",
+        "name": "Midnight Mountain"
+      }
+    ],
+    "assets/characters/gommar/gommarnight_portrait.png": [],
+    "assets/characters/gommar/gommarnightprof.png": [],
+    "assets/characters/gommar/gommarprism0.png": [
+      {
+        "type": "skill",
+        "id": "gommarprism0",
+        "name": "Snowy Glare"
+      }
+    ],
+    "assets/characters/gommar/gommarprism1.png": [
+      {
+        "type": "skill",
+        "id": "gommarprism1",
+        "name": "Dancing Lights"
+      }
+    ],
+    "assets/characters/gommar/gommarprism_portrait.png": [],
+    "assets/characters/gommar/gommarprismprof.png": [],
+    "assets/characters/gommar/gommarprof.png": [
+      {
+        "type": "character",
+        "id": "gommar",
+        "name": "Gommar, Frostfang Chieftain"
+      }
+    ],
+    "assets/characters/gommar/gommarstasis0.png": [
+      {
+        "type": "skill",
+        "id": "gommarstasis0",
+        "name": "Natural Cryogenics"
+      }
+    ],
+    "assets/characters/gommar/gommarstasis1.png": [
+      {
+        "type": "skill",
+        "id": "gommarstasis1",
+        "name": "Keeper of Beasts"
+      }
+    ],
+    "assets/characters/gommar/gommarstasis_portrait.png": [],
+    "assets/characters/gommar/gommarstasisprof.png": [],
+    "assets/characters/gommar/gommarwinter0.png": [
+      {
+        "type": "skill",
+        "id": "gommarwinter0",
+        "name": "Hypothermia"
+      }
+    ],
+    "assets/characters/gommar/gommarwinter1.png": [
+      {
+        "type": "skill",
+        "id": "gommarwinter1",
+        "name": "Howling Gale"
+      }
+    ],
+    "assets/characters/gommar/gommarwinter_portrait.png": [],
+    "assets/characters/gommar/gommarwinterprof.png": [],
+    "assets/characters/hector/hector0.png": [
+      {
+        "type": "skill",
+        "id": "hector0",
+        "name": "Dennis the Apprentice"
+      }
+    ],
+    "assets/characters/hector/hector1.png": [
+      {
+        "type": "skill",
+        "id": "hector1",
+        "name": "Burning Blood Serum"
+      }
+    ],
+    "assets/characters/hector/hector2.png": [
+      {
+        "type": "skill",
+        "id": "hector2",
+        "name": "Stoneseal Serum"
+      }
+    ],
+    "assets/characters/hector/hector3.png": [
+      {
+        "type": "skill",
+        "id": "hector3",
+        "name": "Mindfog Serum"
+      }
+    ],
+    "assets/characters/hector/hector4.png": [
+      {
+        "type": "skill",
+        "id": "hector4",
+        "name": "Protect Me!"
+      }
+    ],
+    "assets/characters/hector/hector5.png": [
+      {
+        "type": "skill",
+        "id": "hector5",
+        "name": "Serum Overload"
+      }
+    ],
+    "assets/characters/hector/hector_portrait.png": [],
+    "assets/characters/hector/hectorantidote0.png": [
+      {
+        "type": "skill",
+        "id": "hectorantidote0",
+        "name": "Cure-All"
+      }
+    ],
+    "assets/characters/hector/hectorantidote1.png": [
+      {
+        "type": "skill",
+        "id": "hectorantidote1",
+        "name": "Inoculation"
+      }
+    ],
+    "assets/characters/hector/hectorantidote_portrait.png": [],
+    "assets/characters/hector/hectorantidoteprof.png": [],
+    "assets/characters/hector/hectorassassin0.png": [
+      {
+        "type": "skill",
+        "id": "hectorassassin0",
+        "name": "Got a Job To Do"
+      }
+    ],
+    "assets/characters/hector/hectorassassin1.png": [
+      {
+        "type": "skill",
+        "id": "hectorassassin1",
+        "name": "To Your Health!"
+      }
+    ],
+    "assets/characters/hector/hectorassassin_portrait.png": [],
+    "assets/characters/hector/hectorassassinprof.png": [],
+    "assets/characters/hector/hectorbattery0.png": [
+      {
+        "type": "skill",
+        "id": "hectorbattery0",
+        "name": "Borrowed Time"
+      }
+    ],
+    "assets/characters/hector/hectorbattery1.png": [
+      {
+        "type": "skill",
+        "id": "hectorbattery1",
+        "name": "Serum Synthesizer"
+      }
+    ],
+    "assets/characters/hector/hectorbattery_portrait.png": [],
+    "assets/characters/hector/hectorbatteryprof.png": [],
+    "assets/characters/hector/hectorblight0.png": [
+      {
+        "type": "skill",
+        "id": "hectorblight0",
+        "name": "Apprenticeborn Pathogen"
+      }
+    ],
+    "assets/characters/hector/hectorblight1.png": [
+      {
+        "type": "skill",
+        "id": "hectorblight1",
+        "name": "Mutated Strain"
+      }
+    ],
+    "assets/characters/hector/hectorblight_portrait.png": [],
+    "assets/characters/hector/hectorblightprof.png": [],
+    "assets/characters/hector/hectorbrimstone0.png": [
+      {
+        "type": "skill",
+        "id": "hectorbrimstone0",
+        "name": "Dennisyphus"
+      }
+    ],
+    "assets/characters/hector/hectorbrimstone1.png": [
+      {
+        "type": "skill",
+        "id": "hectorbrimstone1",
+        "name": "Pulverizing Smash"
+      }
+    ],
+    "assets/characters/hector/hectorbrimstone_portrait.png": [],
+    "assets/characters/hector/hectorbrimstoneprof.png": [],
+    "assets/characters/hector/hectorevolution0.png": [
+      {
+        "type": "skill",
+        "id": "hectorevolution0",
+        "name": "Perfect Form"
+      }
+    ],
+    "assets/characters/hector/hectorevolution1.png": [
+      {
+        "type": "skill",
+        "id": "hectorevolution1",
+        "name": "Morphic Strike"
+      }
+    ],
+    "assets/characters/hector/hectorevolution_portrait.png": [],
+    "assets/characters/hector/hectorevolutionprof.png": [],
+    "assets/characters/hector/hectorfaerie0.png": [
+      {
+        "type": "skill",
+        "id": "hectorfaerie0",
+        "name": "A Dash of Whimsy"
+      }
+    ],
+    "assets/characters/hector/hectorfaerie1.png": [
+      {
+        "type": "skill",
+        "id": "hectorfaerie1",
+        "name": "A Sprinkle of Recklessness"
+      }
+    ],
+    "assets/characters/hector/hectorfaerie_portrait.png": [],
+    "assets/characters/hector/hectorfaerieprof.png": [],
+    "assets/characters/hector/hectorprof.png": [
+      {
+        "type": "character",
+        "id": "hector",
+        "name": "Hector the Injector"
+      }
+    ],
+    "assets/characters/hector/hectorserum0.png": [
+      {
+        "type": "skill",
+        "id": "hectorserum0",
+        "name": "Try the Supply"
+      }
+    ],
+    "assets/characters/hector/hectorserum1.png": [
+      {
+        "type": "skill",
+        "id": "hectorserum1",
+        "name": "Avatar Serum"
+      }
+    ],
+    "assets/characters/hector/hectorserum_portrait.png": [],
+    "assets/characters/hector/hectorserumprof.png": [],
+    "assets/characters/hector/hectorspore0.png": [
+      {
+        "type": "skill",
+        "id": "hectorspore0",
+        "name": "Lingering Spores"
+      }
+    ],
+    "assets/characters/hector/hectorspore1.png": [
+      {
+        "type": "skill",
+        "id": "hectorspore1",
+        "name": "Acceleration Serum"
+      }
+    ],
+    "assets/characters/hector/hectorspore_portrait.png": [],
+    "assets/characters/hector/hectorsporeprof.png": [],
+    "assets/characters/hector/hectorstasis0.png": [
+      {
+        "type": "skill",
+        "id": "hectorstasis0",
+        "name": "Rejuvenation Serum"
+      }
+    ],
+    "assets/characters/hector/hectorstasis1.png": [
+      {
+        "type": "skill",
+        "id": "hectorstasis1",
+        "name": "Rejuvenation Pod"
+      }
+    ],
+    "assets/characters/hector/hectorstasis_portrait.png": [],
+    "assets/characters/hector/hectorstasisprof.png": [],
+    "assets/characters/jarrik/jarrik0.png": [
+      {
+        "type": "skill",
+        "id": "jarrik0",
+        "name": "Cinders"
+      }
+    ],
+    "assets/characters/jarrik/jarrik1.png": [
+      {
+        "type": "skill",
+        "id": "jarrik1",
+        "name": "Blade of Ashes"
+      }
+    ],
+    "assets/characters/jarrik/jarrik2.png": [
+      {
+        "type": "skill",
+        "id": "jarrik2",
+        "name": "Cinderswell"
+      }
+    ],
+    "assets/characters/jarrik/jarrik3.png": [
+      {
+        "type": "skill",
+        "id": "jarrik3",
+        "name": "Call Cinders"
+      }
+    ],
+    "assets/characters/jarrik/jarrik4.png": [
+      {
+        "type": "skill",
+        "id": "jarrik4",
+        "name": "Wall of Sparks"
+      }
+    ],
+    "assets/characters/jarrik/jarrik5.png": [
+      {
+        "type": "skill",
+        "id": "jarrik5",
+        "name": "Blade of Dancing Lights"
+      }
+    ],
+    "assets/characters/jarrik/jarrik_portrait.png": [],
+    "assets/characters/jarrik/jarrikalchemy0.png": [
+      {
+        "type": "skill",
+        "id": "jarrikalchemy0",
+        "name": "Drunken Swordsman"
+      }
+    ],
+    "assets/characters/jarrik/jarrikalchemy1.png": [
+      {
+        "type": "skill",
+        "id": "jarrikalchemy1",
+        "name": "Cindersprig Brew"
+      }
+    ],
+    "assets/characters/jarrik/jarrikalchemy_portrait.png": [],
+    "assets/characters/jarrik/jarrikalchemyprof.png": [],
+    "assets/characters/jarrik/jarrikapocalypse0.png": [
+      {
+        "type": "skill",
+        "id": "jarrikapocalypse0",
+        "name": "Final Breath"
+      }
+    ],
+    "assets/characters/jarrik/jarrikapocalypse1.png": [
+      {
+        "type": "skill",
+        "id": "jarrikapocalypse1",
+        "name": "Last Light"
+      }
+    ],
+    "assets/characters/jarrik/jarrikapocalypse_portrait.png": [],
+    "assets/characters/jarrik/jarrikapocalypseprof.png": [],
+    "assets/characters/jarrik/jarrikbrimstone0.png": [
+      {
+        "type": "skill",
+        "id": "jarrikbrimstone0",
+        "name": "Scorched Flesh"
+      }
+    ],
+    "assets/characters/jarrik/jarrikbrimstone1.png": [
+      {
+        "type": "skill",
+        "id": "jarrikbrimstone1",
+        "name": "Brimsteel Scabbard"
+      }
+    ],
+    "assets/characters/jarrik/jarrikbrimstone_portrait.png": [],
+    "assets/characters/jarrik/jarrikbrimstoneprof.png": [],
+    "assets/characters/jarrik/jarrikdevil0.png": [
+      {
+        "type": "skill",
+        "id": "jarrikdevil0",
+        "name": "Belphegor's Blade"
+      }
+    ],
+    "assets/characters/jarrik/jarrikdevil1.png": [
+      {
+        "type": "skill",
+        "id": "jarrikdevil1",
+        "name": "Chains of Sloth"
+      }
+    ],
+    "assets/characters/jarrik/jarrikdevil_portrait.png": [],
+    "assets/characters/jarrik/jarrikdevilprof.png": [],
+    "assets/characters/jarrik/jarrikdragon0.png": [
+      {
+        "type": "skill",
+        "id": "jarrikdragon0",
+        "name": "Drake Transformation"
+      }
+    ],
+    "assets/characters/jarrik/jarrikdragon1.png": [
+      {
+        "type": "skill",
+        "id": "jarrikdragon1",
+        "name": "Drakken"
+      }
+    ],
+    "assets/characters/jarrik/jarrikdragon_portrait.png": [],
+    "assets/characters/jarrik/jarrikdragonprof.png": [],
+    "assets/characters/jarrik/jarrikjudgment0.png": [
+      {
+        "type": "skill",
+        "id": "jarrikjudgment0",
+        "name": "Pursuit of Justice"
+      }
+    ],
+    "assets/characters/jarrik/jarrikjudgment1.png": [
+      {
+        "type": "skill",
+        "id": "jarrikjudgment1",
+        "name": "Execution Sentence"
+      }
+    ],
+    "assets/characters/jarrik/jarrikjudgment_portrait.png": [],
+    "assets/characters/jarrik/jarrikjudgmentprof.png": [],
+    "assets/characters/jarrik/jarrikmechanic0.png": [
+      {
+        "type": "skill",
+        "id": "jarrikmechanic0",
+        "name": "Blazer Board"
+      }
+    ],
+    "assets/characters/jarrik/jarrikmechanic1.png": [
+      {
+        "type": "skill",
+        "id": "jarrikmechanic1",
+        "name": "Pop Off"
+      }
+    ],
+    "assets/characters/jarrik/jarrikmechanic_portrait.png": [],
+    "assets/characters/jarrik/jarrikmechanicprof.png": [],
+    "assets/characters/jarrik/jarrikplasma0.png": [
+      {
+        "type": "skill",
+        "id": "jarrikplasma0",
+        "name": "Blue Flame Spirits"
+      }
+    ],
+    "assets/characters/jarrik/jarrikplasma1.png": [
+      {
+        "type": "skill",
+        "id": "jarrikplasma1",
+        "name": "Awakener's Spark"
+      }
+    ],
+    "assets/characters/jarrik/jarrikplasma_portrait.png": [],
+    "assets/characters/jarrik/jarrikplasmaprof.png": [],
+    "assets/characters/jarrik/jarrikprof.png": [
+      {
+        "type": "character",
+        "id": "jarrik",
+        "name": "Jarrik Cinderblade"
+      }
+    ],
+    "assets/characters/jarrik/jarrikritual0.png": [
+      {
+        "type": "skill",
+        "id": "jarrikritual0",
+        "name": "Ritual of the Reaper"
+      }
+    ],
+    "assets/characters/jarrik/jarrikritual1.png": [
+      {
+        "type": "skill",
+        "id": "jarrikritual1",
+        "name": "Scythe of Cinders"
+      }
+    ],
+    "assets/characters/jarrik/jarrikritual_portrait.png": [],
+    "assets/characters/jarrik/jarrikritualprof.png": [],
+    "assets/characters/jarrik/jarriksun0.png": [
+      {
+        "type": "skill",
+        "id": "jarriksun0",
+        "name": "Dusken Ascendant"
+      }
+    ],
+    "assets/characters/jarrik/jarriksun1.png": [
+      {
+        "type": "skill",
+        "id": "jarriksun1",
+        "name": "Dawnbreak"
+      }
+    ],
+    "assets/characters/jarrik/jarriksun_portrait.png": [],
+    "assets/characters/jarrik/jarriksunprof.png": [],
+    "assets/characters/keeper/keeper0.png": [
+      {
+        "type": "skill",
+        "id": "keeper0",
+        "name": "Tales to Tell"
+      }
+    ],
+    "assets/characters/keeper/keeper1.png": [
+      {
+        "type": "skill",
+        "id": "keeper1",
+        "name": "Page-turner"
+      }
+    ],
+    "assets/characters/keeper/keeper2.png": [
+      {
+        "type": "skill",
+        "id": "keeper2",
+        "name": "Character Development"
+      }
+    ],
+    "assets/characters/keeper/keeper3.png": [
+      {
+        "type": "skill",
+        "id": "keeper3",
+        "name": "Chronicle Deeds"
+      }
+    ],
+    "assets/characters/keeper/keeper4.png": [
+      {
+        "type": "skill",
+        "id": "keeper4",
+        "name": "Plot Armor"
+      }
+    ],
+    "assets/characters/keeper/keeper5.png": [
+      {
+        "type": "skill",
+        "id": "keeper5",
+        "name": "Hero's Return"
+      }
+    ],
+    "assets/characters/keeper/keeper_portrait.png": [],
+    "assets/characters/keeper/keeperapocalypse0.png": [
+      {
+        "type": "skill",
+        "id": "keeperapocalypse0",
+        "name": "All Is Lost"
+      }
+    ],
+    "assets/characters/keeper/keeperapocalypse1.png": [
+      {
+        "type": "skill",
+        "id": "keeperapocalypse1",
+        "name": "Tale of a Ruined World"
+      }
+    ],
+    "assets/characters/keeper/keeperapocalypse_portrait.png": [],
+    "assets/characters/keeper/keeperapocalypseprof.png": [],
+    "assets/characters/keeper/keeperaurora0.png": [
+      {
+        "type": "skill",
+        "id": "keeperaurora0",
+        "name": "Stellar Story"
+      }
+    ],
+    "assets/characters/keeper/keeperaurora1.png": [
+      {
+        "type": "skill",
+        "id": "keeperaurora1",
+        "name": "Colorful Characters"
+      }
+    ],
+    "assets/characters/keeper/keeperaurora_portrait.png": [],
+    "assets/characters/keeper/keeperauroraprof.png": [],
+    "assets/characters/keeper/keepercrystal0.png": [
+      {
+        "type": "skill",
+        "id": "keepercrystal0",
+        "name": "Chronicle Fragments"
+      }
+    ],
+    "assets/characters/keeper/keepercrystal1.png": [
+      {
+        "type": "skill",
+        "id": "keepercrystal1",
+        "name": "The World Mirror"
+      }
+    ],
+    "assets/characters/keeper/keepercrystal_portrait.png": [],
+    "assets/characters/keeper/keepercrystalprof.png": [],
+    "assets/characters/keeper/keeperglacier0.png": [
+      {
+        "type": "skill",
+        "id": "keeperglacier0",
+        "name": "Glacial Pacing"
+      }
+    ],
+    "assets/characters/keeper/keeperglacier1.png": [
+      {
+        "type": "skill",
+        "id": "keeperglacier1",
+        "name": "Iced Shelf"
+      }
+    ],
+    "assets/characters/keeper/keeperglacier_portrait.png": [],
+    "assets/characters/keeper/keeperglacierprof.png": [],
+    "assets/characters/keeper/keeperlich0.png": [
+      {
+        "type": "skill",
+        "id": "keeperlich0",
+        "name": "Licherature"
+      }
+    ],
+    "assets/characters/keeper/keeperlich1.png": [
+      {
+        "type": "skill",
+        "id": "keeperlich1",
+        "name": "Tale from Beyond"
+      }
+    ],
+    "assets/characters/keeper/keeperlich_portrait.png": [],
+    "assets/characters/keeper/keeperlichprof.png": [],
+    "assets/characters/keeper/keepermyth0.png": [
+      {
+        "type": "skill",
+        "id": "keepermyth0",
+        "name": "Wise Old Man"
+      }
+    ],
+    "assets/characters/keeper/keepermyth1.png": [
+      {
+        "type": "skill",
+        "id": "keepermyth1",
+        "name": "Mentorship"
+      }
+    ],
+    "assets/characters/keeper/keepermyth_portrait.png": [],
+    "assets/characters/keeper/keepermythprof.png": [],
+    "assets/characters/keeper/keepernight0.png": [
+      {
+        "type": "skill",
+        "id": "keepernight0",
+        "name": "Reading in the Dark"
+      }
+    ],
+    "assets/characters/keeper/keepernight1.png": [
+      {
+        "type": "skill",
+        "id": "keepernight1",
+        "name": "Tale of Endless Night"
+      }
+    ],
+    "assets/characters/keeper/keepernight_portrait.png": [],
+    "assets/characters/keeper/keepernightprof.png": [],
+    "assets/characters/keeper/keeperprism0.png": [
+      {
+        "type": "skill",
+        "id": "keeperprism0",
+        "name": "Blinding Reveal"
+      }
+    ],
+    "assets/characters/keeper/keeperprism1.png": [
+      {
+        "type": "skill",
+        "id": "keeperprism1",
+        "name": "Tale of the Coming Dawn"
+      }
+    ],
+    "assets/characters/keeper/keeperprism_portrait.png": [],
+    "assets/characters/keeper/keeperprismprof.png": [],
+    "assets/characters/keeper/keeperprof.png": [
+      {
+        "type": "character",
+        "id": "keeper",
+        "name": "Keeper of Fables"
+      }
+    ],
+    "assets/characters/keeper/keeperstasis0.png": [
+      {
+        "type": "skill",
+        "id": "keeperstasis0",
+        "name": "Modernization"
+      }
+    ],
+    "assets/characters/keeper/keeperstasis1.png": [
+      {
+        "type": "skill",
+        "id": "keeperstasis1",
+        "name": "Tale of a Distant Future"
+      }
+    ],
+    "assets/characters/keeper/keeperstasis_portrait.png": [],
+    "assets/characters/keeper/keeperstasisprof.png": [],
+    "assets/characters/keeper/keeperwinter0.png": [
+      {
+        "type": "skill",
+        "id": "keeperwinter0",
+        "name": "Crackling Hearth"
+      }
+    ],
+    "assets/characters/keeper/keeperwinter1.png": [
+      {
+        "type": "skill",
+        "id": "keeperwinter1",
+        "name": "A Tale of Joy and Wonder"
+      }
+    ],
+    "assets/characters/keeper/keeperwinter_portrait.png": [],
+    "assets/characters/keeper/keeperwinterprof.png": [],
+    "assets/characters/laria/laria0.png": [
+      {
+        "type": "skill",
+        "id": "laria0",
+        "name": "Deepening Shadows"
+      }
+    ],
+    "assets/characters/laria/laria1.png": [
+      {
+        "type": "skill",
+        "id": "laria1",
+        "name": "Nightwrap"
+      }
+    ],
+    "assets/characters/laria/laria2.png": [
+      {
+        "type": "skill",
+        "id": "laria2",
+        "name": "Soothing Night"
+      }
+    ],
+    "assets/characters/laria/laria3.png": [
+      {
+        "type": "skill",
+        "id": "laria3",
+        "name": "Suffocating Night"
+      }
+    ],
+    "assets/characters/laria/laria4.png": [
+      {
+        "type": "skill",
+        "id": "laria4",
+        "name": "Vanish"
+      }
+    ],
+    "assets/characters/laria/laria5.png": [
+      {
+        "type": "skill",
+        "id": "laria5",
+        "name": "Nightfall"
+      }
+    ],
+    "assets/characters/laria/laria_portrait.png": [],
+    "assets/characters/laria/lariaassassin0.png": [
+      {
+        "type": "skill",
+        "id": "lariaassassin0",
+        "name": "Ambush"
+      }
+    ],
+    "assets/characters/laria/lariaassassin1.png": [
+      {
+        "type": "skill",
+        "id": "lariaassassin1",
+        "name": "Severance"
+      }
+    ],
+    "assets/characters/laria/lariaassassin_portrait.png": [],
+    "assets/characters/laria/lariaassassinprof.png": [],
+    "assets/characters/laria/lariacurse0.png": [
+      {
+        "type": "skill",
+        "id": "lariacurse0",
+        "name": "Cursed Shadows"
+      }
+    ],
+    "assets/characters/laria/lariacurse1.png": [
+      {
+        "type": "skill",
+        "id": "lariacurse1",
+        "name": "Curse of Darkness"
+      }
+    ],
+    "assets/characters/laria/lariacurse_portrait.png": [],
+    "assets/characters/laria/lariacurseprof.png": [],
+    "assets/characters/laria/lariadimension0.png": [
+      {
+        "type": "skill",
+        "id": "lariadimension0",
+        "name": "In Between"
+      }
+    ],
+    "assets/characters/laria/lariadimension1.png": [
+      {
+        "type": "skill",
+        "id": "lariadimension1",
+        "name": "Spirit Away"
+      }
+    ],
+    "assets/characters/laria/lariadimension_portrait.png": [],
+    "assets/characters/laria/lariadimensionprof.png": [],
+    "assets/characters/laria/lariaion0.png": [
+      {
+        "type": "skill",
+        "id": "lariaion0",
+        "name": "Dark Matter"
+      }
+    ],
+    "assets/characters/laria/lariaion1.png": [
+      {
+        "type": "skill",
+        "id": "lariaion1",
+        "name": "Dark Matter Beam"
+      }
+    ],
+    "assets/characters/laria/lariaion_portrait.png": [],
+    "assets/characters/laria/lariaionprof.png": [],
+    "assets/characters/laria/lariamirror0.png": [
+      {
+        "type": "skill",
+        "id": "lariamirror0",
+        "name": "Black Reflection"
+      }
+    ],
+    "assets/characters/laria/lariamirror1.png": [
+      {
+        "type": "skill",
+        "id": "lariamirror1",
+        "name": "Shadow Rebound"
+      }
+    ],
+    "assets/characters/laria/lariamirror_portrait.png": [],
+    "assets/characters/laria/lariamirrorprof.png": [],
+    "assets/characters/laria/lariamoon0.png": [
+      {
+        "type": "skill",
+        "id": "lariamoon0",
+        "name": "Full Moon's Night"
+      }
+    ],
+    "assets/characters/laria/lariamoon1.png": [
+      {
+        "type": "skill",
+        "id": "lariamoon1",
+        "name": "Mooncurse"
+      }
+    ],
+    "assets/characters/laria/lariamoon_portrait.png": [],
+    "assets/characters/laria/lariamoonprof.png": [],
+    "assets/characters/laria/larianight0.png": [
+      {
+        "type": "skill",
+        "id": "larianight0",
+        "name": "Deep, Dark Night"
+      }
+    ],
+    "assets/characters/laria/larianight1.png": [
+      {
+        "type": "skill",
+        "id": "larianight1",
+        "name": "Snuff Out"
+      }
+    ],
+    "assets/characters/laria/larianight_portrait.png": [],
+    "assets/characters/laria/larianightprof.png": [],
+    "assets/characters/laria/larianinja0.png": [
+      {
+        "type": "skill",
+        "id": "larianinja0",
+        "name": "Shadow Clones"
+      }
+    ],
+    "assets/characters/laria/larianinja0raw.png": [],
+    "assets/characters/laria/larianinja1.png": [
+      {
+        "type": "skill",
+        "id": "larianinja1",
+        "name": "Shadow Cross"
+      }
+    ],
+    "assets/characters/laria/larianinja_portrait.png": [],
+    "assets/characters/laria/larianinjaprof.png": [],
+    "assets/characters/laria/lariaprof.png": [
+      {
+        "type": "character",
+        "id": "laria",
+        "name": "Laria, Nightcloaked"
+      }
+    ],
+    "assets/characters/laria/lariaritual0.png": [
+      {
+        "type": "skill",
+        "id": "lariaritual0",
+        "name": "Ritual of Culling Night"
+      }
+    ],
+    "assets/characters/laria/lariaritual1.png": [
+      {
+        "type": "skill",
+        "id": "lariaritual1",
+        "name": "Nightcloak Candle"
+      }
+    ],
+    "assets/characters/laria/lariaritual_portrait.png": [],
+    "assets/characters/laria/lariaritualprof.png": [],
+    "assets/characters/laria/lariavigilante0.png": [
+      {
+        "type": "skill",
+        "id": "lariavigilante0",
+        "name": "Evencoin"
+      }
+    ],
+    "assets/characters/laria/lariavigilante1.png": [
+      {
+        "type": "skill",
+        "id": "lariavigilante1",
+        "name": "Midnight Justice"
+      }
+    ],
+    "assets/characters/laria/lariavigilante_portrait.png": [],
+    "assets/characters/laria/lariavigilanteprof.png": [],
+    "assets/characters/maggie/maggie0.png": [
+      {
+        "type": "skill",
+        "id": "maggie0",
+        "name": "Curse of Thorns"
+      }
+    ],
+    "assets/characters/maggie/maggie1.png": [
+      {
+        "type": "skill",
+        "id": "maggie1",
+        "name": "Bramblelash"
+      }
+    ],
+    "assets/characters/maggie/maggie2.png": [
+      {
+        "type": "skill",
+        "id": "maggie2",
+        "name": "Grasping Vines"
+      }
+    ],
+    "assets/characters/maggie/maggie3.png": [
+      {
+        "type": "skill",
+        "id": "maggie3",
+        "name": "Thornburst"
+      }
+    ],
+    "assets/characters/maggie/maggie4.png": [
+      {
+        "type": "skill",
+        "id": "maggie4",
+        "name": "Cursed Resistance"
+      }
+    ],
+    "assets/characters/maggie/maggie5.png": [
+      {
+        "type": "skill",
+        "id": "maggie5",
+        "name": "The Thornborn Witch"
+      }
+    ],
+    "assets/characters/maggie/maggie_portrait.png": [],
+    "assets/characters/maggie/maggieblight0.png": [
+      {
+        "type": "skill",
+        "id": "maggieblight0",
+        "name": "Blighted Witch"
+      }
+    ],
+    "assets/characters/maggie/maggieblight1.png": [
+      {
+        "type": "skill",
+        "id": "maggieblight1",
+        "name": "Bog Witch's Bargain"
+      }
+    ],
+    "assets/characters/maggie/maggieblight_portrait.png": [],
+    "assets/characters/maggie/maggieblightprof.png": [],
+    "assets/characters/maggie/maggieblood0.png": [
+      {
+        "type": "skill",
+        "id": "maggieblood0",
+        "name": "Thorn Siphon"
+      }
+    ],
+    "assets/characters/maggie/maggieblood1.png": [
+      {
+        "type": "skill",
+        "id": "maggieblood1",
+        "name": "Bloodbind"
+      }
+    ],
+    "assets/characters/maggie/maggieblood_portrait.png": [],
+    "assets/characters/maggie/maggiebloodprof.png": [],
+    "assets/characters/maggie/maggiecurse0.png": [
+      {
+        "type": "skill",
+        "id": "maggiecurse0",
+        "name": "Touch of Finality"
+      }
+    ],
+    "assets/characters/maggie/maggiecurse1.png": [
+      {
+        "type": "skill",
+        "id": "maggiecurse1",
+        "name": "Shared Fate"
+      }
+    ],
+    "assets/characters/maggie/maggiecurse_portrait.png": [],
+    "assets/characters/maggie/maggiecurseprof.png": [],
+    "assets/characters/maggie/maggiedevil0.png": [
+      {
+        "type": "skill",
+        "id": "maggiedevil0",
+        "name": "Asmodeus's Promise"
+      }
+    ],
+    "assets/characters/maggie/maggiedevil1.png": [
+      {
+        "type": "skill",
+        "id": "maggiedevil1",
+        "name": "Lust for Power"
+      }
+    ],
+    "assets/characters/maggie/maggiedevil_portrait.png": [],
+    "assets/characters/maggie/maggiedevilprof.png": [],
+    "assets/characters/maggie/maggieevil0.png": [
+      {
+        "type": "skill",
+        "id": "maggieevil0",
+        "name": "Sweet Torment"
+      }
+    ],
+    "assets/characters/maggie/maggieevil1.png": [
+      {
+        "type": "skill",
+        "id": "maggieevil1",
+        "name": "Transferance Contract"
+      }
+    ],
+    "assets/characters/maggie/maggieevil_portrait.png": [],
+    "assets/characters/maggie/maggieevilprof.png": [],
+    "assets/characters/maggie/maggieghost0.png": [
+      {
+        "type": "skill",
+        "id": "maggieghost0",
+        "name": "Spectral Growth"
+      }
+    ],
+    "assets/characters/maggie/maggieghost1.png": [
+      {
+        "type": "skill",
+        "id": "maggieghost1",
+        "name": "Ghostlash"
+      }
+    ],
+    "assets/characters/maggie/maggieghost_portrait.png": [],
+    "assets/characters/maggie/maggieghostprof.png": [],
+    "assets/characters/maggie/maggiegrave0.png": [
+      {
+        "type": "skill",
+        "id": "maggiegrave0",
+        "name": "Graveyard Wanderer"
+      }
+    ],
+    "assets/characters/maggie/maggiegrave1.png": [
+      {
+        "type": "skill",
+        "id": "maggiegrave1",
+        "name": "Bloodrose Offering"
+      }
+    ],
+    "assets/characters/maggie/maggiegrave_portrait.png": [],
+    "assets/characters/maggie/maggiegraveprof.png": [],
+    "assets/characters/maggie/maggielich0.png": [
+      {
+        "type": "skill",
+        "id": "maggielich0",
+        "name": "Lash of Servitude"
+      }
+    ],
+    "assets/characters/maggie/maggielich1.png": [
+      {
+        "type": "skill",
+        "id": "maggielich1",
+        "name": "Icebite Briars"
+      }
+    ],
+    "assets/characters/maggie/maggielich_portrait.png": [],
+    "assets/characters/maggie/maggielichprof.png": [],
+    "assets/characters/maggie/maggieprof.png": [
+      {
+        "type": "character",
+        "id": "maggie",
+        "name": "Maggie Thorncursed"
+      }
+    ],
+    "assets/characters/maggie/maggiereanimation0.png": [
+      {
+        "type": "skill",
+        "id": "maggiereanimation0",
+        "name": "Manipulated Movements"
+      }
+    ],
+    "assets/characters/maggie/maggiereanimation1.png": [
+      {
+        "type": "skill",
+        "id": "maggiereanimation1",
+        "name": "Bloody Marionette"
+      }
+    ],
+    "assets/characters/maggie/maggiereanimation_portrait.png": [],
+    "assets/characters/maggie/maggiereanimationprof.png": [],
+    "assets/characters/maggie/maggiezealot0.png": [
+      {
+        "type": "skill",
+        "id": "maggiezealot0",
+        "name": "Sanguine Craving"
+      }
+    ],
+    "assets/characters/maggie/maggiezealot1.png": [
+      {
+        "type": "skill",
+        "id": "maggiezealot1",
+        "name": "Thousand Lashes"
+      }
+    ],
+    "assets/characters/maggie/maggiezealot_portrait.png": [],
+    "assets/characters/maggie/maggiezealotprof.png": [],
+    "assets/characters/minions/ayanaangelminionprof.png": [
+      {
+        "type": "minion",
+        "id": "ayanaangelminion",
+        "name": "Angel"
+      }
+    ],
+    "assets/characters/minions/blackknightgraveminion11.png": [
+      {
+        "type": "skill",
+        "id": "blackknightgraveminion1",
+        "name": "Arise!"
+      }
+    ],
+    "assets/characters/minions/blackknightgraveminion1prof.png": [
+      {
+        "type": "minion",
+        "id": "blackknightgraveminion",
+        "name": "Grave"
+      }
+    ],
+    "assets/characters/minions/blackknightgraveminion21.png": [
+      {
+        "type": "skill",
+        "id": "blackknightzombieminion1",
+        "name": "Shambling Smash"
+      },
+      {
+        "type": "skill",
+        "id": "rolandzombieminion1",
+        "name": "Shambling Smash"
+      }
+    ],
+    "assets/characters/minions/blackknightgraveminion2prof.png": [
+      {
+        "type": "minion",
+        "id": "blackknightzombieminion",
+        "name": "Zombie"
+      },
+      {
+        "type": "minion",
+        "id": "rolandzombieminion",
+        "name": "Zombie"
+      }
+    ],
+    "assets/characters/minions/blackknightlichminion1.png": [
+      {
+        "type": "skill",
+        "id": "blackknightskeletonminion1",
+        "name": "Bonechill"
+      }
+    ],
+    "assets/characters/minions/blackknightlichminionprof.png": [
+      {
+        "type": "minion",
+        "id": "blackknightskeletonminion",
+        "name": "Skeleton"
+      }
+    ],
+    "assets/characters/minions/gaiaminion1.png": [],
+    "assets/characters/minions/gaiaminion2.png": [],
+    "assets/characters/minions/gaiaminion2prof.png": [
+      {
+        "type": "minion",
+        "id": "gaiaworldsproutminion",
+        "name": "Worldsprout"
+      }
+    ],
+    "assets/characters/minions/gaiaminionprof.png": [
+      {
+        "type": "minion",
+        "id": "gaiaminion",
+        "name": "Seedling"
+      }
+    ],
+    "assets/characters/minions/gaiamoonminion1.png": [
+      {
+        "type": "skill",
+        "id": "gaiafury1",
+        "name": "Killing Frenzy"
+      }
+    ],
+    "assets/characters/minions/gaiamoonminion2.png": [
+      {
+        "type": "skill",
+        "id": "gaiafury2",
+        "name": "Moon Spike"
+      }
+    ],
+    "assets/characters/minions/gaiamoonminionprof.png": [
+      {
+        "type": "minion",
+        "id": "gaiamoonminion",
+        "name": "Gaia's Fury"
+      }
+    ],
+    "assets/characters/minions/gaiamythminion1.png": [
+      {
+        "type": "skill",
+        "id": "gaiaworldtreeminion1",
+        "name": "Fruit of the World Tree"
+      }
+    ],
+    "assets/characters/minions/gaiamythminion2.png": [
+      {
+        "type": "skill",
+        "id": "gaiaworldtreeminion2",
+        "name": "Ancient Roots"
+      }
+    ],
+    "assets/characters/minions/gaiamythminionprof.png": [
+      {
+        "type": "minion",
+        "id": "gaiamythminion",
+        "name": "World Tree"
+      }
+    ],
+    "assets/characters/minions/gaiasporeminion1.png": [
+      {
+        "type": "skill",
+        "id": "gaiamushroomminion1",
+        "name": "Poison Puff"
+      }
+    ],
+    "assets/characters/minions/gaiasporeminionprof.png": [
+      {
+        "type": "minion",
+        "id": "gaiamushroomminion",
+        "name": "Mushroom"
+      }
+    ],
+    "assets/characters/minions/gommarmythminion1.png": [
+      {
+        "type": "skill",
+        "id": "mythminion1",
+        "name": "Sovereign's Howl"
+      }
+    ],
+    "assets/characters/minions/gommarmythminion2.png": [
+      {
+        "type": "skill",
+        "id": "mythminion2",
+        "name": "Might of the Bjorn"
+      }
+    ],
+    "assets/characters/minions/gommarmythminionprof.png": [
+      {
+        "type": "minion",
+        "id": "mythminion",
+        "name": "Bjorn, True King"
+      }
+    ],
+    "assets/characters/minions/gommarstasisminion1.png": [
+      {
+        "type": "skill",
+        "id": "stasisminion1",
+        "name": "Frozen Fangs"
+      }
+    ],
+    "assets/characters/minions/gommarstasisminionprof.png": [
+      {
+        "type": "minion",
+        "id": "stasisminion",
+        "name": "Frozen Beast"
+      }
+    ],
+    "assets/characters/minions/hectorbatteryminion1.png": [
+      {
+        "type": "skill",
+        "id": "batteryminion1",
+        "name": "Synthesize Serum"
+      }
+    ],
+    "assets/characters/minions/hectorbatteryminion2.png": [
+      {
+        "type": "skill",
+        "id": "batteryminion2",
+        "name": "Catalyze Serum"
+      }
+    ],
+    "assets/characters/minions/hectorbatteryminionprof.png": [
+      {
+        "type": "minion",
+        "id": "hectorbatteryminion",
+        "name": "Synthesizer"
+      }
+    ],
+    "assets/characters/minions/hectorminion1.png": [
+      {
+        "type": "skill",
+        "id": "dennis",
+        "name": "Lumbering Smash"
+      }
+    ],
+    "assets/characters/minions/hectorminionprof.png": [
+      {
+        "type": "minion",
+        "id": "hectorminion",
+        "name": "Dennis the Apprentice"
+      }
+    ],
+    "assets/characters/minions/jarrikminion1.png": [
+      {
+        "type": "skill",
+        "id": "cinder1",
+        "name": "Cinder Splash"
+      },
+      {
+        "type": "skill",
+        "id": "largecinder1",
+        "name": "Cinder Splash"
+      }
+    ],
+    "assets/characters/minions/jarrikminionprof.png": [
+      {
+        "type": "minion",
+        "id": "jarriklargeminion",
+        "name": "Large Cinder"
+      },
+      {
+        "type": "minion",
+        "id": "jarrikminion",
+        "name": "Cinderling"
+      }
+    ],
+    "assets/characters/minions/jarrikplasmaminion1.png": [
+      {
+        "type": "skill",
+        "id": "sparkling1",
+        "name": "Awakened Spark"
+      }
+    ],
+    "assets/characters/minions/jarrikplasmaminionprof.png": [
+      {
+        "type": "minion",
+        "id": "jarrikplasmaminion",
+        "name": "Azure Sparkling"
+      }
+    ],
+    "assets/characters/minions/larianinjaminion1.png": [
+      {
+        "type": "skill",
+        "id": "shadowclone1",
+        "name": "Shadow Strike"
+      }
+    ],
+    "assets/characters/minions/larianinjaminionprof.png": [
+      {
+        "type": "minion",
+        "id": "larianinjaminion",
+        "name": "Shadow Clone"
+      }
+    ],
+    "assets/characters/minions/riverdaughterslimeminion1.png": [
+      {
+        "type": "skill",
+        "id": "riverdaughterslimeminion1",
+        "name": "Corrosive Slam"
+      }
+    ],
+    "assets/characters/minions/riverdaughterslimeminionprof.png": [
+      {
+        "type": "minion",
+        "id": "riverdaughterslimeminion",
+        "name": "Slime"
+      }
+    ],
+    "assets/characters/minions/rolandlifeminion1.png": [
+      {
+        "type": "skill",
+        "id": "rolandlivingboulder1",
+        "name": "Living Lash"
+      }
+    ],
+    "assets/characters/minions/rolandminionprof.png": [
+      {
+        "type": "minion",
+        "id": "rolandminion",
+        "name": "Boulder"
+      }
+    ],
+    "assets/characters/minions/rolandmythminion1.png": [
+      {
+        "type": "skill",
+        "id": "rolandstonethrower1",
+        "name": "Hurl"
+      }
+    ],
+    "assets/characters/minions/rolandmythminionprof.png": [
+      {
+        "type": "minion",
+        "id": "rolandmythminion",
+        "name": "Troll Stonethrower"
+      }
+    ],
+    "assets/characters/minions/rolandslimeminionprof.png": [
+      {
+        "type": "minion",
+        "id": "rolandslimeminion",
+        "name": "Slimeball"
+      }
+    ],
+    "assets/characters/minions/rolandsporeminionprof.png": [
+      {
+        "type": "minion",
+        "id": "rolandsporeminion",
+        "name": "Stonecap Mushroom"
+      }
+    ],
+    "assets/characters/minions/sayabatteryminion1.png": [
+      {
+        "type": "skill",
+        "id": "sayabatteryminion1",
+        "name": "Divert Charge"
+      }
+    ],
+    "assets/characters/minions/sayabatteryminionprof.png": [
+      {
+        "type": "minion",
+        "id": "sayabatteryminion",
+        "name": "Saya Cell"
+      }
+    ],
+    "assets/characters/minions/sayareanimationminion11.png": [
+      {
+        "type": "skill",
+        "id": "sayareanimationminion1",
+        "name": "Busy Work"
+      }
+    ],
+    "assets/characters/minions/sayareanimationminion1prof.png": [
+      {
+        "type": "minion",
+        "id": "sayareanimationminion1",
+        "name": "Shady Assistant"
+      }
+    ],
+    "assets/characters/minions/sayareanimationminion21.png": [
+      {
+        "type": "skill",
+        "id": "sayareanimationminion2",
+        "name": "Mad Mash"
+      }
+    ],
+    "assets/characters/minions/sayareanimationminion22.png": [
+      {
+        "type": "skill",
+        "id": "sayareanimationminion3",
+        "name": "Embedded Restoration"
+      }
+    ],
+    "assets/characters/minions/sayareanimationminion2prof.png": [
+      {
+        "type": "minion",
+        "id": "sayareanimationminion2",
+        "name": "Saya-Brand Monstrosity"
+      }
+    ],
+    "assets/characters/minions/seedling1.png": [
+      {
+        "type": "skill",
+        "id": "seedling1",
+        "name": "Channel Earth"
+      }
+    ],
+    "assets/characters/minions/sylfaerieminion1.png": [
+      {
+        "type": "skill",
+        "id": "sylfaerieminion1",
+        "name": "Nettle Strike"
+      }
+    ],
+    "assets/characters/minions/sylfaerieminionprof.png": [
+      {
+        "type": "minion",
+        "id": "sylfaerieminion",
+        "name": "Sparrowrider"
+      }
+    ],
+    "assets/characters/minions/sylminion1.png": [
+      {
+        "type": "skill",
+        "id": "sylminion1",
+        "name": "Talon Rake"
+      }
+    ],
+    "assets/characters/minions/sylminion1prof.png": [
+      {
+        "type": "minion",
+        "id": "sylminion",
+        "name": "Hatchling Eagle"
+      }
+    ],
+    "assets/characters/minions/sylminion2.png": [
+      {
+        "type": "skill",
+        "id": "sylminion2",
+        "name": "Swoop"
+      }
+    ],
+    "assets/characters/minions/sylminion2prof.png": [
+      {
+        "type": "minion",
+        "id": "syladultminion",
+        "name": "Adult Eagle"
+      }
+    ],
+    "assets/characters/minions/sylminion3.png": [
+      {
+        "type": "skill",
+        "id": "sylminion3",
+        "name": "Soar"
+      }
+    ],
+    "assets/characters/minions/sylminion3prof.png": [
+      {
+        "type": "minion",
+        "id": "sylancientminion",
+        "name": "Ancient Eagle"
+      }
+    ],
+    "assets/characters/minions/sylnomadminionprof.png": [
+      {
+        "type": "minion",
+        "id": "sylnomadminion",
+        "name": "Scavenger's Pile"
+      }
+    ],
+    "assets/characters/minions/titaniaminion1.png": [
+      {
+        "type": "skill",
+        "id": "titaniaminion1",
+        "name": "Curry Favor"
+      }
+    ],
+    "assets/characters/minions/titaniaminion2.png": [
+      {
+        "type": "skill",
+        "id": "titaniaminion2",
+        "name": "Diving Slash"
+      }
+    ],
+    "assets/characters/minions/titaniaminionprof.png": [
+      {
+        "type": "minion",
+        "id": "titaniaminion",
+        "name": "Summer Courtesan"
+      }
+    ],
+    "assets/characters/minions/titaniastasisminion1.png": [
+      {
+        "type": "skill",
+        "id": "titaniastasisminion1",
+        "name": "Exile Slash"
+      }
+    ],
+    "assets/characters/minions/titaniastasisminionprof.png": [
+      {
+        "type": "minion",
+        "id": "titaniastasisminion",
+        "name": "Winter Loyalist"
+      }
+    ],
+    "assets/characters/minions/trinity1.png": [
+      {
+        "type": "skill",
+        "id": "trinitycrimson1",
+        "name": "Ruby Lens"
+      }
+    ],
+    "assets/characters/minions/trinity2.png": [
+      {
+        "type": "skill",
+        "id": "trinityazure1",
+        "name": "Sapphire Lens"
+      }
+    ],
+    "assets/characters/minions/trinity3.png": [
+      {
+        "type": "skill",
+        "id": "trinitysaffron1",
+        "name": "Citrine Lens"
+      }
+    ],
+    "assets/characters/minions/trinity4.png": [
+      {
+        "type": "skill",
+        "id": "trinitycrimson3",
+        "name": "Crimson Crash"
+      }
+    ],
+    "assets/characters/minions/trinity5.png": [
+      {
+        "type": "skill",
+        "id": "trinityazure2",
+        "name": "Prisma Whirl"
+      }
+    ],
+    "assets/characters/minions/trinity6.png": [
+      {
+        "type": "skill",
+        "id": "trinitysaffron3",
+        "name": "Saffron Beam"
+      }
+    ],
+    "assets/characters/minions/trinity7.png": [
+      {
+        "type": "skill",
+        "id": "trinitycrimson2",
+        "name": "Prisma Vault"
+      }
+    ],
+    "assets/characters/minions/trinity8.png": [
+      {
+        "type": "skill",
+        "id": "trinityazure3",
+        "name": "Sonata Azure"
+      }
+    ],
+    "assets/characters/minions/trinity9.png": [
+      {
+        "type": "skill",
+        "id": "trinitysaffron2",
+        "name": "Prisma Launch"
+      }
+    ],
+    "assets/characters/minions/trinityazureprof.png": [
+      {
+        "type": "minion",
+        "id": "trinityazureminion",
+        "name": "Prisma Azure"
+      }
+    ],
+    "assets/characters/minions/trinitycrimsonprof.png": [
+      {
+        "type": "minion",
+        "id": "trinitycrimsonminion",
+        "name": "Prisma Crimson"
+      }
+    ],
+    "assets/characters/minions/trinitysaffronprof.png": [
+      {
+        "type": "minion",
+        "id": "trinitysaffronminion",
+        "name": "Prisma Saffron"
+      }
+    ],
+    "assets/characters/minions/worldsprout1.png": [
+      {
+        "type": "skill",
+        "id": "worldsprout1",
+        "name": "Treant Smash"
+      }
+    ],
+    "assets/characters/minions/worldsprout2.png": [
+      {
+        "type": "skill",
+        "id": "worldsprout2",
+        "name": "Vitality Transfer"
+      }
+    ],
+    "assets/characters/minions/xyrisminionprof.png": [
+      {
+        "type": "skill",
+        "id": "xyrisminion1",
+        "name": "Dream Reflection"
+      },
+      {
+        "type": "minion",
+        "id": "xyrisminion",
+        "name": "Dream Reflection"
+      }
+    ],
+    "assets/characters/pyrrha/pyrrha0.png": [
+      {
+        "type": "skill",
+        "id": "pyrrha0",
+        "name": "Burning Up"
+      }
+    ],
+    "assets/characters/pyrrha/pyrrha1.png": [
+      {
+        "type": "skill",
+        "id": "pyrrha1",
+        "name": "Fan the Flames"
+      }
+    ],
+    "assets/characters/pyrrha/pyrrha2.png": [
+      {
+        "type": "skill",
+        "id": "pyrrha2",
+        "name": "Feed the Fire"
+      }
+    ],
+    "assets/characters/pyrrha/pyrrha3.png": [
+      {
+        "type": "skill",
+        "id": "pyrrha3",
+        "name": "Pyrokinesis"
+      }
+    ],
+    "assets/characters/pyrrha/pyrrha4.png": [
+      {
+        "type": "skill",
+        "id": "pyrrha4",
+        "name": "Flashbang"
+      }
+    ],
+    "assets/characters/pyrrha/pyrrha5.png": [
+      {
+        "type": "skill",
+        "id": "pyrrha5",
+        "name": "Wraith in White"
+      }
+    ],
+    "assets/characters/pyrrha/pyrrha_portrait.png": [],
+    "assets/characters/pyrrha/pyrrhaalchemy0.png": [
+      {
+        "type": "skill",
+        "id": "pyrrhaalchemy0",
+        "name": "Alchemist's Fire"
+      }
+    ],
+    "assets/characters/pyrrha/pyrrhaalchemy1.png": [
+      {
+        "type": "skill",
+        "id": "pyrrhaalchemy1",
+        "name": "Bottled Flame"
+      }
+    ],
+    "assets/characters/pyrrha/pyrrhaalchemy_portrait.png": [],
+    "assets/characters/pyrrha/pyrrhaalchemyprof.png": [],
+    "assets/characters/pyrrha/pyrrhaapocalypse0.png": [
+      {
+        "type": "skill",
+        "id": "pyrrhaapocalypse0",
+        "name": "Ice Age"
+      }
+    ],
+    "assets/characters/pyrrha/pyrrhaapocalypse1.png": [
+      {
+        "type": "skill",
+        "id": "pyrrhaapocalypse1",
+        "name": "Extinction Event"
+      }
+    ],
+    "assets/characters/pyrrha/pyrrhaapocalypse_portrait.png": [],
+    "assets/characters/pyrrha/pyrrhaapocalypseprof.png": [],
+    "assets/characters/pyrrha/pyrrhabrimstone_portrait.png": [],
+    "assets/characters/pyrrha/pyrrhabrimstoneprof.png": [],
+    "assets/characters/pyrrha/pyrrhadevil0.png": [
+      {
+        "type": "skill",
+        "id": "pyrrhadevil0",
+        "name": "Flames of Greed"
+      }
+    ],
+    "assets/characters/pyrrha/pyrrhadevil1.png": [
+      {
+        "type": "skill",
+        "id": "pyrrhadevil1",
+        "name": "Mammon's Flame"
+      }
+    ],
+    "assets/characters/pyrrha/pyrrhadevil_portrait.png": [],
+    "assets/characters/pyrrha/pyrrhadevilprof.png": [],
+    "assets/characters/pyrrha/pyrrhadragon0.png": [
+      {
+        "type": "skill",
+        "id": "pyrrhadragon0",
+        "name": "Dragon's Hunger"
+      }
+    ],
+    "assets/characters/pyrrha/pyrrhadragon1.png": [
+      {
+        "type": "skill",
+        "id": "pyrrhadragon1",
+        "name": "Flame of Legends"
+      }
+    ],
+    "assets/characters/pyrrha/pyrrhadragon_portrait.png": [],
+    "assets/characters/pyrrha/pyrrhadragonprof.png": [],
+    "assets/characters/pyrrha/pyrrhagas0.png": [
+      {
+        "type": "skill",
+        "id": "pyrrhabrimstone0",
+        "name": "Festering Burns"
+      }
+    ],
+    "assets/characters/pyrrha/pyrrhagas1.png": [
+      {
+        "type": "skill",
+        "id": "pyrrhabrimstone1",
+        "name": "Sulphur Vent"
+      }
+    ],
+    "assets/characters/pyrrha/pyrrhajudgment0.png": [
+      {
+        "type": "skill",
+        "id": "pyrrhajudgment0",
+        "name": "Flames of Judgment"
+      }
+    ],
+    "assets/characters/pyrrha/pyrrhajudgment1.png": [
+      {
+        "type": "skill",
+        "id": "pyrrhajudgment1",
+        "name": "Judgment Day"
+      }
+    ],
+    "assets/characters/pyrrha/pyrrhajudgment_portrait.png": [],
+    "assets/characters/pyrrha/pyrrhajudgmentprof.png": [],
+    "assets/characters/pyrrha/pyrrhamechanic0.png": [
+      {
+        "type": "skill",
+        "id": "pyrrhamechanic0",
+        "name": "Exhaust Fumes"
+      }
+    ],
+    "assets/characters/pyrrha/pyrrhamechanic1.png": [
+      {
+        "type": "skill",
+        "id": "pyrrhamechanic1",
+        "name": "Blastoff"
+      }
+    ],
+    "assets/characters/pyrrha/pyrrhamechanic_portrait.png": [],
+    "assets/characters/pyrrha/pyrrhamechanicprof.png": [],
+    "assets/characters/pyrrha/pyrrhaplasma0.png": [
+      {
+        "type": "skill",
+        "id": "pyrrhaplasma0",
+        "name": "Burning Plasma"
+      }
+    ],
+    "assets/characters/pyrrha/pyrrhaplasma1.png": [
+      {
+        "type": "skill",
+        "id": "pyrrhaplasma1",
+        "name": "Ivory Cutter"
+      }
+    ],
+    "assets/characters/pyrrha/pyrrhaplasma_portrait.png": [],
+    "assets/characters/pyrrha/pyrrhaplasmaprof.png": [],
+    "assets/characters/pyrrha/pyrrhaprof.png": [
+      {
+        "type": "character",
+        "id": "pyrrha",
+        "name": "Pyrrha, the Mage in Ivory"
+      }
+    ],
+    "assets/characters/pyrrha/pyrrharitual0.png": [
+      {
+        "type": "skill",
+        "id": "pyrrharitual0",
+        "name": "Ritual of Agony"
+      }
+    ],
+    "assets/characters/pyrrha/pyrrharitual1.png": [
+      {
+        "type": "skill",
+        "id": "pyrrharitual1",
+        "name": "Tormentor's Brand"
+      }
+    ],
+    "assets/characters/pyrrha/pyrrharitual_portrait.png": [],
+    "assets/characters/pyrrha/pyrrharitualprof.png": [],
+    "assets/characters/pyrrha/pyrrhasun0.png": [
+      {
+        "type": "skill",
+        "id": "pyrrhasun0",
+        "name": "Solar Flare"
+      }
+    ],
+    "assets/characters/pyrrha/pyrrhasun1.png": [
+      {
+        "type": "skill",
+        "id": "pyrrhasun1",
+        "name": "Scorched Earth"
+      }
+    ],
+    "assets/characters/pyrrha/pyrrhasun_portrait.png": [],
+    "assets/characters/pyrrha/pyrrhasunprof.png": [],
+    "assets/characters/riverdaughter/riverdaughter0.png": [
+      {
+        "type": "skill",
+        "id": "riverdaughter0",
+        "name": "Healing Tears"
+      }
+    ],
+    "assets/characters/riverdaughter/riverdaughter1.png": [
+      {
+        "type": "skill",
+        "id": "riverdaughter1",
+        "name": "Ripple"
+      }
+    ],
+    "assets/characters/riverdaughter/riverdaughter2.png": [
+      {
+        "type": "skill",
+        "id": "riverdaughter2",
+        "name": "Undertow"
+      }
+    ],
+    "assets/characters/riverdaughter/riverdaughter3.png": [
+      {
+        "type": "skill",
+        "id": "riverdaughter3",
+        "name": "River Clone"
+      }
+    ],
+    "assets/characters/riverdaughter/riverdaughter4.png": [
+      {
+        "type": "skill",
+        "id": "riverdaughter4",
+        "name": "Soothe"
+      }
+    ],
+    "assets/characters/riverdaughter/riverdaughter5.png": [
+      {
+        "type": "skill",
+        "id": "riverdaughter5",
+        "name": "Dive"
+      }
+    ],
+    "assets/characters/riverdaughter/riverdaughter_portrait.png": [],
+    "assets/characters/riverdaughter/riverdaughteralchemy0.png": [
+      {
+        "type": "skill",
+        "id": "riverdaughteralchemy0",
+        "name": "Unstable Waters"
+      }
+    ],
+    "assets/characters/riverdaughter/riverdaughteralchemy1.png": [
+      {
+        "type": "skill",
+        "id": "riverdaughteralchemy1",
+        "name": "Mystic Essence"
+      }
+    ],
+    "assets/characters/riverdaughter/riverdaughteralchemy_portrait.png": [],
+    "assets/characters/riverdaughter/riverdaughteralchemyprof.png": [],
+    "assets/characters/riverdaughter/riverdaughteranointment0.png": [
+      {
+        "type": "skill",
+        "id": "riverdaughteranointment0",
+        "name": "Fountain of Youth"
+      }
+    ],
+    "assets/characters/riverdaughter/riverdaughteranointment1.png": [
+      {
+        "type": "skill",
+        "id": "riverdaughteranointment1",
+        "name": "Waters of Life"
+      }
+    ],
+    "assets/characters/riverdaughter/riverdaughteranointment_portrait.png": [],
+    "assets/characters/riverdaughter/riverdaughteranointmentprof.png": [],
+    "assets/characters/riverdaughter/riverdaughterblood0.png": [
+      {
+        "type": "skill",
+        "id": "riverdaughterblood0",
+        "name": "Blood in the Water"
+      }
+    ],
+    "assets/characters/riverdaughter/riverdaughterblood1.png": [
+      {
+        "type": "skill",
+        "id": "riverdaughterblood1",
+        "name": "Run Red"
+      }
+    ],
+    "assets/characters/riverdaughter/riverdaughterblood_portrait.png": [],
+    "assets/characters/riverdaughter/riverdaughterbloodprof.png": [],
+    "assets/characters/riverdaughter/riverdaughtercurrent0.png": [
+      {
+        "type": "skill",
+        "id": "riverdaughtercurrent0",
+        "name": "Conducted Emotion"
+      }
+    ],
+    "assets/characters/riverdaughter/riverdaughtercurrent1.png": [
+      {
+        "type": "skill",
+        "id": "riverdaughtercurrent1",
+        "name": "Catalytic Nova"
+      }
+    ],
+    "assets/characters/riverdaughter/riverdaughtercurrent_portrait.png": [],
+    "assets/characters/riverdaughter/riverdaughtercurrentprof.png": [],
+    "assets/characters/riverdaughter/riverdaughterglacier0.png": [
+      {
+        "type": "skill",
+        "id": "riverdaughterglacier0",
+        "name": "Winter Flow"
+      }
+    ],
+    "assets/characters/riverdaughter/riverdaughterglacier1.png": [
+      {
+        "type": "skill",
+        "id": "riverdaughterglacier1",
+        "name": "Spring Thaw"
+      }
+    ],
+    "assets/characters/riverdaughter/riverdaughterglacier_portrait.png": [],
+    "assets/characters/riverdaughter/riverdaughterglacierprof.png": [],
+    "assets/characters/riverdaughter/riverdaughtermirror0.png": [
+      {
+        "type": "skill",
+        "id": "riverdaughtermirror0",
+        "name": "Reflection of Kindness"
+      }
+    ],
+    "assets/characters/riverdaughter/riverdaughtermirror1.png": [
+      {
+        "type": "skill",
+        "id": "riverdaughtermirror1",
+        "name": "Party Crasher"
+      }
+    ],
+    "assets/characters/riverdaughter/riverdaughtermirror_portrait.png": [],
+    "assets/characters/riverdaughter/riverdaughtermirrorprof.png": [],
+    "assets/characters/riverdaughter/riverdaughtermist0.png": [
+      {
+        "type": "skill",
+        "id": "riverdaughtermist0",
+        "name": "Shallows Dance"
+      }
+    ],
+    "assets/characters/riverdaughter/riverdaughtermist1.png": [
+      {
+        "type": "skill",
+        "id": "riverdaughtermist1",
+        "name": "Shallow Slash"
+      }
+    ],
+    "assets/characters/riverdaughter/riverdaughtermist_portrait.png": [],
+    "assets/characters/riverdaughter/riverdaughtermistprof.png": [],
+    "assets/characters/riverdaughter/riverdaughterocean0.png": [
+      {
+        "type": "skill",
+        "id": "riverdaughterocean0",
+        "name": "Triton's Blessing"
+      }
+    ],
+    "assets/characters/riverdaughter/riverdaughterocean1.png": [
+      {
+        "type": "skill",
+        "id": "riverdaughterocean1",
+        "name": "Atlantean Assault"
+      }
+    ],
+    "assets/characters/riverdaughter/riverdaughterocean_portrait.png": [],
+    "assets/characters/riverdaughter/riverdaughteroceanprof.png": [],
+    "assets/characters/riverdaughter/riverdaughterprof.png": [
+      {
+        "type": "character",
+        "id": "riverdaughter",
+        "name": "The River Daughter"
+      }
+    ],
+    "assets/characters/riverdaughter/riverdaughterserum0.png": [
+      {
+        "type": "skill",
+        "id": "riverdaughterserum0",
+        "name": "Toxic Waste"
+      }
+    ],
+    "assets/characters/riverdaughter/riverdaughterserum1.png": [
+      {
+        "type": "skill",
+        "id": "riverdaughterserum1",
+        "name": "Chemical Bath"
+      }
+    ],
+    "assets/characters/riverdaughter/riverdaughterserum_portrait.png": [],
+    "assets/characters/riverdaughter/riverdaughterserumprof.png": [],
+    "assets/characters/riverdaughter/riverdaughterslime0.png": [
+      {
+        "type": "skill",
+        "id": "riverdaughterslime0",
+        "name": "Bubbling Mire"
+      }
+    ],
+    "assets/characters/riverdaughter/riverdaughterslime1.png": [
+      {
+        "type": "skill",
+        "id": "riverdaughterslime1",
+        "name": "Congeal"
+      }
+    ],
+    "assets/characters/riverdaughter/riverdaughterslime_portrait.png": [],
+    "assets/characters/riverdaughter/riverdaughterslimeprof.png": [],
+    "assets/characters/roland/roland0.png": [
+      {
+        "type": "skill",
+        "id": "roland0",
+        "name": "Living Stone"
+      }
+    ],
+    "assets/characters/roland/roland1.png": [
+      {
+        "type": "skill",
+        "id": "roland1",
+        "name": "Strength From The Earth"
+      }
+    ],
+    "assets/characters/roland/roland2.png": [
+      {
+        "type": "skill",
+        "id": "roland2",
+        "name": "Earth Pillar"
+      }
+    ],
+    "assets/characters/roland/roland3.png": [
+      {
+        "type": "skill",
+        "id": "roland3",
+        "name": "Form Stone"
+      }
+    ],
+    "assets/characters/roland/roland4.png": [
+      {
+        "type": "skill",
+        "id": "roland4",
+        "name": "Stoneform"
+      }
+    ],
+    "assets/characters/roland/roland5.png": [
+      {
+        "type": "skill",
+        "id": "roland5",
+        "name": "Fissure"
+      }
+    ],
+    "assets/characters/roland/roland_portrait.png": [],
+    "assets/characters/roland/rolandbattery_portrait.png": [],
+    "assets/characters/roland/rolandgrave0.png": [
+      {
+        "type": "skill",
+        "id": "rolandgrave0",
+        "name": "Cairnstones"
+      }
+    ],
+    "assets/characters/roland/rolandgrave1.png": [
+      {
+        "type": "skill",
+        "id": "rolandgrave1",
+        "name": "Call the Honored Dead"
+      }
+    ],
+    "assets/characters/roland/rolandgrave_portrait.png": [],
+    "assets/characters/roland/rolandgraveprof.png": [],
+    "assets/characters/roland/rolandlife0.png": [
+      {
+        "type": "skill",
+        "id": "rolandlife0",
+        "name": "Living Boulder"
+      }
+    ],
+    "assets/characters/roland/rolandlife1.png": [
+      {
+        "type": "skill",
+        "id": "rolandlife1",
+        "name": "Mother Stone's Embrace"
+      }
+    ],
+    "assets/characters/roland/rolandlife_portrait.png": [],
+    "assets/characters/roland/rolandlifeprof.png": [],
+    "assets/characters/roland/rolandmagnet0.png": [
+      {
+        "type": "skill",
+        "id": "rolandmagnet0",
+        "name": "Mag-Lev Pillars"
+      }
+    ],
+    "assets/characters/roland/rolandmagnet1.png": [
+      {
+        "type": "skill",
+        "id": "rolandmagnet1",
+        "name": "Magnetize Munitions"
+      }
+    ],
+    "assets/characters/roland/rolandmagnet_portrait.png": [],
+    "assets/characters/roland/rolandmagnetprof.png": [],
+    "assets/characters/roland/rolandmoon0.png": [
+      {
+        "type": "skill",
+        "id": "rolandmoon0",
+        "name": "Moonfield"
+      }
+    ],
+    "assets/characters/roland/rolandmoon1.png": [
+      {
+        "type": "skill",
+        "id": "rolandmoon1",
+        "name": "Stonefield Stalker"
+      }
+    ],
+    "assets/characters/roland/rolandmoon_portrait.png": [],
+    "assets/characters/roland/rolandmoonprof.png": [],
+    "assets/characters/roland/rolandmyth0.png": [
+      {
+        "type": "skill",
+        "id": "rolandmyth0",
+        "name": "Spires of the North"
+      }
+    ],
+    "assets/characters/roland/rolandmyth1.png": [
+      {
+        "type": "skill",
+        "id": "rolandmyth1",
+        "name": "Troll Stonethrower"
+      }
+    ],
+    "assets/characters/roland/rolandmyth_portrait.png": [],
+    "assets/characters/roland/rolandmythprof.png": [],
+    "assets/characters/roland/rolandnomad0.png": [
+      {
+        "type": "skill",
+        "id": "rolandnomad0",
+        "name": "Mark the Path"
+      }
+    ],
+    "assets/characters/roland/rolandnomad1.png": [
+      {
+        "type": "skill",
+        "id": "rolandnomad1",
+        "name": "FInal Warning"
+      }
+    ],
+    "assets/characters/roland/rolandnomad_portrait.png": [],
+    "assets/characters/roland/rolandnomadprof.png": [],
+    "assets/characters/roland/rolandprof.png": [
+      {
+        "type": "character",
+        "id": "roland",
+        "name": "Geolord Roland"
+      }
+    ],
+    "assets/characters/roland/rolandsanctuary0.png": [
+      {
+        "type": "skill",
+        "id": "rolandsanctuary0",
+        "name": "Soothing Stone"
+      }
+    ],
+    "assets/characters/roland/rolandsanctuary1.png": [
+      {
+        "type": "skill",
+        "id": "rolandsanctuary1",
+        "name": "Sanctus Terra"
+      }
+    ],
+    "assets/characters/roland/rolandsanctuary_portrait.png": [],
+    "assets/characters/roland/rolandsanctuaryprof.png": [],
+    "assets/characters/roland/rolandslime0.png": [
+      {
+        "type": "skill",
+        "id": "rolandslime0",
+        "name": "Oozeshaping"
+      }
+    ],
+    "assets/characters/roland/rolandslime1.png": [
+      {
+        "type": "skill",
+        "id": "rolandslime1",
+        "name": "Call to the Mire"
+      }
+    ],
+    "assets/characters/roland/rolandslime_portrait.png": [],
+    "assets/characters/roland/rolandslimeprof.png": [],
+    "assets/characters/roland/rolandspore0.png": [
+      {
+        "type": "skill",
+        "id": "rolandspore0",
+        "name": "Scattered Spores"
+      }
+    ],
+    "assets/characters/roland/rolandspore1.png": [
+      {
+        "type": "skill",
+        "id": "rolandspore1",
+        "name": "Loamwrecker"
+      }
+    ],
+    "assets/characters/roland/rolandspore_portrait.png": [],
+    "assets/characters/roland/rolandsporeprof.png": [],
+    "assets/characters/roland/rolandsun0.png": [
+      {
+        "type": "skill",
+        "id": "rolandsun0",
+        "name": "Exposure"
+      }
+    ],
+    "assets/characters/roland/rolandsun1.png": [
+      {
+        "type": "skill",
+        "id": "rolandsun1",
+        "name": "Molten Rockslide"
+      }
+    ],
+    "assets/characters/roland/rolandsun_portrait.png": [],
+    "assets/characters/roland/rolandsunprof.png": [],
+    "assets/characters/saya/saya0.png": [
+      {
+        "type": "skill",
+        "id": "saya5",
+        "name": "Stroke of Genius"
+      }
+    ],
+    "assets/characters/saya/saya1.png": [
+      {
+        "type": "skill",
+        "id": "saya1",
+        "name": "Universal Energy Conduit"
+      }
+    ],
+    "assets/characters/saya/saya2.png": [
+      {
+        "type": "skill",
+        "id": "saya2",
+        "name": "Saya Coil"
+      }
+    ],
+    "assets/characters/saya/saya3.png": [
+      {
+        "type": "skill",
+        "id": "saya3",
+        "name": "Spider Mines"
+      }
+    ],
+    "assets/characters/saya/saya4.png": [
+      {
+        "type": "skill",
+        "id": "saya4",
+        "name": "Plasma Shield"
+      }
+    ],
+    "assets/characters/saya/saya5.png": [
+      {
+        "type": "skill",
+        "id": "saya0",
+        "name": "Well-Used Panic Button"
+      }
+    ],
+    "assets/characters/saya/saya_portrait.png": [],
+    "assets/characters/saya/sayaaurora0.png": [
+      {
+        "type": "skill",
+        "id": "sayaaurora0",
+        "name": "Prismatic Shielding"
+      }
+    ],
+    "assets/characters/saya/sayaaurora1.png": [
+      {
+        "type": "skill",
+        "id": "sayaaurora1",
+        "name": "Prismatic Energy Cannon"
+      }
+    ],
+    "assets/characters/saya/sayaaurora_portrait.png": [],
+    "assets/characters/saya/sayaauroraprof.png": [],
+    "assets/characters/saya/sayabattery0.png": [
+      {
+        "type": "skill",
+        "id": "sayabattery0",
+        "name": "Storage Capacitor"
+      }
+    ],
+    "assets/characters/saya/sayabattery1.png": [
+      {
+        "type": "skill",
+        "id": "sayabattery1",
+        "name": "Saya Cell"
+      }
+    ],
+    "assets/characters/saya/sayabattery_portrait.png": [],
+    "assets/characters/saya/sayabatteryprof.png": [],
+    "assets/characters/saya/sayacurrent0.png": [
+      {
+        "type": "skill",
+        "id": "sayacurrent0",
+        "name": "Constant Flux"
+      }
+    ],
+    "assets/characters/saya/sayacurrent1.png": [
+      {
+        "type": "skill",
+        "id": "sayacurrent1",
+        "name": "Flux Injector"
+      }
+    ],
+    "assets/characters/saya/sayacurrent_portrait.png": [],
+    "assets/characters/saya/sayacurrentprof.png": [],
+    "assets/characters/saya/sayaion0.png": [
+      {
+        "type": "skill",
+        "id": "sayaion0",
+        "name": "Miniature Ion Cannons"
+      }
+    ],
+    "assets/characters/saya/sayaion1.png": [
+      {
+        "type": "skill",
+        "id": "sayaion1",
+        "name": "Polarity Ray"
+      }
+    ],
+    "assets/characters/saya/sayaion_portrait.png": [],
+    "assets/characters/saya/sayaionprof.png": [],
+    "assets/characters/saya/sayamagnet0.png": [
+      {
+        "type": "skill",
+        "id": "sayamagnet0",
+        "name": "Magnetic Field"
+      }
+    ],
+    "assets/characters/saya/sayamagnet1.png": [
+      {
+        "type": "skill",
+        "id": "sayamagnet1",
+        "name": "Personal Magnetism"
+      }
+    ],
+    "assets/characters/saya/sayamagnet_portrait.png": [],
+    "assets/characters/saya/sayamagnetprof.png": [],
+    "assets/characters/saya/sayaplasma0.png": [
+      {
+        "type": "skill",
+        "id": "sayaplasma0",
+        "name": "Direct Energy Line"
+      }
+    ],
+    "assets/characters/saya/sayaplasma1.png": [
+      {
+        "type": "skill",
+        "id": "sayaplasma1",
+        "name": "Plasma Cannon"
+      }
+    ],
+    "assets/characters/saya/sayaplasma_portrait.png": [],
+    "assets/characters/saya/sayaplasmaprof.png": [],
+    "assets/characters/saya/sayaprof.png": [
+      {
+        "type": "character",
+        "id": "saya",
+        "name": "Saya, Genius Inventor"
+      }
+    ],
+    "assets/characters/saya/sayareanimation0.png": [
+      {
+        "type": "skill",
+        "id": "sayareanimation0",
+        "name": "Shady Assistants"
+      }
+    ],
+    "assets/characters/saya/sayareanimation1.png": [
+      {
+        "type": "skill",
+        "id": "sayareanimation1",
+        "name": "Saya-Brand Monstrosity"
+      }
+    ],
+    "assets/characters/saya/sayareanimation_portrait.png": [],
+    "assets/characters/saya/sayareanimationprof.png": [],
+    "assets/characters/saya/sayastorm0.png": [
+      {
+        "type": "skill",
+        "id": "sayastorm0",
+        "name": "Charged Environment"
+      }
+    ],
+    "assets/characters/saya/sayastorm1.png": [
+      {
+        "type": "skill",
+        "id": "sayastorm1",
+        "name": "Lightning Rod"
+      }
+    ],
+    "assets/characters/saya/sayastorm_portrait.png": [],
+    "assets/characters/saya/sayastormprof.png": [],
+    "assets/characters/saya/sayathunder0.png": [
+      {
+        "type": "skill",
+        "id": "sayathunder0",
+        "name": "Reverberation"
+      }
+    ],
+    "assets/characters/saya/sayathunder1.png": [
+      {
+        "type": "skill",
+        "id": "sayathunder1",
+        "name": "Saya Shrieker"
+      }
+    ],
+    "assets/characters/saya/sayathunder_portrait.png": [],
+    "assets/characters/saya/sayathunderprof.png": [],
+    "assets/characters/saya/sayavengeance0.png": [
+      {
+        "type": "skill",
+        "id": "sayavengeance0",
+        "name": "Overwatch"
+      }
+    ],
+    "assets/characters/saya/sayavengeance1.png": [
+      {
+        "type": "skill",
+        "id": "sayavengeance1",
+        "name": "Orbital Strike"
+      }
+    ],
+    "assets/characters/saya/sayavengeance_portrait.png": [],
+    "assets/characters/saya/sayavengeanceprof.png": [],
+    "assets/characters/scratch/scratch0.png": [
+      {
+        "type": "skill",
+        "id": "scratch0",
+        "name": "The Devil's Price"
+      }
+    ],
+    "assets/characters/scratch/scratch1.png": [
+      {
+        "type": "skill",
+        "id": "scratch1",
+        "name": "Deal: Defeat Your Enemies"
+      }
+    ],
+    "assets/characters/scratch/scratch2.png": [
+      {
+        "type": "skill",
+        "id": "scratch2",
+        "name": "Deal: Save Your Friends"
+      }
+    ],
+    "assets/characters/scratch/scratch3.png": [
+      {
+        "type": "skill",
+        "id": "scratch3",
+        "name": "Deal: Realize Your Potential"
+      }
+    ],
+    "assets/characters/scratch/scratch4.png": [
+      {
+        "type": "skill",
+        "id": "scratch4",
+        "name": "Faustian Bargain"
+      }
+    ],
+    "assets/characters/scratch/scratch5.png": [
+      {
+        "type": "skill",
+        "id": "scratch5",
+        "name": "Disarming Pitch"
+      }
+    ],
+    "assets/characters/scratch/scratch6.png": [
+      {
+        "type": "skill",
+        "id": "scratch6",
+        "name": "Deal: Know Your Fate"
+      }
+    ],
+    "assets/characters/scratch/scratch_portrait.png": [],
+    "assets/characters/scratch/scratchprof.png": [
+      {
+        "type": "character",
+        "id": "scratch",
+        "name": "Mr. Scratch"
+      }
+    ],
+    "assets/characters/sera/sera0.png": [
+      {
+        "type": "skill",
+        "id": "sera0",
+        "name": "Eyes of Vengeance"
+      }
+    ],
+    "assets/characters/sera/sera1.png": [
+      {
+        "type": "skill",
+        "id": "sera1",
+        "name": "Synthetic Skyblade"
+      }
+    ],
+    "assets/characters/sera/sera2.png": [
+      {
+        "type": "skill",
+        "id": "sera2",
+        "name": "Energized Wingstorm"
+      }
+    ],
+    "assets/characters/sera/sera3.png": [
+      {
+        "type": "skill",
+        "id": "sera3",
+        "name": "Heavenly Parry"
+      }
+    ],
+    "assets/characters/sera/sera4.png": [
+      {
+        "type": "skill",
+        "id": "sera4",
+        "name": "Scan of the All-Knowing"
+      }
+    ],
+    "assets/characters/sera/sera5.png": [
+      {
+        "type": "skill",
+        "id": "sera5",
+        "name": "Proactivity Protocol"
+      }
+    ],
+    "assets/characters/sera/sera6.png": [
+      {
+        "type": "skill",
+        "id": "sera6",
+        "name": "Divinity Engine"
+      }
+    ],
+    "assets/characters/sera/sera_portrait.png": [],
+    "assets/characters/sera/seraprof.png": [
+      {
+        "type": "character",
+        "id": "sera",
+        "name": "SERAFIA MKI"
+      }
+    ],
+    "assets/characters/syl/syl0.png": [
+      {
+        "type": "skill",
+        "id": "syl0",
+        "name": "Two as One"
+      }
+    ],
+    "assets/characters/syl/syl1.png": [
+      {
+        "type": "skill",
+        "id": "syl1",
+        "name": "Feed"
+      }
+    ],
+    "assets/characters/syl/syl2.png": [
+      {
+        "type": "skill",
+        "id": "syl2",
+        "name": "Skylance"
+      }
+    ],
+    "assets/characters/syl/syl3.png": [
+      {
+        "type": "skill",
+        "id": "syl3",
+        "name": "To the Skies!"
+      }
+    ],
+    "assets/characters/syl/syl4.png": [
+      {
+        "type": "skill",
+        "id": "syl4",
+        "name": "Unbreakable Bond"
+      }
+    ],
+    "assets/characters/syl/syl5.png": [
+      {
+        "type": "skill",
+        "id": "syl5",
+        "name": "Leyline Nest"
+      }
+    ],
+    "assets/characters/syl/syl_portrait.png": [],
+    "assets/characters/syl/sylangel0.png": [
+      {
+        "type": "skill",
+        "id": "sylangel0",
+        "name": "Shieldmaiden"
+      }
+    ],
+    "assets/characters/syl/sylangel1.png": [
+      {
+        "type": "skill",
+        "id": "sylangel1",
+        "name": "Divine Lance"
+      }
+    ],
+    "assets/characters/syl/sylangel_portrait.png": [],
+    "assets/characters/syl/sylangelprof.png": [],
+    "assets/characters/syl/sylcloud0.png": [
+      {
+        "type": "skill",
+        "id": "sylcloud0",
+        "name": "Great Roc"
+      }
+    ],
+    "assets/characters/syl/sylcloud1.png": [
+      {
+        "type": "skill",
+        "id": "sylcloud1",
+        "name": "Sky Drop"
+      }
+    ],
+    "assets/characters/syl/sylcloud_portrait.png": [],
+    "assets/characters/syl/sylcloudprof.png": [],
+    "assets/characters/syl/sylfaerie0.png": [
+      {
+        "type": "skill",
+        "id": "sylfaerie0",
+        "name": "Harrier"
+      }
+    ],
+    "assets/characters/syl/sylfaerie1.png": [
+      {
+        "type": "skill",
+        "id": "sylfaerie1",
+        "name": "Sparrowrider Cohort"
+      }
+    ],
+    "assets/characters/syl/sylfaerie_portrait.png": [],
+    "assets/characters/syl/sylfaerieprof.png": [],
+    "assets/characters/syl/sylghost0.png": [
+      {
+        "type": "skill",
+        "id": "sylghost0",
+        "name": "Silent Wingbeats"
+      }
+    ],
+    "assets/characters/syl/sylghost1.png": [
+      {
+        "type": "skill",
+        "id": "sylghost1",
+        "name": "Forlorn Feathers"
+      }
+    ],
+    "assets/characters/syl/sylghost_portrait.png": [],
+    "assets/characters/syl/sylghostprof.png": [],
+    "assets/characters/syl/sylmechanic0.png": [
+      {
+        "type": "skill",
+        "id": "sylmechanic0",
+        "name": "The Aerie"
+      }
+    ],
+    "assets/characters/syl/sylmechanic1.png": [
+      {
+        "type": "skill",
+        "id": "sylmechanic1",
+        "name": "The Grand Finale"
+      }
+    ],
+    "assets/characters/syl/sylmechanic_portrait.png": [],
+    "assets/characters/syl/sylmechanicprof.png": [],
+    "assets/characters/syl/sylmist0.png": [
+      {
+        "type": "skill",
+        "id": "sylmist0",
+        "name": "Flutter in the Fog"
+      }
+    ],
+    "assets/characters/syl/sylmist1.png": [
+      {
+        "type": "skill",
+        "id": "sylmist1",
+        "name": "Falling Leaf"
+      }
+    ],
+    "assets/characters/syl/sylmist_portrait.png": [],
+    "assets/characters/syl/sylmistprof.png": [],
+    "assets/characters/syl/sylninja0.png": [
+      {
+        "type": "skill",
+        "id": "sylninja0",
+        "name": "Eaglehawk Rider"
+      }
+    ],
+    "assets/characters/syl/sylninja1.png": [
+      {
+        "type": "skill",
+        "id": "sylninja1",
+        "name": "Shadow Seekers"
+      }
+    ],
+    "assets/characters/syl/sylninja_portrait.png": [],
+    "assets/characters/syl/sylninjaprof.png": [],
+    "assets/characters/syl/sylnomad0.png": [
+      {
+        "type": "skill",
+        "id": "sylnomad0",
+        "name": "Scavenger's Path"
+      }
+    ],
+    "assets/characters/syl/sylnomad1.png": [
+      {
+        "type": "skill",
+        "id": "sylnomad1",
+        "name": "Pick the Bones"
+      }
+    ],
+    "assets/characters/syl/sylnomad_portrait.png": [],
+    "assets/characters/syl/sylnomadprof.png": [],
+    "assets/characters/syl/sylprof.png": [
+      {
+        "type": "character",
+        "id": "syl",
+        "name": "Syl, Scourge of the Skies"
+      }
+    ],
+    "assets/characters/syl/sylstorm0.png": [
+      {
+        "type": "skill",
+        "id": "sylstorm0",
+        "name": "Stormchaser"
+      }
+    ],
+    "assets/characters/syl/sylstorm1.png": [
+      {
+        "type": "skill",
+        "id": "sylstorm1",
+        "name": "Lightning Crash"
+      }
+    ],
+    "assets/characters/syl/sylstorm_portrait.png": [],
+    "assets/characters/syl/sylstormprof.png": [],
+    "assets/characters/syl/sylwinter0.png": [
+      {
+        "type": "skill",
+        "id": "sylwinter0",
+        "name": "Mountain Rescue Team"
+      }
+    ],
+    "assets/characters/syl/sylwinter1.png": [
+      {
+        "type": "skill",
+        "id": "sylwinter1",
+        "name": "Search and Rescue"
+      }
+    ],
+    "assets/characters/syl/sylwinter_portrait.png": [],
+    "assets/characters/syl/sylwinterprof.png": [],
+    "assets/characters/taryn/taryn0.png": [
+      {
+        "type": "skill",
+        "id": "taryn0",
+        "name": "Protector of the Song"
+      }
+    ],
+    "assets/characters/taryn/taryn1.png": [
+      {
+        "type": "skill",
+        "id": "taryn1",
+        "name": "Banner of Harmony"
+      }
+    ],
+    "assets/characters/taryn/taryn2.png": [
+      {
+        "type": "skill",
+        "id": "taryn2",
+        "name": "Refrain"
+      }
+    ],
+    "assets/characters/taryn/taryn3.png": [
+      {
+        "type": "skill",
+        "id": "taryn3",
+        "name": "Inspiring Thrust"
+      }
+    ],
+    "assets/characters/taryn/taryn4.png": [
+      {
+        "type": "skill",
+        "id": "taryn4",
+        "name": "Stalwart Shield"
+      }
+    ],
+    "assets/characters/taryn/taryn5.png": [
+      {
+        "type": "skill",
+        "id": "taryn5",
+        "name": "Radiant Glory"
+      }
+    ],
+    "assets/characters/taryn/taryn_portrait.png": [],
+    "assets/characters/taryn/tarynangel0.png": [
+      {
+        "type": "skill",
+        "id": "tarynangel0",
+        "name": "Skyward Shield"
+      }
+    ],
+    "assets/characters/taryn/tarynangel1.png": [
+      {
+        "type": "skill",
+        "id": "tarynangel1",
+        "name": "Hand of Michael"
+      }
+    ],
+    "assets/characters/taryn/tarynangel_portrait.png": [],
+    "assets/characters/taryn/tarynangelprof.png": [],
+    "assets/characters/taryn/tarynanointment0.png": [
+      {
+        "type": "skill",
+        "id": "tarynanointment0",
+        "name": "Flow of Inspiration"
+      }
+    ],
+    "assets/characters/taryn/tarynanointment1.png": [
+      {
+        "type": "skill",
+        "id": "tarynanointment1",
+        "name": "Font of Glory"
+      }
+    ],
+    "assets/characters/taryn/tarynanointment_portrait.png": [],
+    "assets/characters/taryn/tarynanointmentprof.png": [],
+    "assets/characters/taryn/tarynantidote0.png": [
+      {
+        "type": "skill",
+        "id": "tarynantidote0",
+        "name": "Purifying Shield"
+      }
+    ],
+    "assets/characters/taryn/tarynantidote1.png": [
+      {
+        "type": "skill",
+        "id": "tarynantidote1",
+        "name": "That Which Ails Me"
+      }
+    ],
+    "assets/characters/taryn/tarynantidote_portrait.png": [],
+    "assets/characters/taryn/tarynantidoteprof.png": [],
+    "assets/characters/taryn/taryndivine0.png": [
+      {
+        "type": "skill",
+        "id": "taryndivine0",
+        "name": "Divine Hymn"
+      }
+    ],
+    "assets/characters/taryn/taryndivine1.png": [
+      {
+        "type": "skill",
+        "id": "taryndivine1",
+        "name": "Holy Word: Peace"
+      }
+    ],
+    "assets/characters/taryn/taryndivine_portrait.png": [],
+    "assets/characters/taryn/taryndivineprof.png": [],
+    "assets/characters/taryn/tarynjudgment0.png": [
+      {
+        "type": "skill",
+        "id": "tarynjudgment0",
+        "name": "Forced Harmony"
+      }
+    ],
+    "assets/characters/taryn/tarynjudgment1.png": [
+      {
+        "type": "skill",
+        "id": "tarynjudgment1",
+        "name": "Trial by Fire"
+      }
+    ],
+    "assets/characters/taryn/tarynjudgment_portrait.png": [],
+    "assets/characters/taryn/tarynjudgmentprof.png": [],
+    "assets/characters/taryn/tarynprism0.png": [
+      {
+        "type": "skill",
+        "id": "tarynprism0",
+        "name": "Refracted Refrain"
+      }
+    ],
+    "assets/characters/taryn/tarynprism1.png": [
+      {
+        "type": "skill",
+        "id": "tarynprism1",
+        "name": "Do Unto Others"
+      }
+    ],
+    "assets/characters/taryn/tarynprism_portrait.png": [],
+    "assets/characters/taryn/tarynprismprof.png": [],
+    "assets/characters/taryn/tarynprof.png": [
+      {
+        "type": "character",
+        "id": "taryn",
+        "name": "Taryn, Hand of Glory"
+      }
+    ],
+    "assets/characters/taryn/tarynsanctuary0.png": [
+      {
+        "type": "skill",
+        "id": "tarynsanctuary0",
+        "name": "Guardian at the Gates"
+      }
+    ],
+    "assets/characters/taryn/tarynsanctuary1.png": [
+      {
+        "type": "skill",
+        "id": "tarynsanctuary1",
+        "name": "Banner of  Consecration"
+      }
+    ],
+    "assets/characters/taryn/tarynsanctuary_portrait.png": [],
+    "assets/characters/taryn/tarynsanctuaryprof.png": [],
+    "assets/characters/taryn/tarynvengeance0.png": [
+      {
+        "type": "skill",
+        "id": "tarynvengeance0",
+        "name": "Wingman"
+      }
+    ],
+    "assets/characters/taryn/tarynvengeance1.png": [
+      {
+        "type": "skill",
+        "id": "tarynvengeance1",
+        "name": "Not Today"
+      }
+    ],
+    "assets/characters/taryn/tarynvengeance_portrait.png": [],
+    "assets/characters/taryn/tarynvengeanceprof.png": [],
+    "assets/characters/taryn/tarynvigilante0.png": [
+      {
+        "type": "skill",
+        "id": "tarynvigilante0",
+        "name": "Glorious Justice"
+      }
+    ],
+    "assets/characters/taryn/tarynvigilante1.png": [
+      {
+        "type": "skill",
+        "id": "tarynvigilante1",
+        "name": "Restrain"
+      }
+    ],
+    "assets/characters/taryn/tarynvigilante_portrait.png": [],
+    "assets/characters/taryn/tarynvigilanteprof.png": [],
+    "assets/characters/taryn/tarynzealot0.png": [
+      {
+        "type": "skill",
+        "id": "tarynzealot0",
+        "name": "Flag of Inquisition"
+      }
+    ],
+    "assets/characters/taryn/tarynzealot1.png": [
+      {
+        "type": "skill",
+        "id": "tarynzealot1",
+        "name": "Verse of Accusation"
+      }
+    ],
+    "assets/characters/taryn/tarynzealot_portrait.png": [],
+    "assets/characters/taryn/tarynzealotprof.png": [],
+    "assets/characters/titania/titania0.png": [
+      {
+        "type": "skill",
+        "id": "titania0",
+        "name": "Whimsy"
+      }
+    ],
+    "assets/characters/titania/titania1.png": [
+      {
+        "type": "skill",
+        "id": "titania1",
+        "name": "Thorn Prick"
+      }
+    ],
+    "assets/characters/titania/titania2.png": [
+      {
+        "type": "skill",
+        "id": "titania2",
+        "name": "Laughing Powder"
+      }
+    ],
+    "assets/characters/titania/titania3.png": [
+      {
+        "type": "skill",
+        "id": "titania3",
+        "name": "Barbed Wit"
+      }
+    ],
+    "assets/characters/titania/titania4.png": [
+      {
+        "type": "skill",
+        "id": "titania4",
+        "name": "Prance"
+      }
+    ],
+    "assets/characters/titania/titania5.png": [
+      {
+        "type": "skill",
+        "id": "titania5",
+        "name": "Summer Clique"
+      }
+    ],
+    "assets/characters/titania/titania_portrait.png": [],
+    "assets/characters/titania/titaniaantidote0.png": [
+      {
+        "type": "skill",
+        "id": "titaniaantidote0",
+        "name": "Capricious Cornucopia"
+      }
+    ],
+    "assets/characters/titania/titaniaantidote1.png": [
+      {
+        "type": "skill",
+        "id": "titaniaantidote1",
+        "name": "Gift from the Fae"
+      }
+    ],
+    "assets/characters/titania/titaniaantidote_portrait.png": [],
+    "assets/characters/titania/titaniaantidoteprof.png": [],
+    "assets/characters/titania/titaniaassassin0.png": [
+      {
+        "type": "skill",
+        "id": "titaniaassassin0",
+        "name": "Sealed Fate"
+      }
+    ],
+    "assets/characters/titania/titaniaassassin1.png": [
+      {
+        "type": "skill",
+        "id": "titaniaassassin1",
+        "name": "Drop of Moonglove"
+      }
+    ],
+    "assets/characters/titania/titaniaassassin_portrait.png": [],
+    "assets/characters/titania/titaniaassassinprof.png": [],
+    "assets/characters/titania/titaniabattery0.png": [
+      {
+        "type": "skill",
+        "id": "titaniabattery0",
+        "name": "Arcadian Advancement"
+      }
+    ],
+    "assets/characters/titania/titaniabattery1.png": [
+      {
+        "type": "skill",
+        "id": "titaniabattery1",
+        "name": "The Whimsy Engine"
+      }
+    ],
+    "assets/characters/titania/titaniabattery_portrait.png": [],
+    "assets/characters/titania/titaniabatteryprof.png": [],
+    "assets/characters/titania/titaniablight0.png": [
+      {
+        "type": "skill",
+        "id": "titaniablight0",
+        "name": "Five Plagues"
+      }
+    ],
+    "assets/characters/titania/titaniablight1.png": [
+      {
+        "type": "skill",
+        "id": "titaniablight1",
+        "name": "Locust Swarm"
+      }
+    ],
+    "assets/characters/titania/titaniablight_portrait.png": [],
+    "assets/characters/titania/titaniablightprof.png": [],
+    "assets/characters/titania/titaniabrimstone0.png": [
+      {
+        "type": "skill",
+        "id": "titaniabrimstone0",
+        "name": "Barren Realm"
+      }
+    ],
+    "assets/characters/titania/titaniabrimstone1.png": [
+      {
+        "type": "skill",
+        "id": "titaniabrimstone1",
+        "name": "Arcadia, Enraged"
+      }
+    ],
+    "assets/characters/titania/titaniabrimstone_portrait.png": [],
+    "assets/characters/titania/titaniabrimstoneprof.png": [],
+    "assets/characters/titania/titaniaevolution0.png": [
+      {
+        "type": "skill",
+        "id": "titaniaevolution0",
+        "name": "Compound Eyes"
+      }
+    ],
+    "assets/characters/titania/titaniaevolution1.png": [
+      {
+        "type": "skill",
+        "id": "titaniaevolution1",
+        "name": "Hive Formation"
+      }
+    ],
+    "assets/characters/titania/titaniaevolution_portrait.png": [],
+    "assets/characters/titania/titaniaevolutionprof.png": [],
+    "assets/characters/titania/titaniafaerie0.png": [
+      {
+        "type": "skill",
+        "id": "titaniafaerie0",
+        "name": "Summer Queen"
+      }
+    ],
+    "assets/characters/titania/titaniafaerie1.png": [
+      {
+        "type": "skill",
+        "id": "titaniafaerie1",
+        "name": "Burning Order"
+      }
+    ],
+    "assets/characters/titania/titaniafaerie_portrait.png": [],
+    "assets/characters/titania/titaniafaerieprof.png": [],
+    "assets/characters/titania/titaniaprof.png": [
+      {
+        "type": "character",
+        "id": "titania",
+        "name": "Titania, Laughing Princess"
+      }
+    ],
+    "assets/characters/titania/titaniaserum0.png": [
+      {
+        "type": "skill",
+        "id": "titaniaserum0",
+        "name": "Weaponized Mirth"
+      }
+    ],
+    "assets/characters/titania/titaniaserum1.png": [
+      {
+        "type": "skill",
+        "id": "titaniaserum1",
+        "name": "Hysteria Serum"
+      }
+    ],
+    "assets/characters/titania/titaniaserum_portrait.png": [],
+    "assets/characters/titania/titaniaserumprof.png": [],
+    "assets/characters/titania/titaniaspore0.png": [
+      {
+        "type": "skill",
+        "id": "titaniaspore0",
+        "name": "Hallucinogenic Spores"
+      }
+    ],
+    "assets/characters/titania/titaniaspore1.png": [
+      {
+        "type": "skill",
+        "id": "titaniaspore1",
+        "name": "Raving Madness"
+      }
+    ],
+    "assets/characters/titania/titaniaspore_portrait.png": [],
+    "assets/characters/titania/titaniasporeprof.png": [],
+    "assets/characters/titania/titaniastasis0.png": [
+      {
+        "type": "skill",
+        "id": "titaniastasis0",
+        "name": "Winter Exile"
+      }
+    ],
+    "assets/characters/titania/titaniastasis1.png": [
+      {
+        "type": "skill",
+        "id": "titaniastasis1",
+        "name": "Icy Smile"
+      }
+    ],
+    "assets/characters/titania/titaniastasis_portrait.png": [],
+    "assets/characters/titania/titaniastasisprof.png": [],
+    "assets/characters/trinity/trinity0.png": [
+      {
+        "type": "skill",
+        "id": "trinity0",
+        "name": "Prismari Rangers"
+      }
+    ],
+    "assets/characters/trinity/trinity_portrait.png": [],
+    "assets/characters/trinity/trinitybase1.png": [
+      {
+        "type": "skill",
+        "id": "trinity1",
+        "name": "Prisma Lens"
+      }
+    ],
+    "assets/characters/trinity/trinitybase2.png": [
+      {
+        "type": "skill",
+        "id": "trinity3",
+        "name": "Chroma Magica"
+      }
+    ],
+    "assets/characters/trinity/trinitybase3.png": [
+      {
+        "type": "skill",
+        "id": "trinity2",
+        "name": "Prisma Maneuver"
+      }
+    ],
+    "assets/characters/trinity/trinityprof.png": [
+      {
+        "type": "character",
+        "id": "trinity",
+        "name": "Prisma Trinity"
+      }
+    ],
+    "assets/characters/xyris/xyris0.png": [
+      {
+        "type": "skill",
+        "id": "xyris0",
+        "name": "Dream Body"
+      }
+    ],
+    "assets/characters/xyris/xyris1.png": [
+      {
+        "type": "skill",
+        "id": "xyris1",
+        "name": "Reveal Hidden Truth"
+      }
+    ],
+    "assets/characters/xyris/xyris2.png": [
+      {
+        "type": "skill",
+        "id": "xyris2",
+        "name": "Enter the Dreamscape"
+      }
+    ],
+    "assets/characters/xyris/xyris3.png": [
+      {
+        "type": "skill",
+        "id": "xyris3",
+        "name": "Twisted Nightmares"
+      }
+    ],
+    "assets/characters/xyris/xyris4.png": [
+      {
+        "type": "skill",
+        "id": "xyris4",
+        "name": "Somnic Apparition"
+      }
+    ],
+    "assets/characters/xyris/xyris5.png": [
+      {
+        "type": "skill",
+        "id": "xyris5",
+        "name": "Echoes of Desire"
+      }
+    ],
+    "assets/characters/xyris/xyris_portrait.png": [],
+    "assets/characters/xyris/xyrisassassin0.png": [
+      {
+        "type": "skill",
+        "id": "xyrisassassin0",
+        "name": "Before I Wake"
+      }
+    ],
+    "assets/characters/xyris/xyrisassassin1.png": [
+      {
+        "type": "skill",
+        "id": "xyrisassassin1",
+        "name": "Dream Knife"
+      }
+    ],
+    "assets/characters/xyris/xyrisassassin_portrait.png": [],
+    "assets/characters/xyris/xyrisassassinprof.png": [],
+    "assets/characters/xyris/xyriscurse0.png": [
+      {
+        "type": "skill",
+        "id": "xyriscurse0",
+        "name": "Hypnagogic Curse"
+      }
+    ],
+    "assets/characters/xyris/xyriscurse1.png": [
+      {
+        "type": "skill",
+        "id": "xyriscurse1",
+        "name": "Dream Weaving"
+      }
+    ],
+    "assets/characters/xyris/xyriscurse_portrait.png": [],
+    "assets/characters/xyris/xyriscurseprof.png": [],
+    "assets/characters/xyris/xyrisdimension0.png": [
+      {
+        "type": "skill",
+        "id": "xyrisdimension0",
+        "name": "Dreamform Paradox"
+      }
+    ],
+    "assets/characters/xyris/xyrisdimension1.png": [
+      {
+        "type": "skill",
+        "id": "xyrisdimension1",
+        "name": "Astral Rejection"
+      }
+    ],
+    "assets/characters/xyris/xyrisdimension_portrait.png": [],
+    "assets/characters/xyris/xyrisdimensionprof.png": [],
+    "assets/characters/xyris/xyrision0.png": [
+      {
+        "type": "skill",
+        "id": "xyrision0",
+        "name": "Dark Arcadia"
+      }
+    ],
+    "assets/characters/xyris/xyrision1.png": [
+      {
+        "type": "skill",
+        "id": "xyrision1",
+        "name": "Phantasia Pulse"
+      }
+    ],
+    "assets/characters/xyris/xyrision_portrait.png": [],
+    "assets/characters/xyris/xyrisionprof.png": [],
+    "assets/characters/xyris/xyrismirror0.png": [
+      {
+        "type": "skill",
+        "id": "xyrismirror0",
+        "name": "Darkness and Truth"
+      }
+    ],
+    "assets/characters/xyris/xyrismirror1.png": [
+      {
+        "type": "skill",
+        "id": "xyrismirror1",
+        "name": "Simulacrum"
+      }
+    ],
+    "assets/characters/xyris/xyrismirror_portrait.png": [],
+    "assets/characters/xyris/xyrismirrorprof.png": [],
+    "assets/characters/xyris/xyrismoon0.png": [
+      {
+        "type": "skill",
+        "id": "xyrismoon0",
+        "name": "Captured Humanity"
+      }
+    ],
+    "assets/characters/xyris/xyrismoon1.png": [
+      {
+        "type": "skill",
+        "id": "xyrismoon1",
+        "name": "Wild Hunt"
+      }
+    ],
+    "assets/characters/xyris/xyrismoon_portrait.png": [],
+    "assets/characters/xyris/xyrismoonprof.png": [],
+    "assets/characters/xyris/xyrisnight0.png": [
+      {
+        "type": "skill",
+        "id": "xyrisnight0",
+        "name": "Quiet Nightmare"
+      }
+    ],
+    "assets/characters/xyris/xyrisnight1.png": [
+      {
+        "type": "skill",
+        "id": "xyrisnight1",
+        "name": "Spine Chill"
+      }
+    ],
+    "assets/characters/xyris/xyrisnight_portrait.png": [],
+    "assets/characters/xyris/xyrisnightprof.png": [],
+    "assets/characters/xyris/xyrisninja0.png": [
+      {
+        "type": "skill",
+        "id": "xyrisninja0",
+        "name": "Dream Infiltration"
+      }
+    ],
+    "assets/characters/xyris/xyrisninja1.png": [
+      {
+        "type": "skill",
+        "id": "xyrisninja1",
+        "name": "Steal Secrets"
+      }
+    ],
+    "assets/characters/xyris/xyrisninja_portrait.png": [],
+    "assets/characters/xyris/xyrisninjaprof.png": [],
+    "assets/characters/xyris/xyrisprof.png": [
+      {
+        "type": "character",
+        "id": "xyris",
+        "name": "Xyris, King of Dreams"
+      }
+    ],
+    "assets/characters/xyris/xyrisritual0.png": [
+      {
+        "type": "skill",
+        "id": "xyrisritual0",
+        "name": "Shadow Court Ritual"
+      }
+    ],
+    "assets/characters/xyris/xyrisritual1.png": [
+      {
+        "type": "skill",
+        "id": "xyrisritual1",
+        "name": "Heartfire"
+      }
+    ],
+    "assets/characters/xyris/xyrisritual_portrait.png": [],
+    "assets/characters/xyris/xyrisritualprof.png": [],
+    "assets/characters/xyris/xyrisvigilante0.png": [
+      {
+        "type": "skill",
+        "id": "xyrisvigilante0",
+        "name": "Dreams of Power"
+      }
+    ],
+    "assets/characters/xyris/xyrisvigilante1.png": [
+      {
+        "type": "skill",
+        "id": "xyrisvigilante1",
+        "name": "Sacred Severing"
+      }
+    ],
+    "assets/characters/xyris/xyrisvigilante_portrait.png": [],
+    "assets/characters/xyris/xyrisvigilanteprof.png": [],
+    "assets/characters/zephyrex/zephyrex0.png": [
+      {
+        "type": "skill",
+        "id": "zephyrex0",
+        "name": "Biting Wind"
+      }
+    ],
+    "assets/characters/zephyrex/zephyrex1.png": [
+      {
+        "type": "skill",
+        "id": "zephyrex1",
+        "name": "Arcadian Duet"
+      }
+    ],
+    "assets/characters/zephyrex/zephyrex2.png": [
+      {
+        "type": "skill",
+        "id": "zephyrex2",
+        "name": "Elegant Sweep"
+      }
+    ],
+    "assets/characters/zephyrex/zephyrex3.png": [
+      {
+        "type": "skill",
+        "id": "zephyrex3",
+        "name": "Sonic Thrust"
+      }
+    ],
+    "assets/characters/zephyrex/zephyrex4.png": [
+      {
+        "type": "skill",
+        "id": "zephyrex4",
+        "name": "Wind Step"
+      }
+    ],
+    "assets/characters/zephyrex/zephyrex5.png": [
+      {
+        "type": "skill",
+        "id": "zephyrex5",
+        "name": "Perfect Execution"
+      }
+    ],
+    "assets/characters/zephyrex/zephyrex_portrait.png": [],
+    "assets/characters/zephyrex/zephyrexangel0.png": [
+      {
+        "type": "skill",
+        "id": "zephyrexangel0",
+        "name": "Brush of Wings"
+      }
+    ],
+    "assets/characters/zephyrex/zephyrexangel1.png": [
+      {
+        "type": "skill",
+        "id": "zephyrexangel1",
+        "name": "Light of Raphael"
+      }
+    ],
+    "assets/characters/zephyrex/zephyrexangel_portrait.png": [],
+    "assets/characters/zephyrex/zephyrexangelprof.png": [],
+    "assets/characters/zephyrex/zephyrexcloud0.png": [
+      {
+        "type": "skill",
+        "id": "zephyrexcloud0",
+        "name": "Cloud Step"
+      }
+    ],
+    "assets/characters/zephyrex/zephyrexcloud1.png": [
+      {
+        "type": "skill",
+        "id": "zephyrexcloud1",
+        "name": "Waft"
+      }
+    ],
+    "assets/characters/zephyrex/zephyrexcloud_portrait.png": [],
+    "assets/characters/zephyrex/zephyrexcloudprof.png": [],
+    "assets/characters/zephyrex/zephyrexfaerie0.png": [
+      {
+        "type": "skill",
+        "id": "zephyrexfaerie0",
+        "name": "Fae Prince"
+      }
+    ],
+    "assets/characters/zephyrex/zephyrexfaerie1.png": [
+      {
+        "type": "skill",
+        "id": "zephyrexfaerie1",
+        "name": "Prod"
+      }
+    ],
+    "assets/characters/zephyrex/zephyrexfaerie_portrait.png": [],
+    "assets/characters/zephyrex/zephyrexfaerieprof.png": [],
+    "assets/characters/zephyrex/zephyrexghost0.png": [
+      {
+        "type": "skill",
+        "id": "zephyrexghost0",
+        "name": "Fell Wind"
+      }
+    ],
+    "assets/characters/zephyrex/zephyrexghost1.png": [
+      {
+        "type": "skill",
+        "id": "zephyrexghost1",
+        "name": "Soulsteal"
+      }
+    ],
+    "assets/characters/zephyrex/zephyrexghost_portrait.png": [],
+    "assets/characters/zephyrex/zephyrexghostprof.png": [],
+    "assets/characters/zephyrex/zephyrexmechanic0.png": [
+      {
+        "type": "skill",
+        "id": "zephyrexmechanic0",
+        "name": "Winds of Summer"
+      }
+    ],
+    "assets/characters/zephyrex/zephyrexmechanic1.png": [
+      {
+        "type": "skill",
+        "id": "zephyrexmechanic1",
+        "name": "Blazing Flourish"
+      }
+    ],
+    "assets/characters/zephyrex/zephyrexmechanic_portrait.png": [],
+    "assets/characters/zephyrex/zephyrexmechanicprof.png": [],
+    "assets/characters/zephyrex/zephyrexmist0.png": [
+      {
+        "type": "skill",
+        "id": "zephyrexmist0",
+        "name": "Wingless Wanderer"
+      }
+    ],
+    "assets/characters/zephyrex/zephyrexmist1.png": [
+      {
+        "type": "skill",
+        "id": "zephyrexmist1",
+        "name": "Cleave the Veil"
+      }
+    ],
+    "assets/characters/zephyrex/zephyrexmist_portrait.png": [],
+    "assets/characters/zephyrex/zephyrexmistprof.png": [],
+    "assets/characters/zephyrex/zephyrexninja0.png": [
+      {
+        "type": "skill",
+        "id": "zephyrexninja0",
+        "name": "Vacuum Blade"
+      }
+    ],
+    "assets/characters/zephyrex/zephyrexninja1.png": [
+      {
+        "type": "skill",
+        "id": "zephyrexninja1",
+        "name": "Vacuum Style: Blade Prison"
+      }
+    ],
+    "assets/characters/zephyrex/zephyrexninja_portrait.png": [],
+    "assets/characters/zephyrex/zephyrexninjaprof.png": [],
+    "assets/characters/zephyrex/zephyrexnomad0.png": [
+      {
+        "type": "skill",
+        "id": "zephyrexnomad0",
+        "name": "Sand Spectre"
+      }
+    ],
+    "assets/characters/zephyrex/zephyrexnomad1.png": [
+      {
+        "type": "skill",
+        "id": "zephyrexnomad1",
+        "name": "Sand in the Eyes"
+      }
+    ],
+    "assets/characters/zephyrex/zephyrexnomad_portrait.png": [],
+    "assets/characters/zephyrex/zephyrexnomadprof.png": [],
+    "assets/characters/zephyrex/zephyrexprof.png": [
+      {
+        "type": "character",
+        "id": "zephyrex",
+        "name": "Zephyrex the Windblade"
+      }
+    ],
+    "assets/characters/zephyrex/zephyrexstorm0.png": [
+      {
+        "type": "skill",
+        "id": "zephyrexstorm0",
+        "name": "Ominous Rumble"
+      }
+    ],
+    "assets/characters/zephyrex/zephyrexstorm1.png": [
+      {
+        "type": "skill",
+        "id": "zephyrexstorm1",
+        "name": "Jolt"
+      }
+    ],
+    "assets/characters/zephyrex/zephyrexstorm_portrait.png": [],
+    "assets/characters/zephyrex/zephyrexstormprof.png": [],
+    "assets/characters/zephyrex/zephyrexwinter0.png": [
+      {
+        "type": "skill",
+        "id": "zephyrexwinter0",
+        "name": "Cold and Alone"
+      }
+    ],
+    "assets/characters/zephyrex/zephyrexwinter1.png": [
+      {
+        "type": "skill",
+        "id": "zephyrexwinter1",
+        "name": "Winter's Bite"
+      }
+    ],
+    "assets/characters/zephyrex/zephyrexwinter_portrait.png": [],
+    "assets/characters/zephyrex/zephyrexwinterprof.png": [],
+    "assets/characters/zevkir/zevkir0.png": [
+      {
+        "type": "skill",
+        "id": "zevkir0",
+        "name": "Oceans Gather"
+      }
+    ],
+    "assets/characters/zevkir/zevkir1.png": [
+      {
+        "type": "skill",
+        "id": "zevkir1",
+        "name": "Call Tides"
+      }
+    ],
+    "assets/characters/zevkir/zevkir2.png": [
+      {
+        "type": "skill",
+        "id": "zevkir2",
+        "name": "Riptide"
+      }
+    ],
+    "assets/characters/zevkir/zevkir3.png": [
+      {
+        "type": "skill",
+        "id": "zevkir3",
+        "name": "Bubble Prison"
+      }
+    ],
+    "assets/characters/zevkir/zevkir4.png": [
+      {
+        "type": "skill",
+        "id": "zevkir4",
+        "name": "Repulse"
+      }
+    ],
+    "assets/characters/zevkir/zevkir5.png": [
+      {
+        "type": "skill",
+        "id": "zevkir5",
+        "name": "Tidal Wave"
+      }
+    ],
+    "assets/characters/zevkir/zevkir_portrait.png": [],
+    "assets/characters/zevkir/zevkiralchemy0.png": [
+      {
+        "type": "skill",
+        "id": "zevkiralchemy0",
+        "name": "Submerged Leyline"
+      }
+    ],
+    "assets/characters/zevkir/zevkiralchemy1.png": [
+      {
+        "type": "skill",
+        "id": "zevkiralchemy1",
+        "name": "Leyline Bolt"
+      }
+    ],
+    "assets/characters/zevkir/zevkiralchemy_portrait.png": [],
+    "assets/characters/zevkir/zevkiralchemyprof.png": [],
+    "assets/characters/zevkir/zevkiranointment0.png": [
+      {
+        "type": "skill",
+        "id": "zevkiranointment0",
+        "name": "Atlantean Hymn"
+      }
+    ],
+    "assets/characters/zevkir/zevkiranointment1.png": [
+      {
+        "type": "skill",
+        "id": "zevkiranointment1",
+        "name": "Purelight Pool"
+      }
+    ],
+    "assets/characters/zevkir/zevkiranointment_portrait.png": [],
+    "assets/characters/zevkir/zevkiranointmentprof.png": [],
+    "assets/characters/zevkir/zevkirblood0.png": [
+      {
+        "type": "skill",
+        "id": "zevkirblood0",
+        "name": "Sanguine Spectre"
+      }
+    ],
+    "assets/characters/zevkir/zevkirblood1.png": [
+      {
+        "type": "skill",
+        "id": "zevkirblood1",
+        "name": "Crimson Tide"
+      }
+    ],
+    "assets/characters/zevkir/zevkirblood_portrait.png": [],
+    "assets/characters/zevkir/zevkirbloodprof.png": [],
+    "assets/characters/zevkir/zevkircurrent0.png": [
+      {
+        "type": "skill",
+        "id": "zevkircurrent0",
+        "name": "Static Maelstrom"
+      }
+    ],
+    "assets/characters/zevkir/zevkircurrent1.png": [
+      {
+        "type": "skill",
+        "id": "zevkircurrent1",
+        "name": "Crackling Slipstream"
+      }
+    ],
+    "assets/characters/zevkir/zevkircurrent_portrait.png": [],
+    "assets/characters/zevkir/zevkircurrentprof.png": [],
+    "assets/characters/zevkir/zevkirglacier0.png": [
+      {
+        "type": "skill",
+        "id": "zevkirglacier0",
+        "name": "Freezing Brine"
+      }
+    ],
+    "assets/characters/zevkir/zevkirglacier1.png": [
+      {
+        "type": "skill",
+        "id": "zevkirglacier1",
+        "name": "Cold Snap"
+      }
+    ],
+    "assets/characters/zevkir/zevkirglacier_portrait.png": [],
+    "assets/characters/zevkir/zevkirglacierprof.png": [],
+    "assets/characters/zevkir/zevkirmirror0.png": [
+      {
+        "type": "skill",
+        "id": "zevkirmirror0",
+        "name": "Patient Predation"
+      }
+    ],
+    "assets/characters/zevkir/zevkirmirror1.png": [
+      {
+        "type": "skill",
+        "id": "zevkirmirror1",
+        "name": "Lens of the Deep"
+      }
+    ],
+    "assets/characters/zevkir/zevkirmirror_portrait.png": [],
+    "assets/characters/zevkir/zevkirmirrorprof.png": [],
+    "assets/characters/zevkir/zevkirmist0.png": [
+      {
+        "type": "skill",
+        "id": "zevkirmist0",
+        "name": "Misty Mire"
+      }
+    ],
+    "assets/characters/zevkir/zevkirmist1.png": [
+      {
+        "type": "skill",
+        "id": "zevkirmist1",
+        "name": "Spear of Fog"
+      }
+    ],
+    "assets/characters/zevkir/zevkirmist_portrait.png": [],
+    "assets/characters/zevkir/zevkirmistprof.png": [],
+    "assets/characters/zevkir/zevkirocean0.png": [
+      {
+        "type": "skill",
+        "id": "zevkirocean0",
+        "name": "Chains of Atlantis"
+      }
+    ],
+    "assets/characters/zevkir/zevkirocean1.png": [
+      {
+        "type": "skill",
+        "id": "zevkirocean1",
+        "name": "Abyssal Grasp"
+      }
+    ],
+    "assets/characters/zevkir/zevkirocean_portrait.png": [],
+    "assets/characters/zevkir/zevkiroceanprof.png": [],
+    "assets/characters/zevkir/zevkirprof.png": [
+      {
+        "type": "character",
+        "id": "zevkir",
+        "name": "Tidecaller Zev'kir"
+      }
+    ],
+    "assets/characters/zevkir/zevkirserum0.png": [
+      {
+        "type": "skill",
+        "id": "zevkirserum0",
+        "name": "Rapid Mutation"
+      }
+    ],
+    "assets/characters/zevkir/zevkirserum1.png": [
+      {
+        "type": "skill",
+        "id": "zevkirserum1",
+        "name": "Mutable Form"
+      }
+    ],
+    "assets/characters/zevkir/zevkirserum_portrait.png": [],
+    "assets/characters/zevkir/zevkirserumprof.png": [],
+    "assets/characters/zevkir/zevkirslime0.png": [
+      {
+        "type": "skill",
+        "id": "zevkirslime0",
+        "name": "Stinking Marsh"
+      }
+    ],
+    "assets/characters/zevkir/zevkirslime1.png": [
+      {
+        "type": "skill",
+        "id": "zevkirslime1",
+        "name": "Rising Bog"
+      }
+    ],
+    "assets/characters/zevkir/zevkirslime_portrait.png": [],
+    "assets/characters/zevkir/zevkirslimeprof.png": []
+  },
+  "db_refs_missing_file": [],
+  "images_not_referenced_by_db": [
+    "assets/characters/ando/ando_portrait.png",
+    "assets/characters/ando/andoaurora_portrait.png",
+    "assets/characters/ando/andoauroraprof.png",
+    "assets/characters/ando/andobattery_portrait.png",
+    "assets/characters/ando/andobatteryprof.png",
+    "assets/characters/ando/andocurrent_portrait.png",
+    "assets/characters/ando/andocurrentprof.png",
+    "assets/characters/ando/andoion_portrait.png",
+    "assets/characters/ando/andoionprof.png",
+    "assets/characters/ando/andomagnet_portrait.png",
+    "assets/characters/ando/andomagnetprof.png",
+    "assets/characters/ando/andoplasma_portrait.png",
+    "assets/characters/ando/andoplasmaprof.png",
+    "assets/characters/ando/andoreanimation_portrait.png",
+    "assets/characters/ando/andoreanimationprof.png",
+    "assets/characters/ando/andostorm_portrait.png",
+    "assets/characters/ando/andostormprof.png",
+    "assets/characters/ando/andothunder_portrait.png",
+    "assets/characters/ando/andothunderprof.png",
+    "assets/characters/ando/andovengeance_portrait.png",
+    "assets/characters/ando/andovengeanceprof.png",
+    "assets/characters/aramao/aramao_portrait.png",
+    "assets/characters/ayana/ayana_portrait.png",
+    "assets/characters/ayana/ayanaangel_portrait.png",
+    "assets/characters/ayana/ayanaangelprof.png",
+    "assets/characters/ayana/ayanaanointment_portrait.png",
+    "assets/characters/ayana/ayanaanointmentprof.png",
+    "assets/characters/ayana/ayanaantidote_portrait.png",
+    "assets/characters/ayana/ayanaantidoteprof.png",
+    "assets/characters/ayana/ayanadivine_portrait.png",
+    "assets/characters/ayana/ayanadivineprof.png",
+    "assets/characters/ayana/ayanafull.png",
+    "assets/characters/ayana/ayanajudgment_portrait.png",
+    "assets/characters/ayana/ayanajudgmentprof.png",
+    "assets/characters/ayana/ayanaprism_portrait.png",
+    "assets/characters/ayana/ayanaprismprof.png",
+    "assets/characters/ayana/ayanasanctuary_portrait.png",
+    "assets/characters/ayana/ayanasanctuaryprof.png",
+    "assets/characters/ayana/ayanavengeance_portrait.png",
+    "assets/characters/ayana/ayanavengeanceprof.png",
+    "assets/characters/ayana/ayanavigilante_portrait.png",
+    "assets/characters/ayana/ayanavigilanteprof.png",
+    "assets/characters/ayana/ayanazealot_portrait.png",
+    "assets/characters/ayana/ayanazealotprof.png",
+    "assets/characters/blackknight/base.png",
+    "assets/characters/blackknight/blackknight_portrait.png",
+    "assets/characters/blackknight/blackknightblight_portrait.png",
+    "assets/characters/blackknight/blackknightblightprof.png",
+    "assets/characters/blackknight/blackknightblood_portrait.png",
+    "assets/characters/blackknight/blackknightbloodprof.png",
+    "assets/characters/blackknight/blackknightcurse_portrait.png",
+    "assets/characters/blackknight/blackknightcurseprof.png",
+    "assets/characters/blackknight/blackknightdevil_portrait.png",
+    "assets/characters/blackknight/blackknightdevilprof.png",
+    "assets/characters/blackknight/blackknightevil_portrait.png",
+    "assets/characters/blackknight/blackknightevilprof.png",
+    "assets/characters/blackknight/blackknightghost_portrait.png",
+    "assets/characters/blackknight/blackknightghostprof.png",
+    "assets/characters/blackknight/blackknightgrave_portrait.png",
+    "assets/characters/blackknight/blackknightgraveprof.png",
+    "assets/characters/blackknight/blackknightlich_portrait.png",
+    "assets/characters/blackknight/blackknightlichprof.png",
+    "assets/characters/blackknight/blackknightreanimation_portrait.png",
+    "assets/characters/blackknight/blackknightreanimationprof.png",
+    "assets/characters/blackknight/blackknightzealot_portrait.png",
+    "assets/characters/blackknight/blackknightzealotprof.png",
+    "assets/characters/darkness/darkness_portrait.png",
+    "assets/characters/dennis/dennis_portrait.png",
+    "assets/characters/fate/fate_portrait.png",
+    "assets/characters/gaia/gaia_portrait.png",
+    "assets/characters/gaia/gaiagrave_portrait.png",
+    "assets/characters/gaia/gaiagraveprof.png",
+    "assets/characters/gaia/gaialife_portrait.png",
+    "assets/characters/gaia/gaialifeprof.png",
+    "assets/characters/gaia/gaiamagnet_portrait.png",
+    "assets/characters/gaia/gaiamagnetprof.png",
+    "assets/characters/gaia/gaiamoon_portrait.png",
+    "assets/characters/gaia/gaiamoonprof.png",
+    "assets/characters/gaia/gaiamyth_portrait.png",
+    "assets/characters/gaia/gaiamythprof.png",
+    "assets/characters/gaia/gaianomad_portrait.png",
+    "assets/characters/gaia/gaianomadprof.png",
+    "assets/characters/gaia/gaiasanctuary_portrait.png",
+    "assets/characters/gaia/gaiasanctuaryprof.png",
+    "assets/characters/gaia/gaiaslime_portrait.png",
+    "assets/characters/gaia/gaiaslimeprof.png",
+    "assets/characters/gaia/gaiaspore_portrait.png",
+    "assets/characters/gaia/gaiasporeprof.png",
+    "assets/characters/gaia/gaiasun_portrait.png",
+    "assets/characters/gaia/gaiasunprof.png",
+    "assets/characters/galazax/galazax_portrait.png",
+    "assets/characters/gommar/gommar_portrait.png",
+    "assets/characters/gommar/gommarapocalypse_portrait.png",
+    "assets/characters/gommar/gommarapocalypseprof.png",
+    "assets/characters/gommar/gommaraurora_portrait.png",
+    "assets/characters/gommar/gommarauroraprof.png",
+    "assets/characters/gommar/gommarcrystal_portrait.png",
+    "assets/characters/gommar/gommarcrystalprof.png",
+    "assets/characters/gommar/gommarglacier_portrait.png",
+    "assets/characters/gommar/gommarglacierprof.png",
+    "assets/characters/gommar/gommarlich_portrait.png",
+    "assets/characters/gommar/gommarlichprof.png",
+    "assets/characters/gommar/gommarmyth_portrait.png",
+    "assets/characters/gommar/gommarmythprof.png",
+    "assets/characters/gommar/gommarnight_portrait.png",
+    "assets/characters/gommar/gommarnightprof.png",
+    "assets/characters/gommar/gommarprism_portrait.png",
+    "assets/characters/gommar/gommarprismprof.png",
+    "assets/characters/gommar/gommarstasis_portrait.png",
+    "assets/characters/gommar/gommarstasisprof.png",
+    "assets/characters/gommar/gommarwinter_portrait.png",
+    "assets/characters/gommar/gommarwinterprof.png",
+    "assets/characters/hector/hector_portrait.png",
+    "assets/characters/hector/hectorantidote_portrait.png",
+    "assets/characters/hector/hectorantidoteprof.png",
+    "assets/characters/hector/hectorassassin_portrait.png",
+    "assets/characters/hector/hectorassassinprof.png",
+    "assets/characters/hector/hectorbattery_portrait.png",
+    "assets/characters/hector/hectorbatteryprof.png",
+    "assets/characters/hector/hectorblight_portrait.png",
+    "assets/characters/hector/hectorblightprof.png",
+    "assets/characters/hector/hectorbrimstone_portrait.png",
+    "assets/characters/hector/hectorbrimstoneprof.png",
+    "assets/characters/hector/hectorevolution_portrait.png",
+    "assets/characters/hector/hectorevolutionprof.png",
+    "assets/characters/hector/hectorfaerie_portrait.png",
+    "assets/characters/hector/hectorfaerieprof.png",
+    "assets/characters/hector/hectorserum_portrait.png",
+    "assets/characters/hector/hectorserumprof.png",
+    "assets/characters/hector/hectorspore_portrait.png",
+    "assets/characters/hector/hectorsporeprof.png",
+    "assets/characters/hector/hectorstasis_portrait.png",
+    "assets/characters/hector/hectorstasisprof.png",
+    "assets/characters/jarrik/jarrik_portrait.png",
+    "assets/characters/jarrik/jarrikalchemy_portrait.png",
+    "assets/characters/jarrik/jarrikalchemyprof.png",
+    "assets/characters/jarrik/jarrikapocalypse_portrait.png",
+    "assets/characters/jarrik/jarrikapocalypseprof.png",
+    "assets/characters/jarrik/jarrikbrimstone_portrait.png",
+    "assets/characters/jarrik/jarrikbrimstoneprof.png",
+    "assets/characters/jarrik/jarrikdevil_portrait.png",
+    "assets/characters/jarrik/jarrikdevilprof.png",
+    "assets/characters/jarrik/jarrikdragon_portrait.png",
+    "assets/characters/jarrik/jarrikdragonprof.png",
+    "assets/characters/jarrik/jarrikjudgment_portrait.png",
+    "assets/characters/jarrik/jarrikjudgmentprof.png",
+    "assets/characters/jarrik/jarrikmechanic_portrait.png",
+    "assets/characters/jarrik/jarrikmechanicprof.png",
+    "assets/characters/jarrik/jarrikplasma_portrait.png",
+    "assets/characters/jarrik/jarrikplasmaprof.png",
+    "assets/characters/jarrik/jarrikritual_portrait.png",
+    "assets/characters/jarrik/jarrikritualprof.png",
+    "assets/characters/jarrik/jarriksun_portrait.png",
+    "assets/characters/jarrik/jarriksunprof.png",
+    "assets/characters/keeper/keeper_portrait.png",
+    "assets/characters/keeper/keeperapocalypse_portrait.png",
+    "assets/characters/keeper/keeperapocalypseprof.png",
+    "assets/characters/keeper/keeperaurora_portrait.png",
+    "assets/characters/keeper/keeperauroraprof.png",
+    "assets/characters/keeper/keepercrystal_portrait.png",
+    "assets/characters/keeper/keepercrystalprof.png",
+    "assets/characters/keeper/keeperglacier_portrait.png",
+    "assets/characters/keeper/keeperglacierprof.png",
+    "assets/characters/keeper/keeperlich_portrait.png",
+    "assets/characters/keeper/keeperlichprof.png",
+    "assets/characters/keeper/keepermyth_portrait.png",
+    "assets/characters/keeper/keepermythprof.png",
+    "assets/characters/keeper/keepernight_portrait.png",
+    "assets/characters/keeper/keepernightprof.png",
+    "assets/characters/keeper/keeperprism_portrait.png",
+    "assets/characters/keeper/keeperprismprof.png",
+    "assets/characters/keeper/keeperstasis_portrait.png",
+    "assets/characters/keeper/keeperstasisprof.png",
+    "assets/characters/keeper/keeperwinter_portrait.png",
+    "assets/characters/keeper/keeperwinterprof.png",
+    "assets/characters/laria/laria_portrait.png",
+    "assets/characters/laria/lariaassassin_portrait.png",
+    "assets/characters/laria/lariaassassinprof.png",
+    "assets/characters/laria/lariacurse_portrait.png",
+    "assets/characters/laria/lariacurseprof.png",
+    "assets/characters/laria/lariadimension_portrait.png",
+    "assets/characters/laria/lariadimensionprof.png",
+    "assets/characters/laria/lariaion_portrait.png",
+    "assets/characters/laria/lariaionprof.png",
+    "assets/characters/laria/lariamirror_portrait.png",
+    "assets/characters/laria/lariamirrorprof.png",
+    "assets/characters/laria/lariamoon_portrait.png",
+    "assets/characters/laria/lariamoonprof.png",
+    "assets/characters/laria/larianight_portrait.png",
+    "assets/characters/laria/larianightprof.png",
+    "assets/characters/laria/larianinja0raw.png",
+    "assets/characters/laria/larianinja_portrait.png",
+    "assets/characters/laria/larianinjaprof.png",
+    "assets/characters/laria/lariaritual_portrait.png",
+    "assets/characters/laria/lariaritualprof.png",
+    "assets/characters/laria/lariavigilante_portrait.png",
+    "assets/characters/laria/lariavigilanteprof.png",
+    "assets/characters/maggie/maggie_portrait.png",
+    "assets/characters/maggie/maggieblight_portrait.png",
+    "assets/characters/maggie/maggieblightprof.png",
+    "assets/characters/maggie/maggieblood_portrait.png",
+    "assets/characters/maggie/maggiebloodprof.png",
+    "assets/characters/maggie/maggiecurse_portrait.png",
+    "assets/characters/maggie/maggiecurseprof.png",
+    "assets/characters/maggie/maggiedevil_portrait.png",
+    "assets/characters/maggie/maggiedevilprof.png",
+    "assets/characters/maggie/maggieevil_portrait.png",
+    "assets/characters/maggie/maggieevilprof.png",
+    "assets/characters/maggie/maggieghost_portrait.png",
+    "assets/characters/maggie/maggieghostprof.png",
+    "assets/characters/maggie/maggiegrave_portrait.png",
+    "assets/characters/maggie/maggiegraveprof.png",
+    "assets/characters/maggie/maggielich_portrait.png",
+    "assets/characters/maggie/maggielichprof.png",
+    "assets/characters/maggie/maggiereanimation_portrait.png",
+    "assets/characters/maggie/maggiereanimationprof.png",
+    "assets/characters/maggie/maggiezealot_portrait.png",
+    "assets/characters/maggie/maggiezealotprof.png",
+    "assets/characters/minions/gaiaminion1.png",
+    "assets/characters/minions/gaiaminion2.png",
+    "assets/characters/pyrrha/pyrrha_portrait.png",
+    "assets/characters/pyrrha/pyrrhaalchemy_portrait.png",
+    "assets/characters/pyrrha/pyrrhaalchemyprof.png",
+    "assets/characters/pyrrha/pyrrhaapocalypse_portrait.png",
+    "assets/characters/pyrrha/pyrrhaapocalypseprof.png",
+    "assets/characters/pyrrha/pyrrhabrimstone_portrait.png",
+    "assets/characters/pyrrha/pyrrhabrimstoneprof.png",
+    "assets/characters/pyrrha/pyrrhadevil_portrait.png",
+    "assets/characters/pyrrha/pyrrhadevilprof.png",
+    "assets/characters/pyrrha/pyrrhadragon_portrait.png",
+    "assets/characters/pyrrha/pyrrhadragonprof.png",
+    "assets/characters/pyrrha/pyrrhajudgment_portrait.png",
+    "assets/characters/pyrrha/pyrrhajudgmentprof.png",
+    "assets/characters/pyrrha/pyrrhamechanic_portrait.png",
+    "assets/characters/pyrrha/pyrrhamechanicprof.png",
+    "assets/characters/pyrrha/pyrrhaplasma_portrait.png",
+    "assets/characters/pyrrha/pyrrhaplasmaprof.png",
+    "assets/characters/pyrrha/pyrrharitual_portrait.png",
+    "assets/characters/pyrrha/pyrrharitualprof.png",
+    "assets/characters/pyrrha/pyrrhasun_portrait.png",
+    "assets/characters/pyrrha/pyrrhasunprof.png",
+    "assets/characters/riverdaughter/riverdaughter_portrait.png",
+    "assets/characters/riverdaughter/riverdaughteralchemy_portrait.png",
+    "assets/characters/riverdaughter/riverdaughteralchemyprof.png",
+    "assets/characters/riverdaughter/riverdaughteranointment_portrait.png",
+    "assets/characters/riverdaughter/riverdaughteranointmentprof.png",
+    "assets/characters/riverdaughter/riverdaughterblood_portrait.png",
+    "assets/characters/riverdaughter/riverdaughterbloodprof.png",
+    "assets/characters/riverdaughter/riverdaughtercurrent_portrait.png",
+    "assets/characters/riverdaughter/riverdaughtercurrentprof.png",
+    "assets/characters/riverdaughter/riverdaughterglacier_portrait.png",
+    "assets/characters/riverdaughter/riverdaughterglacierprof.png",
+    "assets/characters/riverdaughter/riverdaughtermirror_portrait.png",
+    "assets/characters/riverdaughter/riverdaughtermirrorprof.png",
+    "assets/characters/riverdaughter/riverdaughtermist_portrait.png",
+    "assets/characters/riverdaughter/riverdaughtermistprof.png",
+    "assets/characters/riverdaughter/riverdaughterocean_portrait.png",
+    "assets/characters/riverdaughter/riverdaughteroceanprof.png",
+    "assets/characters/riverdaughter/riverdaughterserum_portrait.png",
+    "assets/characters/riverdaughter/riverdaughterserumprof.png",
+    "assets/characters/riverdaughter/riverdaughterslime_portrait.png",
+    "assets/characters/riverdaughter/riverdaughterslimeprof.png",
+    "assets/characters/roland/roland_portrait.png",
+    "assets/characters/roland/rolandbattery_portrait.png",
+    "assets/characters/roland/rolandgrave_portrait.png",
+    "assets/characters/roland/rolandgraveprof.png",
+    "assets/characters/roland/rolandlife_portrait.png",
+    "assets/characters/roland/rolandlifeprof.png",
+    "assets/characters/roland/rolandmagnet_portrait.png",
+    "assets/characters/roland/rolandmagnetprof.png",
+    "assets/characters/roland/rolandmoon_portrait.png",
+    "assets/characters/roland/rolandmoonprof.png",
+    "assets/characters/roland/rolandmyth_portrait.png",
+    "assets/characters/roland/rolandmythprof.png",
+    "assets/characters/roland/rolandnomad_portrait.png",
+    "assets/characters/roland/rolandnomadprof.png",
+    "assets/characters/roland/rolandsanctuary_portrait.png",
+    "assets/characters/roland/rolandsanctuaryprof.png",
+    "assets/characters/roland/rolandslime_portrait.png",
+    "assets/characters/roland/rolandslimeprof.png",
+    "assets/characters/roland/rolandspore_portrait.png",
+    "assets/characters/roland/rolandsporeprof.png",
+    "assets/characters/roland/rolandsun_portrait.png",
+    "assets/characters/roland/rolandsunprof.png",
+    "assets/characters/saya/saya_portrait.png",
+    "assets/characters/saya/sayaaurora_portrait.png",
+    "assets/characters/saya/sayaauroraprof.png",
+    "assets/characters/saya/sayabattery_portrait.png",
+    "assets/characters/saya/sayabatteryprof.png",
+    "assets/characters/saya/sayacurrent_portrait.png",
+    "assets/characters/saya/sayacurrentprof.png",
+    "assets/characters/saya/sayaion_portrait.png",
+    "assets/characters/saya/sayaionprof.png",
+    "assets/characters/saya/sayamagnet_portrait.png",
+    "assets/characters/saya/sayamagnetprof.png",
+    "assets/characters/saya/sayaplasma_portrait.png",
+    "assets/characters/saya/sayaplasmaprof.png",
+    "assets/characters/saya/sayareanimation_portrait.png",
+    "assets/characters/saya/sayareanimationprof.png",
+    "assets/characters/saya/sayastorm_portrait.png",
+    "assets/characters/saya/sayastormprof.png",
+    "assets/characters/saya/sayathunder_portrait.png",
+    "assets/characters/saya/sayathunderprof.png",
+    "assets/characters/saya/sayavengeance_portrait.png",
+    "assets/characters/saya/sayavengeanceprof.png",
+    "assets/characters/scratch/scratch_portrait.png",
+    "assets/characters/sera/sera_portrait.png",
+    "assets/characters/syl/syl_portrait.png",
+    "assets/characters/syl/sylangel_portrait.png",
+    "assets/characters/syl/sylangelprof.png",
+    "assets/characters/syl/sylcloud_portrait.png",
+    "assets/characters/syl/sylcloudprof.png",
+    "assets/characters/syl/sylfaerie_portrait.png",
+    "assets/characters/syl/sylfaerieprof.png",
+    "assets/characters/syl/sylghost_portrait.png",
+    "assets/characters/syl/sylghostprof.png",
+    "assets/characters/syl/sylmechanic_portrait.png",
+    "assets/characters/syl/sylmechanicprof.png",
+    "assets/characters/syl/sylmist_portrait.png",
+    "assets/characters/syl/sylmistprof.png",
+    "assets/characters/syl/sylninja_portrait.png",
+    "assets/characters/syl/sylninjaprof.png",
+    "assets/characters/syl/sylnomad_portrait.png",
+    "assets/characters/syl/sylnomadprof.png",
+    "assets/characters/syl/sylstorm_portrait.png",
+    "assets/characters/syl/sylstormprof.png",
+    "assets/characters/syl/sylwinter_portrait.png",
+    "assets/characters/syl/sylwinterprof.png",
+    "assets/characters/taryn/taryn_portrait.png",
+    "assets/characters/taryn/tarynangel_portrait.png",
+    "assets/characters/taryn/tarynangelprof.png",
+    "assets/characters/taryn/tarynanointment_portrait.png",
+    "assets/characters/taryn/tarynanointmentprof.png",
+    "assets/characters/taryn/tarynantidote_portrait.png",
+    "assets/characters/taryn/tarynantidoteprof.png",
+    "assets/characters/taryn/taryndivine_portrait.png",
+    "assets/characters/taryn/taryndivineprof.png",
+    "assets/characters/taryn/tarynjudgment_portrait.png",
+    "assets/characters/taryn/tarynjudgmentprof.png",
+    "assets/characters/taryn/tarynprism_portrait.png",
+    "assets/characters/taryn/tarynprismprof.png",
+    "assets/characters/taryn/tarynsanctuary_portrait.png",
+    "assets/characters/taryn/tarynsanctuaryprof.png",
+    "assets/characters/taryn/tarynvengeance_portrait.png",
+    "assets/characters/taryn/tarynvengeanceprof.png",
+    "assets/characters/taryn/tarynvigilante_portrait.png",
+    "assets/characters/taryn/tarynvigilanteprof.png",
+    "assets/characters/taryn/tarynzealot_portrait.png",
+    "assets/characters/taryn/tarynzealotprof.png",
+    "assets/characters/titania/titania_portrait.png",
+    "assets/characters/titania/titaniaantidote_portrait.png",
+    "assets/characters/titania/titaniaantidoteprof.png",
+    "assets/characters/titania/titaniaassassin_portrait.png",
+    "assets/characters/titania/titaniaassassinprof.png",
+    "assets/characters/titania/titaniabattery_portrait.png",
+    "assets/characters/titania/titaniabatteryprof.png",
+    "assets/characters/titania/titaniablight_portrait.png",
+    "assets/characters/titania/titaniablightprof.png",
+    "assets/characters/titania/titaniabrimstone_portrait.png",
+    "assets/characters/titania/titaniabrimstoneprof.png",
+    "assets/characters/titania/titaniaevolution_portrait.png",
+    "assets/characters/titania/titaniaevolutionprof.png",
+    "assets/characters/titania/titaniafaerie_portrait.png",
+    "assets/characters/titania/titaniafaerieprof.png",
+    "assets/characters/titania/titaniaserum_portrait.png",
+    "assets/characters/titania/titaniaserumprof.png",
+    "assets/characters/titania/titaniaspore_portrait.png",
+    "assets/characters/titania/titaniasporeprof.png",
+    "assets/characters/titania/titaniastasis_portrait.png",
+    "assets/characters/titania/titaniastasisprof.png",
+    "assets/characters/trinity/trinity_portrait.png",
+    "assets/characters/xyris/xyris_portrait.png",
+    "assets/characters/xyris/xyrisassassin_portrait.png",
+    "assets/characters/xyris/xyrisassassinprof.png",
+    "assets/characters/xyris/xyriscurse_portrait.png",
+    "assets/characters/xyris/xyriscurseprof.png",
+    "assets/characters/xyris/xyrisdimension_portrait.png",
+    "assets/characters/xyris/xyrisdimensionprof.png",
+    "assets/characters/xyris/xyrision_portrait.png",
+    "assets/characters/xyris/xyrisionprof.png",
+    "assets/characters/xyris/xyrismirror_portrait.png",
+    "assets/characters/xyris/xyrismirrorprof.png",
+    "assets/characters/xyris/xyrismoon_portrait.png",
+    "assets/characters/xyris/xyrismoonprof.png",
+    "assets/characters/xyris/xyrisnight_portrait.png",
+    "assets/characters/xyris/xyrisnightprof.png",
+    "assets/characters/xyris/xyrisninja_portrait.png",
+    "assets/characters/xyris/xyrisninjaprof.png",
+    "assets/characters/xyris/xyrisritual_portrait.png",
+    "assets/characters/xyris/xyrisritualprof.png",
+    "assets/characters/xyris/xyrisvigilante_portrait.png",
+    "assets/characters/xyris/xyrisvigilanteprof.png",
+    "assets/characters/zephyrex/zephyrex_portrait.png",
+    "assets/characters/zephyrex/zephyrexangel_portrait.png",
+    "assets/characters/zephyrex/zephyrexangelprof.png",
+    "assets/characters/zephyrex/zephyrexcloud_portrait.png",
+    "assets/characters/zephyrex/zephyrexcloudprof.png",
+    "assets/characters/zephyrex/zephyrexfaerie_portrait.png",
+    "assets/characters/zephyrex/zephyrexfaerieprof.png",
+    "assets/characters/zephyrex/zephyrexghost_portrait.png",
+    "assets/characters/zephyrex/zephyrexghostprof.png",
+    "assets/characters/zephyrex/zephyrexmechanic_portrait.png",
+    "assets/characters/zephyrex/zephyrexmechanicprof.png",
+    "assets/characters/zephyrex/zephyrexmist_portrait.png",
+    "assets/characters/zephyrex/zephyrexmistprof.png",
+    "assets/characters/zephyrex/zephyrexninja_portrait.png",
+    "assets/characters/zephyrex/zephyrexninjaprof.png",
+    "assets/characters/zephyrex/zephyrexnomad_portrait.png",
+    "assets/characters/zephyrex/zephyrexnomadprof.png",
+    "assets/characters/zephyrex/zephyrexstorm_portrait.png",
+    "assets/characters/zephyrex/zephyrexstormprof.png",
+    "assets/characters/zephyrex/zephyrexwinter_portrait.png",
+    "assets/characters/zephyrex/zephyrexwinterprof.png",
+    "assets/characters/zevkir/zevkir_portrait.png",
+    "assets/characters/zevkir/zevkiralchemy_portrait.png",
+    "assets/characters/zevkir/zevkiralchemyprof.png",
+    "assets/characters/zevkir/zevkiranointment_portrait.png",
+    "assets/characters/zevkir/zevkiranointmentprof.png",
+    "assets/characters/zevkir/zevkirblood_portrait.png",
+    "assets/characters/zevkir/zevkirbloodprof.png",
+    "assets/characters/zevkir/zevkircurrent_portrait.png",
+    "assets/characters/zevkir/zevkircurrentprof.png",
+    "assets/characters/zevkir/zevkirglacier_portrait.png",
+    "assets/characters/zevkir/zevkirglacierprof.png",
+    "assets/characters/zevkir/zevkirmirror_portrait.png",
+    "assets/characters/zevkir/zevkirmirrorprof.png",
+    "assets/characters/zevkir/zevkirmist_portrait.png",
+    "assets/characters/zevkir/zevkirmistprof.png",
+    "assets/characters/zevkir/zevkirocean_portrait.png",
+    "assets/characters/zevkir/zevkiroceanprof.png",
+    "assets/characters/zevkir/zevkirserum_portrait.png",
+    "assets/characters/zevkir/zevkirserumprof.png",
+    "assets/characters/zevkir/zevkirslime_portrait.png",
+    "assets/characters/zevkir/zevkirslimeprof.png"
+  ],
+  "non_image_files_left_in_place": []
+}

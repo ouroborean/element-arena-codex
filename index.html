@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Element Arena — Codex</title>
+  <link rel="stylesheet" href="app/styles.css" />
+</head>
+<body>
+  <header class="appbar">
+    <div class="appbar-inner">
+      <a class="brand" href="#/roster">
+        <span class="brand-mark">◆</span>
+        <span class="brand-text">Element Arena <em>Codex</em></span>
+      </a>
+      <nav class="mainnav" id="mainnav">
+        <a href="#/roster" data-route="roster">Roster</a>
+        <a href="#/fusions" data-route="fusions">Fusion Lab</a>
+        <a href="#/skills" data-route="skills">Skills</a>
+        <a href="#/elements" data-route="elements">Elements</a>
+        <a href="#/minions" data-route="minions">Minions</a>
+        <a href="#/about" data-route="about">About</a>
+      </nav>
+      <div class="appbar-search">
+        <input id="globalSearch" type="search" placeholder="Search anything…  (/)" autocomplete="off" spellcheck="false" />
+        <div id="searchResults" class="search-results" hidden></div>
+      </div>
+    </div>
+  </header>
+
+  <main id="view" class="view">
+    <div class="loading">Loading codex…</div>
+  </main>
+
+  <footer class="appfoot">
+    <span id="footStats"></span>
+    <span class="foot-note">Data extracted from the Godot project. Damage/heal numbers live in each skill's description.</span>
+  </footer>
+
+  <script src="app/db.js"></script>
+  <script src="app/app.js"></script>
+</body>
+</html>

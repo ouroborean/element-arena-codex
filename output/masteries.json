@@ -1,0 +1,1352 @@
+[
+  {
+    "id": "ando_attacker",
+    "owner": "ando",
+    "role": "attacker",
+    "mastery_name": "Attacker",
+    "progress_multiplier": 0.4,
+    "progress_increment": null,
+    "type": null,
+    "source_file": "masteries/ando/attackermastery.tscn"
+  },
+  {
+    "id": "ando_defender",
+    "owner": "ando",
+    "role": "defender",
+    "mastery_name": "Defender",
+    "progress_multiplier": 0.6,
+    "progress_increment": 15,
+    "type": 1,
+    "source_file": "masteries/ando/defendermastery.tscn"
+  },
+  {
+    "id": "ando_disruptor",
+    "owner": "ando",
+    "role": "disruptor",
+    "mastery_name": "Disruptor",
+    "progress_multiplier": 2.0,
+    "progress_increment": 9,
+    "type": 3,
+    "source_file": "masteries/ando/disruptormastery.tscn"
+  },
+  {
+    "id": "ando_strategist",
+    "owner": "ando",
+    "role": "strategist",
+    "mastery_name": "Strategist",
+    "progress_multiplier": 2.0,
+    "progress_increment": 15,
+    "type": 4,
+    "source_file": "masteries/ando/strategistmastery.tscn"
+  },
+  {
+    "id": "ando_support",
+    "owner": "ando",
+    "role": "support",
+    "mastery_name": "Support",
+    "progress_multiplier": 0.8,
+    "progress_increment": 10,
+    "type": 2,
+    "source_file": "masteries/ando/supportmastery.tscn"
+  },
+  {
+    "id": "aramao_attacker",
+    "owner": "aramao",
+    "role": "attacker",
+    "mastery_name": "Attacker",
+    "progress_multiplier": 0.6,
+    "progress_increment": null,
+    "type": null,
+    "source_file": "masteries/aramao/attackermastery.tscn"
+  },
+  {
+    "id": "aramao_defender",
+    "owner": "aramao",
+    "role": "defender",
+    "mastery_name": "Defender",
+    "progress_multiplier": 0.6,
+    "progress_increment": 15,
+    "type": 1,
+    "source_file": "masteries/aramao/defendermastery.tscn"
+  },
+  {
+    "id": "aramao_disruptor",
+    "owner": "aramao",
+    "role": "disruptor",
+    "mastery_name": "Disruptor",
+    "progress_multiplier": 2.0,
+    "progress_increment": 9,
+    "type": 3,
+    "source_file": "masteries/aramao/disruptormastery.tscn"
+  },
+  {
+    "id": "aramao_strategist",
+    "owner": "aramao",
+    "role": "strategist",
+    "mastery_name": "Strategist",
+    "progress_multiplier": 2.0,
+    "progress_increment": 15,
+    "type": 4,
+    "source_file": "masteries/aramao/strategistmastery.tscn"
+  },
+  {
+    "id": "aramao_support",
+    "owner": "aramao",
+    "role": "support",
+    "mastery_name": "Support",
+    "progress_multiplier": 0.8,
+    "progress_increment": 10,
+    "type": 2,
+    "source_file": "masteries/aramao/supportmastery.tscn"
+  },
+  {
+    "id": "ayana_attacker",
+    "owner": "ayana",
+    "role": "attacker",
+    "mastery_name": "Attacker",
+    "progress_multiplier": 0.6,
+    "progress_increment": null,
+    "type": null,
+    "source_file": "masteries/ayana/attackermastery.tscn"
+  },
+  {
+    "id": "ayana_defender",
+    "owner": "ayana",
+    "role": "defender",
+    "mastery_name": "Defender",
+    "progress_multiplier": 0.6,
+    "progress_increment": 15,
+    "type": 1,
+    "source_file": "masteries/ayana/defendermastery.tscn"
+  },
+  {
+    "id": "ayana_disruptor",
+    "owner": "ayana",
+    "role": "disruptor",
+    "mastery_name": "Disruptor",
+    "progress_multiplier": 2.0,
+    "progress_increment": 9,
+    "type": 3,
+    "source_file": "masteries/ayana/disruptormastery.tscn"
+  },
+  {
+    "id": "ayana_strategist",
+    "owner": "ayana",
+    "role": "strategist",
+    "mastery_name": "Strategist",
+    "progress_multiplier": 2.0,
+    "progress_increment": 15,
+    "type": 4,
+    "source_file": "masteries/ayana/strategistmastery.tscn"
+  },
+  {
+    "id": "ayana_support",
+    "owner": "ayana",
+    "role": "support",
+    "mastery_name": "Support",
+    "progress_multiplier": 0.8,
+    "progress_increment": 10,
+    "type": 2,
+    "source_file": "masteries/ayana/supportmastery.tscn"
+  },
+  {
+    "id": "blackknight_attacker",
+    "owner": "blackknight",
+    "role": "attacker",
+    "mastery_name": "Attacker",
+    "progress_multiplier": 0.4,
+    "progress_increment": null,
+    "type": null,
+    "source_file": "masteries/blackknight/attackermastery.tscn"
+  },
+  {
+    "id": "blackknight_defender",
+    "owner": "blackknight",
+    "role": "defender",
+    "mastery_name": "Defender",
+    "progress_multiplier": 0.6,
+    "progress_increment": 15,
+    "type": 1,
+    "source_file": "masteries/blackknight/defendermastery.tscn"
+  },
+  {
+    "id": "blackknight_disruptor",
+    "owner": "blackknight",
+    "role": "disruptor",
+    "mastery_name": "Disruptor",
+    "progress_multiplier": 2.0,
+    "progress_increment": 9,
+    "type": 3,
+    "source_file": "masteries/blackknight/disruptormastery.tscn"
+  },
+  {
+    "id": "blackknight_strategist",
+    "owner": "blackknight",
+    "role": "strategist",
+    "mastery_name": "Strategist",
+    "progress_multiplier": 2.0,
+    "progress_increment": 15,
+    "type": 4,
+    "source_file": "masteries/blackknight/strategistmastery.tscn"
+  },
+  {
+    "id": "blackknight_support",
+    "owner": "blackknight",
+    "role": "support",
+    "mastery_name": "Support",
+    "progress_multiplier": 0.8,
+    "progress_increment": 10,
+    "type": 2,
+    "source_file": "masteries/blackknight/supportmastery.tscn"
+  },
+  {
+    "id": "dennis_attacker",
+    "owner": "dennis",
+    "role": "attacker",
+    "mastery_name": "Attacker",
+    "progress_multiplier": 0.4,
+    "progress_increment": null,
+    "type": null,
+    "source_file": "masteries/dennis/attackermastery.tscn"
+  },
+  {
+    "id": "dennis_defender",
+    "owner": "dennis",
+    "role": "defender",
+    "mastery_name": "Defender",
+    "progress_multiplier": 0.6,
+    "progress_increment": 15,
+    "type": 1,
+    "source_file": "masteries/dennis/defendermastery.tscn"
+  },
+  {
+    "id": "dennis_disruptor",
+    "owner": "dennis",
+    "role": "disruptor",
+    "mastery_name": "Disruptor",
+    "progress_multiplier": 2.0,
+    "progress_increment": 9,
+    "type": 3,
+    "source_file": "masteries/dennis/disruptormastery.tscn"
+  },
+  {
+    "id": "dennis_strategist",
+    "owner": "dennis",
+    "role": "strategist",
+    "mastery_name": "Strategist",
+    "progress_multiplier": 2.0,
+    "progress_increment": 15,
+    "type": 4,
+    "source_file": "masteries/dennis/strategistmastery.tscn"
+  },
+  {
+    "id": "dennis_support",
+    "owner": "dennis",
+    "role": "support",
+    "mastery_name": "Support",
+    "progress_multiplier": 0.8,
+    "progress_increment": 10,
+    "type": 2,
+    "source_file": "masteries/dennis/supportmastery.tscn"
+  },
+  {
+    "id": "fate_attacker",
+    "owner": "fate",
+    "role": "attacker",
+    "mastery_name": "Attacker",
+    "progress_multiplier": 0.6,
+    "progress_increment": null,
+    "type": null,
+    "source_file": "masteries/fate/attackermastery.tscn"
+  },
+  {
+    "id": "fate_defender",
+    "owner": "fate",
+    "role": "defender",
+    "mastery_name": "Defender",
+    "progress_multiplier": 0.6,
+    "progress_increment": 15,
+    "type": 1,
+    "source_file": "masteries/fate/defendermastery.tscn"
+  },
+  {
+    "id": "fate_disruptor",
+    "owner": "fate",
+    "role": "disruptor",
+    "mastery_name": "Disruptor",
+    "progress_multiplier": 2.0,
+    "progress_increment": 9,
+    "type": 3,
+    "source_file": "masteries/fate/disruptormastery.tscn"
+  },
+  {
+    "id": "fate_strategist",
+    "owner": "fate",
+    "role": "strategist",
+    "mastery_name": "Strategist",
+    "progress_multiplier": 2.0,
+    "progress_increment": 15,
+    "type": 4,
+    "source_file": "masteries/fate/strategistmastery.tscn"
+  },
+  {
+    "id": "fate_support",
+    "owner": "fate",
+    "role": "support",
+    "mastery_name": "Support",
+    "progress_multiplier": 0.8,
+    "progress_increment": 10,
+    "type": 2,
+    "source_file": "masteries/fate/supportmastery.tscn"
+  },
+  {
+    "id": "gaia_attacker",
+    "owner": "gaia",
+    "role": "attacker",
+    "mastery_name": "Attacker",
+    "progress_multiplier": 0.4,
+    "progress_increment": null,
+    "type": null,
+    "source_file": "masteries/gaia/attackermastery.tscn"
+  },
+  {
+    "id": "gaia_defender",
+    "owner": "gaia",
+    "role": "defender",
+    "mastery_name": "Defender",
+    "progress_multiplier": 0.6,
+    "progress_increment": 15,
+    "type": 1,
+    "source_file": "masteries/gaia/defendermastery.tscn"
+  },
+  {
+    "id": "gaia_disruptor",
+    "owner": "gaia",
+    "role": "disruptor",
+    "mastery_name": "Disruptor",
+    "progress_multiplier": 2.0,
+    "progress_increment": 9,
+    "type": 3,
+    "source_file": "masteries/gaia/disruptormastery.tscn"
+  },
+  {
+    "id": "gaia_strategist",
+    "owner": "gaia",
+    "role": "strategist",
+    "mastery_name": "Strategist",
+    "progress_multiplier": 2.0,
+    "progress_increment": 15,
+    "type": 4,
+    "source_file": "masteries/gaia/strategistmastery.tscn"
+  },
+  {
+    "id": "gaia_support",
+    "owner": "gaia",
+    "role": "support",
+    "mastery_name": "Support",
+    "progress_multiplier": 0.8,
+    "progress_increment": 10,
+    "type": 2,
+    "source_file": "masteries/gaia/supportmastery.tscn"
+  },
+  {
+    "id": "galazax_attacker",
+    "owner": "galazax",
+    "role": "attacker",
+    "mastery_name": "Attacker",
+    "progress_multiplier": 0.4,
+    "progress_increment": null,
+    "type": null,
+    "source_file": "masteries/galazax/attackermastery.tscn"
+  },
+  {
+    "id": "galazax_defender",
+    "owner": "galazax",
+    "role": "defender",
+    "mastery_name": "Defender",
+    "progress_multiplier": 0.6,
+    "progress_increment": 15,
+    "type": 1,
+    "source_file": "masteries/galazax/defendermastery.tscn"
+  },
+  {
+    "id": "galazax_disruptor",
+    "owner": "galazax",
+    "role": "disruptor",
+    "mastery_name": "Disruptor",
+    "progress_multiplier": 2.0,
+    "progress_increment": 9,
+    "type": 3,
+    "source_file": "masteries/galazax/disruptormastery.tscn"
+  },
+  {
+    "id": "galazax_strategist",
+    "owner": "galazax",
+    "role": "strategist",
+    "mastery_name": "Strategist",
+    "progress_multiplier": 2.0,
+    "progress_increment": 15,
+    "type": 4,
+    "source_file": "masteries/galazax/strategistmastery.tscn"
+  },
+  {
+    "id": "galazax_support",
+    "owner": "galazax",
+    "role": "support",
+    "mastery_name": "Support",
+    "progress_multiplier": 0.8,
+    "progress_increment": 10,
+    "type": 2,
+    "source_file": "masteries/galazax/supportmastery.tscn"
+  },
+  {
+    "id": "gommar_attacker",
+    "owner": "gommar",
+    "role": "attacker",
+    "mastery_name": "Attacker",
+    "progress_multiplier": 0.4,
+    "progress_increment": null,
+    "type": null,
+    "source_file": "masteries/gommar/attackermastery.tscn"
+  },
+  {
+    "id": "gommar_defender",
+    "owner": "gommar",
+    "role": "defender",
+    "mastery_name": "Defender",
+    "progress_multiplier": 0.6,
+    "progress_increment": 15,
+    "type": 1,
+    "source_file": "masteries/gommar/defendermastery.tscn"
+  },
+  {
+    "id": "gommar_disruptor",
+    "owner": "gommar",
+    "role": "disruptor",
+    "mastery_name": "Disruptor",
+    "progress_multiplier": 2.0,
+    "progress_increment": 9,
+    "type": 3,
+    "source_file": "masteries/gommar/disruptormastery.tscn"
+  },
+  {
+    "id": "gommar_strategist",
+    "owner": "gommar",
+    "role": "strategist",
+    "mastery_name": "Strategist",
+    "progress_multiplier": 2.0,
+    "progress_increment": 15,
+    "type": 4,
+    "source_file": "masteries/gommar/strategistmastery.tscn"
+  },
+  {
+    "id": "gommar_support",
+    "owner": "gommar",
+    "role": "support",
+    "mastery_name": "Support",
+    "progress_multiplier": 0.8,
+    "progress_increment": 10,
+    "type": 2,
+    "source_file": "masteries/gommar/supportmastery.tscn"
+  },
+  {
+    "id": "hector_attacker",
+    "owner": "hector",
+    "role": "attacker",
+    "mastery_name": "Attacker",
+    "progress_multiplier": 0.6,
+    "progress_increment": null,
+    "type": null,
+    "source_file": "masteries/hector/attackermastery.tscn"
+  },
+  {
+    "id": "hector_defender",
+    "owner": "hector",
+    "role": "defender",
+    "mastery_name": "Defender",
+    "progress_multiplier": 0.6,
+    "progress_increment": 15,
+    "type": 1,
+    "source_file": "masteries/hector/defendermastery.tscn"
+  },
+  {
+    "id": "hector_disruptor",
+    "owner": "hector",
+    "role": "disruptor",
+    "mastery_name": "Disruptor",
+    "progress_multiplier": 2.0,
+    "progress_increment": 9,
+    "type": 3,
+    "source_file": "masteries/hector/disruptormastery.tscn"
+  },
+  {
+    "id": "hector_strategist",
+    "owner": "hector",
+    "role": "strategist",
+    "mastery_name": "Strategist",
+    "progress_multiplier": 2.0,
+    "progress_increment": 15,
+    "type": 4,
+    "source_file": "masteries/hector/strategistmastery.tscn"
+  },
+  {
+    "id": "hector_support",
+    "owner": "hector",
+    "role": "support",
+    "mastery_name": "Support",
+    "progress_multiplier": 0.8,
+    "progress_increment": 10,
+    "type": 2,
+    "source_file": "masteries/hector/supportmastery.tscn"
+  },
+  {
+    "id": "jarrik_attacker",
+    "owner": "jarrik",
+    "role": "attacker",
+    "mastery_name": "Attacker",
+    "progress_multiplier": 0.4,
+    "progress_increment": null,
+    "type": null,
+    "source_file": "masteries/jarrik/attackermastery.tscn"
+  },
+  {
+    "id": "jarrik_defender",
+    "owner": "jarrik",
+    "role": "defender",
+    "mastery_name": "Defender",
+    "progress_multiplier": 0.6,
+    "progress_increment": 15,
+    "type": 1,
+    "source_file": "masteries/jarrik/defendermastery.tscn"
+  },
+  {
+    "id": "jarrik_disruptor",
+    "owner": "jarrik",
+    "role": "disruptor",
+    "mastery_name": "Disruptor",
+    "progress_multiplier": 2.0,
+    "progress_increment": 9,
+    "type": 3,
+    "source_file": "masteries/jarrik/disruptormastery.tscn"
+  },
+  {
+    "id": "jarrik_strategist",
+    "owner": "jarrik",
+    "role": "strategist",
+    "mastery_name": "Strategist",
+    "progress_multiplier": 2.0,
+    "progress_increment": 15,
+    "type": 4,
+    "source_file": "masteries/jarrik/strategistmastery.tscn"
+  },
+  {
+    "id": "jarrik_support",
+    "owner": "jarrik",
+    "role": "support",
+    "mastery_name": "Support",
+    "progress_multiplier": 0.8,
+    "progress_increment": 10,
+    "type": 2,
+    "source_file": "masteries/jarrik/supportmastery.tscn"
+  },
+  {
+    "id": "keeper_attacker",
+    "owner": "keeper",
+    "role": "attacker",
+    "mastery_name": "Attacker",
+    "progress_multiplier": 0.6,
+    "progress_increment": null,
+    "type": null,
+    "source_file": "masteries/keeper/attackermastery.tscn"
+  },
+  {
+    "id": "keeper_defender",
+    "owner": "keeper",
+    "role": "defender",
+    "mastery_name": "Defender",
+    "progress_multiplier": 0.6,
+    "progress_increment": 15,
+    "type": 1,
+    "source_file": "masteries/keeper/defendermastery.tscn"
+  },
+  {
+    "id": "keeper_disruptor",
+    "owner": "keeper",
+    "role": "disruptor",
+    "mastery_name": "Disruptor",
+    "progress_multiplier": 2.0,
+    "progress_increment": 9,
+    "type": 3,
+    "source_file": "masteries/keeper/disruptormastery.tscn"
+  },
+  {
+    "id": "keeper_strategist",
+    "owner": "keeper",
+    "role": "strategist",
+    "mastery_name": "Strategist",
+    "progress_multiplier": 2.0,
+    "progress_increment": 15,
+    "type": 4,
+    "source_file": "masteries/keeper/strategistmastery.tscn"
+  },
+  {
+    "id": "keeper_support",
+    "owner": "keeper",
+    "role": "support",
+    "mastery_name": "Support",
+    "progress_multiplier": 0.8,
+    "progress_increment": 10,
+    "type": 2,
+    "source_file": "masteries/keeper/supportmastery.tscn"
+  },
+  {
+    "id": "laria_attacker",
+    "owner": "laria",
+    "role": "attacker",
+    "mastery_name": "Attacker",
+    "progress_multiplier": 0.4,
+    "progress_increment": null,
+    "type": null,
+    "source_file": "masteries/laria/attackermastery.tscn"
+  },
+  {
+    "id": "laria_defender",
+    "owner": "laria",
+    "role": "defender",
+    "mastery_name": "Defender",
+    "progress_multiplier": 0.6,
+    "progress_increment": 15,
+    "type": 1,
+    "source_file": "masteries/laria/defendermastery.tscn"
+  },
+  {
+    "id": "laria_disruptor",
+    "owner": "laria",
+    "role": "disruptor",
+    "mastery_name": "Disruptor",
+    "progress_multiplier": 2.0,
+    "progress_increment": 9,
+    "type": 3,
+    "source_file": "masteries/laria/disruptormastery.tscn"
+  },
+  {
+    "id": "laria_strategist",
+    "owner": "laria",
+    "role": "strategist",
+    "mastery_name": "Strategist",
+    "progress_multiplier": 2.0,
+    "progress_increment": 15,
+    "type": 4,
+    "source_file": "masteries/laria/strategistmastery.tscn"
+  },
+  {
+    "id": "laria_support",
+    "owner": "laria",
+    "role": "support",
+    "mastery_name": "Support",
+    "progress_multiplier": 0.8,
+    "progress_increment": 10,
+    "type": 2,
+    "source_file": "masteries/laria/supportmastery.tscn"
+  },
+  {
+    "id": "maggie_attacker",
+    "owner": "maggie",
+    "role": "attacker",
+    "mastery_name": "Attacker",
+    "progress_multiplier": 0.4,
+    "progress_increment": null,
+    "type": null,
+    "source_file": "masteries/maggie/attackermastery.tscn"
+  },
+  {
+    "id": "maggie_defender",
+    "owner": "maggie",
+    "role": "defender",
+    "mastery_name": "Defender",
+    "progress_multiplier": 0.6,
+    "progress_increment": 15,
+    "type": 1,
+    "source_file": "masteries/maggie/defendermastery.tscn"
+  },
+  {
+    "id": "maggie_disruptor",
+    "owner": "maggie",
+    "role": "disruptor",
+    "mastery_name": "Disruptor",
+    "progress_multiplier": 2.0,
+    "progress_increment": 9,
+    "type": 3,
+    "source_file": "masteries/maggie/disruptormastery.tscn"
+  },
+  {
+    "id": "maggie_strategist",
+    "owner": "maggie",
+    "role": "strategist",
+    "mastery_name": "Strategist",
+    "progress_multiplier": 2.0,
+    "progress_increment": 15,
+    "type": 4,
+    "source_file": "masteries/maggie/strategistmastery.tscn"
+  },
+  {
+    "id": "maggie_support",
+    "owner": "maggie",
+    "role": "support",
+    "mastery_name": "Support",
+    "progress_multiplier": 0.8,
+    "progress_increment": 10,
+    "type": 2,
+    "source_file": "masteries/maggie/supportmastery.tscn"
+  },
+  {
+    "id": "pyrrha_attacker",
+    "owner": "pyrrha",
+    "role": "attacker",
+    "mastery_name": "Attacker",
+    "progress_multiplier": 0.4,
+    "progress_increment": null,
+    "type": null,
+    "source_file": "masteries/pyrrha/attackermastery.tscn"
+  },
+  {
+    "id": "pyrrha_defender",
+    "owner": "pyrrha",
+    "role": "defender",
+    "mastery_name": "Defender",
+    "progress_multiplier": 0.6,
+    "progress_increment": 15,
+    "type": 1,
+    "source_file": "masteries/pyrrha/defendermastery.tscn"
+  },
+  {
+    "id": "pyrrha_disruptor",
+    "owner": "pyrrha",
+    "role": "disruptor",
+    "mastery_name": "Disruptor",
+    "progress_multiplier": 2.0,
+    "progress_increment": 9,
+    "type": 3,
+    "source_file": "masteries/pyrrha/disruptormastery.tscn"
+  },
+  {
+    "id": "pyrrha_strategist",
+    "owner": "pyrrha",
+    "role": "strategist",
+    "mastery_name": "Strategist",
+    "progress_multiplier": 2.0,
+    "progress_increment": 15,
+    "type": 4,
+    "source_file": "masteries/pyrrha/strategistmastery.tscn"
+  },
+  {
+    "id": "pyrrha_support",
+    "owner": "pyrrha",
+    "role": "support",
+    "mastery_name": "Support",
+    "progress_multiplier": 0.8,
+    "progress_increment": 10,
+    "type": 2,
+    "source_file": "masteries/pyrrha/supportmastery.tscn"
+  },
+  {
+    "id": "riverdaughter_attacker",
+    "owner": "riverdaughter",
+    "role": "attacker",
+    "mastery_name": "Attacker",
+    "progress_multiplier": 0.4,
+    "progress_increment": null,
+    "type": null,
+    "source_file": "masteries/riverdaughter/attackermastery.tscn"
+  },
+  {
+    "id": "riverdaughter_defender",
+    "owner": "riverdaughter",
+    "role": "defender",
+    "mastery_name": "Defender",
+    "progress_multiplier": 0.6,
+    "progress_increment": 15,
+    "type": 1,
+    "source_file": "masteries/riverdaughter/defendermastery.tscn"
+  },
+  {
+    "id": "riverdaughter_disruptor",
+    "owner": "riverdaughter",
+    "role": "disruptor",
+    "mastery_name": "Disruptor",
+    "progress_multiplier": 2.0,
+    "progress_increment": 9,
+    "type": 3,
+    "source_file": "masteries/riverdaughter/disruptormastery.tscn"
+  },
+  {
+    "id": "riverdaughter_strategist",
+    "owner": "riverdaughter",
+    "role": "strategist",
+    "mastery_name": "Strategist",
+    "progress_multiplier": 2.0,
+    "progress_increment": 15,
+    "type": 4,
+    "source_file": "masteries/riverdaughter/strategistmastery.tscn"
+  },
+  {
+    "id": "riverdaughter_support",
+    "owner": "riverdaughter",
+    "role": "support",
+    "mastery_name": "Support",
+    "progress_multiplier": 0.8,
+    "progress_increment": 10,
+    "type": 2,
+    "source_file": "masteries/riverdaughter/supportmastery.tscn"
+  },
+  {
+    "id": "roland_attacker",
+    "owner": "roland",
+    "role": "attacker",
+    "mastery_name": "Attacker",
+    "progress_multiplier": 0.6,
+    "progress_increment": null,
+    "type": null,
+    "source_file": "masteries/roland/attackermastery.tscn"
+  },
+  {
+    "id": "roland_defender",
+    "owner": "roland",
+    "role": "defender",
+    "mastery_name": "Defender",
+    "progress_multiplier": 0.6,
+    "progress_increment": 15,
+    "type": 1,
+    "source_file": "masteries/roland/defendermastery.tscn"
+  },
+  {
+    "id": "roland_disruptor",
+    "owner": "roland",
+    "role": "disruptor",
+    "mastery_name": "Disruptor",
+    "progress_multiplier": 2.0,
+    "progress_increment": 9,
+    "type": 3,
+    "source_file": "masteries/roland/disruptormastery.tscn"
+  },
+  {
+    "id": "roland_strategist",
+    "owner": "roland",
+    "role": "strategist",
+    "mastery_name": "Strategist",
+    "progress_multiplier": 2.0,
+    "progress_increment": 15,
+    "type": 4,
+    "source_file": "masteries/roland/strategistmastery.tscn"
+  },
+  {
+    "id": "roland_support",
+    "owner": "roland",
+    "role": "support",
+    "mastery_name": "Support",
+    "progress_multiplier": 0.8,
+    "progress_increment": 10,
+    "type": 2,
+    "source_file": "masteries/roland/supportmastery.tscn"
+  },
+  {
+    "id": "saya_attacker",
+    "owner": "saya",
+    "role": "attacker",
+    "mastery_name": "Attacker",
+    "progress_multiplier": 0.6,
+    "progress_increment": null,
+    "type": null,
+    "source_file": "masteries/saya/attackermastery.tscn"
+  },
+  {
+    "id": "saya_defender",
+    "owner": "saya",
+    "role": "defender",
+    "mastery_name": "Defender",
+    "progress_multiplier": 0.6,
+    "progress_increment": 15,
+    "type": 1,
+    "source_file": "masteries/saya/defendermastery.tscn"
+  },
+  {
+    "id": "saya_disruptor",
+    "owner": "saya",
+    "role": "disruptor",
+    "mastery_name": "Disruptor",
+    "progress_multiplier": 2.0,
+    "progress_increment": 9,
+    "type": 3,
+    "source_file": "masteries/saya/disruptormastery.tscn"
+  },
+  {
+    "id": "saya_strategist",
+    "owner": "saya",
+    "role": "strategist",
+    "mastery_name": "Strategist",
+    "progress_multiplier": 2.0,
+    "progress_increment": 15,
+    "type": 4,
+    "source_file": "masteries/saya/strategistmastery.tscn"
+  },
+  {
+    "id": "saya_support",
+    "owner": "saya",
+    "role": "support",
+    "mastery_name": "Support",
+    "progress_multiplier": 0.8,
+    "progress_increment": 10,
+    "type": 2,
+    "source_file": "masteries/saya/supportmastery.tscn"
+  },
+  {
+    "id": "scratch_attacker",
+    "owner": "scratch",
+    "role": "attacker",
+    "mastery_name": "Attacker",
+    "progress_multiplier": 0.6,
+    "progress_increment": null,
+    "type": null,
+    "source_file": "masteries/scratch/attackermastery.tscn"
+  },
+  {
+    "id": "scratch_defender",
+    "owner": "scratch",
+    "role": "defender",
+    "mastery_name": "Defender",
+    "progress_multiplier": 0.6,
+    "progress_increment": 15,
+    "type": 1,
+    "source_file": "masteries/scratch/defendermastery.tscn"
+  },
+  {
+    "id": "scratch_disruptor",
+    "owner": "scratch",
+    "role": "disruptor",
+    "mastery_name": "Disruptor",
+    "progress_multiplier": 2.0,
+    "progress_increment": 9,
+    "type": 3,
+    "source_file": "masteries/scratch/disruptormastery.tscn"
+  },
+  {
+    "id": "scratch_strategist",
+    "owner": "scratch",
+    "role": "strategist",
+    "mastery_name": "Strategist",
+    "progress_multiplier": 2.0,
+    "progress_increment": 15,
+    "type": 4,
+    "source_file": "masteries/scratch/strategistmastery.tscn"
+  },
+  {
+    "id": "scratch_support",
+    "owner": "scratch",
+    "role": "support",
+    "mastery_name": "Support",
+    "progress_multiplier": 0.8,
+    "progress_increment": 10,
+    "type": 2,
+    "source_file": "masteries/scratch/supportmastery.tscn"
+  },
+  {
+    "id": "sera_attacker",
+    "owner": "sera",
+    "role": "attacker",
+    "mastery_name": "Attacker",
+    "progress_multiplier": 0.4,
+    "progress_increment": null,
+    "type": null,
+    "source_file": "masteries/sera/attackermastery.tscn"
+  },
+  {
+    "id": "sera_defender",
+    "owner": "sera",
+    "role": "defender",
+    "mastery_name": "Defender",
+    "progress_multiplier": 0.6,
+    "progress_increment": 15,
+    "type": 1,
+    "source_file": "masteries/sera/defendermastery.tscn"
+  },
+  {
+    "id": "sera_disruptor",
+    "owner": "sera",
+    "role": "disruptor",
+    "mastery_name": "Disruptor",
+    "progress_multiplier": 2.0,
+    "progress_increment": 9,
+    "type": 3,
+    "source_file": "masteries/sera/disruptormastery.tscn"
+  },
+  {
+    "id": "sera_strategist",
+    "owner": "sera",
+    "role": "strategist",
+    "mastery_name": "Strategist",
+    "progress_multiplier": 2.0,
+    "progress_increment": 15,
+    "type": 4,
+    "source_file": "masteries/sera/strategistmastery.tscn"
+  },
+  {
+    "id": "sera_support",
+    "owner": "sera",
+    "role": "support",
+    "mastery_name": "Support",
+    "progress_multiplier": 0.8,
+    "progress_increment": 10,
+    "type": 2,
+    "source_file": "masteries/sera/supportmastery.tscn"
+  },
+  {
+    "id": "syl_attacker",
+    "owner": "syl",
+    "role": "attacker",
+    "mastery_name": "Attacker",
+    "progress_multiplier": 0.4,
+    "progress_increment": null,
+    "type": null,
+    "source_file": "masteries/syl/attackermastery.tscn"
+  },
+  {
+    "id": "syl_defender",
+    "owner": "syl",
+    "role": "defender",
+    "mastery_name": "Defender",
+    "progress_multiplier": 0.6,
+    "progress_increment": 15,
+    "type": 1,
+    "source_file": "masteries/syl/defendermastery.tscn"
+  },
+  {
+    "id": "syl_disruptor",
+    "owner": "syl",
+    "role": "disruptor",
+    "mastery_name": "Disruptor",
+    "progress_multiplier": 2.0,
+    "progress_increment": 9,
+    "type": 3,
+    "source_file": "masteries/syl/disruptormastery.tscn"
+  },
+  {
+    "id": "syl_strategist",
+    "owner": "syl",
+    "role": "strategist",
+    "mastery_name": "Strategist",
+    "progress_multiplier": 2.0,
+    "progress_increment": 15,
+    "type": 4,
+    "source_file": "masteries/syl/strategistmastery.tscn"
+  },
+  {
+    "id": "syl_support",
+    "owner": "syl",
+    "role": "support",
+    "mastery_name": "Support",
+    "progress_multiplier": 0.8,
+    "progress_increment": 10,
+    "type": 2,
+    "source_file": "masteries/syl/supportmastery.tscn"
+  },
+  {
+    "id": "taryn_attacker",
+    "owner": "taryn",
+    "role": "attacker",
+    "mastery_name": "Attacker",
+    "progress_multiplier": 0.6,
+    "progress_increment": null,
+    "type": null,
+    "source_file": "masteries/taryn/attackermastery.tscn"
+  },
+  {
+    "id": "taryn_defender",
+    "owner": "taryn",
+    "role": "defender",
+    "mastery_name": "Defender",
+    "progress_multiplier": 0.6,
+    "progress_increment": 15,
+    "type": 1,
+    "source_file": "masteries/taryn/defendermastery.tscn"
+  },
+  {
+    "id": "taryn_disruptor",
+    "owner": "taryn",
+    "role": "disruptor",
+    "mastery_name": "Disruptor",
+    "progress_multiplier": 2.0,
+    "progress_increment": 9,
+    "type": 3,
+    "source_file": "masteries/taryn/disruptormastery.tscn"
+  },
+  {
+    "id": "taryn_strategist",
+    "owner": "taryn",
+    "role": "strategist",
+    "mastery_name": "Strategist",
+    "progress_multiplier": 2.0,
+    "progress_increment": 15,
+    "type": 4,
+    "source_file": "masteries/taryn/strategistmastery.tscn"
+  },
+  {
+    "id": "taryn_support",
+    "owner": "taryn",
+    "role": "support",
+    "mastery_name": "Support",
+    "progress_multiplier": 0.8,
+    "progress_increment": 10,
+    "type": 2,
+    "source_file": "masteries/taryn/supportmastery.tscn"
+  },
+  {
+    "id": "titania_attacker",
+    "owner": "titania",
+    "role": "attacker",
+    "mastery_name": "Attacker",
+    "progress_multiplier": 0.6,
+    "progress_increment": null,
+    "type": null,
+    "source_file": "masteries/titania/attackermastery.tscn"
+  },
+  {
+    "id": "titania_defender",
+    "owner": "titania",
+    "role": "defender",
+    "mastery_name": "Defender",
+    "progress_multiplier": 0.6,
+    "progress_increment": 15,
+    "type": 1,
+    "source_file": "masteries/titania/defendermastery.tscn"
+  },
+  {
+    "id": "titania_disruptor",
+    "owner": "titania",
+    "role": "disruptor",
+    "mastery_name": "Disruptor",
+    "progress_multiplier": 2.0,
+    "progress_increment": 9,
+    "type": 3,
+    "source_file": "masteries/titania/disruptormastery.tscn"
+  },
+  {
+    "id": "titania_strategist",
+    "owner": "titania",
+    "role": "strategist",
+    "mastery_name": "Strategist",
+    "progress_multiplier": 2.0,
+    "progress_increment": 15,
+    "type": 4,
+    "source_file": "masteries/titania/strategistmastery.tscn"
+  },
+  {
+    "id": "titania_support",
+    "owner": "titania",
+    "role": "support",
+    "mastery_name": "Support",
+    "progress_multiplier": 0.8,
+    "progress_increment": 10,
+    "type": 2,
+    "source_file": "masteries/titania/supportmastery.tscn"
+  },
+  {
+    "id": "trinity_attacker",
+    "owner": "trinity",
+    "role": "attacker",
+    "mastery_name": "Attacker",
+    "progress_multiplier": 0.6,
+    "progress_increment": null,
+    "type": null,
+    "source_file": "masteries/trinity/attackermastery.tscn"
+  },
+  {
+    "id": "trinity_defender",
+    "owner": "trinity",
+    "role": "defender",
+    "mastery_name": "Defender",
+    "progress_multiplier": 0.6,
+    "progress_increment": 15,
+    "type": 1,
+    "source_file": "masteries/trinity/defendermastery.tscn"
+  },
+  {
+    "id": "trinity_disruptor",
+    "owner": "trinity",
+    "role": "disruptor",
+    "mastery_name": "Disruptor",
+    "progress_multiplier": 2.0,
+    "progress_increment": 9,
+    "type": 3,
+    "source_file": "masteries/trinity/disruptormastery.tscn"
+  },
+  {
+    "id": "trinity_strategist",
+    "owner": "trinity",
+    "role": "strategist",
+    "mastery_name": "Strategist",
+    "progress_multiplier": 2.0,
+    "progress_increment": 15,
+    "type": 4,
+    "source_file": "masteries/trinity/strategistmastery.tscn"
+  },
+  {
+    "id": "trinity_support",
+    "owner": "trinity",
+    "role": "support",
+    "mastery_name": "Support",
+    "progress_multiplier": 0.8,
+    "progress_increment": 10,
+    "type": 2,
+    "source_file": "masteries/trinity/supportmastery.tscn"
+  },
+  {
+    "id": "xyris_attacker",
+    "owner": "xyris",
+    "role": "attacker",
+    "mastery_name": "Attacker",
+    "progress_multiplier": 0.6,
+    "progress_increment": null,
+    "type": null,
+    "source_file": "masteries/xyris/attackermastery.tscn"
+  },
+  {
+    "id": "xyris_defender",
+    "owner": "xyris",
+    "role": "defender",
+    "mastery_name": "Defender",
+    "progress_multiplier": 0.6,
+    "progress_increment": 15,
+    "type": 1,
+    "source_file": "masteries/xyris/defendermastery.tscn"
+  },
+  {
+    "id": "xyris_disruptor",
+    "owner": "xyris",
+    "role": "disruptor",
+    "mastery_name": "Disruptor",
+    "progress_multiplier": 2.0,
+    "progress_increment": 9,
+    "type": 3,
+    "source_file": "masteries/xyris/disruptormastery.tscn"
+  },
+  {
+    "id": "xyris_strategist",
+    "owner": "xyris",
+    "role": "strategist",
+    "mastery_name": "Strategist",
+    "progress_multiplier": 2.0,
+    "progress_increment": 15,
+    "type": 4,
+    "source_file": "masteries/xyris/strategistmastery.tscn"
+  },
+  {
+    "id": "xyris_support",
+    "owner": "xyris",
+    "role": "support",
+    "mastery_name": "Support",
+    "progress_multiplier": 0.8,
+    "progress_increment": 10,
+    "type": 2,
+    "source_file": "masteries/xyris/supportmastery.tscn"
+  },
+  {
+    "id": "zephyrex_attacker",
+    "owner": "zephyrex",
+    "role": "attacker",
+    "mastery_name": "Attacker",
+    "progress_multiplier": 0.4,
+    "progress_increment": null,
+    "type": null,
+    "source_file": "masteries/zephyrex/attackermastery.tscn"
+  },
+  {
+    "id": "zephyrex_defender",
+    "owner": "zephyrex",
+    "role": "defender",
+    "mastery_name": "Defender",
+    "progress_multiplier": 0.6,
+    "progress_increment": 15,
+    "type": 1,
+    "source_file": "masteries/zephyrex/defendermastery.tscn"
+  },
+  {
+    "id": "zephyrex_disruptor",
+    "owner": "zephyrex",
+    "role": "disruptor",
+    "mastery_name": "Disruptor",
+    "progress_multiplier": 2.0,
+    "progress_increment": 9,
+    "type": 3,
+    "source_file": "masteries/zephyrex/disruptormastery.tscn"
+  },
+  {
+    "id": "zephyrex_strategist",
+    "owner": "zephyrex",
+    "role": "strategist",
+    "mastery_name": "Strategist",
+    "progress_multiplier": 2.0,
+    "progress_increment": 15,
+    "type": 4,
+    "source_file": "masteries/zephyrex/strategistmastery.tscn"
+  },
+  {
+    "id": "zephyrex_support",
+    "owner": "zephyrex",
+    "role": "support",
+    "mastery_name": "Support",
+    "progress_multiplier": 0.8,
+    "progress_increment": 10,
+    "type": 2,
+    "source_file": "masteries/zephyrex/supportmastery.tscn"
+  },
+  {
+    "id": "zevkir_attacker",
+    "owner": "zevkir",
+    "role": "attacker",
+    "mastery_name": "Attacker",
+    "progress_multiplier": 0.4,
+    "progress_increment": null,
+    "type": null,
+    "source_file": "masteries/zevkir/attackermastery.tscn"
+  },
+  {
+    "id": "zevkir_defender",
+    "owner": "zevkir",
+    "role": "defender",
+    "mastery_name": "Defender",
+    "progress_multiplier": 0.6,
+    "progress_increment": 15,
+    "type": 1,
+    "source_file": "masteries/zevkir/defendermastery.tscn"
+  },
+  {
+    "id": "zevkir_disruptor",
+    "owner": "zevkir",
+    "role": "disruptor",
+    "mastery_name": "Disruptor",
+    "progress_multiplier": 2.0,
+    "progress_increment": 9,
+    "type": 3,
+    "source_file": "masteries/zevkir/disruptormastery.tscn"
+  },
+  {
+    "id": "zevkir_strategist",
+    "owner": "zevkir",
+    "role": "strategist",
+    "mastery_name": "Strategist",
+    "progress_multiplier": 2.0,
+    "progress_increment": 15,
+    "type": 4,
+    "source_file": "masteries/zevkir/strategistmastery.tscn"
+  },
+  {
+    "id": "zevkir_support",
+    "owner": "zevkir",
+    "role": "support",
+    "mastery_name": "Support",
+    "progress_multiplier": 0.8,
+    "progress_increment": 10,
+    "type": 2,
+    "source_file": "masteries/zevkir/supportmastery.tscn"
+  }
+]

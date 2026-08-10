@@ -1,0 +1,682 @@
+[
+  {
+    "id": "ayanaangelminion",
+    "character_name": "Angel",
+    "path_name": "ayanaangelminion",
+    "owner": "ayana",
+    "element": {
+      "id": 33,
+      "name": "angel",
+      "display_name": "Angel"
+    },
+    "image": "assets/characters/minions/ayanaangelminionprof.png",
+    "base_hp": 30,
+    "base_hp_candidates": [
+      30
+    ],
+    "hp_source": "gd-heuristic",
+    "source_file": "characters/minions/ayanaangelminion.tscn"
+  },
+  {
+    "id": "blackknightgraveminion",
+    "character_name": "Grave",
+    "path_name": "blackknightgraveminion",
+    "owner": "blackknight",
+    "element": {
+      "id": 41,
+      "name": "grave",
+      "display_name": "Grave"
+    },
+    "image": "assets/characters/minions/blackknightgraveminion1prof.png",
+    "base_hp": 30,
+    "base_hp_candidates": [
+      30
+    ],
+    "hp_source": "gd-heuristic",
+    "source_file": "characters/minions/blackknightgraveminion.tscn"
+  },
+  {
+    "id": "blackknightskeletonminion",
+    "character_name": "Skeleton",
+    "path_name": "blackknightskeletonminion",
+    "owner": "blackknight",
+    "element": {
+      "id": 52,
+      "name": "lich",
+      "display_name": "Lich"
+    },
+    "image": "assets/characters/minions/blackknightlichminionprof.png",
+    "base_hp": 10,
+    "base_hp_candidates": [
+      10
+    ],
+    "hp_source": "gd-heuristic",
+    "source_file": "characters/minions/blackknightskeletonminion.tscn"
+  },
+  {
+    "id": "blackknightzombieminion",
+    "character_name": "Zombie",
+    "path_name": "blackknightzombieminion",
+    "owner": "blackknight",
+    "element": {
+      "id": 41,
+      "name": "grave",
+      "display_name": "Grave"
+    },
+    "image": "assets/characters/minions/blackknightgraveminion2prof.png",
+    "base_hp": 40,
+    "base_hp_candidates": [
+      40
+    ],
+    "hp_source": "gd-heuristic",
+    "source_file": "characters/minions/blackknightzombieminion.tscn"
+  },
+  {
+    "id": "gaiaminion",
+    "character_name": "Seedling",
+    "path_name": "gaiaminion",
+    "owner": "gaia",
+    "element": {
+      "id": 6,
+      "name": "earth",
+      "display_name": "Earth"
+    },
+    "image": "assets/characters/minions/gaiaminionprof.png",
+    "base_hp": 25,
+    "base_hp_candidates": [
+      25
+    ],
+    "hp_source": "gd-heuristic",
+    "source_file": "characters/minions/gaiaminion.tscn"
+  },
+  {
+    "id": "gaiamoonminion",
+    "character_name": "Gaia's Fury",
+    "path_name": "gaiamoonminion",
+    "owner": "gaia",
+    "element": {
+      "id": 43,
+      "name": "moon",
+      "display_name": "Moon"
+    },
+    "image": "assets/characters/minions/gaiamoonminionprof.png",
+    "base_hp": null,
+    "base_hp_candidates": [],
+    "hp_source": "dynamic",
+    "source_file": "characters/minions/gaiamoonminion.tscn"
+  },
+  {
+    "id": "gaiamushroomminion",
+    "character_name": "Mushroom",
+    "path_name": "gaiamushroomminion",
+    "owner": "gaia",
+    "element": {
+      "id": 38,
+      "name": "spore",
+      "display_name": "Spore"
+    },
+    "image": "assets/characters/minions/gaiasporeminionprof.png",
+    "base_hp": 20,
+    "base_hp_candidates": [
+      20
+    ],
+    "hp_source": "gd-heuristic",
+    "source_file": "characters/minions/gaiamushroomminion.tscn"
+  },
+  {
+    "id": "gaiamythminion",
+    "character_name": "World Tree",
+    "path_name": "gaiamythminion",
+    "owner": "gaia",
+    "element": {
+      "id": 39,
+      "name": "myth",
+      "display_name": "Myth"
+    },
+    "image": "assets/characters/minions/gaiamythminionprof.png",
+    "base_hp": 80,
+    "base_hp_candidates": [
+      80
+    ],
+    "hp_source": "gd-heuristic",
+    "source_file": "characters/minions/gaiamythminion.tscn"
+  },
+  {
+    "id": "gaiaworldsproutminion",
+    "character_name": "Worldsprout",
+    "path_name": "gaiaworldsproutminion",
+    "owner": "gaia",
+    "element": {
+      "id": 6,
+      "name": "earth",
+      "display_name": "Earth"
+    },
+    "image": "assets/characters/minions/gaiaminion2prof.png",
+    "base_hp": 40,
+    "base_hp_candidates": [
+      40
+    ],
+    "hp_source": "gd-heuristic",
+    "source_file": "characters/minions/gaiaworldsproutminion.tscn"
+  },
+  {
+    "id": "hectorbatteryminion",
+    "character_name": "Synthesizer",
+    "path_name": "hectorbatteryminion",
+    "owner": "hector",
+    "element": {
+      "id": 48,
+      "name": "battery",
+      "display_name": "Battery"
+    },
+    "image": "assets/characters/minions/hectorbatteryminionprof.png",
+    "base_hp": 40,
+    "base_hp_candidates": [
+      40
+    ],
+    "hp_source": "gd-heuristic",
+    "source_file": "characters/minions/hectorbatteryminion.tscn"
+  },
+  {
+    "id": "hectorminion",
+    "character_name": "Dennis the Apprentice",
+    "path_name": "hectorminion",
+    "owner": "hector",
+    "element": {
+      "id": 5,
+      "name": "poison",
+      "display_name": "Poison"
+    },
+    "image": "assets/characters/minions/hectorminionprof.png",
+    "base_hp": 80,
+    "base_hp_candidates": [
+      80
+    ],
+    "hp_source": "gd-heuristic",
+    "source_file": "characters/minions/hectorminion.tscn"
+  },
+  {
+    "id": "jarriklargeminion",
+    "character_name": "Large Cinder",
+    "path_name": "jarriklargeminion",
+    "owner": "jarrik",
+    "element": {
+      "id": 0,
+      "name": "fire",
+      "display_name": "Fire",
+      "defaulted": true
+    },
+    "image": "assets/characters/minions/jarrikminionprof.png",
+    "base_hp": 50,
+    "base_hp_candidates": [
+      50
+    ],
+    "hp_source": "gd-heuristic",
+    "source_file": "characters/minions/jarriklargeminion.tscn"
+  },
+  {
+    "id": "jarrikminion",
+    "character_name": "Cinderling",
+    "path_name": "jarrikminion",
+    "owner": "jarrik",
+    "element": {
+      "id": 0,
+      "name": "fire",
+      "display_name": "Fire",
+      "defaulted": true
+    },
+    "image": "assets/characters/minions/jarrikminionprof.png",
+    "base_hp": 10,
+    "base_hp_candidates": [
+      10
+    ],
+    "hp_source": "gd-heuristic",
+    "source_file": "characters/minions/jarrikminion.tscn"
+  },
+  {
+    "id": "jarrikplasmaminion",
+    "character_name": "Azure Sparkling",
+    "path_name": "jarrikplasmaminion",
+    "owner": "jarrik",
+    "element": {
+      "id": 18,
+      "name": "plasma",
+      "display_name": "Plasma"
+    },
+    "image": "assets/characters/minions/jarrikplasmaminionprof.png",
+    "base_hp": 10,
+    "base_hp_candidates": [
+      10
+    ],
+    "hp_source": "gd-heuristic",
+    "source_file": "characters/minions/jarrikplasmaminion.tscn"
+  },
+  {
+    "id": "larianinjaminion",
+    "character_name": "Shadow Clone",
+    "path_name": "larianinjaminion",
+    "owner": "laria",
+    "element": {
+      "id": 36,
+      "name": "ninja",
+      "display_name": "Ninja"
+    },
+    "image": "assets/characters/minions/larianinjaminionprof.png",
+    "base_hp": 5,
+    "base_hp_candidates": [
+      5
+    ],
+    "hp_source": "gd-heuristic",
+    "source_file": "characters/minions/larianinjaminion.tscn"
+  },
+  {
+    "id": "mythminion",
+    "character_name": "Bjorn, True King",
+    "path_name": "mythminion",
+    "owner": null,
+    "element": {
+      "id": 39,
+      "name": "myth",
+      "display_name": "Myth"
+    },
+    "image": "assets/characters/minions/gommarmythminionprof.png",
+    "base_hp": 80,
+    "base_hp_candidates": [
+      80
+    ],
+    "hp_source": "gd-heuristic",
+    "source_file": "characters/minions/mythminion.tscn"
+  },
+  {
+    "id": "riverdaughterslimeminion",
+    "character_name": "Slime",
+    "path_name": "riverdaughterslimeminion",
+    "owner": "riverdaughter",
+    "element": {
+      "id": 22,
+      "name": "slime",
+      "display_name": "Slime"
+    },
+    "image": "assets/characters/minions/riverdaughterslimeminionprof.png",
+    "base_hp": 15,
+    "base_hp_candidates": [
+      15
+    ],
+    "hp_source": "gd-heuristic",
+    "source_file": "characters/minions/riverdaughterslimeminion.tscn"
+  },
+  {
+    "id": "rolandminion",
+    "character_name": "Boulder",
+    "path_name": "rolandminion",
+    "owner": "roland",
+    "element": {
+      "id": 6,
+      "name": "earth",
+      "display_name": "Earth"
+    },
+    "image": "assets/characters/minions/rolandminionprof.png",
+    "base_hp": 50,
+    "base_hp_candidates": [
+      50
+    ],
+    "hp_source": "gd-heuristic",
+    "source_file": "characters/minions/rolandminion.tscn"
+  },
+  {
+    "id": "rolandmythminion",
+    "character_name": "Troll Stonethrower",
+    "path_name": "rolandmythminion",
+    "owner": "roland",
+    "element": {
+      "id": 39,
+      "name": "myth",
+      "display_name": "Myth"
+    },
+    "image": "assets/characters/minions/rolandmythminionprof.png",
+    "base_hp": 40,
+    "base_hp_candidates": [
+      40
+    ],
+    "hp_source": "gd-heuristic",
+    "source_file": "characters/minions/rolandmythminion.tscn"
+  },
+  {
+    "id": "rolandslimeminion",
+    "character_name": "Slimeball",
+    "path_name": "rolandslimeminion",
+    "owner": "roland",
+    "element": {
+      "id": 22,
+      "name": "slime",
+      "display_name": "Slime"
+    },
+    "image": "assets/characters/minions/rolandslimeminionprof.png",
+    "base_hp": 30,
+    "base_hp_candidates": [
+      30
+    ],
+    "hp_source": "gd-heuristic",
+    "source_file": "characters/minions/rolandslimeminion.tscn"
+  },
+  {
+    "id": "rolandsporeminion",
+    "character_name": "Stonecap Mushroom",
+    "path_name": "rolandsporeminion",
+    "owner": "roland",
+    "element": {
+      "id": 38,
+      "name": "spore",
+      "display_name": "Spore"
+    },
+    "image": "assets/characters/minions/rolandsporeminionprof.png",
+    "base_hp": 25,
+    "base_hp_candidates": [
+      25
+    ],
+    "hp_source": "gd-heuristic",
+    "source_file": "characters/minions/rolandsporeminion.tscn"
+  },
+  {
+    "id": "rolandzombieminion",
+    "character_name": "Zombie",
+    "path_name": "rolandzombieminion",
+    "owner": "roland",
+    "element": {
+      "id": 41,
+      "name": "grave",
+      "display_name": "Grave"
+    },
+    "image": "assets/characters/minions/blackknightgraveminion2prof.png",
+    "base_hp": 40,
+    "base_hp_candidates": [
+      40
+    ],
+    "hp_source": "gd-heuristic",
+    "source_file": "characters/minions/rolandzombieminion.tscn"
+  },
+  {
+    "id": "sayaauroraminion",
+    "character_name": "Prismatic Energy Cannon",
+    "path_name": "sayaauroraminion",
+    "owner": "saya",
+    "element": {
+      "id": 53,
+      "name": "aurora",
+      "display_name": "Aurora"
+    },
+    "image": null,
+    "base_hp": null,
+    "base_hp_candidates": [],
+    "hp_source": null,
+    "source_file": "characters/minions/sayaauroraminion.tscn"
+  },
+  {
+    "id": "sayabatteryminion",
+    "character_name": "Saya Cell",
+    "path_name": "sayabatteryminion",
+    "owner": "saya",
+    "element": {
+      "id": 48,
+      "name": "battery",
+      "display_name": "Battery"
+    },
+    "image": "assets/characters/minions/sayabatteryminionprof.png",
+    "base_hp": 40,
+    "base_hp_candidates": [
+      40
+    ],
+    "hp_source": "gd-heuristic",
+    "source_file": "characters/minions/sayabatteryminion.tscn"
+  },
+  {
+    "id": "sayareanimationminion1",
+    "character_name": "Shady Assistant",
+    "path_name": "sayareanimationminion1",
+    "owner": "saya",
+    "element": {
+      "id": 60,
+      "name": "reanimation",
+      "display_name": "Reanimation"
+    },
+    "image": "assets/characters/minions/sayareanimationminion1prof.png",
+    "base_hp": 25,
+    "base_hp_candidates": [
+      25
+    ],
+    "hp_source": "gd-heuristic",
+    "source_file": "characters/minions/sayareanimationminion1.tscn"
+  },
+  {
+    "id": "sayareanimationminion2",
+    "character_name": "Saya-Brand Monstrosity",
+    "path_name": "sayareanimationminion2",
+    "owner": "saya",
+    "element": {
+      "id": 60,
+      "name": "reanimation",
+      "display_name": "Reanimation"
+    },
+    "image": "assets/characters/minions/sayareanimationminion2prof.png",
+    "base_hp": 100,
+    "base_hp_candidates": [
+      100
+    ],
+    "hp_source": "gd-heuristic",
+    "source_file": "characters/minions/sayareanimationminion2.tscn"
+  },
+  {
+    "id": "stasisminion",
+    "character_name": "Frozen Beast",
+    "path_name": "stasisminion",
+    "owner": null,
+    "element": {
+      "id": 45,
+      "name": "stasis",
+      "display_name": "Stasis"
+    },
+    "image": "assets/characters/minions/gommarstasisminionprof.png",
+    "base_hp": 50,
+    "base_hp_candidates": [
+      50
+    ],
+    "hp_source": "gd-heuristic",
+    "source_file": "characters/minions/stasisminion.tscn"
+  },
+  {
+    "id": "syladultminion",
+    "character_name": "Adult Eagle",
+    "path_name": "syladultminion",
+    "owner": "syl",
+    "element": {
+      "id": 4,
+      "name": "wind",
+      "display_name": "Wind"
+    },
+    "image": "assets/characters/minions/sylminion2prof.png",
+    "base_hp": 80,
+    "base_hp_candidates": [
+      80
+    ],
+    "hp_source": "gd-heuristic",
+    "source_file": "characters/minions/syladultminion.tscn"
+  },
+  {
+    "id": "sylancientminion",
+    "character_name": "Ancient Eagle",
+    "path_name": "sylancientminion",
+    "owner": "syl",
+    "element": {
+      "id": 4,
+      "name": "wind",
+      "display_name": "Wind"
+    },
+    "image": "assets/characters/minions/sylminion3prof.png",
+    "base_hp": 100,
+    "base_hp_candidates": [
+      100
+    ],
+    "hp_source": "gd-heuristic",
+    "source_file": "characters/minions/sylancientminion.tscn"
+  },
+  {
+    "id": "sylfaerieminion",
+    "character_name": "Sparrowrider",
+    "path_name": "sylfaerieminion",
+    "owner": "syl",
+    "element": {
+      "id": 31,
+      "name": "faerie",
+      "display_name": "Faerie"
+    },
+    "image": "assets/characters/minions/sylfaerieminionprof.png",
+    "base_hp": 15,
+    "base_hp_candidates": [
+      15
+    ],
+    "hp_source": "gd-heuristic",
+    "source_file": "characters/minions/sylfaerieminion.tscn"
+  },
+  {
+    "id": "sylminion",
+    "character_name": "Hatchling Eagle",
+    "path_name": "sylminion",
+    "owner": "syl",
+    "element": {
+      "id": 4,
+      "name": "wind",
+      "display_name": "Wind"
+    },
+    "image": "assets/characters/minions/sylminion1prof.png",
+    "base_hp": 60,
+    "base_hp_candidates": [
+      60
+    ],
+    "hp_source": "gd-heuristic",
+    "source_file": "characters/minions/sylminion.tscn"
+  },
+  {
+    "id": "sylnomadminion",
+    "character_name": "Scavenger's Pile",
+    "path_name": "sylnomadminion",
+    "owner": "syl",
+    "element": {
+      "id": 30,
+      "name": "nomad",
+      "display_name": "Nomad"
+    },
+    "image": "assets/characters/minions/sylnomadminionprof.png",
+    "base_hp": 25,
+    "base_hp_candidates": [
+      25
+    ],
+    "hp_source": "gd-heuristic",
+    "source_file": "characters/minions/sylnomadminion.tscn"
+  },
+  {
+    "id": "titaniaminion",
+    "character_name": "Summer Courtesan",
+    "path_name": "titaniaminion",
+    "owner": "titania",
+    "element": {
+      "id": 5,
+      "name": "poison",
+      "display_name": "Poison"
+    },
+    "image": "assets/characters/minions/titaniaminionprof.png",
+    "base_hp": 30,
+    "base_hp_candidates": [
+      30
+    ],
+    "hp_source": "gd-heuristic",
+    "source_file": "characters/minions/titaniaminion.tscn"
+  },
+  {
+    "id": "titaniastasisminion",
+    "character_name": "Winter Loyalist",
+    "path_name": "titaniastasisminion",
+    "owner": "titania",
+    "element": {
+      "id": 45,
+      "name": "stasis",
+      "display_name": "Stasis"
+    },
+    "image": "assets/characters/minions/titaniastasisminionprof.png",
+    "base_hp": 20,
+    "base_hp_candidates": [
+      20
+    ],
+    "hp_source": "gd-heuristic",
+    "source_file": "characters/minions/titaniastasisminion.tscn"
+  },
+  {
+    "id": "trinityazureminion",
+    "character_name": "Prisma Azure",
+    "path_name": "trinityazureminion",
+    "owner": "trinity",
+    "element": {
+      "id": 51,
+      "name": "prism",
+      "display_name": "Prism"
+    },
+    "image": "assets/characters/minions/trinityazureprof.png",
+    "base_hp": 60,
+    "base_hp_candidates": [
+      60
+    ],
+    "hp_source": "gd-heuristic",
+    "source_file": "characters/minions/trinityazureminion.tscn"
+  },
+  {
+    "id": "trinitycrimsonminion",
+    "character_name": "Prisma Crimson",
+    "path_name": "trinitycrimsonminion",
+    "owner": "trinity",
+    "element": {
+      "id": 51,
+      "name": "prism",
+      "display_name": "Prism"
+    },
+    "image": "assets/characters/minions/trinitycrimsonprof.png",
+    "base_hp": 60,
+    "base_hp_candidates": [
+      60
+    ],
+    "hp_source": "gd-heuristic",
+    "source_file": "characters/minions/trinitycrimsonminion.tscn"
+  },
+  {
+    "id": "trinitysaffronminion",
+    "character_name": "Prisma Saffron",
+    "path_name": "trinitysaffronminion",
+    "owner": "trinity",
+    "element": {
+      "id": 51,
+      "name": "prism",
+      "display_name": "Prism"
+    },
+    "image": "assets/characters/minions/trinitysaffronprof.png",
+    "base_hp": 60,
+    "base_hp_candidates": [
+      60
+    ],
+    "hp_source": "gd-heuristic",
+    "source_file": "characters/minions/trinitysaffronminion.tscn"
+  },
+  {
+    "id": "xyrisminion",
+    "character_name": "Dream Reflection",
+    "path_name": "xyrisminion",
+    "owner": "xyris",
+    "element": {
+      "id": 9,
+      "name": "shadow",
+      "display_name": "Shadow"
+    },
+    "image": "assets/characters/minions/xyrisminionprof.png",
+    "base_hp": null,
+    "base_hp_candidates": [],
+    "hp_source": null,
+    "source_file": "characters/minions/xyrisminion.tscn"
+  }
+]
