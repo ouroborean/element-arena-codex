@@ -175,7 +175,6 @@
     if (assetExists(c.image)) return c.image;
     return c.image;
   }
-  function charProf(c) { return assetExists(c.image) ? c.image : charPortrait(c); }
   function fusionFormArt(c, elemName) {
     var stem = charStem(c);
     var prof = stem + elemName + "prof.png";
@@ -839,7 +838,7 @@
           var pair = c.fusion_skills[e.name];
           var art = fusionFormArt(c, e.name);
           return h("div", { class: "skill-card click", style: "--el:" + color, onclick: function () { go("#/fusion/" + c.id + "/" + e.name); } }, [
-            img(art.prof || charProf(c), "skill-icon"),
+            img(art.portrait || art.prof || charPortrait(c), "pf-thumb", (c.short_name || c.character_name) + " " + e.display_name + " form"),
             h("div", { class: "skill-main" }, [
               h("div", { class: "skill-head" }, [h("span", { class: "skill-name" }, (c.short_name || c.character_name))]),
               h("div", { class: "skill-desc" }, "Passive: " + ((IDX.skillById[pair.passive] || {}).name || "?") + " · Active: " + ((IDX.skillById[pair.active] || {}).name || "?")),
@@ -956,7 +955,7 @@
   // ---------- GLOBAL SEARCH ----------
   var searchIndex = [];
   function buildSearchIndex() {
-    DB.characters.forEach(function (c) { searchIndex.push({ type: "Hero", name: c.character_name, sub: c.element.display_name, hash: "#/char/" + c.id, img: charProf(c), key: (c.character_name + " " + c.id + " " + (c.short_name || "")).toLowerCase() }); });
+    DB.characters.forEach(function (c) { searchIndex.push({ type: "Hero", name: c.character_name, sub: c.element.display_name, hash: "#/char/" + c.id, img: charPortrait(c), rect: true, key: (c.character_name + " " + c.id + " " + (c.short_name || "")).toLowerCase() }); });
     DB.skills.forEach(function (s) { searchIndex.push({ type: "Skill", name: s.name, sub: (IDX.charById[s.owner] ? (IDX.charById[s.owner].short_name || s.owner) : s.owner) + " · " + (s.element ? s.element.display_name : ""), hash: "#/skill/" + encodeURIComponent(s.id), img: assetExists(s.image) ? s.image : null, key: (s.name + " " + s.id + " " + (s.description || "")).toLowerCase() }); });
     DB.augments.forEach(function (a) { searchIndex.push({ type: "Augment", name: a.display_name || a.augment_name, sub: (IDX.charById[a.owner] ? (IDX.charById[a.owner].short_name || a.owner) : a.owner), hash: "#/char/" + a.owner, img: null, key: ((a.display_name || "") + " " + a.id + " " + (a.description || "")).toLowerCase() }); });
     DB.elements.forEach(function (e) { if (!e.is_generic) searchIndex.push({ type: "Element", name: e.display_name, sub: e.is_base ? "Base" : "Fusion", hash: "#/element/" + e.name, img: null, key: (e.display_name + " " + e.name).toLowerCase() }); });
@@ -989,7 +988,7 @@
       groups[g].forEach(function (it) {
         var idx = flat.length; flat.push(it);
         var item = h("div", { class: "sr-item", onclick: function () { pickSearch(it); } }, [
-          it.img ? img(it.img, "") : h("div", { style: "width:30px;height:30px;border-radius:6px;background:var(--panel-3);flex:none" }),
+          it.img ? img(it.img, it.rect ? "sr-thumb-rect" : "") : h("div", { style: "width:30px;height:30px;border-radius:6px;background:var(--panel-3);flex:none" }),
           h("div", { style: "min-width:0" }, [h("div", { class: "sr-name" }, it.name), h("div", { class: "sr-sub" }, it.sub)]),
         ]);
         item.dataset.idx = idx;
