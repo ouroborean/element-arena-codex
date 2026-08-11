@@ -2,7 +2,7 @@
 
 A dependency-free, offline web app for browsing the extracted game database:
 heroes, their base skills, every fusion form and its skills, augments,
-masteries, elements, the fusion recipe table, and minions.
+elements, the fusion recipe table, and minions.
 
 ## Open it
 
@@ -41,6 +41,12 @@ python build_data.py           # rebundle app/db.js + reindex assets/
 Global search (top-right, or press `/`) jumps to any hero, skill, augment,
 element or minion. Element chips and cross-links are clickable everywhere.
 
+**Keyword hover glossary.** In any skill or augment description, defined
+mechanics (Stun, Shield, Piercing…) and referenced skill / minion names show as
+coloured links. Hover one for a small panel with its definition or the skill's
+details; **📌 pin** a panel to keep it open, then hover keywords *inside* it to
+chain further panels. Unpinned panels vanish once your mouse leaves them.
+
 ## Notes on the data
 
 - **Base HP is a uniform 100** for every hero (a class default, not per-record).
@@ -56,9 +62,10 @@ element or minion. Element chips and cross-links are clickable everywhere.
 ```
 index.html            the app shell
 app/styles.css        theme + layout
-app/app.js            all views + router + search (vanilla JS, no libraries)
+app/app.js            all views + router + search + keyword glossary (vanilla JS)
 app/db.js             AUTO-GENERATED bundle (database + asset index)
+app/glossary.js       AUTO-GENERATED bundle (hover-keyword glossary)
 build_data.py         regenerates app/db.js from output/database.json
-output/*.json         the extracted database (unchanged)
+output/*.json         the extracted database + glossary (unchanged)
 assets/               images (unchanged)
 ```

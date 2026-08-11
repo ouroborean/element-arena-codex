@@ -225,7 +225,7 @@
           elChip(e, { sm: true }),
           h("span", { class: "skill-slot" }, slotLabel),
         ]),
-        h("div", { class: "skill-desc" }, s.description || h("em", { style: "color:var(--text-faint)" }, "No description.")),
+        h("div", { class: "skill-desc" }, descNodes(s.description, h("em", { style: "color:var(--text-faint)" }, "No description."))),
         h("div", { class: "skill-meta" }, meta),
       ]),
     ]);
@@ -258,6 +258,7 @@
   function render() {
     var p = parseHash();
     var fn = routes[p.route] || viewRoster;
+    Panels.closeAll();
     clear(el.view);
     window.scrollTo(0, 0);
     try { fn(p.args); } catch (err) {
@@ -485,7 +486,7 @@
       var color = elColor(resolveEl(a.element));
       return h("div", { class: "aug-card", style: "--el:" + color }, [
         h("div", { class: "an" }, [a.display_name || a.augment_name, " ", elChip(a.element, { sm: true })]),
-        h("div", { class: "ad" }, a.description || h("em", { style: "color:var(--text-faint)" }, "No description.")),
+        h("div", { class: "ad" }, descNodes(a.description, h("em", { style: "color:var(--text-faint)" }, "No description."))),
       ]);
     }));
   }
@@ -709,7 +710,7 @@
           stat("Type", s.is_passive ? "Passive" : "Active"),
           stat("Targeting", s.targeting_type ? titleCase(s.targeting_type.name) : "—"),
         ]),
-        h("div", { class: "skill-desc", style: "font-size:15px;color:var(--text)" }, s.description || "No description."),
+        h("div", { class: "skill-desc", style: "font-size:15px;color:var(--text)" }, descNodes(s.description, [document.createTextNode("No description.")])),
         h("div", { class: "pill-row", style: "margin-top:12px" }, classChips(s).concat(
           s.hidden ? [h("span", { class: "meta-pill" }, "hidden")] : [],
           s.hidden_targets ? [h("span", { class: "meta-pill" }, "hidden targets")] : []
@@ -1001,11 +1002,246 @@
     }
   });
 
+  // ============================================================
+  //  GLOSSARY: keyword linking + chainable hover panels
+  // ============================================================
+  var GTERMS = null;   // exact string -> target descriptor
+  var GBUCKET = null;  // first-char -> [terms] sorted longest-first
+
+  // Godot color-constant names -> dark-theme-legible hex (keeps the game's hue coding).
+  var GODOT_COLORS = {
+    RED: "#ff6b6b", DARK_RED: "#e46a6a", INDIAN_RED: "#e0836f", CORAL: "#ff8a5c",
+    LIGHT_SALMON: "#ffab86", SADDLE_BROWN: "#cc9366", TAN: "#dcc79a", BISQUE: "#f0d6b2",
+    ORANGE: "#ffa838", GOLD: "#ffcf45", GOLDENROD: "#e8b83f", YELLOW: "#ffe867",
+    GREEN_YELLOW: "#c2e356", GREEN: "#63d16a", DARK_CYAN: "#43bbbb", AQUA: "#54e4e4",
+    AQUAMARINE: "#7cf0c8", MEDIUM_AQUAMARINE: "#7ed5b0", CADET_BLUE: "#8fbcc2",
+    SKY_BLUE: "#82caf1", LIGHT_BLUE: "#aadcec", CORNFLOWER_BLUE: "#84a9f3",
+    DARK_BLUE: "#8aa0f6", REBECCA_PURPLE: "#b992e8", DARK_GRAY: "#c6cad1", DIM_GRAY: "#aab0ba",
+  };
+  var DEF_COLOR = "var(--accent)";
+  function godotColor(name) { return (name && GODOT_COLORS[name]) || null; }
+
+  function initGlossary(g) {
+    if (!g) return;
+    GTERMS = {};
+    (g.definitions || []).forEach(function (d) {
+      (d.keywords || []).forEach(function (kw) {
+        if (kw && !GTERMS[kw]) GTERMS[kw] = { kind: "def", term: d.term, def: d.definition, color: godotColor(d.color) || DEF_COLOR };
+      });
+    });
+    Object.keys(g.keyword_lookup || {}).forEach(function (kw) {
+      if (kw && !GTERMS[kw]) GTERMS[kw] = { kind: "def", term: kw, def: g.keyword_lookup[kw], color: DEF_COLOR };
+    });
+    (g.skill_references || []).forEach(function (s) {
+      if (s.name && !GTERMS[s.name]) GTERMS[s.name] = { kind: "skill", name: s.name, skill_id: s.skill_id };
+    });
+    (g.minion_references || []).forEach(function (m) {
+      if (m.name && !GTERMS[m.name]) GTERMS[m.name] = { kind: "minion", name: m.name, minion_id: m.minion_id, hp: m.hp, hp_dynamic: m.hp_dynamic };
+    });
+    GBUCKET = {};
+    Object.keys(GTERMS).forEach(function (t) { var c = t.charAt(0); (GBUCKET[c] = GBUCKET[c] || []).push(t); });
+    Object.keys(GBUCKET).forEach(function (c) { GBUCKET[c].sort(function (a, b) { return b.length - a.length; }); });
+  }
+
+  function isWordChar(ch) { return ch != null && ((ch >= "A" && ch <= "Z") || (ch >= "a" && ch <= "z") || (ch >= "0" && ch <= "9")); }
+
+  // Plain string -> array of text nodes + gloss-link spans (whole-word, longest-match, case-sensitive).
+  function annotate(textIn) {
+    var text = textIn == null ? "" : String(textIn);
+    if (!GTERMS || !text) return [document.createTextNode(text)];
+    var out = [], buf = "", i = 0, n = text.length;
+    function flush() { if (buf) { out.push(document.createTextNode(buf)); buf = ""; } }
+    while (i < n) {
+      var ch = text.charAt(i), bucket = GBUCKET[ch], matched = null;
+      if (bucket) {
+        for (var b = 0; b < bucket.length; b++) {
+          var term = bucket[b], L = term.length;
+          if (text.substr(i, L) !== term) continue;
+          var beforeOK = !isWordChar(term.charAt(0)) || !isWordChar(text.charAt(i - 1));
+          var afterOK = !isWordChar(term.charAt(L - 1)) || !isWordChar(text.charAt(i + L));
+          if (beforeOK && afterOK) { matched = term; break; }
+        }
+      }
+      if (matched) { flush(); out.push(makeGlossLink(matched, GTERMS[matched])); i += matched.length; }
+      else { buf += ch; i++; }
+    }
+    flush();
+    return out;
+  }
+  // Description helper: annotate, or a fallback node when the text is empty.
+  function descNodes(text, fallback) {
+    if (text == null || text === "") return fallback != null ? fallback : [document.createTextNode("")];
+    return annotate(text);
+  }
+
+  function glossTargetColor(t) {
+    if (t.kind === "def") return t.color || DEF_COLOR;
+    if (t.kind === "skill") { var f = IDX.skillById[t.skill_id]; var e = f ? resolveEl(f.element) : null; return e ? elColor(e) : "var(--accent-2)"; }
+    if (t.kind === "minion") { var m = IDX.minionById[t.minion_id]; var e2 = m ? resolveEl(m.element) : null; return e2 ? elColor(e2) : "var(--accent)"; }
+    return "var(--accent)";
+  }
+  function makeGlossLink(term, target) {
+    var span = h("span", { class: "gloss gloss-" + target.kind }, [term]);
+    span.style.setProperty("--gc", glossTargetColor(target));
+    span.addEventListener("mouseenter", function () { Panels.linkEnter(span, target); });
+    span.addEventListener("mouseleave", function () { Panels.linkLeave(span, target); });
+    span.addEventListener("click", function (ev) { ev.stopPropagation(); ev.preventDefault(); Panels.linkClick(span, target); });
+    return span;
+  }
+
+  function costText(s, e) {
+    var c = s.cost || {}, g = c.generic || 0, sp = c.specific || 0;
+    if (!g && !sp) return "Free";
+    var parts = [];
+    if (g) parts.push(g + " generic");
+    if (sp) parts.push(sp + " " + (e ? e.display_name : "element"));
+    return parts.join(" + ");
+  }
+  function gpStat(k, v) { return h("span", { class: "gp-stat" }, [h("i", null, k + " "), String(v)]); }
+
+  function skillPanelParts(target) {
+    var f = IDX.skillById[target.skill_id];
+    if (!f) return { title: h("span", { class: "gp-title" }, target.name || "Skill"), body: [h("div", { class: "gp-def" }, "Details unavailable.")] };
+    var e = resolveEl(f.element), color = elColor(e), owner = IDX.charById[f.owner];
+    var stats = [gpStat("Cost", costText(f, e)), gpStat("CD", String(f.cooldown || 0)), gpStat("Type", f.is_passive ? "Passive" : "Active")];
+    if (f.targeting_type) stats.push(gpStat("Target", titleCase(f.targeting_type.name)));
+    var body = [
+      h("div", { class: "gp-stats" }, stats),
+      h("div", { class: "gp-def" }, descNodes(f.description, [document.createTextNode("No description.")])),
+      h("div", { class: "gp-foot" }, [
+        owner ? h("span", { class: "gp-open", onclick: function (ev) { ev.stopPropagation(); Panels.navigate("#/char/" + owner.id); } }, (owner.short_name || owner.character_name)) : null,
+        h("span", { class: "gp-open", onclick: function (ev) { ev.stopPropagation(); Panels.navigate("#/skill/" + encodeURIComponent(f.id)); } }, "Open skill →"),
+      ]),
+    ];
+    return { title: h("span", { class: "gp-title", style: "color:" + color }, f.name), body: body };
+  }
+  function minionPanelParts(target) {
+    var m = IDX.minionById[target.minion_id];
+    var name = target.name || (m && m.character_name) || "Minion";
+    var e = m ? resolveEl(m.element) : null, color = e ? elColor(e) : "var(--accent)", owner = m ? IDX.charById[m.owner] : null;
+    var hp = target.hp_dynamic ? "Dynamic" : (target.hp != null ? String(target.hp) : (m && m.base_hp != null ? String(m.base_hp) : "—"));
+    var stats = [gpStat("HP", hp)];
+    if (e) stats.push(gpStat("Element", e.display_name));
+    var body = [
+      h("div", { class: "gp-stats" }, stats),
+      owner ? h("div", { class: "gp-def" }, ["Summoned by ", h("span", { class: "gp-open", onclick: function (ev) { ev.stopPropagation(); Panels.navigate("#/char/" + owner.id); } }, (owner.short_name || owner.character_name))]) : null,
+      m ? h("div", { class: "gp-foot" }, [h("span", { class: "gp-open", onclick: function (ev) { ev.stopPropagation(); Panels.navigate("#/minion/" + encodeURIComponent(m.id)); } }, "Open minion →")]) : null,
+    ];
+    return { title: h("span", { class: "gp-title", style: "color:" + color }, name), body: body };
+  }
+
+  var Panels = (function () {
+    var list = [], hovered = new Set(), uid = 0;
+    var openTimer = null, sweepTimer = null, pendingAnchor = null;
+    var OPEN_DELAY = 120, SWEEP_DELAY = 240;
+
+    function panelContaining(node) { for (var i = 0; i < list.length; i++) { if (list[i].el.contains(node)) return list[i]; } return null; }
+    function childrenOf(p) { return list.filter(function (x) { return x.parent === p; }); }
+    function descendants(p) { var res = [], st = [p]; while (st.length) { var x = st.pop(); childrenOf(x).forEach(function (c) { res.push(c); st.push(c); }); } return res; }
+    function removePanel(p) { var i = list.indexOf(p); if (i < 0) return; list.splice(i, 1); hovered.delete(p.el); if (p.el.parentNode) p.el.parentNode.removeChild(p.el); }
+    function closeChain(p) { [p].concat(descendants(p)).forEach(removePanel); }
+    function closeAll() { list.slice().forEach(removePanel); }
+    function closeTransient() { list.slice().filter(function (p) { return !p.pinned; }).forEach(removePanel); }
+    function cancelSweep() { if (sweepTimer) { clearTimeout(sweepTimer); sweepTimer = null; } }
+    function scheduleSweep() { cancelSweep(); sweepTimer = setTimeout(reconcile, SWEEP_DELAY); }
+
+    function reconcile() {
+      cancelSweep();
+      var byDeep = list.slice().sort(function (a, b) { return b.level - a.level; }), alive = {};
+      byDeep.forEach(function (p) {
+        var a = p.pinned || hovered.has(p.el) || hovered.has(p.anchor);
+        if (!a) childrenOf(p).forEach(function (c) { if (alive[c.id]) a = true; });
+        alive[p.id] = a;
+      });
+      list.slice().forEach(function (p) { if (!alive[p.id]) removePanel(p); });
+    }
+
+    function positionPanel(node, anchor) {
+      var r = anchor.getBoundingClientRect(), pw = node.offsetWidth || 320, ph = node.offsetHeight || 200;
+      var vw = window.innerWidth, vh = window.innerHeight, m = 8, left = r.left;
+      if (left + pw > vw - m) left = vw - m - pw;
+      if (left < m) left = m;
+      var top = r.bottom + 6;
+      if (top + ph > vh - m) { var above = r.top - 6 - ph; top = above > m ? above : Math.max(m, vh - m - ph); }
+      node.style.left = Math.round(left) + "px";
+      node.style.top = Math.round(top) + "px";
+    }
+
+    function build(target) {
+      var parts, kind = target.kind;
+      if (kind === "def") parts = { title: h("span", { class: "gp-title", style: "color:" + (target.color || DEF_COLOR) }, target.term), body: [h("div", { class: "gp-def" }, annotate(target.def))] };
+      else if (kind === "skill") parts = skillPanelParts(target);
+      else parts = minionPanelParts(target);
+      var pinBtn = h("button", { class: "gp-btn gp-pin", title: "Pin (keep open)" }, "📌");
+      var closeBtn = h("button", { class: "gp-btn gp-close", title: "Close" }, "✕");
+      var head = h("div", { class: "gp-head" }, [
+        h("span", { class: "gp-kind gp-kind-" + kind }, kind === "def" ? "keyword" : kind),
+        parts.title, h("span", { class: "gp-spring" }), pinBtn, closeBtn,
+      ]);
+      var node = h("div", { class: "gloss-panel gloss-panel-" + kind }, [head, h("div", { class: "gp-body" }, parts.body)]);
+      return { el: node, pinBtn: pinBtn, closeBtn: closeBtn };
+    }
+
+    function togglePin(p) {
+      p.pinned = !p.pinned;
+      if (p.pinned) { p.parent = null; p.el.classList.add("pinned"); p.built.pinBtn.textContent = "📍"; p.built.pinBtn.title = "Unpin"; }
+      else { p.el.classList.remove("pinned"); p.built.pinBtn.textContent = "📌"; p.built.pinBtn.title = "Pin (keep open)"; scheduleSweep(); }
+    }
+
+    function open(anchor, target) {
+      if (!GTERMS) return null;
+      var parent = panelContaining(anchor);
+      list.slice().forEach(function (p) { if (p.parent === parent && !p.pinned && p.anchor !== anchor) closeChain(p); });
+      for (var i = 0; i < list.length; i++) { if (list[i].anchor === anchor) return list[i]; }
+      var built = build(target), node = built.el;
+      node.style.visibility = "hidden";
+      document.body.appendChild(node);
+      positionPanel(node, anchor);
+      node.style.visibility = "";
+      var p = { id: ++uid, el: node, level: parent ? parent.level + 1 : 0, pinned: false, anchor: anchor, parent: parent, target: target, built: built };
+      node.addEventListener("mouseenter", function () { hovered.add(node); cancelSweep(); });
+      node.addEventListener("mouseleave", function () { hovered.delete(node); scheduleSweep(); });
+      built.pinBtn.addEventListener("click", function (ev) { ev.stopPropagation(); togglePin(p); });
+      built.closeBtn.addEventListener("click", function (ev) { ev.stopPropagation(); closeChain(p); });
+      list.push(p);
+      return p;
+    }
+
+    function linkEnter(link, target) {
+      hovered.add(link); cancelSweep();
+      if (openTimer) clearTimeout(openTimer);
+      pendingAnchor = link;
+      openTimer = setTimeout(function () { openTimer = null; if (document.body.contains(link)) open(link, target); }, OPEN_DELAY);
+    }
+    function linkLeave(link) {
+      hovered.delete(link);
+      if (openTimer && pendingAnchor === link) { clearTimeout(openTimer); openTimer = null; }
+      scheduleSweep();
+    }
+    function linkClick(link, target) {
+      if (target.kind === "skill") { var f = IDX.skillById[target.skill_id]; if (f) { navigate("#/skill/" + encodeURIComponent(f.id)); return; } }
+      if (target.kind === "minion") { var m = IDX.minionById[target.minion_id]; if (m) { navigate("#/minion/" + encodeURIComponent(m.id)); return; } }
+      if (openTimer) { clearTimeout(openTimer); openTimer = null; }
+      var p = open(link, target);
+      if (p && !p.pinned) togglePin(p);
+    }
+    function navigate(hash) { closeAll(); go(hash); }
+
+    window.addEventListener("scroll", function (ev) {
+      if (ev.target && ev.target.nodeType === 1 && panelContaining(ev.target)) return;
+      closeTransient();
+    }, true);
+    window.addEventListener("resize", function () { closeAll(); });
+
+    return { linkEnter: linkEnter, linkLeave: linkLeave, linkClick: linkClick, closeAll: closeAll, closeTransient: closeTransient, navigate: navigate };
+  })();
+
   // ---------- BOOT ----------
   function boot(db, assets) {
     DB = db; ASSETS = assets ? new Set(assets) : null;
     buildIndices();
     buildSearchIndex();
+    if (window.GAME_GLOSSARY) initGlossary(window.GAME_GLOSSARY);
     el.footStats.textContent = DB._meta.counts.characters + " heroes · " + DB._meta.counts.skills + " skills · " +
       DB._meta.counts.augments + " augments · " + DB._meta.counts.elements + " elements";
     window.addEventListener("hashchange", render);
@@ -1015,10 +1251,14 @@
   function start() {
     if (window.GAME_DB) { boot(window.GAME_DB, window.ASSETS_INDEX); return; }
     // Fallback: fetch when served over HTTP (file:// will throw → show guidance)
-    fetch("output/database.json").then(function (r) { return r.json(); }).then(function (db) { boot(db, null); })
-      .catch(function () {
-        el.view.innerHTML = '<div class="empty-note" style="margin:40px">Could not load the game data. Please reload the page.</div>';
-      });
+    fetch("output/database.json").then(function (r) { return r.json(); }).then(function (db) {
+      if (window.GAME_GLOSSARY) { boot(db, null); return; }
+      return fetch("output/glossary.json").then(function (r) { return r.json(); }).then(function (g) {
+        window.GAME_GLOSSARY = g; boot(db, null);
+      }).catch(function () { boot(db, null); });
+    }).catch(function () {
+      el.view.innerHTML = '<div class="empty-note" style="margin:40px">Could not load the game data. Please reload the page.</div>';
+    });
   }
   start();
 })();
