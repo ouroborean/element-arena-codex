@@ -1005,8 +1005,10 @@
   // ============================================================
   //  GLOSSARY: keyword linking + chainable hover panels
   // ============================================================
-  var GTERMS = null;   // exact string -> target descriptor
-  var GBUCKET = null;  // first-char -> [terms] sorted longest-first
+  // GBUCKET: lowercase-first-char -> [candidate] sorted longest-first.
+  // Each candidate: { key, lckey, len, ci, target }. ci=true (definitions) match
+  // case-insensitively; ci=false (skill/minion names) match case-sensitively.
+  var GBUCKET = null;
 
   // Godot color-constant names -> dark-theme-legible hex (keeps the game's hue coding).
   var GODOT_COLORS = {
@@ -1023,24 +1025,29 @@
 
   function initGlossary(g) {
     if (!g) return;
-    GTERMS = {};
+    var cand = [], seenDef = {}, seenName = {};
+    function addDef(kw, target) {
+      if (!kw) return; var lc = kw.toLowerCase();
+      if (seenDef[lc]) return; seenDef[lc] = 1;
+      cand.push({ key: kw, lckey: lc, len: kw.length, ci: true, target: target });
+    }
     (g.definitions || []).forEach(function (d) {
-      (d.keywords || []).forEach(function (kw) {
-        if (kw && !GTERMS[kw]) GTERMS[kw] = { kind: "def", term: d.term, def: d.definition, color: godotColor(d.color) || DEF_COLOR };
-      });
+      var color = godotColor(d.color) || DEF_COLOR;
+      (d.keywords || []).forEach(function (kw) { addDef(kw, { kind: "def", term: d.term, def: d.definition, color: color }); });
     });
-    Object.keys(g.keyword_lookup || {}).forEach(function (kw) {
-      if (kw && !GTERMS[kw]) GTERMS[kw] = { kind: "def", term: kw, def: g.keyword_lookup[kw], color: DEF_COLOR };
-    });
+    Object.keys(g.keyword_lookup || {}).forEach(function (kw) { addDef(kw, { kind: "def", term: kw, def: g.keyword_lookup[kw], color: DEF_COLOR }); });
     (g.skill_references || []).forEach(function (s) {
-      if (s.name && !GTERMS[s.name]) GTERMS[s.name] = { kind: "skill", name: s.name, skill_id: s.skill_id };
+      if (!s.name || seenName[s.name]) return; seenName[s.name] = 1;
+      cand.push({ key: s.name, lckey: s.name.toLowerCase(), len: s.name.length, ci: false, target: { kind: "skill", name: s.name, skill_id: s.skill_id } });
     });
     (g.minion_references || []).forEach(function (m) {
-      if (m.name && !GTERMS[m.name]) GTERMS[m.name] = { kind: "minion", name: m.name, minion_id: m.minion_id, hp: m.hp, hp_dynamic: m.hp_dynamic };
+      if (!m.name || seenName[m.name]) return; seenName[m.name] = 1;
+      cand.push({ key: m.name, lckey: m.name.toLowerCase(), len: m.name.length, ci: false, target: { kind: "minion", name: m.name, minion_id: m.minion_id, hp: m.hp, hp_dynamic: m.hp_dynamic } });
     });
     GBUCKET = {};
-    Object.keys(GTERMS).forEach(function (t) { var c = t.charAt(0); (GBUCKET[c] = GBUCKET[c] || []).push(t); });
-    Object.keys(GBUCKET).forEach(function (c) { GBUCKET[c].sort(function (a, b) { return b.length - a.length; }); });
+    cand.forEach(function (c) { var f = c.lckey.charAt(0); (GBUCKET[f] = GBUCKET[f] || []).push(c); });
+    // longest first; on equal length prefer case-sensitive names (ci=false) over definitions.
+    Object.keys(GBUCKET).forEach(function (f) { GBUCKET[f].sort(function (a, b) { return (b.len - a.len) || (a.ci === b.ci ? 0 : (a.ci ? 1 : -1)); }); });
   }
 
   function isWordChar(ch) { return ch != null && ((ch >= "A" && ch <= "Z") || (ch >= "a" && ch <= "z") || (ch >= "0" && ch <= "9")); }
@@ -1048,22 +1055,23 @@
   // Plain string -> array of text nodes + gloss-link spans (whole-word, longest-match, case-sensitive).
   function annotate(textIn) {
     var text = textIn == null ? "" : String(textIn);
-    if (!GTERMS || !text) return [document.createTextNode(text)];
+    if (!GBUCKET || !text) return [document.createTextNode(text)];
     var out = [], buf = "", i = 0, n = text.length;
     function flush() { if (buf) { out.push(document.createTextNode(buf)); buf = ""; } }
     while (i < n) {
-      var ch = text.charAt(i), bucket = GBUCKET[ch], matched = null;
+      var bucket = GBUCKET[text.charAt(i).toLowerCase()], matched = null, mtarget = null;
       if (bucket) {
         for (var b = 0; b < bucket.length; b++) {
-          var term = bucket[b], L = term.length;
-          if (text.substr(i, L) !== term) continue;
-          var beforeOK = !isWordChar(term.charAt(0)) || !isWordChar(text.charAt(i - 1));
-          var afterOK = !isWordChar(term.charAt(L - 1)) || !isWordChar(text.charAt(i + L));
-          if (beforeOK && afterOK) { matched = term; break; }
+          var c = bucket[b], L = c.len, slice = text.substr(i, L);
+          if (slice.length < L) continue;
+          if (c.ci ? (slice.toLowerCase() !== c.lckey) : (slice !== c.key)) continue;
+          var beforeOK = !isWordChar(slice.charAt(0)) || !isWordChar(text.charAt(i - 1));
+          var afterOK = !isWordChar(slice.charAt(L - 1)) || !isWordChar(text.charAt(i + L));
+          if (beforeOK && afterOK) { matched = slice; mtarget = c.target; break; }
         }
       }
-      if (matched) { flush(); out.push(makeGlossLink(matched, GTERMS[matched])); i += matched.length; }
-      else { buf += ch; i++; }
+      if (matched) { flush(); out.push(makeGlossLink(matched, mtarget)); i += matched.length; }
+      else { buf += text.charAt(i); i++; }
     }
     flush();
     return out;
@@ -1189,7 +1197,7 @@
     }
 
     function open(anchor, target) {
-      if (!GTERMS) return null;
+      if (!GBUCKET) return null;
       var parent = panelContaining(anchor);
       list.slice().forEach(function (p) { if (p.parent === parent && !p.pinned && p.anchor !== anchor) closeChain(p); });
       for (var i = 0; i < list.length; i++) { if (list[i].anchor === anchor) return list[i]; }
