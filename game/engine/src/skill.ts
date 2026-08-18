@@ -19,6 +19,8 @@ export interface SkillInstance extends SkillDef {
   cooldown: number;
   /** Turns until usable again; 0 = ready. */
   currentCd: number;
+  /** The turn `currentCd` was last set on — advanceCooldowns skips this "birth turn" so cooldown N blocks N turns. */
+  cdSetTurn?: number;
   klass: SkillClass;
   /** Active class tags (Harmful, Instant, Strategic, Affliction, ...) — drives stun scoping. */
   tags: string[];

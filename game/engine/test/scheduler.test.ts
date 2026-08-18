@@ -44,7 +44,7 @@ test("canPay: generic is covered by any energy type", () => {
   assert.equal(canPay({ fire: 1, water: 2 }, "fire", { generic: 1, specific: 1 }), true);
 });
 
-test("cooldown: set on use, blocks reuse, advances per turn, gated by Paralysis", () => {
+test("cooldown: set on use, blocks reuse, SKIPS its birth turn, then advances (gated by Paralysis)", () => {
   const caster = makeUnit({ id: "a1", team: "A", skills: [atk(10, { cooldown: 2 })] });
   const state = makeState([caster], [makeUnit({ id: "b1", team: "B", hp: 100 })]);
 
@@ -52,12 +52,43 @@ test("cooldown: set on use, blocks reuse, advances per turn, gated by Paralysis"
   assert.equal(caster.skills![0]!.currentCd, 2);
   assert.equal(performAction(state, { unit: "a1", skillId: "atk", targets: ["b1"] }).reason, "on-cooldown");
 
+  // The cooldown does NOT tick on the turn it was set (its birth turn) — like status durations.
+  advanceCooldowns(state, "A");
+  assert.equal(caster.skills![0]!.currentCd, 2, "birth turn is skipped");
+
+  // A later turn: now it ticks down.
+  state.turn += 1;
   advanceCooldowns(state, "A");
   assert.equal(caster.skills![0]!.currentCd, 1);
 
+  state.turn += 1;
   applyStatus(caster, status("paralysis", { duration: 3 }));
   advanceCooldowns(state, "A");
   assert.equal(caster.skills![0]!.currentCd, 1, "paralysis freezes cooldowns");
+});
+
+test("cooldown 1 blocks the caster's NEXT turn, then frees the turn after (real turn cycle)", () => {
+  const caster = makeUnit({ id: "a1", team: "A", skills: [atk(10, { cooldown: 1 })] });
+  const state = makeState([caster], [makeUnit({ id: "b1", team: "B", hp: 100 })]);
+  const cd = () => caster.skills![0]!.currentCd;
+  const use = () => performAction(state, { unit: "a1", skillId: "atk", targets: ["b1"] });
+
+  startTurn(state);                              // A turn 1
+  assert.equal(use().ok, true);
+  endTurn(state);
+  assert.equal(cd(), 1, "not ticked on the use turn (birth skip)");
+
+  startTurn(state); endTurn(state);              // B turn
+
+  startTurn(state);                              // A turn 2 — STILL on cooldown (this is the bug that was fixed)
+  assert.equal(use().reason, "on-cooldown");
+  endTurn(state);
+  assert.equal(cd(), 0, "ticks down at the end of the caster's next turn");
+
+  startTurn(state); endTurn(state);              // B turn
+
+  startTurn(state);                              // A turn 3 — usable again
+  assert.equal(use().ok, true, "usable the turn after a cooldown-1 skill");
 });
 
 test("stun: 'non-Strategic' scope stops harmful skills but not Strategic ones (Flashbang)", () => {
