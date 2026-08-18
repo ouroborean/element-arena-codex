@@ -36,7 +36,9 @@ function dealAndEmit(ctx: Ctx, u: Unit, amount: number, dtype: DamageType = "nor
 /** Install a temporary reactive/counter/reflect trigger on `owner`, expiring after `turns` (ticked
  *  at the installer's turn-end). This is the primitive behind every "for N turns, when X happens…" clause. */
 function installWatch(ctx: Ctx, spec: Omit<TriggeredEffect, "owner">, turns: number | null, owner: Unit = ctx.self): void {
-  owner.triggers = [...(owner.triggers ?? []), { ...spec, owner: owner.id, duration: turns, appliedBy: ctx.self.id, appliedTurn: ctx.state.turn }];
+  // sourceSkillId = the skill/passive that installed this watch (ctx.skillId), so a status the watch
+  // later applies can show that skill's icon even though it fires in a fresh, deferred context.
+  owner.triggers = [...(owner.triggers ?? []), { sourceSkillId: ctx.skillId, ...spec, owner: owner.id, duration: turns, appliedBy: ctx.self.id, appliedTurn: ctx.state.turn }];
 }
 /** Tag units with a marker so a later-firing dynamic trigger can name "the target(s)" by mark. */
 function markUnits(ctx: Ctx, sel: Selector, name: string, duration: number | null): void {

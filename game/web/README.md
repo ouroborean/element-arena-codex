@@ -56,10 +56,14 @@ npm run typecheck    # tsc --noEmit
   `image` field, which resolves the irregular minion-asset filenames).
 
 Effect-source resolution (`view.ts` `statusSource`) is most-precise-first: a named status →
-`statussource.generated`; else the engine-stamped `sourceId` (skill-cast provenance — the engine
-now records which skill applied each status); else a scoped cost/cooldown mod's `skillId`; else
-the applier's passive, so an effect is always at least hero-correct (no bare lettered chips).
-Regenerate the maps with `python game/web/tools/gen_skillicon.py` after art/skill changes.
+`statussource.generated`; else the engine-stamped `sourceId`. The engine records which skill
+applied each status across every path — direct casts, inline `useSkill`, **reactive/watch
+triggers** (a runtime-installed watch carries the installing skill's id; authored triggers fall
+back to the owner's current passive), and **scheduled** (delayed) effects — so even an unnamed
+effect from a fusion's watch-trigger shows that fusion skill's icon. Then a scoped cost/cooldown
+mod's `skillId`; else the applier's passive, so an effect is always at least hero-correct (no bare
+lettered chips). Regenerate the icon map with `python game/web/tools/gen_skillicon.py` after art
+changes.
 
 Reuses the engine + `game/client/{loop,draft}.ts`. `render.ts` in the terminal client is
 ANSI-specific; the browser has its own `view.ts`.

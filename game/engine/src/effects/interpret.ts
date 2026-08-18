@@ -63,6 +63,12 @@ function otherTeam(team: TeamId): TeamId {
   return team === "A" ? "B" : "A";
 }
 
+/** A unit's current passive id (base or fusion form) — the provenance for its statically authored
+ *  triggers, so a status they apply is attributed to the right passive icon. */
+function ownerPassiveId(u: Unit): string | undefined {
+  return u.heroId ? `${u.heroId}${u.fused ?? ""}0` : undefined;
+}
+
 // --------------------------------------------------------------------------- //
 //  Selector resolution
 // --------------------------------------------------------------------------- //
@@ -502,7 +508,7 @@ export function exec(effect: Effect, ctx: Ctx): void {
       const targets = (effect.to ? resolveSelector(effect.to, ctx) : ctx.targets).map((u) => u.id);
       ctx.state.scheduled.push({
         effect: effect.effect, caster: ctx.caster.id, targets,
-        turns: effect.delayTurns, appliedTurn: ctx.state.turn,
+        turns: effect.delayTurns, appliedTurn: ctx.state.turn, skillId: ctx.skillId,
       });
       return;
     }
@@ -596,7 +602,8 @@ export function createBus(state: MatchState, rng: Rng): Bus {
           if (!owner.alive && !ownDeath) continue;
           if (stealthSuppressed(state, event, owner)) continue;
           const tctx: Ctx = {
-            state, rng, caster: owner, self: owner, targets: [], it: null, vars: {}, event, emit: bus.emit,
+            state, rng, caster: owner, self: owner, targets: [], it: null, vars: {},
+            skillId: trig.sourceSkillId ?? ownerPassiveId(owner), event, emit: bus.emit,
           };
           if (trig.when && !evalCondition(trig.when, tctx)) continue;
           runAll(trig.effect, tctx);
@@ -688,7 +695,7 @@ export function resolveDeclaration(state: MatchState, caster: Unit, skill: Skill
       const event: GameEvent = { type: "skillDeclared", caster: caster.id, skillId: skill.id, tags: skill.tags, targets: current.map((t) => t.id) };
       const rep = findReplace(state, rng, bus, event);
       if (rep) {
-        const tctx: Ctx = { state, rng, caster: rep.owner, self: rep.owner, targets: [], it: null, vars: {}, event, emit: bus.emit };
+        const tctx: Ctx = { state, rng, caster: rep.owner, self: rep.owner, targets: [], it: null, vars: {}, skillId: rep.trig.sourceSkillId ?? ownerPassiveId(rep.owner), event, emit: bus.emit };
         runAll(rep.trig.effect, tctx);
         if (rep.trig.once) rep.owner.triggers = (rep.owner.triggers ?? []).filter((t) => t !== rep.trig);
         return { cancelled: true, finalTargets: current };
@@ -707,7 +714,7 @@ export function resolveDeclaration(state: MatchState, caster: Unit, skill: Skill
       const hit = findInterrupt(state, rng, bus, event);
       if (!hit) return { cancelled: false, finalTargets: current };
       const { owner, trig } = hit;
-      const tctx: Ctx = { state, rng, caster: owner, self: owner, targets: [], it: null, vars: {}, event, emit: bus.emit };
+      const tctx: Ctx = { state, rng, caster: owner, self: owner, targets: [], it: null, vars: {}, skillId: trig.sourceSkillId ?? ownerPassiveId(owner), event, emit: bus.emit };
       runAll(trig.effect, tctx);
       if (trig.once) owner.triggers = (owner.triggers ?? []).filter((t) => t !== trig);
       if ((trig.kind ?? "react") === "counter") {

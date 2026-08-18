@@ -185,4 +185,6 @@ export interface ScheduledEntry {
   targets: UnitId[];
   turns: number;
   appliedTurn: number;
+  /** The skill/passive that scheduled it — carried across the delay so applied statuses keep their source. */
+  skillId?: string;
 }

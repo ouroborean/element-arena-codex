@@ -217,7 +217,7 @@ function fireScheduled(state: MatchState, id: TeamId): void {
         const caster = state.units[e.caster];
         if (caster) {
           const targets = e.targets.map((t) => state.units[t]).filter((t): t is Unit => !!t);
-          runEffects(state, e.effect, { caster, targets });
+          runEffects(state, e.effect, { caster, targets, skillId: e.skillId });
         }
         continue; // fired — drop
       }
