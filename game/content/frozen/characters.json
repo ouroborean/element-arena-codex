@@ -1,0 +1,2376 @@
+[
+  {
+    "id": "ando",
+    "path_name": "ando",
+    "character_name": "Ando-91",
+    "short_name": "Ando-91",
+    "element": {
+      "id": 3,
+      "name": "lightning",
+      "display_name": "Lightning"
+    },
+    "starts_fused": false,
+    "can_fuse": true,
+    "can_augment": true,
+    "in_roster": true,
+    "roster_index": 7,
+    "is_bot": false,
+    "titles": {
+      "minor": [
+        "Agent",
+        "Machine"
+      ],
+      "middle": [
+        "Flash",
+        "Electric"
+      ],
+      "major": [
+        "Android",
+        "Cyborg"
+      ]
+    },
+    "image": "assets/characters/ando/andoprof.png",
+    "base_skill_ids": [
+      "ando0",
+      "ando1",
+      "ando2",
+      "ando3",
+      "ando4",
+      "ando5"
+    ],
+    "fusion_skills": {
+      "aurora": {
+        "passive": "andoaurora0",
+        "active": "andoaurora1"
+      },
+      "battery": {
+        "passive": "andobattery0",
+        "active": "andobattery1"
+      },
+      "current": {
+        "passive": "andocurrent0",
+        "active": "andocurrent1"
+      },
+      "ion": {
+        "passive": "andoion0",
+        "active": "andoion1"
+      },
+      "magnet": {
+        "passive": "andomagnet0",
+        "active": "andomagnet1"
+      },
+      "plasma": {
+        "passive": "andoplasma0",
+        "active": "andoplasma1"
+      },
+      "reanimation": {
+        "passive": "andoreanimation0",
+        "active": "andoreanimation1"
+      },
+      "storm": {
+        "passive": "andostorm0",
+        "active": "andostorm1"
+      },
+      "thunder": {
+        "passive": "andothunder0",
+        "active": "andothunder1"
+      },
+      "vengeance": {
+        "passive": "andovengeance0",
+        "active": "andovengeance1"
+      }
+    },
+    "augment_ids": [
+      "ando1",
+      "ando2",
+      "ando3",
+      "ando4",
+      "ando5"
+    ],
+    "mastery_multipliers": {
+      "attacker": 0.4,
+      "defender": 0.6,
+      "disruptor": 2.0,
+      "strategist": 2.0,
+      "support": 0.8
+    },
+    "source_file": "characters/ando.tscn",
+    "resource_extras": {
+      "display_name": "Ando",
+      "character_type": 0,
+      "initial_element": 3
+    }
+  },
+  {
+    "id": "aramao",
+    "path_name": "aramao",
+    "character_name": "Aramao, Spectre of the Sands",
+    "short_name": "Aramao",
+    "element": {
+      "id": 30,
+      "name": "nomad",
+      "display_name": "Nomad"
+    },
+    "starts_fused": true,
+    "can_fuse": false,
+    "can_augment": true,
+    "in_roster": true,
+    "roster_index": 23,
+    "is_bot": false,
+    "titles": {
+      "minor": [
+        "Wraith",
+        "Sand"
+      ],
+      "middle": [
+        "Veil",
+        "Shift"
+      ],
+      "major": [
+        "Desert",
+        "Dunes"
+      ]
+    },
+    "image": "assets/characters/aramao/aramaoprof.png",
+    "base_skill_ids": [
+      "aramao0",
+      "aramao1",
+      "aramao2",
+      "aramao3",
+      "aramao4",
+      "aramao5",
+      "aramao6"
+    ],
+    "fusion_skills": {},
+    "augment_ids": [
+      "aramao1",
+      "aramao2",
+      "aramao3",
+      "aramao4",
+      "aramao5"
+    ],
+    "mastery_multipliers": {
+      "attacker": 0.6,
+      "defender": 0.6,
+      "disruptor": 2.0,
+      "strategist": 2.0,
+      "support": 0.8
+    },
+    "source_file": "characters/aramao.tscn"
+  },
+  {
+    "id": "ayana",
+    "path_name": "ayana",
+    "character_name": "Ayana, Voice of Light",
+    "short_name": "Ayana",
+    "element": {
+      "id": 7,
+      "name": "holy",
+      "display_name": "Holy"
+    },
+    "starts_fused": false,
+    "can_fuse": true,
+    "can_augment": true,
+    "in_roster": true,
+    "roster_index": 14,
+    "is_bot": true,
+    "titles": {
+      "minor": [
+        "Priest",
+        "Priestess"
+      ],
+      "middle": [
+        "Musical",
+        "Song"
+      ],
+      "major": [
+        "Revered"
+      ]
+    },
+    "image": "assets/characters/ayana/ayanaprof.png",
+    "base_skill_ids": [
+      "ayana0",
+      "ayana1",
+      "ayana2",
+      "ayana3",
+      "ayana4",
+      "ayana5"
+    ],
+    "fusion_skills": {
+      "angel": {
+        "passive": "ayanaangel0",
+        "active": "ayanaangel1"
+      },
+      "anointment": {
+        "passive": "ayanaanointment0",
+        "active": "ayanaanointment1"
+      },
+      "antidote": {
+        "passive": "ayanaantidote0",
+        "active": "ayanaantidote1"
+      },
+      "divine": {
+        "passive": "ayanadivine0",
+        "active": "ayanadivine1"
+      },
+      "judgment": {
+        "passive": "ayanajudgment0",
+        "active": "ayanajudgment1"
+      },
+      "prism": {
+        "passive": "ayanaprism0",
+        "active": "ayanaprism1"
+      },
+      "sanctuary": {
+        "passive": "ayanasanctuary0",
+        "active": "ayanasanctuary1"
+      },
+      "vengeance": {
+        "passive": "ayanavengeance0",
+        "active": "ayanavengeance1"
+      },
+      "vigilante": {
+        "passive": "ayanavigilante0",
+        "active": "ayanavigilante1"
+      },
+      "zealot": {
+        "passive": "ayanazealot0",
+        "active": "ayanazealot1"
+      }
+    },
+    "augment_ids": [
+      "ayana1",
+      "ayana2",
+      "ayana3",
+      "ayana4",
+      "ayana5"
+    ],
+    "mastery_multipliers": {
+      "attacker": 0.6,
+      "defender": 0.6,
+      "disruptor": 2.0,
+      "strategist": 2.0,
+      "support": 0.8
+    },
+    "source_file": "characters/ayana.tscn",
+    "resource_extras": {
+      "display_name": "Ayana",
+      "character_type": 0,
+      "initial_element": 7
+    }
+  },
+  {
+    "id": "blackknight",
+    "path_name": "blackknight",
+    "character_name": "The Black Knight",
+    "short_name": "Black Knight",
+    "element": {
+      "id": 8,
+      "name": "unholy",
+      "display_name": "Unholy"
+    },
+    "starts_fused": false,
+    "can_fuse": true,
+    "can_augment": true,
+    "in_roster": true,
+    "roster_index": 16,
+    "is_bot": true,
+    "titles": {
+      "minor": [
+        "Knight",
+        "Oath"
+      ],
+      "middle": [
+        "Cruel",
+        "-breaker"
+      ],
+      "major": [
+        "Exile"
+      ]
+    },
+    "image": "assets/characters/blackknight/blackknightprof.png",
+    "base_skill_ids": [
+      "blackknight0",
+      "blackknight1",
+      "blackknight2",
+      "blackknight3",
+      "blackknight4",
+      "blackknight5"
+    ],
+    "fusion_skills": {
+      "blight": {
+        "passive": "blackknightblight0",
+        "active": "blackknightblight1"
+      },
+      "blood": {
+        "passive": "blackknightblood0",
+        "active": "blackknightblood1"
+      },
+      "curse": {
+        "passive": "blackknightcurse0",
+        "active": "blackknightcurse1"
+      },
+      "devil": {
+        "passive": "blackknightdevil0",
+        "active": "blackknightdevil1"
+      },
+      "evil": {
+        "passive": "blackknightevil0",
+        "active": "blackknightevil1"
+      },
+      "ghost": {
+        "passive": "blackknightghost0",
+        "active": "blackknightghost1"
+      },
+      "grave": {
+        "passive": "blackknightgrave0",
+        "active": "blackknightgrave1"
+      },
+      "lich": {
+        "passive": "blackknightlich0",
+        "active": "blackknightlich1"
+      },
+      "reanimation": {
+        "passive": "blackknightreanimation0",
+        "active": "blackknightreanimation1"
+      },
+      "zealot": {
+        "passive": "blackknightzealot0",
+        "active": "blackknightzealot1"
+      }
+    },
+    "augment_ids": [
+      "blackknight1",
+      "blackknight2",
+      "blackknight3",
+      "blackknight4",
+      "blackknight5"
+    ],
+    "mastery_multipliers": {
+      "attacker": 0.4,
+      "defender": 0.6,
+      "disruptor": 2.0,
+      "strategist": 2.0,
+      "support": 0.8
+    },
+    "source_file": "characters/blackknight.tscn"
+  },
+  {
+    "id": "darkness",
+    "path_name": "darkness",
+    "character_name": "Darkness-Outside-The-Door",
+    "short_name": null,
+    "element": {
+      "id": 54,
+      "name": "night",
+      "display_name": "Night"
+    },
+    "starts_fused": true,
+    "can_fuse": false,
+    "can_augment": true,
+    "in_roster": false,
+    "roster_index": null,
+    "is_bot": false,
+    "titles": {
+      "minor": [],
+      "middle": [],
+      "major": []
+    },
+    "image": null,
+    "base_skill_ids": [
+      "darkness0",
+      "darkness1",
+      "darkness2",
+      "darkness3",
+      "darkness4",
+      "darkness5",
+      "darkness6"
+    ],
+    "fusion_skills": {},
+    "augment_ids": [
+      "darkness1",
+      "darkness2",
+      "darkness3",
+      "darkness4",
+      "darkness5"
+    ],
+    "mastery_multipliers": {},
+    "source_file": "characters/darkness.tscn"
+  },
+  {
+    "id": "dennis",
+    "path_name": "dennis",
+    "character_name": "Dennis the Apprentice",
+    "short_name": "Dennis",
+    "element": {
+      "id": 23,
+      "name": "serum",
+      "display_name": "Serum"
+    },
+    "starts_fused": true,
+    "can_fuse": false,
+    "can_augment": true,
+    "in_roster": true,
+    "roster_index": 20,
+    "is_bot": false,
+    "titles": {
+      "minor": [
+        "Apprentice",
+        "Serum"
+      ],
+      "middle": [
+        "Brawn",
+        "Agony"
+      ],
+      "major": [
+        "Subject",
+        "Smash"
+      ]
+    },
+    "image": "assets/characters/dennis/dennisprof.png",
+    "base_skill_ids": [
+      "dennis0",
+      "dennis1",
+      "dennis2",
+      "dennis3",
+      "dennis4",
+      "dennis5",
+      "dennis6"
+    ],
+    "fusion_skills": {},
+    "augment_ids": [
+      "dennis1",
+      "dennis2",
+      "dennis3",
+      "dennis4",
+      "dennis5"
+    ],
+    "mastery_multipliers": {
+      "attacker": 0.4,
+      "defender": 0.6,
+      "disruptor": 2.0,
+      "strategist": 2.0,
+      "support": 0.8
+    },
+    "source_file": "characters/dennis.tscn"
+  },
+  {
+    "id": "fate",
+    "path_name": "fate",
+    "character_name": "Fate, Reborn Hero",
+    "short_name": null,
+    "element": {
+      "id": 15,
+      "name": "apocalypse",
+      "display_name": "Apocalypse"
+    },
+    "starts_fused": true,
+    "can_fuse": false,
+    "can_augment": true,
+    "in_roster": true,
+    "roster_index": 22,
+    "is_bot": false,
+    "titles": {
+      "minor": [
+        "Snow",
+        "Fox"
+      ],
+      "middle": [
+        "Apocalypse",
+        "Ruined"
+      ],
+      "major": [
+        "Traveler",
+        "Reborn"
+      ]
+    },
+    "image": "assets/characters/fate/fateprof.png",
+    "base_skill_ids": [
+      "fate0",
+      "fate1",
+      "fate2",
+      "fate3",
+      "fate4",
+      "fate5",
+      "fate6"
+    ],
+    "fusion_skills": {},
+    "augment_ids": [
+      "fate1",
+      "fate2",
+      "fate3",
+      "fate4",
+      "fate5"
+    ],
+    "mastery_multipliers": {
+      "attacker": 0.6,
+      "defender": 0.6,
+      "disruptor": 2.0,
+      "strategist": 2.0,
+      "support": 0.8
+    },
+    "source_file": "characters/fate.tscn"
+  },
+  {
+    "id": "gaia",
+    "path_name": "gaia",
+    "character_name": "Gaia Worldsoul",
+    "short_name": "Gaia",
+    "element": {
+      "id": 6,
+      "name": "earth",
+      "display_name": "Earth"
+    },
+    "starts_fused": false,
+    "can_fuse": true,
+    "can_augment": true,
+    "in_roster": true,
+    "roster_index": 12,
+    "is_bot": true,
+    "titles": {
+      "minor": [
+        "Druid",
+        "Growth"
+      ],
+      "middle": [
+        "Verdant",
+        "World"
+      ],
+      "major": [
+        "World",
+        "-soul"
+      ]
+    },
+    "image": "assets/characters/gaia/gaiaprof.png",
+    "base_skill_ids": [
+      "gaia0",
+      "gaia1",
+      "gaia2",
+      "gaia3",
+      "gaia4",
+      "gaia5"
+    ],
+    "fusion_skills": {
+      "grave": {
+        "passive": "gaiagrave0",
+        "active": "gaiagrave1"
+      },
+      "life": {
+        "passive": "gaialife0",
+        "active": "gaialife1"
+      },
+      "magnet": {
+        "passive": "gaiamagnet0",
+        "active": "gaiamagnet1"
+      },
+      "moon": {
+        "passive": "gaiamoon0",
+        "active": "gaiamoon1"
+      },
+      "myth": {
+        "passive": "gaiamyth0",
+        "active": "gaiamyth1"
+      },
+      "nomad": {
+        "passive": "gaianomad0",
+        "active": "gaianomad1"
+      },
+      "sanctuary": {
+        "passive": "gaiasanctuary0",
+        "active": "gaiasanctuary1"
+      },
+      "slime": {
+        "passive": "gaiaslime0",
+        "active": "gaiaslime1"
+      },
+      "spore": {
+        "passive": "gaiaspore0",
+        "active": "gaiaspore1"
+      },
+      "sun": {
+        "passive": "gaiasun0",
+        "active": "gaiasun1"
+      }
+    },
+    "augment_ids": [
+      "gaia1",
+      "gaia2",
+      "gaia3",
+      "gaia4",
+      "gaia5"
+    ],
+    "mastery_multipliers": {
+      "attacker": 0.4,
+      "defender": 0.6,
+      "disruptor": 2.0,
+      "strategist": 2.0,
+      "support": 0.8
+    },
+    "source_file": "characters/gaia.tscn"
+  },
+  {
+    "id": "galazax",
+    "path_name": "galazax",
+    "character_name": "Galazax, the Coming Storm",
+    "short_name": "Galazax",
+    "element": {
+      "id": 35,
+      "name": "storm",
+      "display_name": "Storm"
+    },
+    "starts_fused": true,
+    "can_fuse": false,
+    "can_augment": true,
+    "in_roster": true,
+    "roster_index": 25,
+    "is_bot": false,
+    "titles": {
+      "minor": [
+        "Cloud",
+        "Dark"
+      ],
+      "middle": [
+        "Pressure",
+        "Ancient"
+      ],
+      "major": [
+        "Storm",
+        "Vortex"
+      ]
+    },
+    "image": "assets/characters/galazax/galazaxprof.png",
+    "base_skill_ids": [
+      "galazax0",
+      "galazax1",
+      "galazax2",
+      "galazax3",
+      "galazax4",
+      "galazax5",
+      "galazax6"
+    ],
+    "fusion_skills": {},
+    "augment_ids": [
+      "galazax1",
+      "galazax2",
+      "galazax3",
+      "galazax4",
+      "galazax5"
+    ],
+    "mastery_multipliers": {
+      "attacker": 0.4,
+      "defender": 0.6,
+      "disruptor": 2.0,
+      "strategist": 2.0,
+      "support": 0.8
+    },
+    "source_file": "characters/galazax.tscn"
+  },
+  {
+    "id": "gommar",
+    "path_name": "gommar",
+    "character_name": "Gommar, Frostfang Chieftain",
+    "short_name": "Gommar",
+    "element": {
+      "id": 1,
+      "name": "ice",
+      "display_name": "Ice"
+    },
+    "starts_fused": false,
+    "can_fuse": true,
+    "can_augment": true,
+    "in_roster": true,
+    "roster_index": 2,
+    "is_bot": true,
+    "titles": {
+      "minor": [
+        "Barbarian",
+        "North"
+      ],
+      "middle": [
+        "Leader",
+        "Hammer"
+      ],
+      "major": [
+        "Chieftain",
+        "Frostfang"
+      ]
+    },
+    "image": "assets/characters/gommar/gommarprof.png",
+    "base_skill_ids": [
+      "gommar0",
+      "gommar1",
+      "gommar2",
+      "gommar3",
+      "gommar4",
+      "gommar5"
+    ],
+    "fusion_skills": {
+      "apocalypse": {
+        "passive": "gommarapocalypse0",
+        "active": "gommarapocalypse1"
+      },
+      "aurora": {
+        "passive": "gommaraurora0",
+        "active": "gommaraurora1"
+      },
+      "crystal": {
+        "passive": "gommarcrystal0",
+        "active": "gommarcrystal1"
+      },
+      "glacier": {
+        "passive": "gommarglacier0",
+        "active": "gommarglacier1"
+      },
+      "lich": {
+        "passive": "gommarlich0",
+        "active": "gommarlich1"
+      },
+      "myth": {
+        "passive": "gommarmyth0",
+        "active": "gommarmyth1"
+      },
+      "night": {
+        "passive": "gommarnight0",
+        "active": "gommarnight1"
+      },
+      "prism": {
+        "passive": "gommarprism0",
+        "active": "gommarprism1"
+      },
+      "stasis": {
+        "passive": "gommarstasis0",
+        "active": "gommarstasis1"
+      },
+      "winter": {
+        "passive": "gommarwinter0",
+        "active": "gommarwinter1"
+      }
+    },
+    "augment_ids": [
+      "gommar1",
+      "gommar2",
+      "gommar3",
+      "gommar4",
+      "gommar5"
+    ],
+    "mastery_multipliers": {
+      "attacker": 0.4,
+      "defender": 0.6,
+      "disruptor": 2.0,
+      "strategist": 2.0,
+      "support": 0.8
+    },
+    "source_file": "characters/gommar.tscn"
+  },
+  {
+    "id": "hector",
+    "path_name": "hector",
+    "character_name": "Hector the Injector",
+    "short_name": "Hector",
+    "element": {
+      "id": 5,
+      "name": "poison",
+      "display_name": "Poison"
+    },
+    "starts_fused": false,
+    "can_fuse": true,
+    "can_augment": true,
+    "in_roster": true,
+    "roster_index": 10,
+    "is_bot": true,
+    "titles": {
+      "minor": [
+        "Scientist",
+        "Mad"
+      ],
+      "middle": [
+        "Insane",
+        "Doctor"
+      ],
+      "major": [
+        "Injector"
+      ]
+    },
+    "image": "assets/characters/hector/hectorprof.png",
+    "base_skill_ids": [
+      "hector0",
+      "hector1",
+      "hector2",
+      "hector3",
+      "hector4",
+      "hector5"
+    ],
+    "fusion_skills": {
+      "antidote": {
+        "passive": "hectorantidote0",
+        "active": "hectorantidote1"
+      },
+      "assassin": {
+        "passive": "hectorassassin0",
+        "active": "hectorassassin1"
+      },
+      "battery": {
+        "passive": "hectorbattery0",
+        "active": "hectorbattery1"
+      },
+      "blight": {
+        "passive": "hectorblight0",
+        "active": "hectorblight1"
+      },
+      "brimstone": {
+        "passive": "hectorbrimstone0",
+        "active": "hectorbrimstone1"
+      },
+      "evolution": {
+        "passive": "hectorevolution0",
+        "active": "hectorevolution1"
+      },
+      "faerie": {
+        "passive": "hectorfaerie0",
+        "active": "hectorfaerie1"
+      },
+      "serum": {
+        "passive": "hectorserum0",
+        "active": "hectorserum1"
+      },
+      "spore": {
+        "passive": "hectorspore0",
+        "active": "hectorspore1"
+      },
+      "stasis": {
+        "passive": "hectorstasis0",
+        "active": "hectorstasis1"
+      }
+    },
+    "augment_ids": [
+      "hector1",
+      "hector2",
+      "hector3",
+      "hector4",
+      "hector5"
+    ],
+    "mastery_multipliers": {
+      "attacker": 0.6,
+      "defender": 0.6,
+      "disruptor": 2.0,
+      "strategist": 2.0,
+      "support": 0.8
+    },
+    "source_file": "characters/hector.tscn"
+  },
+  {
+    "id": "jarrik",
+    "path_name": "jarrik",
+    "character_name": "Jarrik Cinderblade",
+    "short_name": "Jarrik",
+    "element": {
+      "id": 0,
+      "name": "fire",
+      "display_name": "Fire",
+      "defaulted": true
+    },
+    "starts_fused": false,
+    "can_fuse": true,
+    "can_augment": true,
+    "in_roster": true,
+    "roster_index": 1,
+    "is_bot": false,
+    "titles": {
+      "minor": [
+        "Ronin",
+        "Ashes"
+      ],
+      "middle": [
+        "Smolder",
+        "Doomed"
+      ],
+      "major": [
+        "Cinderblade"
+      ]
+    },
+    "image": "assets/characters/jarrik/jarrikprof.png",
+    "base_skill_ids": [
+      "jarrik0",
+      "jarrik1",
+      "jarrik2",
+      "jarrik3",
+      "jarrik4",
+      "jarrik5"
+    ],
+    "fusion_skills": {
+      "alchemy": {
+        "passive": "jarrikalchemy0",
+        "active": "jarrikalchemy1"
+      },
+      "apocalypse": {
+        "passive": "jarrikapocalypse0",
+        "active": "jarrikapocalypse1"
+      },
+      "brimstone": {
+        "passive": "jarrikbrimstone0",
+        "active": "jarrikbrimstone1"
+      },
+      "devil": {
+        "passive": "jarrikdevil0",
+        "active": "jarrikdevil1"
+      },
+      "dragon": {
+        "passive": "jarrikdragon0",
+        "active": "jarrikdragon1"
+      },
+      "judgment": {
+        "passive": "jarrikjudgment0",
+        "active": "jarrikjudgment1"
+      },
+      "mechanic": {
+        "passive": "jarrikmechanic0",
+        "active": "jarrikmechanic1"
+      },
+      "plasma": {
+        "passive": "jarrikplasma0",
+        "active": "jarrikplasma1"
+      },
+      "ritual": {
+        "passive": "jarrikritual0",
+        "active": "jarrikritual1"
+      },
+      "sun": {
+        "passive": "jarriksun0",
+        "active": "jarriksun1"
+      }
+    },
+    "augment_ids": [
+      "jarrik1",
+      "jarrik2",
+      "jarrik3",
+      "jarrik4",
+      "jarrik5"
+    ],
+    "mastery_multipliers": {
+      "attacker": 0.4,
+      "defender": 0.6,
+      "disruptor": 2.0,
+      "strategist": 2.0,
+      "support": 0.8
+    },
+    "source_file": "characters/jarrik.tscn"
+  },
+  {
+    "id": "keeper",
+    "path_name": "keeper",
+    "character_name": "Keeper of Fables",
+    "short_name": "Keeper",
+    "element": {
+      "id": 1,
+      "name": "ice",
+      "display_name": "Ice"
+    },
+    "starts_fused": false,
+    "can_fuse": true,
+    "can_augment": true,
+    "in_roster": true,
+    "roster_index": 3,
+    "is_bot": false,
+    "titles": {
+      "minor": [
+        "Sage",
+        "Tales"
+      ],
+      "middle": [
+        "Books",
+        "Peaceful"
+      ],
+      "major": [
+        "Fables"
+      ]
+    },
+    "image": "assets/characters/keeper/keeperprof.png",
+    "base_skill_ids": [
+      "keeper0",
+      "keeper1",
+      "keeper2",
+      "keeper3",
+      "keeper4",
+      "keeper5"
+    ],
+    "fusion_skills": {
+      "apocalypse": {
+        "passive": "keeperapocalypse0",
+        "active": "keeperapocalypse1"
+      },
+      "aurora": {
+        "passive": "keeperaurora0",
+        "active": "keeperaurora1"
+      },
+      "crystal": {
+        "passive": "keepercrystal0",
+        "active": "keepercrystal1"
+      },
+      "glacier": {
+        "passive": "keeperglacier0",
+        "active": "keeperglacier1"
+      },
+      "lich": {
+        "passive": "keeperlich0",
+        "active": "keeperlich1"
+      },
+      "myth": {
+        "passive": "keepermyth0",
+        "active": "keepermyth1"
+      },
+      "night": {
+        "passive": "keepernight0",
+        "active": "keepernight1"
+      },
+      "prism": {
+        "passive": "keeperprism0",
+        "active": "keeperprism1"
+      },
+      "stasis": {
+        "passive": "keeperstasis0",
+        "active": "keeperstasis1"
+      },
+      "winter": {
+        "passive": "keeperwinter0",
+        "active": "keeperwinter1"
+      }
+    },
+    "augment_ids": [
+      "keeper1",
+      "keeper2",
+      "keeper3",
+      "keeper4",
+      "keeper5"
+    ],
+    "mastery_multipliers": {
+      "attacker": 0.6,
+      "defender": 0.6,
+      "disruptor": 2.0,
+      "strategist": 2.0,
+      "support": 0.8
+    },
+    "source_file": "characters/keeper.tscn"
+  },
+  {
+    "id": "laria",
+    "path_name": "laria",
+    "character_name": "Laria, Nightcloaked",
+    "short_name": "Laria",
+    "element": {
+      "id": 9,
+      "name": "shadow",
+      "display_name": "Shadow"
+    },
+    "starts_fused": false,
+    "can_fuse": true,
+    "can_augment": true,
+    "in_roster": true,
+    "roster_index": 18,
+    "is_bot": true,
+    "titles": {
+      "minor": [
+        "Thief",
+        "Night"
+      ],
+      "middle": [
+        "Subtle",
+        "Hidden"
+      ],
+      "major": [
+        "Nightcloaked"
+      ]
+    },
+    "image": "assets/characters/laria/lariaprof.png",
+    "base_skill_ids": [
+      "laria0",
+      "laria1",
+      "laria2",
+      "laria3",
+      "laria4",
+      "laria5"
+    ],
+    "fusion_skills": {
+      "assassin": {
+        "passive": "lariaassassin0",
+        "active": "lariaassassin1"
+      },
+      "curse": {
+        "passive": "lariacurse0",
+        "active": "lariacurse1"
+      },
+      "dimension": {
+        "passive": "lariadimension0",
+        "active": "lariadimension1"
+      },
+      "ion": {
+        "passive": "lariaion0",
+        "active": "lariaion1"
+      },
+      "mirror": {
+        "passive": "lariamirror0",
+        "active": "lariamirror1"
+      },
+      "moon": {
+        "passive": "lariamoon0",
+        "active": "lariamoon1"
+      },
+      "night": {
+        "passive": "larianight0",
+        "active": "larianight1"
+      },
+      "ninja": {
+        "passive": "larianinja0",
+        "active": "larianinja1"
+      },
+      "ritual": {
+        "passive": "lariaritual0",
+        "active": "lariaritual1"
+      },
+      "vigilante": {
+        "passive": "lariavigilante0",
+        "active": "lariavigilante1"
+      }
+    },
+    "augment_ids": [
+      "laria1",
+      "laria2",
+      "laria3",
+      "laria4",
+      "laria5"
+    ],
+    "mastery_multipliers": {
+      "attacker": 0.4,
+      "defender": 0.6,
+      "disruptor": 2.0,
+      "strategist": 2.0,
+      "support": 0.8
+    },
+    "source_file": "characters/laria.tscn"
+  },
+  {
+    "id": "maggie",
+    "path_name": "maggie",
+    "character_name": "Maggie Thorncursed",
+    "short_name": "Maggie",
+    "element": {
+      "id": 8,
+      "name": "unholy",
+      "display_name": "Unholy"
+    },
+    "starts_fused": false,
+    "can_fuse": true,
+    "can_augment": true,
+    "in_roster": true,
+    "roster_index": 17,
+    "is_bot": false,
+    "titles": {
+      "minor": [
+        "Witch",
+        "Blood"
+      ],
+      "middle": [
+        "Bloody",
+        "Curse"
+      ],
+      "major": [
+        "Thorn",
+        "-cursed"
+      ]
+    },
+    "image": "assets/characters/maggie/maggieprof.png",
+    "base_skill_ids": [
+      "maggie0",
+      "maggie1",
+      "maggie2",
+      "maggie3",
+      "maggie4",
+      "maggie5"
+    ],
+    "fusion_skills": {
+      "blight": {
+        "passive": "maggieblight0",
+        "active": "maggieblight1"
+      },
+      "blood": {
+        "passive": "maggieblood0",
+        "active": "maggieblood1"
+      },
+      "curse": {
+        "passive": "maggiecurse0",
+        "active": "maggiecurse1"
+      },
+      "devil": {
+        "passive": "maggiedevil0",
+        "active": "maggiedevil1"
+      },
+      "evil": {
+        "passive": "maggieevil0",
+        "active": "maggieevil1"
+      },
+      "ghost": {
+        "passive": "maggieghost0",
+        "active": "maggieghost1"
+      },
+      "grave": {
+        "passive": "maggiegrave0",
+        "active": "maggiegrave1"
+      },
+      "lich": {
+        "passive": "maggielich0",
+        "active": "maggielich1"
+      },
+      "reanimation": {
+        "passive": "maggiereanimation0",
+        "active": "maggiereanimation1"
+      },
+      "zealot": {
+        "passive": "maggiezealot0",
+        "active": "maggiezealot1"
+      }
+    },
+    "augment_ids": [
+      "maggie1",
+      "maggie2",
+      "maggie3",
+      "maggie4",
+      "maggie5"
+    ],
+    "mastery_multipliers": {
+      "attacker": 0.4,
+      "defender": 0.6,
+      "disruptor": 2.0,
+      "strategist": 2.0,
+      "support": 0.8
+    },
+    "source_file": "characters/maggie.tscn"
+  },
+  {
+    "id": "pyrrha",
+    "path_name": "pyrrha",
+    "character_name": "Pyrrha, the Mage in Ivory",
+    "short_name": "Pyrrha",
+    "element": {
+      "id": 0,
+      "name": "fire",
+      "display_name": "Fire",
+      "defaulted": true
+    },
+    "starts_fused": false,
+    "can_fuse": true,
+    "can_augment": true,
+    "in_roster": true,
+    "roster_index": 0,
+    "is_bot": true,
+    "titles": {
+      "minor": [
+        "Pyromancer",
+        "Blaze"
+      ],
+      "middle": [
+        "Prodigal",
+        "Burning"
+      ],
+      "major": [
+        "Wraith",
+        "in",
+        "White"
+      ]
+    },
+    "image": "assets/characters/pyrrha/pyrrhaprof.png",
+    "base_skill_ids": [
+      "pyrrha0",
+      "pyrrha1",
+      "pyrrha2",
+      "pyrrha3",
+      "pyrrha4",
+      "pyrrha5"
+    ],
+    "fusion_skills": {
+      "alchemy": {
+        "passive": "pyrrhaalchemy0",
+        "active": "pyrrhaalchemy1"
+      },
+      "apocalypse": {
+        "passive": "pyrrhaapocalypse0",
+        "active": "pyrrhaapocalypse1"
+      },
+      "brimstone": {
+        "passive": "pyrrhabrimstone0",
+        "active": "pyrrhabrimstone1"
+      },
+      "devil": {
+        "passive": "pyrrhadevil0",
+        "active": "pyrrhadevil1"
+      },
+      "dragon": {
+        "passive": "pyrrhadragon0",
+        "active": "pyrrhadragon1"
+      },
+      "judgment": {
+        "passive": "pyrrhajudgment0",
+        "active": "pyrrhajudgment1"
+      },
+      "mechanic": {
+        "passive": "pyrrhamechanic0",
+        "active": "pyrrhamechanic1"
+      },
+      "plasma": {
+        "passive": "pyrrhaplasma0",
+        "active": "pyrrhaplasma1"
+      },
+      "ritual": {
+        "passive": "pyrrharitual0",
+        "active": "pyrrharitual1"
+      },
+      "sun": {
+        "passive": "pyrrhasun0",
+        "active": "pyrrhasun1"
+      }
+    },
+    "augment_ids": [
+      "pyrrha1",
+      "pyrrha2",
+      "pyrrha3",
+      "pyrrha4",
+      "pyrrha5"
+    ],
+    "mastery_multipliers": {
+      "attacker": 0.4,
+      "defender": 0.6,
+      "disruptor": 2.0,
+      "strategist": 2.0,
+      "support": 0.8
+    },
+    "source_file": "characters/pyrrha.tscn"
+  },
+  {
+    "id": "riverdaughter",
+    "path_name": "riverdaughter",
+    "character_name": "The River Daughter",
+    "short_name": "River Daughter",
+    "element": {
+      "id": 2,
+      "name": "water",
+      "display_name": "Water"
+    },
+    "starts_fused": false,
+    "can_fuse": true,
+    "can_augment": true,
+    "in_roster": true,
+    "roster_index": 4,
+    "is_bot": true,
+    "titles": {
+      "minor": [
+        "Naiad",
+        "Spirit"
+      ],
+      "middle": [
+        "Weeping",
+        "Tears"
+      ],
+      "major": [
+        "River",
+        "Daughter"
+      ]
+    },
+    "image": "assets/characters/riverdaughter/riverdaughterprof.png",
+    "base_skill_ids": [
+      "riverdaughter0",
+      "riverdaughter1",
+      "riverdaughter2",
+      "riverdaughter3",
+      "riverdaughter4",
+      "riverdaughter5"
+    ],
+    "fusion_skills": {
+      "alchemy": {
+        "passive": "riverdaughteralchemy0",
+        "active": "riverdaughteralchemy1"
+      },
+      "anointment": {
+        "passive": "riverdaughteranointment0",
+        "active": "riverdaughteranointment1"
+      },
+      "blood": {
+        "passive": "riverdaughterblood0",
+        "active": "riverdaughterblood1"
+      },
+      "current": {
+        "passive": "riverdaughtercurrent0",
+        "active": "riverdaughtercurrent1"
+      },
+      "glacier": {
+        "passive": "riverdaughterglacier0",
+        "active": "riverdaughterglacier1"
+      },
+      "mirror": {
+        "passive": "riverdaughtermirror0",
+        "active": "riverdaughtermirror1"
+      },
+      "mist": {
+        "passive": "riverdaughtermist0",
+        "active": "riverdaughtermist1"
+      },
+      "ocean": {
+        "passive": "riverdaughterocean0",
+        "active": "riverdaughterocean1"
+      },
+      "serum": {
+        "passive": "riverdaughterserum0",
+        "active": "riverdaughterserum1"
+      },
+      "slime": {
+        "passive": "riverdaughterslime0",
+        "active": "riverdaughterslime1"
+      }
+    },
+    "augment_ids": [
+      "riverdaughter1",
+      "riverdaughter2",
+      "riverdaughter3",
+      "riverdaughter4",
+      "riverdaughter5"
+    ],
+    "mastery_multipliers": {
+      "attacker": 0.4,
+      "defender": 0.6,
+      "disruptor": 2.0,
+      "strategist": 2.0,
+      "support": 0.8
+    },
+    "source_file": "characters/riverdaughter.tscn"
+  },
+  {
+    "id": "roland",
+    "path_name": "roland",
+    "character_name": "Geolord Roland",
+    "short_name": "Roland",
+    "element": {
+      "id": 6,
+      "name": "earth",
+      "display_name": "Earth"
+    },
+    "starts_fused": false,
+    "can_fuse": true,
+    "can_augment": true,
+    "in_roster": true,
+    "roster_index": 13,
+    "is_bot": false,
+    "titles": {
+      "minor": [
+        "Brute",
+        "Muscle"
+      ],
+      "middle": [
+        "Strong",
+        "Stone"
+      ],
+      "major": [
+        "Geolord"
+      ]
+    },
+    "image": "assets/characters/roland/rolandprof.png",
+    "base_skill_ids": [
+      "roland0",
+      "roland1",
+      "roland2",
+      "roland3",
+      "roland4",
+      "roland5"
+    ],
+    "fusion_skills": {
+      "grave": {
+        "passive": "rolandgrave0",
+        "active": "rolandgrave1"
+      },
+      "life": {
+        "passive": "rolandlife0",
+        "active": "rolandlife1"
+      },
+      "magnet": {
+        "passive": "rolandmagnet0",
+        "active": "rolandmagnet1"
+      },
+      "moon": {
+        "passive": "rolandmoon0",
+        "active": "rolandmoon1"
+      },
+      "myth": {
+        "passive": "rolandmyth0",
+        "active": "rolandmyth1"
+      },
+      "nomad": {
+        "passive": "rolandnomad0",
+        "active": "rolandnomad1"
+      },
+      "sanctuary": {
+        "passive": "rolandsanctuary0",
+        "active": "rolandsanctuary1"
+      },
+      "slime": {
+        "passive": "rolandslime0",
+        "active": "rolandslime1"
+      },
+      "spore": {
+        "passive": "rolandspore0",
+        "active": "rolandspore1"
+      },
+      "sun": {
+        "passive": "rolandsun0",
+        "active": "rolandsun1"
+      }
+    },
+    "augment_ids": [
+      "roland1",
+      "roland2",
+      "roland3",
+      "roland4",
+      "roland5"
+    ],
+    "mastery_multipliers": {
+      "attacker": 0.6,
+      "defender": 0.6,
+      "disruptor": 2.0,
+      "strategist": 2.0,
+      "support": 0.8
+    },
+    "source_file": "characters/roland.tscn"
+  },
+  {
+    "id": "saya",
+    "path_name": "saya",
+    "character_name": "Saya, Genius Inventor",
+    "short_name": "Saya",
+    "element": {
+      "id": 3,
+      "name": "lightning",
+      "display_name": "Lightning"
+    },
+    "starts_fused": false,
+    "can_fuse": true,
+    "can_augment": true,
+    "in_roster": true,
+    "roster_index": 6,
+    "is_bot": true,
+    "titles": {
+      "minor": [
+        "Tinker",
+        "Innovation"
+      ],
+      "middle": [
+        "Future",
+        "Reckless"
+      ],
+      "major": [
+        "Genius",
+        "Inventor"
+      ]
+    },
+    "image": "assets/characters/saya/sayaprof.png",
+    "base_skill_ids": [
+      "saya0",
+      "saya1",
+      "saya2",
+      "saya3",
+      "saya4",
+      "saya5"
+    ],
+    "fusion_skills": {
+      "aurora": {
+        "passive": "sayaaurora0",
+        "active": "sayaaurora1"
+      },
+      "battery": {
+        "passive": "sayabattery0",
+        "active": "sayabattery1"
+      },
+      "current": {
+        "passive": "sayacurrent0",
+        "active": "sayacurrent1"
+      },
+      "ion": {
+        "passive": "sayaion0",
+        "active": "sayaion1"
+      },
+      "magnet": {
+        "passive": "sayamagnet0",
+        "active": "sayamagnet1"
+      },
+      "plasma": {
+        "passive": "sayaplasma0",
+        "active": "sayaplasma1"
+      },
+      "reanimation": {
+        "passive": "sayareanimation0",
+        "active": "sayareanimation1"
+      },
+      "storm": {
+        "passive": "sayastorm0",
+        "active": "sayastorm1"
+      },
+      "thunder": {
+        "passive": "sayathunder0",
+        "active": "sayathunder1"
+      },
+      "vengeance": {
+        "passive": "sayavengeance0",
+        "active": "sayavengeance1"
+      }
+    },
+    "augment_ids": [
+      "saya1",
+      "saya2",
+      "saya3",
+      "saya4",
+      "saya5"
+    ],
+    "mastery_multipliers": {
+      "attacker": 0.6,
+      "defender": 0.6,
+      "disruptor": 2.0,
+      "strategist": 2.0,
+      "support": 0.8
+    },
+    "source_file": "characters/saya.tscn"
+  },
+  {
+    "id": "scratch",
+    "path_name": "scratch",
+    "character_name": "Mr. Scratch",
+    "short_name": "Scratch",
+    "element": {
+      "id": 17,
+      "name": "devil",
+      "display_name": "Devil"
+    },
+    "starts_fused": true,
+    "can_fuse": false,
+    "can_augment": true,
+    "in_roster": true,
+    "roster_index": 21,
+    "is_bot": false,
+    "titles": {
+      "minor": [
+        "Fedora",
+        "Suit"
+      ],
+      "middle": [
+        "Offer",
+        "Price"
+      ],
+      "major": [
+        "Dealer",
+        "Devil"
+      ]
+    },
+    "image": "assets/characters/scratch/scratchprof.png",
+    "base_skill_ids": [
+      "scratch0",
+      "scratch1",
+      "scratch2",
+      "scratch3",
+      "scratch4",
+      "scratch5",
+      "scratch6"
+    ],
+    "fusion_skills": {},
+    "augment_ids": [
+      "scratch1",
+      "scratch2",
+      "scratch3",
+      "scratch4",
+      "scratch5"
+    ],
+    "mastery_multipliers": {
+      "attacker": 0.6,
+      "defender": 0.6,
+      "disruptor": 2.0,
+      "strategist": 2.0,
+      "support": 0.8
+    },
+    "source_file": "characters/scratch.tscn"
+  },
+  {
+    "id": "sera",
+    "path_name": "sera",
+    "character_name": "SERAFIA MKI",
+    "short_name": "SERAFINA",
+    "element": {
+      "id": 57,
+      "name": "vengeance",
+      "display_name": "Vengeance"
+    },
+    "starts_fused": true,
+    "can_fuse": false,
+    "can_augment": true,
+    "in_roster": true,
+    "roster_index": 24,
+    "is_bot": false,
+    "titles": {
+      "minor": [
+        "Guardian",
+        "Angel"
+      ],
+      "middle": [
+        "Seraphim",
+        "Ophanim"
+      ],
+      "major": [
+        "Vengeance",
+        "Artificial"
+      ]
+    },
+    "image": "assets/characters/sera/seraprof.png",
+    "base_skill_ids": [
+      "sera0",
+      "sera1",
+      "sera2",
+      "sera3",
+      "sera4",
+      "sera5",
+      "sera6"
+    ],
+    "fusion_skills": {},
+    "augment_ids": [
+      "sera1",
+      "sera2",
+      "sera3",
+      "sera4",
+      "sera5"
+    ],
+    "mastery_multipliers": {
+      "attacker": 0.4,
+      "defender": 0.6,
+      "disruptor": 2.0,
+      "strategist": 2.0,
+      "support": 0.8
+    },
+    "source_file": "characters/sera.tscn"
+  },
+  {
+    "id": "syl",
+    "path_name": "syl",
+    "character_name": "Syl, Scourge of the Skies",
+    "short_name": "Syl",
+    "element": {
+      "id": 4,
+      "name": "wind",
+      "display_name": "Wind"
+    },
+    "starts_fused": false,
+    "can_fuse": true,
+    "can_augment": true,
+    "in_roster": true,
+    "roster_index": 9,
+    "is_bot": false,
+    "titles": {
+      "minor": [
+        "Eagle",
+        "Kind"
+      ],
+      "middle": [
+        "Wild",
+        "Tribe"
+      ],
+      "major": [
+        "Scourge",
+        "Skies"
+      ]
+    },
+    "image": "assets/characters/syl/sylprof.png",
+    "base_skill_ids": [
+      "syl0",
+      "syl1",
+      "syl2",
+      "syl3",
+      "syl4",
+      "syl5"
+    ],
+    "fusion_skills": {
+      "angel": {
+        "passive": "sylangel0",
+        "active": "sylangel1"
+      },
+      "cloud": {
+        "passive": "sylcloud0",
+        "active": "sylcloud1"
+      },
+      "faerie": {
+        "passive": "sylfaerie0",
+        "active": "sylfaerie1"
+      },
+      "ghost": {
+        "passive": "sylghost0",
+        "active": "sylghost1"
+      },
+      "mechanic": {
+        "passive": "sylmechanic0",
+        "active": "sylmechanic1"
+      },
+      "mist": {
+        "passive": "sylmist0",
+        "active": "sylmist1"
+      },
+      "ninja": {
+        "passive": "sylninja0",
+        "active": "sylninja1"
+      },
+      "nomad": {
+        "passive": "sylnomad0",
+        "active": "sylnomad1"
+      },
+      "storm": {
+        "passive": "sylstorm0",
+        "active": "sylstorm1"
+      },
+      "winter": {
+        "passive": "sylwinter0",
+        "active": "sylwinter1"
+      }
+    },
+    "augment_ids": [
+      "syl1",
+      "syl2",
+      "syl3",
+      "syl4",
+      "syl5"
+    ],
+    "mastery_multipliers": {
+      "attacker": 0.4,
+      "defender": 0.6,
+      "disruptor": 2.0,
+      "strategist": 2.0,
+      "support": 0.8
+    },
+    "source_file": "characters/syl.tscn"
+  },
+  {
+    "id": "taryn",
+    "path_name": "taryn",
+    "character_name": "Taryn, Hand of Glory",
+    "short_name": "Taryn",
+    "element": {
+      "id": 7,
+      "name": "holy",
+      "display_name": "Holy"
+    },
+    "starts_fused": false,
+    "can_fuse": true,
+    "can_augment": true,
+    "in_roster": true,
+    "roster_index": 15,
+    "is_bot": false,
+    "titles": {
+      "minor": [
+        "Honor",
+        "Guard"
+      ],
+      "middle": [
+        "Steadfast",
+        "Protector"
+      ],
+      "major": [
+        "Hand",
+        "Glory"
+      ]
+    },
+    "image": "assets/characters/taryn/tarynprof.png",
+    "base_skill_ids": [
+      "taryn0",
+      "taryn1",
+      "taryn2",
+      "taryn3",
+      "taryn4",
+      "taryn5"
+    ],
+    "fusion_skills": {
+      "angel": {
+        "passive": "tarynangel0",
+        "active": "tarynangel1"
+      },
+      "anointment": {
+        "passive": "tarynanointment0",
+        "active": "tarynanointment1"
+      },
+      "antidote": {
+        "passive": "tarynantidote0",
+        "active": "tarynantidote1"
+      },
+      "divine": {
+        "passive": "taryndivine0",
+        "active": "taryndivine1"
+      },
+      "judgment": {
+        "passive": "tarynjudgment0",
+        "active": "tarynjudgment1"
+      },
+      "prism": {
+        "passive": "tarynprism0",
+        "active": "tarynprism1"
+      },
+      "sanctuary": {
+        "passive": "tarynsanctuary0",
+        "active": "tarynsanctuary1"
+      },
+      "vengeance": {
+        "passive": "tarynvengeance0",
+        "active": "tarynvengeance1"
+      },
+      "vigilante": {
+        "passive": "tarynvigilante0",
+        "active": "tarynvigilante1"
+      },
+      "zealot": {
+        "passive": "tarynzealot0",
+        "active": "tarynzealot1"
+      }
+    },
+    "augment_ids": [
+      "taryn1",
+      "taryn2",
+      "taryn3",
+      "taryn4",
+      "taryn5"
+    ],
+    "mastery_multipliers": {
+      "attacker": 0.6,
+      "defender": 0.6,
+      "disruptor": 2.0,
+      "strategist": 2.0,
+      "support": 0.8
+    },
+    "source_file": "characters/taryn.tscn"
+  },
+  {
+    "id": "titania",
+    "path_name": "titania",
+    "character_name": "Titania, Laughing Princess",
+    "short_name": "Titania",
+    "element": {
+      "id": 5,
+      "name": "poison",
+      "display_name": "Poison"
+    },
+    "starts_fused": false,
+    "can_fuse": true,
+    "can_augment": true,
+    "in_roster": true,
+    "roster_index": 11,
+    "is_bot": false,
+    "titles": {
+      "minor": [
+        "Royal",
+        "Smile"
+      ],
+      "middle": [
+        "Whimsical",
+        "Whimsy"
+      ],
+      "major": [
+        "Laugh",
+        "Princess"
+      ]
+    },
+    "image": "assets/characters/titania/titaniaprof.png",
+    "base_skill_ids": [
+      "titania0",
+      "titania1",
+      "titania2",
+      "titania3",
+      "titania4",
+      "titania5"
+    ],
+    "fusion_skills": {
+      "antidote": {
+        "passive": "titaniaantidote0",
+        "active": "titaniaantidote1"
+      },
+      "assassin": {
+        "passive": "titaniaassassin0",
+        "active": "titaniaassassin1"
+      },
+      "battery": {
+        "passive": "titaniabattery0",
+        "active": "titaniabattery1"
+      },
+      "blight": {
+        "passive": "titaniablight0",
+        "active": "titaniablight1"
+      },
+      "brimstone": {
+        "passive": "titaniabrimstone0",
+        "active": "titaniabrimstone1"
+      },
+      "evolution": {
+        "passive": "titaniaevolution0",
+        "active": "titaniaevolution1"
+      },
+      "faerie": {
+        "passive": "titaniafaerie0",
+        "active": "titaniafaerie1"
+      },
+      "serum": {
+        "passive": "titaniaserum0",
+        "active": "titaniaserum1"
+      },
+      "spore": {
+        "passive": "titaniaspore0",
+        "active": "titaniaspore1"
+      },
+      "stasis": {
+        "passive": "titaniastasis0",
+        "active": "titaniastasis1"
+      }
+    },
+    "augment_ids": [
+      "titania1",
+      "titania2",
+      "titania3",
+      "titania4",
+      "titania5"
+    ],
+    "mastery_multipliers": {
+      "attacker": 0.6,
+      "defender": 0.6,
+      "disruptor": 2.0,
+      "strategist": 2.0,
+      "support": 0.8
+    },
+    "source_file": "characters/titania.tscn"
+  },
+  {
+    "id": "trinity",
+    "path_name": "trinity",
+    "character_name": "Prisma Trinity",
+    "short_name": null,
+    "element": {
+      "id": 51,
+      "name": "prism",
+      "display_name": "Prism"
+    },
+    "starts_fused": true,
+    "can_fuse": false,
+    "can_augment": true,
+    "in_roster": true,
+    "roster_index": 26,
+    "is_bot": false,
+    "titles": {
+      "minor": [],
+      "middle": [],
+      "major": []
+    },
+    "image": "assets/characters/trinity/trinityprof.png",
+    "base_skill_ids": [
+      "trinity0",
+      "trinity1",
+      "trinity2",
+      "trinity3"
+    ],
+    "fusion_skills": {},
+    "augment_ids": [
+      "trinity1",
+      "trinity2",
+      "trinity3",
+      "trinity4",
+      "trinity5"
+    ],
+    "mastery_multipliers": {
+      "attacker": 0.6,
+      "defender": 0.6,
+      "disruptor": 2.0,
+      "strategist": 2.0,
+      "support": 0.8
+    },
+    "source_file": "characters/trinity.tscn"
+  },
+  {
+    "id": "xyris",
+    "path_name": "xyris",
+    "character_name": "Xyris, King of Dreams",
+    "short_name": "Xyris",
+    "element": {
+      "id": 9,
+      "name": "shadow",
+      "display_name": "Shadow"
+    },
+    "starts_fused": false,
+    "can_fuse": true,
+    "can_augment": true,
+    "in_roster": true,
+    "roster_index": 19,
+    "is_bot": false,
+    "titles": {
+      "minor": [
+        "Dreamer",
+        "Promised"
+      ],
+      "middle": [
+        "Shifting",
+        "Ethereal"
+      ],
+      "major": [
+        "King",
+        "Dreams"
+      ]
+    },
+    "image": "assets/characters/xyris/xyrisprof.png",
+    "base_skill_ids": [
+      "xyris0",
+      "xyris1",
+      "xyris2",
+      "xyris3",
+      "xyris4",
+      "xyris5"
+    ],
+    "fusion_skills": {
+      "assassin": {
+        "passive": "xyrisassassin0",
+        "active": "xyrisassassin1"
+      },
+      "curse": {
+        "passive": "xyriscurse0",
+        "active": "xyriscurse1"
+      },
+      "dimension": {
+        "passive": "xyrisdimension0",
+        "active": "xyrisdimension1"
+      },
+      "ion": {
+        "passive": "xyrision0",
+        "active": "xyrision1"
+      },
+      "mirror": {
+        "passive": "xyrismirror0",
+        "active": "xyrismirror1"
+      },
+      "moon": {
+        "passive": "xyrismoon0",
+        "active": "xyrismoon1"
+      },
+      "night": {
+        "passive": "xyrisnight0",
+        "active": "xyrisnight1"
+      },
+      "ninja": {
+        "passive": "xyrisninja0",
+        "active": "xyrisninja1"
+      },
+      "ritual": {
+        "passive": "xyrisritual0",
+        "active": "xyrisritual1"
+      },
+      "vigilante": {
+        "passive": "xyrisvigilante0",
+        "active": "xyrisvigilante1"
+      }
+    },
+    "augment_ids": [
+      "xyris1",
+      "xyris2",
+      "xyris3",
+      "xyris4",
+      "xyris5"
+    ],
+    "mastery_multipliers": {
+      "attacker": 0.6,
+      "defender": 0.6,
+      "disruptor": 2.0,
+      "strategist": 2.0,
+      "support": 0.8
+    },
+    "source_file": "characters/xyris.tscn"
+  },
+  {
+    "id": "zephyrex",
+    "path_name": "zephyrex",
+    "character_name": "Zephyrex the Windblade",
+    "short_name": "Zephyrex",
+    "element": {
+      "id": 4,
+      "name": "wind",
+      "display_name": "Wind"
+    },
+    "starts_fused": false,
+    "can_fuse": true,
+    "can_augment": true,
+    "in_roster": true,
+    "roster_index": 8,
+    "is_bot": true,
+    "titles": {
+      "minor": [
+        "Soldier",
+        "Hungry"
+      ],
+      "middle": [
+        "Swift",
+        "Bloodlust"
+      ],
+      "major": [
+        "Wind",
+        "-blade"
+      ]
+    },
+    "image": "assets/characters/zephyrex/zephyrexprof.png",
+    "base_skill_ids": [
+      "zephyrex0",
+      "zephyrex1",
+      "zephyrex2",
+      "zephyrex3",
+      "zephyrex4",
+      "zephyrex5"
+    ],
+    "fusion_skills": {
+      "angel": {
+        "passive": "zephyrexangel0",
+        "active": "zephyrexangel1"
+      },
+      "cloud": {
+        "passive": "zephyrexcloud0",
+        "active": "zephyrexcloud1"
+      },
+      "faerie": {
+        "passive": "zephyrexfaerie0",
+        "active": "zephyrexfaerie1"
+      },
+      "ghost": {
+        "passive": "zephyrexghost0",
+        "active": "zephyrexghost1"
+      },
+      "mechanic": {
+        "passive": "zephyrexmechanic0",
+        "active": "zephyrexmechanic1"
+      },
+      "mist": {
+        "passive": "zephyrexmist0",
+        "active": "zephyrexmist1"
+      },
+      "ninja": {
+        "passive": "zephyrexninja0",
+        "active": "zephyrexninja1"
+      },
+      "nomad": {
+        "passive": "zephyrexnomad0",
+        "active": "zephyrexnomad1"
+      },
+      "storm": {
+        "passive": "zephyrexstorm0",
+        "active": "zephyrexstorm1"
+      },
+      "winter": {
+        "passive": "zephyrexwinter0",
+        "active": "zephyrexwinter1"
+      }
+    },
+    "augment_ids": [
+      "zephyrex1",
+      "zephyrex2",
+      "zephyrex3",
+      "zephyrex4",
+      "zephyrex5"
+    ],
+    "mastery_multipliers": {
+      "attacker": 0.4,
+      "defender": 0.6,
+      "disruptor": 2.0,
+      "strategist": 2.0,
+      "support": 0.8
+    },
+    "source_file": "characters/zephyrex.tscn"
+  },
+  {
+    "id": "zevkir",
+    "path_name": "zevkir",
+    "character_name": "Tidecaller Zev'kir",
+    "short_name": "Zev'kir",
+    "element": {
+      "id": 2,
+      "name": "water",
+      "display_name": "Water"
+    },
+    "starts_fused": false,
+    "can_fuse": true,
+    "can_augment": true,
+    "in_roster": true,
+    "roster_index": 5,
+    "is_bot": false,
+    "titles": {
+      "minor": [
+        "Merfolk",
+        "Depths"
+      ],
+      "middle": [
+        "Tidal",
+        "Deep"
+      ],
+      "major": [
+        "Tidecaller"
+      ]
+    },
+    "image": "assets/characters/zevkir/zevkirprof.png",
+    "base_skill_ids": [
+      "zevkir0",
+      "zevkir1",
+      "zevkir2",
+      "zevkir3",
+      "zevkir4",
+      "zevkir5"
+    ],
+    "fusion_skills": {
+      "alchemy": {
+        "passive": "zevkiralchemy0",
+        "active": "zevkiralchemy1"
+      },
+      "anointment": {
+        "passive": "zevkiranointment0",
+        "active": "zevkiranointment1"
+      },
+      "blood": {
+        "passive": "zevkirblood0",
+        "active": "zevkirblood1"
+      },
+      "current": {
+        "passive": "zevkircurrent0",
+        "active": "zevkircurrent1"
+      },
+      "glacier": {
+        "passive": "zevkirglacier0",
+        "active": "zevkirglacier1"
+      },
+      "mirror": {
+        "passive": "zevkirmirror0",
+        "active": "zevkirmirror1"
+      },
+      "mist": {
+        "passive": "zevkirmist0",
+        "active": "zevkirmist1"
+      },
+      "ocean": {
+        "passive": "zevkirocean0",
+        "active": "zevkirocean1"
+      },
+      "serum": {
+        "passive": "zevkirserum0",
+        "active": "zevkirserum1"
+      },
+      "slime": {
+        "passive": "zevkirslime0",
+        "active": "zevkirslime1"
+      }
+    },
+    "augment_ids": [
+      "zevkir1",
+      "zevkir2",
+      "zevkir3",
+      "zevkir4",
+      "zevkir5"
+    ],
+    "mastery_multipliers": {
+      "attacker": 0.4,
+      "defender": 0.6,
+      "disruptor": 2.0,
+      "strategist": 2.0,
+      "support": 0.8
+    },
+    "source_file": "characters/zevkir.tscn"
+  }
+]

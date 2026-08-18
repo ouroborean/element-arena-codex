@@ -1,0 +1,97 @@
+{
+  "element_mis_tags": [
+    {
+      "skill": "rolandmyth0",
+      "tagged": "nomad",
+      "correct": "myth",
+      "reason": "fusion form is myth"
+    },
+    {
+      "skill": "rolandmyth1",
+      "tagged": "nomad",
+      "correct": "myth",
+      "reason": "fusion form is myth"
+    },
+    {
+      "skill": "blackknightevil0",
+      "tagged": "fire(default)",
+      "correct": "evil",
+      "reason": "defaulted; owner unholy fusion=evil"
+    },
+    {
+      "skill": "maggiedevil0",
+      "tagged": "fire(default)",
+      "correct": "devil",
+      "reason": "defaulted; fusion form is devil"
+    }
+  ],
+  "minion_hp_conflicts_glossary_vs_db": [
+    {
+      "minion": "trinityazureminion",
+      "db": 60,
+      "glossary": 65
+    },
+    {
+      "minion": "trinitycrimsonminion",
+      "db": 60,
+      "glossary": 65
+    },
+    {
+      "minion": "trinitysaffronminion",
+      "db": 60,
+      "glossary": 65
+    },
+    {
+      "minion": "sayabatteryminion",
+      "db": 40,
+      "glossary": 25
+    },
+    {
+      "minion": "rolandsporeminion",
+      "db": 25,
+      "glossary": 20
+    },
+    {
+      "minion": "xyrisminion",
+      "db": null,
+      "glossary": 35
+    }
+  ],
+  "minion_owner_null": [
+    "mythminion",
+    "stasisminion"
+  ],
+  "orphan_minion_templates": [
+    "jarriklargeminion",
+    "sayaauroraminion"
+  ],
+  "runtime_only_units_no_template": [
+    {
+      "name": "Revenant",
+      "from": "maggielich0",
+      "hp": 25
+    },
+    {
+      "name": "Simulacrum",
+      "from": "xyrismirror1",
+      "hp": 30
+    }
+  ],
+  "records_without_art": [
+    "darkness0",
+    "darkness1",
+    "darkness2",
+    "darkness3",
+    "darkness4",
+    "darkness5",
+    "darkness6",
+    "sayaauroraminion1"
+  ],
+  "art_path_do_not_derive": "Read the skill.image field (correct for 621/622); do NOT derive paths. e.g. pyrrhabrimstone0.image == assets/characters/pyrrha/pyrrhagas0.png",
+  "excluded_from_roster": {
+    "darkness": "not in roster; all 5 augments empty; no art; excluded with its 7 skills"
+  },
+  "ruling_needed": [
+    "minion_hp_conflicts: prefer glossary (its _meta calls it the authoritative table) or db?"
+  ]
+}

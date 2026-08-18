@@ -1,0 +1,39 @@
+{
+  "_note": "Genuine reference problems, adjudicated. NORMALIZE = a safe transcription fix of a KNOWN entity (spelling/casing/punctuation), applied to frozen content with provenance. DESIGNER_FLAG = a real inconsistency whose fix is a guess; under faithful reconstruction (no source) we DO NOT invent it — text is left as-is and the question goes to the designer. Both keys count as adjudicated so the lint stays green.",
+  "Channelling": {
+    "fix": "Channeling",
+    "kind": "NORMALIZE",
+    "rationale": "British spelling; the glossary term is 'Channeling'. Normalizing lets the keyword resolve.",
+    "examples": ["skill:zevkir1"]
+  },
+  "Zek'vir": {
+    "fix": "Zev'kir",
+    "kind": "NORMALIZE",
+    "rationale": "Transposition typo of the hero's own name (Zev'kir) within his skill Repulse.",
+    "examples": ["skill:zevkir4"]
+  },
+  "Hectors Serums": {
+    "fix": "Hector's Serums",
+    "kind": "NORMALIZE",
+    "rationale": "Missing possessive apostrophe; every other reference is 'Hector's Serum(s)'.",
+    "examples": ["skill:hectorevolution0"]
+  },
+  "Prisma Scarlet": {
+    "fix": "Prisma Crimson",
+    "kind": "NORMALIZE",
+    "rationale": "Designer ruling 2026-08-13: the red Ranger is canonically 'Prisma Crimson' (minion table + 'Crimson Crash'). Normalizing the lone 'Scarlet' reference in the description. The augment's flavor name 'Scarlet Somersault Crash' is left as-is.",
+    "examples": ["aug:trinity1"]
+  },
+  "Prisma Citrine": {
+    "fix": "Prisma Saffron",
+    "kind": "NORMALIZE",
+    "rationale": "Designer ruling 2026-08-13: the yellow Ranger is canonically 'Prisma Saffron' (minion table + skill stem 'saffron'). Normalizing the 'Citrine' reference. Skill name 'Citrine Lens' left as-is.",
+    "examples": ["skill:trinitysaffron1"]
+  },
+  "Keeper of Tales": {
+    "fix": "Keeper of Fables",
+    "kind": "NORMALIZE",
+    "rationale": "Designer ruling 2026-08-13: typo for the character's name 'Keeper of Fables' (23x vs 3x). His resources 'Tales to Tell' / 'Chronicle Fragments' are unaffected.",
+    "examples": ["skill:keepercrystal0"]
+  }
+}

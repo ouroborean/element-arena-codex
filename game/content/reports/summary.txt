@@ -1,0 +1,20 @@
+Element Arena — content lint summary
+======================================
+
+[INFO] aug/skill id collisions: 138 of 140 augments
+[INFO] expected cross-namespace id collision: 'dennis' used by ['char', 'skill']
+[INFO] expected cross-namespace id collision: 'sayareanimationminion1' used by ['minion', 'skill']
+[INFO] expected cross-namespace id collision: 'sayareanimationminion2' used by ['minion', 'skill']
+[INFO] reference lint: 0 unadjudicated phrases (108 accepted, 7 corrections on file)
+[INFO] patch-map kinds: SKILL_PATCH=78, MULTI_SKILL_PATCH=34, UNIT_OR_GLOBAL=12, RESOURCE_OR_UNIT=7, EMPTY=5, MINION_OR_TEMPLATE=4
+[INFO] skills patched by >1 augment: 28
+[INFO] repairs manifest: 4 element re-tags, 6 HP conflicts
+
+ERROR=0 WARN=0 INFO=8
+
+Artifacts written under game/content/:
+  - ids.generated.ts
+  - patch_map.suggested.json
+  - reports/id_namespace.json
+  - reports/reference_lint.md
+  - reports/repairs.manifest.json

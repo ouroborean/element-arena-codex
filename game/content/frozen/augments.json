@@ -1,0 +1,2117 @@
+[
+  {
+    "id": "ando1",
+    "owner": "ando",
+    "augment_name": "ando1",
+    "display_name": "Afterimage",
+    "description": "If Ando uses Flash Step while Uncharged, he becomes invulnerable to non-strategic skills for 1 turn.",
+    "element": {
+      "id": 3,
+      "name": "lightning",
+      "display_name": "Lightning"
+    },
+    "index": 1,
+    "deploy_mark": true,
+    "source_file": "augments/ando/ando1.tscn"
+  },
+  {
+    "id": "ando2",
+    "owner": "ando",
+    "augment_name": "ando2",
+    "display_name": "Static Repulsion",
+    "description": "When Ando uses Focus Power, he gains 5 DR for 2 turns for each target marked by Electroblade.",
+    "element": {
+      "id": 3,
+      "name": "lightning",
+      "display_name": "Lightning"
+    },
+    "index": 2,
+    "deploy_mark": true,
+    "source_file": "augments/ando/ando2.tscn"
+  },
+  {
+    "id": "ando3",
+    "owner": "ando",
+    "augment_name": "ando3",
+    "display_name": "Pulse Blade",
+    "description": "Expel Energy also marks its target and another random target with Electroblade.",
+    "element": {
+      "id": 3,
+      "name": "lightning",
+      "display_name": "Lightning"
+    },
+    "index": 3,
+    "deploy_mark": true,
+    "source_file": "augments/ando/ando3.tscn"
+  },
+  {
+    "id": "ando4",
+    "owner": "ando",
+    "augment_name": "ando4",
+    "display_name": "On the Clock",
+    "description": "Overclock is now permanent, but Ando receives 15 Affliction damage when he uses a Supercharged ability.",
+    "element": {
+      "id": 3,
+      "name": "lightning",
+      "display_name": "Lightning"
+    },
+    "index": 4,
+    "deploy_mark": true,
+    "source_file": "augments/ando/ando4.tscn"
+  },
+  {
+    "id": "ando5",
+    "owner": "ando",
+    "augment_name": "ando5",
+    "display_name": "Singular Directive",
+    "description": "While Ando is Charged or Supercharged, he ignores Counters and Reflects.",
+    "element": {
+      "id": 3,
+      "name": "lightning",
+      "display_name": "Lightning"
+    },
+    "index": 5,
+    "deploy_mark": true,
+    "source_file": "augments/ando/ando5.tscn"
+  },
+  {
+    "id": "aramao1",
+    "owner": "aramao",
+    "augment_name": "aramao1",
+    "display_name": "Veiled Beat",
+    "description": "Sand Quake's cost is reduced by 1 [65], but Desert Veil only applies Veiled for 1 turn.",
+    "element": {
+      "id": 30,
+      "name": "nomad",
+      "display_name": "Nomad"
+    },
+    "index": 1,
+    "deploy_mark": true,
+    "source_file": "augments/aramao/aramao1.tscn"
+  },
+  {
+    "id": "aramao2",
+    "owner": "aramao",
+    "augment_name": "aramao2",
+    "display_name": "Hidden Oasis",
+    "description": "If Mirage Trap expires without being triggered, the affected enemy heals the allied Hero directly across from them for 25 HP.",
+    "element": {
+      "id": 30,
+      "name": "nomad",
+      "display_name": "Nomad"
+    },
+    "index": 2,
+    "deploy_mark": true,
+    "source_file": "augments/aramao/aramao2.tscn"
+  },
+  {
+    "id": "aramao3",
+    "owner": "aramao",
+    "augment_name": "aramao3",
+    "display_name": "Vanishing Act",
+    "description": "After Desert Veil finishes applying Veiled, the untargeted allied Hero is Veiled for 2 turns.",
+    "element": {
+      "id": 30,
+      "name": "nomad",
+      "display_name": "Nomad"
+    },
+    "index": 3,
+    "deploy_mark": true,
+    "source_file": "augments/aramao/aramao3.tscn"
+  },
+  {
+    "id": "aramao4",
+    "owner": "aramao",
+    "augment_name": "aramao4",
+    "display_name": "Wraithblade",
+    "description": "If Aramao is Veiled, Desert Knife deals 10 more damage and extends the duration of his Veiled effects by 1 turn.",
+    "element": {
+      "id": 30,
+      "name": "nomad",
+      "display_name": "Nomad"
+    },
+    "index": 4,
+    "deploy_mark": true,
+    "source_file": "augments/aramao/aramao4.tscn"
+  },
+  {
+    "id": "aramao5",
+    "owner": "aramao",
+    "augment_name": "aramao5",
+    "display_name": "Dune Step",
+    "description": "Trial of Sands lasts 1 more turn. While it is active, all enemy Heroes are considered to be across from Aramao, and all allied Heroes are considered to be adjacent to him.",
+    "element": {
+      "id": 30,
+      "name": "nomad",
+      "display_name": "Nomad"
+    },
+    "index": 5,
+    "deploy_mark": true,
+    "source_file": "augments/aramao/aramao5.tscn"
+  },
+  {
+    "id": "ayana1",
+    "owner": "ayana",
+    "augment_name": "ayana1",
+    "display_name": "Honor Guard",
+    "description": "The base damage reduction per ally is increased to 10",
+    "element": {
+      "id": 7,
+      "name": "holy",
+      "display_name": "Holy"
+    },
+    "index": 1,
+    "deploy_mark": true,
+    "source_file": "augments/ayana/ayana1.tscn"
+  },
+  {
+    "id": "ayana2",
+    "owner": "ayana",
+    "augment_name": "ayana2",
+    "display_name": "Guarded Meditation",
+    "description": "Ayana gains 30 shield for 1 turn when she uses Prayer.",
+    "element": {
+      "id": 7,
+      "name": "holy",
+      "display_name": "Holy"
+    },
+    "index": 2,
+    "deploy_mark": true,
+    "source_file": "augments/ayana/ayana2.tscn"
+  },
+  {
+    "id": "ayana3",
+    "owner": "ayana",
+    "augment_name": "ayana3",
+    "display_name": "Stern Reminder",
+    "description": "If an enemy triggers Voice of Light, it is automatically recast on them, ignoring invulnerability and counters",
+    "element": {
+      "id": 7,
+      "name": "holy",
+      "display_name": "Holy"
+    },
+    "index": 3,
+    "deploy_mark": true,
+    "source_file": "augments/ayana/ayana3.tscn"
+  },
+  {
+    "id": "ayana4",
+    "owner": "ayana",
+    "augment_name": "ayana4",
+    "display_name": "Answered Prayers",
+    "description": "Prayer makes its target Invulnerable for 1 turn if used on a target below 20 HP.",
+    "element": {
+      "id": 7,
+      "name": "holy",
+      "display_name": "Holy"
+    },
+    "index": 4,
+    "deploy_mark": true,
+    "source_file": "augments/ayana/ayana4.tscn"
+  },
+  {
+    "id": "ayana5",
+    "owner": "ayana",
+    "augment_name": "ayana5",
+    "display_name": "Harsh Words",
+    "description": "Prayer and Voice of Light cause 10 more healing or damage, but no longer have a secondary effect.",
+    "element": {
+      "id": 7,
+      "name": "holy",
+      "display_name": "Holy"
+    },
+    "index": 5,
+    "deploy_mark": false,
+    "source_file": "augments/ayana/ayana5.tscn"
+  },
+  {
+    "id": "blackknight1",
+    "owner": "blackknight",
+    "augment_name": "blackknight1",
+    "display_name": "Obsidian Duelist",
+    "description": "If the Black Knight defeats an enemy, his skills are enhanced for the following two turns",
+    "element": {
+      "id": 8,
+      "name": "unholy",
+      "display_name": "Unholy"
+    },
+    "index": 1,
+    "deploy_mark": false,
+    "source_file": "augments/blackknight/blackknight1.tscn"
+  },
+  {
+    "id": "blackknight2",
+    "owner": "blackknight",
+    "augment_name": "blackknight2",
+    "display_name": "Ebonsteel Charger",
+    "description": "The turn after activating his passive, The Nightmare Rides costs one less [8].",
+    "element": {
+      "id": 8,
+      "name": "unholy",
+      "display_name": "Unholy"
+    },
+    "index": 2,
+    "deploy_mark": true,
+    "source_file": "augments/blackknight/blackknight2.tscn"
+  },
+  {
+    "id": "blackknight3",
+    "owner": "blackknight",
+    "augment_name": "blackknight3",
+    "display_name": "Devour Strength",
+    "description": "Oathbreaker Strike deals 15 additional damage to the primary target if Unholy Aura is affecting more than 3 targets",
+    "element": {
+      "id": 8,
+      "name": "unholy",
+      "display_name": "Unholy"
+    },
+    "index": 3,
+    "deploy_mark": true,
+    "source_file": "augments/blackknight/blackknight3.tscn"
+  },
+  {
+    "id": "blackknight4",
+    "owner": "blackknight",
+    "augment_name": "blackknight4",
+    "display_name": "Unholy Fortitude",
+    "description": "If Dead or Alive successfully redirects an ability, the Black Knight gains Elemental Essence",
+    "element": {
+      "id": 8,
+      "name": "unholy",
+      "display_name": "Unholy"
+    },
+    "index": 4,
+    "deploy_mark": true,
+    "source_file": "augments/blackknight/blackknight4.tscn"
+  },
+  {
+    "id": "blackknight5",
+    "owner": "blackknight",
+    "augment_name": "blackknight5",
+    "display_name": "Oathbreaker's Blade",
+    "description": "Oathbreaker Strike deals 10 damage to the target's allies while enhanced.",
+    "element": {
+      "id": 8,
+      "name": "unholy",
+      "display_name": "Unholy"
+    },
+    "index": 5,
+    "deploy_mark": true,
+    "source_file": "augments/blackknight/blackknight5.tscn"
+  },
+  {
+    "id": "darkness1",
+    "owner": "darkness",
+    "augment_name": "darkness1",
+    "display_name": null,
+    "description": null,
+    "element": {
+      "id": 0,
+      "name": "fire",
+      "display_name": "Fire",
+      "defaulted": true
+    },
+    "index": 1,
+    "deploy_mark": true,
+    "source_file": "augments/darkness/darkness1.tscn"
+  },
+  {
+    "id": "darkness2",
+    "owner": "darkness",
+    "augment_name": "darkness2",
+    "display_name": null,
+    "description": null,
+    "element": {
+      "id": 0,
+      "name": "fire",
+      "display_name": "Fire",
+      "defaulted": true
+    },
+    "index": 2,
+    "deploy_mark": true,
+    "source_file": "augments/darkness/darkness2.tscn"
+  },
+  {
+    "id": "darkness3",
+    "owner": "darkness",
+    "augment_name": "darkness3",
+    "display_name": null,
+    "description": null,
+    "element": {
+      "id": 0,
+      "name": "fire",
+      "display_name": "Fire",
+      "defaulted": true
+    },
+    "index": 3,
+    "deploy_mark": true,
+    "source_file": "augments/darkness/darkness3.tscn"
+  },
+  {
+    "id": "darkness4",
+    "owner": "darkness",
+    "augment_name": "darkness4",
+    "display_name": null,
+    "description": null,
+    "element": {
+      "id": 0,
+      "name": "fire",
+      "display_name": "Fire",
+      "defaulted": true
+    },
+    "index": 4,
+    "deploy_mark": true,
+    "source_file": "augments/darkness/darkness4.tscn"
+  },
+  {
+    "id": "darkness5",
+    "owner": "darkness",
+    "augment_name": "darkness5",
+    "display_name": null,
+    "description": null,
+    "element": {
+      "id": 0,
+      "name": "fire",
+      "display_name": "Fire",
+      "defaulted": true
+    },
+    "index": 5,
+    "deploy_mark": true,
+    "source_file": "augments/darkness/darkness5.tscn"
+  },
+  {
+    "id": "dennis1",
+    "owner": "dennis",
+    "augment_name": "dennis1",
+    "display_name": "Auto-Injectors",
+    "description": "Dennis will automatically use HS-46 Ascendant Serum on himself any time he receives a stun effect.",
+    "element": {
+      "id": 23,
+      "name": "serum",
+      "display_name": "Serum"
+    },
+    "index": 1,
+    "deploy_mark": false,
+    "source_file": "augments/dennis/dennis1.tscn"
+  },
+  {
+    "id": "dennis2",
+    "owner": "dennis",
+    "augment_name": "dennis2",
+    "display_name": "Rage Response",
+    "description": "Dennis will automatically use HS-112 Fury Serum on himself if an allied Hero dies. If that Hero was Hector the Injector, Dennis uses End of Shift instead.",
+    "element": {
+      "id": 23,
+      "name": "serum",
+      "display_name": "Serum"
+    },
+    "index": 2,
+    "deploy_mark": false,
+    "source_file": "augments/dennis/dennis2.tscn"
+  },
+  {
+    "id": "dennis3",
+    "owner": "dennis",
+    "augment_name": "dennis3",
+    "display_name": "Long Memory",
+    "description": "Pain Tolerance now lasts for 2 turns.",
+    "element": {
+      "id": 23,
+      "name": "serum",
+      "display_name": "Serum"
+    },
+    "index": 3,
+    "deploy_mark": true,
+    "source_file": "augments/dennis/dennis3.tscn"
+  },
+  {
+    "id": "dennis4",
+    "owner": "dennis",
+    "augment_name": "dennis4",
+    "display_name": "Dennis So Popular Now",
+    "description": "Shared Agony now costs 1 Generic energy, but both parts of its activation now include all allied units.",
+    "element": {
+      "id": 23,
+      "name": "serum",
+      "display_name": "Serum"
+    },
+    "index": 4,
+    "deploy_mark": false,
+    "source_file": "augments/dennis/dennis4.tscn"
+  },
+  {
+    "id": "dennis5",
+    "owner": "dennis",
+    "augment_name": "dennis5",
+    "display_name": "Working for Weekend",
+    "description": "Big Green Fist deals 5 more base damage, and decreases the remaining cooldown of End of Shift by 1 turn.",
+    "element": {
+      "id": 23,
+      "name": "serum",
+      "display_name": "Serum"
+    },
+    "index": 5,
+    "deploy_mark": true,
+    "source_file": "augments/dennis/dennis5.tscn"
+  },
+  {
+    "id": "fate1",
+    "owner": "fate",
+    "augment_name": "fate1",
+    "display_name": "Resurgent Revival",
+    "description": "If Fate is revived using This Is Not The End, he no longer prevents healing from his allies from affecting him.",
+    "element": {
+      "id": 15,
+      "name": "apocalypse",
+      "display_name": "Apocalypse"
+    },
+    "index": 1,
+    "deploy_mark": true,
+    "source_file": "augments/fate/fate1.tscn"
+  },
+  {
+    "id": "fate2",
+    "owner": "fate",
+    "augment_name": "fate2",
+    "display_name": "Azure Lure",
+    "description": "Will-o'-wisp no longer gives Fate's team Shield. Instead, the enemy team has their Helpful skills stunned while it is active.",
+    "element": {
+      "id": 15,
+      "name": "apocalypse",
+      "display_name": "Apocalypse"
+    },
+    "index": 2,
+    "deploy_mark": true,
+    "source_file": "augments/fate/fate2.tscn"
+  },
+  {
+    "id": "fate3",
+    "owner": "fate",
+    "augment_name": "fate3",
+    "display_name": "Vulpus Arcana",
+    "description": "Vulpus Incendia and Vulpus Crystallia can now be used without interrupting Channeling.",
+    "element": {
+      "id": 15,
+      "name": "apocalypse",
+      "display_name": "Apocalypse"
+    },
+    "index": 3,
+    "deploy_mark": true,
+    "source_file": "augments/fate/fate3.tscn"
+  },
+  {
+    "id": "fate4",
+    "owner": "fate",
+    "augment_name": "fate4",
+    "display_name": "Deja Vu",
+    "description": "Enemies that don't trigger Fox's Cunning during its duration will have their cooldowns paralyzed for 2 turns.",
+    "element": {
+      "id": 15,
+      "name": "apocalypse",
+      "display_name": "Apocalypse"
+    },
+    "index": 4,
+    "deploy_mark": true,
+    "source_file": "augments/fate/fate4.tscn"
+  },
+  {
+    "id": "fate5",
+    "owner": "fate",
+    "augment_name": "fate5",
+    "display_name": "Once More, Together",
+    "description": "This Is Not The End's trigger limit is now per allied Hero (each Hero can be revived once per round.)",
+    "element": {
+      "id": 15,
+      "name": "apocalypse",
+      "display_name": "Apocalypse"
+    },
+    "index": 5,
+    "deploy_mark": true,
+    "source_file": "augments/fate/fate5.tscn"
+  },
+  {
+    "id": "gaia1",
+    "owner": "gaia",
+    "augment_name": "gaia1",
+    "display_name": "Yggdrasil's Guidance",
+    "description": "At the start of the game, Gaia creates a Worldsprout minion instead of a Seedling.",
+    "element": {
+      "id": 6,
+      "name": "earth",
+      "display_name": "Earth"
+    },
+    "index": 1,
+    "deploy_mark": true,
+    "source_file": "augments/gaia/gaia1.tscn"
+  },
+  {
+    "id": "gaia2",
+    "owner": "gaia",
+    "augment_name": "gaia2",
+    "display_name": "Earthen Aid",
+    "description": "Channel Earth heals a random ally for 10 HP",
+    "element": {
+      "id": 6,
+      "name": "earth",
+      "display_name": "Earth"
+    },
+    "index": 2,
+    "deploy_mark": true,
+    "source_file": "augments/gaia/gaia2.tscn"
+  },
+  {
+    "id": "gaia3",
+    "owner": "gaia",
+    "augment_name": "gaia3",
+    "display_name": "Stonepod Seedlings",
+    "description": "Gaia's minions are created with 10 more maximum HP.",
+    "element": {
+      "id": 6,
+      "name": "earth",
+      "display_name": "Earth"
+    },
+    "index": 3,
+    "deploy_mark": true,
+    "source_file": "augments/gaia/gaia3.tscn"
+  },
+  {
+    "id": "gaia4",
+    "owner": "gaia",
+    "augment_name": "gaia4",
+    "display_name": "Destructive Divergence",
+    "description": "Each time Channel Vitality is triggered, Gaia gains a stack of Channel Earth.",
+    "element": {
+      "id": 6,
+      "name": "earth",
+      "display_name": "Earth"
+    },
+    "index": 4,
+    "deploy_mark": true,
+    "source_file": "augments/gaia/gaia4.tscn"
+  },
+  {
+    "id": "gaia5",
+    "owner": "gaia",
+    "augment_name": "gaia5",
+    "display_name": "Soul Channeling",
+    "description": "Gaia now starts the round with 3 Seedlings",
+    "element": {
+      "id": 6,
+      "name": "earth",
+      "display_name": "Earth"
+    },
+    "index": 5,
+    "deploy_mark": false,
+    "source_file": "augments/gaia/gaia5.tscn"
+  },
+  {
+    "id": "galazax1",
+    "owner": "galazax",
+    "augment_name": "galazax1",
+    "display_name": "Twin Storms",
+    "description": "Galazax can now Channel up to 2 separate copies of The Skies Darken.",
+    "element": {
+      "id": 35,
+      "name": "storm",
+      "display_name": "Storm"
+    },
+    "index": 1,
+    "deploy_mark": true,
+    "source_file": "augments/galazax/galazax1.tscn"
+  },
+  {
+    "id": "galazax2",
+    "owner": "galazax",
+    "augment_name": "galazax2",
+    "display_name": "Chain Lightning",
+    "description": "Lightning Strikes now deals 10 damage to the primary target and 5 to all other enemies, and becomes Piercing.",
+    "element": {
+      "id": 35,
+      "name": "storm",
+      "display_name": "Storm"
+    },
+    "index": 2,
+    "deploy_mark": true,
+    "source_file": "augments/galazax/galazax2.tscn"
+  },
+  {
+    "id": "galazax3",
+    "owner": "galazax",
+    "augment_name": "galazax3",
+    "display_name": "The Voice Above",
+    "description": "The Heavens Speak now costs [65] less and no longer cancels Channeled skills.",
+    "element": {
+      "id": 35,
+      "name": "storm",
+      "display_name": "Storm"
+    },
+    "index": 3,
+    "deploy_mark": true,
+    "source_file": "augments/galazax/galazax3.tscn"
+  },
+  {
+    "id": "galazax4",
+    "owner": "galazax",
+    "augment_name": "galazax4",
+    "display_name": "Deafening Silence",
+    "description": "Thunder Deafens has its cooldown reduced by 1, but it no longer causes Galazax to ignore damage.",
+    "element": {
+      "id": 35,
+      "name": "storm",
+      "display_name": "Storm"
+    },
+    "index": 4,
+    "deploy_mark": true,
+    "source_file": "augments/galazax/galazax4.tscn"
+  },
+  {
+    "id": "galazax5",
+    "owner": "galazax",
+    "augment_name": "galazax5",
+    "display_name": "Looming Grudge",
+    "description": "A random enemy Hero starts each round with 3 stacks of The Storm Builds.",
+    "element": {
+      "id": 35,
+      "name": "storm",
+      "display_name": "Storm"
+    },
+    "index": 5,
+    "deploy_mark": true,
+    "source_file": "augments/galazax/galazax5.tscn"
+  },
+  {
+    "id": "gommar1",
+    "owner": "gommar",
+    "augment_name": "gommar1",
+    "display_name": "Icy Shrapnel",
+    "description": "Iceblood Hammer and Foot of the Mountain now mark a random enemy on use. The following turn, that enemy will take 20 damage.",
+    "element": {
+      "id": 1,
+      "name": "ice",
+      "display_name": "Ice"
+    },
+    "index": 1,
+    "deploy_mark": true,
+    "source_file": "augments/gommar/gommar1.tscn"
+  },
+  {
+    "id": "gommar2",
+    "owner": "gommar",
+    "augment_name": "gommar2",
+    "display_name": "Frozen Fortress",
+    "description": "While Frost-Covered, Gommar gains 10 points of DR",
+    "element": {
+      "id": 1,
+      "name": "ice",
+      "display_name": "Ice"
+    },
+    "index": 2,
+    "deploy_mark": true,
+    "source_file": "augments/gommar/gommar2.tscn"
+  },
+  {
+    "id": "gommar3",
+    "owner": "gommar",
+    "augment_name": "gommar3",
+    "display_name": "Winter's Howl",
+    "description": "Breath of the North now lowers the targets damage by 15, lowered by 5 every time they use a skill.",
+    "element": {
+      "id": 1,
+      "name": "ice",
+      "display_name": "Ice"
+    },
+    "index": 3,
+    "deploy_mark": true,
+    "source_file": "augments/gommar/gommar3.tscn"
+  },
+  {
+    "id": "gommar4",
+    "owner": "gommar",
+    "augment_name": "gommar4",
+    "display_name": "Flashfreeze",
+    "description": "After Gommar consumes Frost-Covered, he regains it at the end of his next turn.",
+    "element": {
+      "id": 1,
+      "name": "ice",
+      "display_name": "Ice"
+    },
+    "index": 4,
+    "deploy_mark": true,
+    "source_file": "augments/gommar/gommar4.tscn"
+  },
+  {
+    "id": "gommar5",
+    "owner": "gommar",
+    "augment_name": "gommar5",
+    "display_name": "Brittle Ice",
+    "description": "Iceblood Hammer deals 5 less damage and costs one fewer r each time it is used, stacking up to twice.",
+    "element": {
+      "id": 1,
+      "name": "ice",
+      "display_name": "Ice"
+    },
+    "index": 5,
+    "deploy_mark": true,
+    "source_file": "augments/gommar/gommar5.tscn"
+  },
+  {
+    "id": "hector1",
+    "owner": "hector",
+    "augment_name": "hector1",
+    "display_name": "Overeager",
+    "description": "At the start of each round, Hector automatically casts Burning Blood Serum on Dennis.",
+    "element": {
+      "id": 5,
+      "name": "poison",
+      "display_name": "Poison"
+    },
+    "index": 1,
+    "deploy_mark": true,
+    "source_file": "augments/hector/hector1.tscn"
+  },
+  {
+    "id": "hector2",
+    "owner": "hector",
+    "augment_name": "hector2",
+    "display_name": "Calibrated Syringe Gun",
+    "description": "Hector's Serum skills cannot be stunned.",
+    "element": {
+      "id": 5,
+      "name": "poison",
+      "display_name": "Poison"
+    },
+    "index": 2,
+    "deploy_mark": true,
+    "source_file": "augments/hector/hector2.tscn"
+  },
+  {
+    "id": "hector3",
+    "owner": "hector",
+    "augment_name": "hector3",
+    "display_name": "Dilution",
+    "description": "Serums now last for 2 additional turns, but their costs are increased by [65].",
+    "element": {
+      "id": 5,
+      "name": "poison",
+      "display_name": "Poison"
+    },
+    "index": 3,
+    "deploy_mark": true,
+    "source_file": "augments/hector/hector3.tscn"
+  },
+  {
+    "id": "hector4",
+    "owner": "hector",
+    "augment_name": "hector4",
+    "display_name": "Promotion",
+    "description": "Dennis the Apprentice begins the game with 20 extra health, and under the effect of a random Serum",
+    "element": {
+      "id": 5,
+      "name": "poison",
+      "display_name": "Poison"
+    },
+    "index": 4,
+    "deploy_mark": true,
+    "source_file": "augments/hector/hector4.tscn"
+  },
+  {
+    "id": "hector5",
+    "owner": "hector",
+    "augment_name": "hector5",
+    "display_name": "Emergency Clinic",
+    "description": "Hector may use his Serums on targets other than Dennis once Dennis has died.",
+    "element": {
+      "id": 5,
+      "name": "poison",
+      "display_name": "Poison"
+    },
+    "index": 5,
+    "deploy_mark": true,
+    "source_file": "augments/hector/hector5.tscn"
+  },
+  {
+    "id": "jarrik1",
+    "owner": "jarrik",
+    "augment_name": "jarrik1",
+    "display_name": "Ashen Cleave",
+    "description": "Blade of Ashes strikes an additional random enemy for 10 damage. Has no effect if Blade of Ashes is AOE.",
+    "element": {
+      "id": 0,
+      "name": "fire",
+      "display_name": "Fire",
+      "defaulted": true
+    },
+    "index": 1,
+    "deploy_mark": true,
+    "source_file": "augments/jarrik/jarrik1.tscn"
+  },
+  {
+    "id": "jarrik2",
+    "owner": "jarrik",
+    "augment_name": "jarrik2",
+    "display_name": "Charred and Crumbling",
+    "description": "Enemies affected by Blackened Wounds ignore healing for 1 turn.",
+    "element": {
+      "id": 0,
+      "name": "fire",
+      "display_name": "Fire",
+      "defaulted": true
+    },
+    "index": 2,
+    "deploy_mark": true,
+    "source_file": "augments/jarrik/jarrik2.tscn"
+  },
+  {
+    "id": "jarrik3",
+    "owner": "jarrik",
+    "augment_name": "jarrik3",
+    "display_name": "Blazing Crescendo",
+    "description": "If all enemies affected by Cinderswell are marked by Cinders, they have their non-Strategic skills stunned for 1 turn.",
+    "element": {
+      "id": 0,
+      "name": "fire",
+      "display_name": "Fire",
+      "defaulted": true
+    },
+    "index": 3,
+    "deploy_mark": true,
+    "source_file": "augments/jarrik/jarrik3.tscn"
+  },
+  {
+    "id": "jarrik4",
+    "owner": "jarrik",
+    "augment_name": "jarrik4",
+    "display_name": "Blackened Soul",
+    "description": "Jarrik splits all single-target damage received between him and any active Cinders.",
+    "element": {
+      "id": 0,
+      "name": "fire",
+      "display_name": "Fire",
+      "defaulted": true
+    },
+    "index": 4,
+    "deploy_mark": true,
+    "source_file": "augments/jarrik/jarrik4.tscn"
+  },
+  {
+    "id": "jarrik5",
+    "owner": "jarrik",
+    "augment_name": "jarrik5",
+    "display_name": "Dazzling Lights",
+    "description": "While Blade of Dancing Lights is active, Cinder minions ignore harmful skills.",
+    "element": {
+      "id": 0,
+      "name": "fire",
+      "display_name": "Fire",
+      "defaulted": true
+    },
+    "index": 5,
+    "deploy_mark": true,
+    "source_file": "augments/jarrik/jarrik5.tscn"
+  },
+  {
+    "id": "keeper1",
+    "owner": "keeper",
+    "augment_name": "keeper1",
+    "display_name": "Riveting Read",
+    "description": "If Keeper of Fables still has Shield on Tales to Tell after using Page-turner, the targeted enemy is stunned for 1 turn. Page-turner's cooldown is increased by 1.",
+    "element": {
+      "id": 1,
+      "name": "ice",
+      "display_name": "Ice"
+    },
+    "index": 1,
+    "deploy_mark": true,
+    "source_file": "augments/keeper/keeper1.tscn"
+  },
+  {
+    "id": "keeper2",
+    "owner": "keeper",
+    "augment_name": "keeper2",
+    "display_name": "Flat Design",
+    "description": "If Character Development targets an ally it hasn't targeted yet this round, Keeper of Fables gains Elemental Essence.",
+    "element": {
+      "id": 1,
+      "name": "ice",
+      "display_name": "Ice"
+    },
+    "index": 2,
+    "deploy_mark": true,
+    "source_file": "augments/keeper/keeper2.tscn"
+  },
+  {
+    "id": "keeper3",
+    "owner": "keeper",
+    "augment_name": "keeper3",
+    "display_name": "Plot Twist",
+    "description": "If Keeper of Fables is the only living Hero you control, Hero's Return only consumes 50 Shield and costs one less [65].",
+    "element": {
+      "id": 1,
+      "name": "ice",
+      "display_name": "Ice"
+    },
+    "index": 3,
+    "deploy_mark": true,
+    "source_file": "augments/keeper/keeper3.tscn"
+  },
+  {
+    "id": "keeper4",
+    "owner": "keeper",
+    "augment_name": "keeper4",
+    "display_name": "Good Pacing",
+    "description": "Shield from Tales to Tell can only take a maximum of 20 damage from a single hit.",
+    "element": {
+      "id": 1,
+      "name": "ice",
+      "display_name": "Ice"
+    },
+    "index": 4,
+    "deploy_mark": true,
+    "source_file": "augments/keeper/keeper4.tscn"
+  },
+  {
+    "id": "keeper5",
+    "owner": "keeper",
+    "augment_name": "keeper5",
+    "display_name": "Nose in a Book",
+    "description": "If Keeper of Fables doesn't act during his turn, he heals his team for 5 health.",
+    "element": {
+      "id": 1,
+      "name": "ice",
+      "display_name": "Ice"
+    },
+    "index": 5,
+    "deploy_mark": true,
+    "source_file": "augments/keeper/keeper5.tscn"
+  },
+  {
+    "id": "laria1",
+    "owner": "laria",
+    "augment_name": "laria1",
+    "display_name": "Darkest Hour",
+    "description": "If the target of Nightwrap has 4 Stacks of Deepening Shadows, they become Invulnerable if they are an ally or Stunned if they are an enemy. Effect lasts 1 turn.",
+    "element": {
+      "id": 9,
+      "name": "shadow",
+      "display_name": "Shadow"
+    },
+    "index": 1,
+    "deploy_mark": true,
+    "source_file": "augments/laria/laria1.tscn"
+  },
+  {
+    "id": "laria2",
+    "owner": "laria",
+    "augment_name": "laria2",
+    "display_name": "Noble Thief",
+    "description": "If Laria uses Nightwrap on a target without Elemental Essence, she gives them Elemental Essence if they are an ally, and generates a Generic energy if they are an enemy.",
+    "element": {
+      "id": 9,
+      "name": "shadow",
+      "display_name": "Shadow"
+    },
+    "index": 2,
+    "deploy_mark": true,
+    "source_file": "augments/laria/laria2.tscn"
+  },
+  {
+    "id": "laria3",
+    "owner": "laria",
+    "augment_name": "laria3",
+    "display_name": "Nightblade",
+    "description": "Nightwrap now counts stacks of Deepening Shadows on Laria if she is using it on an enemy",
+    "element": {
+      "id": 9,
+      "name": "shadow",
+      "display_name": "Shadow"
+    },
+    "index": 3,
+    "deploy_mark": true,
+    "source_file": "augments/laria/laria3.tscn"
+  },
+  {
+    "id": "laria4",
+    "owner": "laria",
+    "augment_name": "laria4",
+    "display_name": "Nightwalker",
+    "description": "Characters with 3 or more stacks of Deepening Shadows Bypass.",
+    "element": {
+      "id": 9,
+      "name": "shadow",
+      "display_name": "Shadow"
+    },
+    "index": 4,
+    "deploy_mark": true,
+    "source_file": "augments/laria/laria4.tscn"
+  },
+  {
+    "id": "laria5",
+    "owner": "laria",
+    "augment_name": "laria5",
+    "display_name": "Vanishing Powder",
+    "description": "When a character receives their 3rd stack of Deepening Shadows, they gain the effects of Vanish.",
+    "element": {
+      "id": 9,
+      "name": "shadow",
+      "display_name": "Shadow"
+    },
+    "index": 5,
+    "deploy_mark": true,
+    "source_file": "augments/laria/laria5.tscn"
+  },
+  {
+    "id": "maggie1",
+    "owner": "maggie",
+    "augment_name": "maggie1",
+    "display_name": "Leeching Briars",
+    "description": "When Maggie gains Elemental Essence from Bramblelash, she heals 5 health for every stack of Curse of Thorns on her.",
+    "element": {
+      "id": 8,
+      "name": "unholy",
+      "display_name": "Unholy"
+    },
+    "index": 1,
+    "deploy_mark": true,
+    "source_file": "augments/maggie/maggie1.tscn"
+  },
+  {
+    "id": "maggie2",
+    "owner": "maggie",
+    "augment_name": "maggie2",
+    "display_name": "Fractal Thorns",
+    "description": "Bramblelash, Thornburst, and Grasping Vines deal 5 additional damage if Maggie has 2 or more stacks of Curse of Thorns. This damage increases to 10 when she has 4 or more.",
+    "element": {
+      "id": 8,
+      "name": "unholy",
+      "display_name": "Unholy"
+    },
+    "index": 2,
+    "deploy_mark": true,
+    "source_file": "augments/maggie/maggie2.tscn"
+  },
+  {
+    "id": "maggie3",
+    "owner": "maggie",
+    "augment_name": "maggie3",
+    "display_name": "Mutual Assurance",
+    "description": "When Maggie's Shield is damaged while Bramblebarrier is active, she deals 5 Piercing damage to the enemy team.",
+    "element": {
+      "id": 8,
+      "name": "unholy",
+      "display_name": "Unholy"
+    },
+    "index": 3,
+    "deploy_mark": true,
+    "source_file": "augments/maggie/maggie3.tscn"
+  },
+  {
+    "id": "maggie4",
+    "owner": "maggie",
+    "augment_name": "maggie4",
+    "display_name": "Hold Still",
+    "description": "Enemies stunned by Grasping Vines take 15 more damage from Bramblelash.",
+    "element": {
+      "id": 8,
+      "name": "unholy",
+      "display_name": "Unholy"
+    },
+    "index": 4,
+    "deploy_mark": true,
+    "source_file": "augments/maggie/maggie4.tscn"
+  },
+  {
+    "id": "maggie5",
+    "owner": "maggie",
+    "augment_name": "maggie5",
+    "display_name": "Scornful Thorns",
+    "description": "Targets marked by Bramblelash receive 10 additional damage from Thornburst.",
+    "element": {
+      "id": 8,
+      "name": "unholy",
+      "display_name": "Unholy"
+    },
+    "index": 5,
+    "deploy_mark": true,
+    "source_file": "augments/maggie/maggie5.tscn"
+  },
+  {
+    "id": "pyrrha1",
+    "owner": "pyrrha",
+    "augment_name": "pyrrha1",
+    "display_name": "Pyromania",
+    "description": "Fan the Flames now costs 1 more [65], but deals 5 additional damage per tick.",
+    "element": {
+      "id": 0,
+      "name": "fire",
+      "display_name": "Fire",
+      "defaulted": true
+    },
+    "index": 1,
+    "deploy_mark": true,
+    "source_file": "augments/pyrrha/pyrrha1.tscn"
+  },
+  {
+    "id": "pyrrha2",
+    "owner": "pyrrha",
+    "augment_name": "pyrrha2",
+    "display_name": "Flickering Form",
+    "description": "Pyrrha heals for 10 health any time Fan the Flames expires or is removed.",
+    "element": {
+      "id": 0,
+      "name": "fire",
+      "display_name": "Fire",
+      "defaulted": true
+    },
+    "index": 2,
+    "deploy_mark": true,
+    "source_file": "augments/pyrrha/pyrrha2.tscn"
+  },
+  {
+    "id": "pyrrha3",
+    "owner": "pyrrha",
+    "augment_name": "pyrrha3",
+    "display_name": "Unending Hunger",
+    "description": "Pyrokinesis will now consume Fan the Flames to deal 15 extra damage.",
+    "element": {
+      "id": 0,
+      "name": "fire",
+      "display_name": "Fire",
+      "defaulted": true
+    },
+    "index": 3,
+    "deploy_mark": true,
+    "source_file": "augments/pyrrha/pyrrha3.tscn"
+  },
+  {
+    "id": "pyrrha4",
+    "owner": "pyrrha",
+    "augment_name": "pyrrha4",
+    "display_name": "Concussive Force",
+    "description": "Flashbang now fully stuns the targeted enemy",
+    "element": {
+      "id": 0,
+      "name": "fire",
+      "display_name": "Fire",
+      "defaulted": true
+    },
+    "index": 4,
+    "deploy_mark": true,
+    "source_file": "augments/pyrrha/pyrrha4.tscn"
+  },
+  {
+    "id": "pyrrha5",
+    "owner": "pyrrha",
+    "augment_name": "pyrrha5",
+    "display_name": "World in Flames",
+    "description": "While Wraith in White is active, Pyrrha deals 5 Affliction damage to the enemy team each turn.",
+    "element": {
+      "id": 0,
+      "name": "fire",
+      "display_name": "Fire",
+      "defaulted": true
+    },
+    "index": 5,
+    "deploy_mark": true,
+    "source_file": "augments/pyrrha/pyrrha5.tscn"
+  },
+  {
+    "id": "riverdaughter1",
+    "owner": "riverdaughter",
+    "augment_name": "riverdaughter1",
+    "display_name": "Crushing Depths",
+    "description": "Enemies who have been stunned by Undertow take 10 affliction damage each turn for the rest of the game.",
+    "element": {
+      "id": 2,
+      "name": "water",
+      "display_name": "Water"
+    },
+    "index": 1,
+    "deploy_mark": true,
+    "source_file": "augments/riverdaughter/riverdaughter1.tscn"
+  },
+  {
+    "id": "riverdaughter2",
+    "owner": "riverdaughter",
+    "augment_name": "riverdaughter2",
+    "display_name": "Balm",
+    "description": "When Soothe expires, it will attempt to jump to an ally that doesn't currently have it.",
+    "element": {
+      "id": 2,
+      "name": "water",
+      "display_name": "Water"
+    },
+    "index": 2,
+    "deploy_mark": true,
+    "source_file": "augments/riverdaughter/riverdaughter2.tscn"
+  },
+  {
+    "id": "riverdaughter3",
+    "owner": "riverdaughter",
+    "augment_name": "riverdaughter3",
+    "display_name": "Trickster Clone",
+    "description": "If River Clone expires without being triggered, it will attempt to jump to an ally that doesn't currently have it.",
+    "element": {
+      "id": 2,
+      "name": "water",
+      "display_name": "Water"
+    },
+    "index": 3,
+    "deploy_mark": true,
+    "source_file": "augments/riverdaughter/riverdaughter3.tscn"
+  },
+  {
+    "id": "riverdaughter4",
+    "owner": "riverdaughter",
+    "augment_name": "riverdaughter4",
+    "display_name": "Restorative Retreat",
+    "description": "River Daughter heals 20 health for 2 turns when she uses Dive.",
+    "element": {
+      "id": 2,
+      "name": "water",
+      "display_name": "Water"
+    },
+    "index": 4,
+    "deploy_mark": true,
+    "source_file": "augments/riverdaughter/riverdaughter4.tscn"
+  },
+  {
+    "id": "riverdaughter5",
+    "owner": "riverdaughter",
+    "augment_name": "riverdaughter5",
+    "display_name": "River Within",
+    "description": "Whenever River Clone is triggered, River Daughter casts Ripple.",
+    "element": {
+      "id": 2,
+      "name": "water",
+      "display_name": "Water"
+    },
+    "index": 5,
+    "deploy_mark": true,
+    "source_file": "augments/riverdaughter/riverdaughter5.tscn"
+  },
+  {
+    "id": "roland1",
+    "owner": "roland",
+    "augment_name": "roland1",
+    "display_name": "Ricochet Rumble",
+    "description": "Boulder minions are created with 60 HP.",
+    "element": {
+      "id": 6,
+      "name": "earth",
+      "display_name": "Earth"
+    },
+    "index": 1,
+    "deploy_mark": true,
+    "source_file": "augments/roland/roland1.tscn"
+  },
+  {
+    "id": "roland2",
+    "owner": "roland",
+    "augment_name": "roland2",
+    "display_name": "Bedrock Bident",
+    "description": "Earth Pillar marks an additional random enemy each time it is used.",
+    "element": {
+      "id": 6,
+      "name": "earth",
+      "display_name": "Earth"
+    },
+    "index": 2,
+    "deploy_mark": true,
+    "source_file": "augments/roland/roland2.tscn"
+  },
+  {
+    "id": "roland3",
+    "owner": "roland",
+    "augment_name": "roland3",
+    "display_name": "Stone Speaks To Stone",
+    "description": "Stoneform now lasts 1 additional turn, and while affected by it, Boulders deal double damage when launched with Strength From The Earth.",
+    "element": {
+      "id": 6,
+      "name": "earth",
+      "display_name": "Earth"
+    },
+    "index": 3,
+    "deploy_mark": true,
+    "source_file": "augments/roland/roland3.tscn"
+  },
+  {
+    "id": "roland4",
+    "owner": "roland",
+    "augment_name": "roland4",
+    "display_name": "Sediment Shotgun",
+    "description": "Boulders are now created with 25 less HP. If Roland destroys a Boulder with Strength From The Earth, he deals 25 Piercing damage to all enemies.",
+    "element": {
+      "id": 6,
+      "name": "earth",
+      "display_name": "Earth"
+    },
+    "index": 4,
+    "deploy_mark": true,
+    "source_file": "augments/roland/roland4.tscn"
+  },
+  {
+    "id": "roland5",
+    "owner": "roland",
+    "augment_name": "roland5",
+    "display_name": "Rockslide",
+    "description": "Form Stone now creates two Boulders at a time.",
+    "element": {
+      "id": 6,
+      "name": "earth",
+      "display_name": "Earth"
+    },
+    "index": 5,
+    "deploy_mark": true,
+    "source_file": "augments/roland/roland5.tscn"
+  },
+  {
+    "id": "saya1",
+    "owner": "saya",
+    "augment_name": "saya1",
+    "display_name": "Royalties",
+    "description": "When Saya gives an ally Elemental Essence with Universal Energy Conduit, she also gains Elemental Essence",
+    "element": {
+      "id": 3,
+      "name": "lightning",
+      "display_name": "Lightning"
+    },
+    "index": 1,
+    "deploy_mark": true,
+    "source_file": "augments/saya/saya1.tscn"
+  },
+  {
+    "id": "saya2",
+    "owner": "saya",
+    "augment_name": "saya2",
+    "display_name": "Link Coils",
+    "description": "Saya Coil deals an additional 5 damage for every Saya Coil she has active",
+    "element": {
+      "id": 3,
+      "name": "lightning",
+      "display_name": "Lightning"
+    },
+    "index": 2,
+    "deploy_mark": true,
+    "source_file": "augments/saya/saya2.tscn"
+  },
+  {
+    "id": "saya3",
+    "owner": "saya",
+    "augment_name": "saya3",
+    "display_name": "What's Mine is Yours",
+    "description": "Spider Mines now affects a single enemy, but only lasts for one turn.",
+    "element": {
+      "id": 3,
+      "name": "lightning",
+      "display_name": "Lightning"
+    },
+    "index": 3,
+    "deploy_mark": true,
+    "source_file": "augments/saya/saya3.tscn"
+  },
+  {
+    "id": "saya4",
+    "owner": "saya",
+    "augment_name": "saya4",
+    "display_name": "Kinetic Converter",
+    "description": "Reduces the cooldown of Plasma Shield to 1 turn, but reduces the shield it grants to 25.",
+    "element": {
+      "id": 3,
+      "name": "lightning",
+      "display_name": "Lightning"
+    },
+    "index": 4,
+    "deploy_mark": true,
+    "source_file": "augments/saya/saya4.tscn"
+  },
+  {
+    "id": "saya5",
+    "owner": "saya",
+    "augment_name": "saya5",
+    "display_name": "Hair Trigger",
+    "description": "Well-Used Panic Button will now trigger when Saya falls below 60 health.",
+    "element": {
+      "id": 3,
+      "name": "lightning",
+      "display_name": "Lightning"
+    },
+    "index": 5,
+    "deploy_mark": false,
+    "source_file": "augments/saya/saya5.tscn"
+  },
+  {
+    "id": "scratch1",
+    "owner": "scratch",
+    "augment_name": "scratch1",
+    "display_name": "Sign In Blood",
+    "description": "Allies receive 10 Affliction damage when triggering Scratch's Deal skills, but they gain Elemental Essence when doing so.",
+    "element": {
+      "id": 17,
+      "name": "devil",
+      "display_name": "Devil"
+    },
+    "index": 1,
+    "deploy_mark": true,
+    "source_file": "augments/scratch/scratch1.tscn"
+  },
+  {
+    "id": "scratch2",
+    "owner": "scratch",
+    "augment_name": "scratch2",
+    "display_name": "Absolute Power",
+    "description": "Heroes affected by Deal: Defeat Your Enemies ignore stuns and counters.",
+    "element": {
+      "id": 17,
+      "name": "devil",
+      "display_name": "Devil"
+    },
+    "index": 2,
+    "deploy_mark": true,
+    "source_file": "augments/scratch/scratch2.tscn"
+  },
+  {
+    "id": "scratch3",
+    "owner": "scratch",
+    "augment_name": "scratch3",
+    "display_name": "Everything Must Go",
+    "description": "Each round, the first time Scratch falls below 30 HP, his next non-Ultimate Deal skill applies all other non-Ultimate Deal skills.",
+    "element": {
+      "id": 17,
+      "name": "devil",
+      "display_name": "Devil"
+    },
+    "index": 3,
+    "deploy_mark": false,
+    "source_file": "augments/scratch/scratch3.tscn"
+  },
+  {
+    "id": "scratch4",
+    "owner": "scratch",
+    "augment_name": "scratch4",
+    "display_name": "Bump Those Numbers",
+    "description": "Scratch's Deal skills no longer have a cooldown, but can only affect each Hero once per round.",
+    "element": {
+      "id": 17,
+      "name": "devil",
+      "display_name": "Devil"
+    },
+    "index": 4,
+    "deploy_mark": true,
+    "source_file": "augments/scratch/scratch4.tscn"
+  },
+  {
+    "id": "scratch5",
+    "owner": "scratch",
+    "augment_name": "scratch5",
+    "display_name": "Dramatic Irony",
+    "description": "Deal: Defeat Your Enemies and Deal: Save Your Friends are now invisible until triggered.",
+    "element": {
+      "id": 17,
+      "name": "devil",
+      "display_name": "Devil"
+    },
+    "index": 5,
+    "deploy_mark": true,
+    "source_file": "augments/scratch/scratch5.tscn"
+  },
+  {
+    "id": "sera1",
+    "owner": "sera",
+    "augment_name": "sera1",
+    "display_name": "Vengeful Tempest",
+    "description": "Synthetic Skyblade deals 5 additional base damage, costs an additional Generic, and will consume 2 stacks of Eyes of Vengeance.",
+    "element": {
+      "id": 57,
+      "name": "vengeance",
+      "display_name": "Vengeance"
+    },
+    "index": 1,
+    "deploy_mark": true,
+    "source_file": "augments/sera/sera1.tscn"
+  },
+  {
+    "id": "sera2",
+    "owner": "sera",
+    "augment_name": "sera2",
+    "display_name": "Proto-Prophecy",
+    "description": "Enemies targeted by Heavenly Parry deal 10 reduced damage for their next turn. This effect is invisible.",
+    "element": {
+      "id": 57,
+      "name": "vengeance",
+      "display_name": "Vengeance"
+    },
+    "index": 2,
+    "deploy_mark": true,
+    "source_file": "augments/sera/sera2.tscn"
+  },
+  {
+    "id": "sera3",
+    "owner": "sera",
+    "augment_name": "sera3",
+    "display_name": "Ire of the Storm",
+    "description": "If Energized Wingstorm consumes 3 or more stacks of Eyes of Vengeance, it will deal an additional 15 Piercing damage to each target the following turn.",
+    "element": {
+      "id": 57,
+      "name": "vengeance",
+      "display_name": "Vengeance"
+    },
+    "index": 3,
+    "deploy_mark": true,
+    "source_file": "augments/sera/sera3.tscn"
+  },
+  {
+    "id": "sera4",
+    "owner": "sera",
+    "augment_name": "sera4",
+    "display_name": "Unto Others",
+    "description": "Proactivity Protocol now deals 15 normal Damage and heals for 25, but gains an additional 1 turn cooldown.",
+    "element": {
+      "id": 57,
+      "name": "vengeance",
+      "display_name": "Vengeance"
+    },
+    "index": 4,
+    "deploy_mark": true,
+    "source_file": "augments/sera/sera4.tscn"
+  },
+  {
+    "id": "sera5",
+    "owner": "sera",
+    "augment_name": "sera5",
+    "display_name": "Fueled by Vengeance",
+    "description": "Divinity Engine lasts an additional turn for each of Sera's dead allies.",
+    "element": {
+      "id": 57,
+      "name": "vengeance",
+      "display_name": "Vengeance"
+    },
+    "index": 5,
+    "deploy_mark": true,
+    "source_file": "augments/sera/sera5.tscn"
+  },
+  {
+    "id": "syl1",
+    "owner": "syl",
+    "augment_name": "syl1",
+    "display_name": "Voracious Growth",
+    "description": "Successfully healing Syl's Eagle Minion with Feed lowers the cost of Leyline Nest by [4] until the next time it is used.",
+    "element": {
+      "id": 4,
+      "name": "wind",
+      "display_name": "Wind"
+    },
+    "index": 1,
+    "deploy_mark": true,
+    "source_file": "augments/syl/syl1.tscn"
+  },
+  {
+    "id": "syl2",
+    "owner": "syl",
+    "augment_name": "syl2",
+    "display_name": "Wonder by Wonder",
+    "description": "To the Skies! now lasts an additional turn.",
+    "element": {
+      "id": 4,
+      "name": "wind",
+      "display_name": "Wind"
+    },
+    "index": 2,
+    "deploy_mark": true,
+    "source_file": "augments/syl/syl2.tscn"
+  },
+  {
+    "id": "syl3",
+    "owner": "syl",
+    "augment_name": "syl3",
+    "display_name": "Plummet",
+    "description": "Enemies stunned by Talon Rake receive 15 damage when the stun ends.",
+    "element": {
+      "id": 4,
+      "name": "wind",
+      "display_name": "Wind"
+    },
+    "index": 3,
+    "deploy_mark": true,
+    "source_file": "augments/syl/syl3.tscn"
+  },
+  {
+    "id": "syl4",
+    "owner": "syl",
+    "augment_name": "syl4",
+    "display_name": "You and Me",
+    "description": "Unbreakable Bond now heals Syl and her Eagle for 10 health after health has been equalized.",
+    "element": {
+      "id": 4,
+      "name": "wind",
+      "display_name": "Wind"
+    },
+    "index": 4,
+    "deploy_mark": true,
+    "source_file": "augments/syl/syl4.tscn"
+  },
+  {
+    "id": "syl5",
+    "owner": "syl",
+    "augment_name": "syl5",
+    "display_name": "Shish Kebab",
+    "description": "Skylance now heals Syl's Eagle minion for 10 health. If her Eagle minion is at maximum life after the heal, she gains Elemental Essence.",
+    "element": {
+      "id": 4,
+      "name": "wind",
+      "display_name": "Wind"
+    },
+    "index": 5,
+    "deploy_mark": true,
+    "source_file": "augments/syl/syl5.tscn"
+  },
+  {
+    "id": "taryn1",
+    "owner": "taryn",
+    "augment_name": "taryn1",
+    "display_name": "Inspiring Sweep",
+    "description": "Inspiring Thrust now targets all enemies but has an additional 1 turn cooldown.",
+    "element": {
+      "id": 7,
+      "name": "holy",
+      "display_name": "Holy"
+    },
+    "index": 1,
+    "deploy_mark": true,
+    "source_file": "augments/taryn/taryn1.tscn"
+  },
+  {
+    "id": "taryn2",
+    "owner": "taryn",
+    "augment_name": "taryn2",
+    "display_name": "Unbreakable Protector",
+    "description": "Protector of the Song now also triggers when Taryn is stunned or countered.",
+    "element": {
+      "id": 7,
+      "name": "holy",
+      "display_name": "Holy"
+    },
+    "index": 2,
+    "deploy_mark": true,
+    "source_file": "augments/taryn/taryn2.tscn"
+  },
+  {
+    "id": "taryn3",
+    "owner": "taryn",
+    "augment_name": "taryn3",
+    "display_name": "Eternal Service",
+    "description": "Taryn's Strategic skills cannot be stunned.",
+    "element": {
+      "id": 7,
+      "name": "holy",
+      "display_name": "Holy"
+    },
+    "index": 3,
+    "deploy_mark": true,
+    "source_file": "augments/taryn/taryn3.tscn"
+  },
+  {
+    "id": "taryn4",
+    "owner": "taryn",
+    "augment_name": "taryn4",
+    "display_name": "Mine is the Verse",
+    "description": "Allies affected by Refrain reflect harmful they receive to Taryn.",
+    "element": {
+      "id": 7,
+      "name": "holy",
+      "display_name": "Holy"
+    },
+    "index": 4,
+    "deploy_mark": true,
+    "source_file": "augments/taryn/taryn4.tscn"
+  },
+  {
+    "id": "taryn5",
+    "owner": "taryn",
+    "augment_name": "taryn5",
+    "display_name": "Hers is the Glory",
+    "description": "Refrain will now target a random ally when used on an enemy, or a random enemy when used on an ally.",
+    "element": {
+      "id": 7,
+      "name": "holy",
+      "display_name": "Holy"
+    },
+    "index": 5,
+    "deploy_mark": false,
+    "source_file": "augments/taryn/taryn5.tscn"
+  },
+  {
+    "id": "titania1",
+    "owner": "titania",
+    "augment_name": "titania1",
+    "display_name": "In On The Joke",
+    "description": "Allies affected by Laughing Powder also gain the effects of Whimsy.",
+    "element": {
+      "id": 5,
+      "name": "poison",
+      "display_name": "Poison"
+    },
+    "index": 1,
+    "deploy_mark": true,
+    "source_file": "augments/titania/titania1.tscn"
+  },
+  {
+    "id": "titania2",
+    "owner": "titania",
+    "augment_name": "titania2",
+    "display_name": "Bloody Humor",
+    "description": "Enemies under the effect of Barbed Wit now receive 15 Affliction damage when they use a Harmful skill on Titania, and Barbed Wit no longer ends when this occurs.",
+    "element": {
+      "id": 5,
+      "name": "poison",
+      "display_name": "Poison"
+    },
+    "index": 2,
+    "deploy_mark": true,
+    "source_file": "augments/titania/titania2.tscn"
+  },
+  {
+    "id": "titania3",
+    "owner": "titania",
+    "augment_name": "titania3",
+    "display_name": "Elderwood Sap",
+    "description": "Thorn Prick no longer deals initial damage, but its affliction damage is doubled.",
+    "element": {
+      "id": 5,
+      "name": "poison",
+      "display_name": "Poison"
+    },
+    "index": 3,
+    "deploy_mark": true,
+    "source_file": "augments/titania/titania3.tscn"
+  },
+  {
+    "id": "titania4",
+    "owner": "titania",
+    "augment_name": "titania4",
+    "display_name": "Persistent Suitor",
+    "description": "Titania starts each round with a Summer Courtesan, but her maximum is reduced to 1.",
+    "element": {
+      "id": 5,
+      "name": "poison",
+      "display_name": "Poison"
+    },
+    "index": 4,
+    "deploy_mark": true,
+    "source_file": "augments/titania/titania4.tscn"
+  },
+  {
+    "id": "titania5",
+    "owner": "titania",
+    "augment_name": "titania5",
+    "display_name": "Jealousy",
+    "description": "If Prance is triggered by one of Titania's allies, the following turn, the other ally will have their basic abilities' Specific costs changed to Generic",
+    "element": {
+      "id": 5,
+      "name": "poison",
+      "display_name": "Poison"
+    },
+    "index": 5,
+    "deploy_mark": true,
+    "source_file": "augments/titania/titania5.tscn"
+  },
+  {
+    "id": "trinity1",
+    "owner": "trinity",
+    "augment_name": "trinity1",
+    "display_name": "Scarlet Somersault Crash",
+    "description": "Prisma Maneuver skills mark Prisma Crimson for 3 turns when she uses them or they are used on her. If she is marked by all 3 Prisma Maneuver skills, Crimson Crash deals 40 more damage.",
+    "element": {
+      "id": 51,
+      "name": "prism",
+      "display_name": "Prism"
+    },
+    "index": 1,
+    "deploy_mark": true,
+    "source_file": "augments/trinity/trinity1.tscn"
+  },
+  {
+    "id": "trinity2",
+    "owner": "trinity",
+    "augment_name": "trinity2",
+    "display_name": "Grand Sonata",
+    "description": "Prisma Whirl now applies Sonata Azure instead of its normal effect.",
+    "element": {
+      "id": 51,
+      "name": "prism",
+      "display_name": "Prism"
+    },
+    "index": 2,
+    "deploy_mark": true,
+    "source_file": "augments/trinity/trinity2.tscn"
+  },
+  {
+    "id": "trinity3",
+    "owner": "trinity",
+    "augment_name": "trinity3",
+    "display_name": "Golden Fantasia",
+    "description": "Saffron Beam now affects all enemies, but using it Shatters Prisma Saffron for 1 turn.",
+    "element": {
+      "id": 51,
+      "name": "prism",
+      "display_name": "Prism"
+    },
+    "index": 3,
+    "deploy_mark": true,
+    "source_file": "augments/trinity/trinity3.tscn"
+  },
+  {
+    "id": "trinity4",
+    "owner": "trinity",
+    "augment_name": "trinity4",
+    "display_name": "The Power of Friendship",
+    "description": "Prisma Lens skills deal 0 damage to their target, increased by 5 for each other Lens skill already used on them this turn.",
+    "element": {
+      "id": 51,
+      "name": "prism",
+      "display_name": "Prism"
+    },
+    "index": 4,
+    "deploy_mark": true,
+    "source_file": "augments/trinity/trinity4.tscn"
+  },
+  {
+    "id": "trinity5",
+    "owner": "trinity",
+    "augment_name": "trinity5",
+    "display_name": "Kibi, the Mascot",
+    "description": "At the start of each round, a random Prismari Ranger has their maximum HP increased by 20.",
+    "element": {
+      "id": 51,
+      "name": "prism",
+      "display_name": "Prism"
+    },
+    "index": 5,
+    "deploy_mark": true,
+    "source_file": "augments/trinity/trinity5.tscn"
+  },
+  {
+    "id": "xyris1",
+    "owner": "xyris",
+    "augment_name": "xyris1",
+    "display_name": "Painful Memories",
+    "description": "Reveal Hidden Truth lowers its targets damage dealt by 10 for 1 turn.",
+    "element": {
+      "id": 9,
+      "name": "shadow",
+      "display_name": "Shadow"
+    },
+    "index": 1,
+    "deploy_mark": true,
+    "source_file": "augments/xyris/xyris1.tscn"
+  },
+  {
+    "id": "xyris2",
+    "owner": "xyris",
+    "augment_name": "xyris2",
+    "display_name": "Somnic Adaptation",
+    "description": "Xyris gains 5 permanent Shield each time he gains Elemental Essence.",
+    "element": {
+      "id": 9,
+      "name": "shadow",
+      "display_name": "Shadow"
+    },
+    "index": 2,
+    "deploy_mark": true,
+    "source_file": "augments/xyris/xyris2.tscn"
+  },
+  {
+    "id": "xyris3",
+    "owner": "xyris",
+    "augment_name": "xyris3",
+    "display_name": "Return to the Dream",
+    "description": "If Xyris has Elemental Essence when he uses Enter the Dreamscape, its cooldown is set to 1.",
+    "element": {
+      "id": 9,
+      "name": "shadow",
+      "display_name": "Shadow"
+    },
+    "index": 3,
+    "deploy_mark": true,
+    "source_file": "augments/xyris/xyris3.tscn"
+  },
+  {
+    "id": "xyris4",
+    "owner": "xyris",
+    "augment_name": "xyris4",
+    "display_name": "Neverending Nightmares",
+    "description": "Twisted Nightmares becomes permanent if used on an enemy affected by Enter the Dreamscape.",
+    "element": {
+      "id": 9,
+      "name": "shadow",
+      "display_name": "Shadow"
+    },
+    "index": 4,
+    "deploy_mark": true,
+    "source_file": "augments/xyris/xyris4.tscn"
+  },
+  {
+    "id": "xyris5",
+    "owner": "xyris",
+    "augment_name": "xyris5",
+    "display_name": "Twisted Replica",
+    "description": "Dream Reflection minions are created with the countered enemy's current HP.",
+    "element": {
+      "id": 9,
+      "name": "shadow",
+      "display_name": "Shadow"
+    },
+    "index": 5,
+    "deploy_mark": true,
+    "source_file": "augments/xyris/xyris5.tscn"
+  },
+  {
+    "id": "zephyrex1",
+    "owner": "zephyrex",
+    "augment_name": "zephyrex1",
+    "display_name": "Blade of Romance",
+    "description": "If Arcadian Duet targets a different enemy than its last target, Zephyrex gains Elemental Essence.",
+    "element": {
+      "id": 4,
+      "name": "wind",
+      "display_name": "Wind"
+    },
+    "index": 1,
+    "deploy_mark": true,
+    "source_file": "augments/zephyrex/zephyrex1.tscn"
+  },
+  {
+    "id": "zephyrex2",
+    "owner": "zephyrex",
+    "augment_name": "zephyrex2",
+    "display_name": "Blade of Symphonies",
+    "description": "Using Sonic Thrust on an enemy will also use Arcadian Duet on them.",
+    "element": {
+      "id": 4,
+      "name": "wind",
+      "display_name": "Wind"
+    },
+    "index": 2,
+    "deploy_mark": true,
+    "source_file": "augments/zephyrex/zephyrex2.tscn"
+  },
+  {
+    "id": "zephyrex3",
+    "owner": "zephyrex",
+    "augment_name": "zephyrex3",
+    "display_name": "Wind Dancer",
+    "description": "Wind Step now targets an enemy, lowering their non-Affliction damage by 10 for 1 turn. If that enemy uses a new harmful skill during this time, Zephyrex gains Elemental Essence. This effect is invisible.",
+    "element": {
+      "id": 4,
+      "name": "wind",
+      "display_name": "Wind"
+    },
+    "index": 3,
+    "deploy_mark": true,
+    "source_file": "augments/zephyrex/zephyrex3.tscn"
+  },
+  {
+    "id": "zephyrex4",
+    "owner": "zephyrex",
+    "augment_name": "zephyrex4",
+    "display_name": "Zephyr Blade",
+    "description": "Perfection now grants Zephyrex immunity to Stuns.",
+    "element": {
+      "id": 4,
+      "name": "wind",
+      "display_name": "Wind"
+    },
+    "index": 4,
+    "deploy_mark": true,
+    "source_file": "augments/zephyrex/zephyrex4.tscn"
+  },
+  {
+    "id": "zephyrex5",
+    "owner": "zephyrex",
+    "augment_name": "zephyrex5",
+    "display_name": "Polite Denial",
+    "description": "Elegant Sweep is now invisible, and Zephyrex gains the effect of Wind Step while it is active.",
+    "element": {
+      "id": 4,
+      "name": "wind",
+      "display_name": "Wind"
+    },
+    "index": 5,
+    "deploy_mark": true,
+    "source_file": "augments/zephyrex/zephyrex5.tscn"
+  },
+  {
+    "id": "zevkir1",
+    "owner": "zevkir",
+    "augment_name": "zevkir1",
+    "display_name": "Atlantean Waters",
+    "description": "While Zev'kir is Channeling Call Tides, he heals 5 HP per turn and ignores stuns.",
+    "element": {
+      "id": 2,
+      "name": "water",
+      "display_name": "Water"
+    },
+    "index": 1,
+    "deploy_mark": true,
+    "source_file": "augments/zevkir/zevkir1.tscn"
+  },
+  {
+    "id": "zevkir2",
+    "owner": "zevkir",
+    "augment_name": "zevkir2",
+    "display_name": "Airless Prison",
+    "description": "If Zev'kir has 2 or more stacks of Call Tides, Bubble Prison increases affected enemy skill costs by 1 [65]. If he has 4 or more stacks, they are increased by 1 Energy of the target's Element instead.",
+    "element": {
+      "id": 2,
+      "name": "water",
+      "display_name": "Water"
+    },
+    "index": 2,
+    "deploy_mark": true,
+    "source_file": "augments/zevkir/zevkir2.tscn"
+  },
+  {
+    "id": "zevkir3",
+    "owner": "zevkir",
+    "augment_name": "zevkir3",
+    "display_name": "Piercing Tide",
+    "description": "If Zev'kir has 2 or more stacks of Call Tides, Riptide deals Piercing damage. If he has 4 or more stacks, it deals Affliction damage instead.",
+    "element": {
+      "id": 2,
+      "name": "water",
+      "display_name": "Water"
+    },
+    "index": 3,
+    "deploy_mark": true,
+    "source_file": "augments/zevkir/zevkir3.tscn"
+  },
+  {
+    "id": "zevkir4",
+    "owner": "zevkir",
+    "augment_name": "zevkir4",
+    "display_name": "Storm Surge",
+    "description": "Tidal Wave deals 20 less damage, but its base cost is reduced by 2 Specific energy",
+    "element": {
+      "id": 2,
+      "name": "water",
+      "display_name": "Water"
+    },
+    "index": 4,
+    "deploy_mark": true,
+    "source_file": "augments/zevkir/zevkir4.tscn"
+  },
+  {
+    "id": "zevkir5",
+    "owner": "zevkir",
+    "augment_name": "zevkir5",
+    "display_name": "Arcane Barrier",
+    "description": "While Repulse is not on cooldown, Zev'kir gains 15 Shield that replenishes at the start of his turn.",
+    "element": {
+      "id": 2,
+      "name": "water",
+      "display_name": "Water"
+    },
+    "index": 5,
+    "deploy_mark": false,
+    "source_file": "augments/zevkir/zevkir5.tscn"
+  }
+]

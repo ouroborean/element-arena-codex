@@ -1,0 +1,175 @@
+{
+  "_note": "Machine-readable defaults for every rule the export never states. One entry per open question with a chosen default, a confidence, whether it needs the designer, and its evidence. Code and golden tests read these so a flip is a one-line change with a measurable diff, not an archaeology project. Edit deliberately; each flip changes game behaviour.",
+  "_confidence_scale": "CONFIRMED = answered by the designer (oracle); HIGH = grounded in glossary/data; MED = inferred from strong signal; LOW = genuine guess, on the designer list",
+  "_oracle": "Faithful reconstruction, no original source available (DECISIONS.md D1). Description is the fidelity ceiling; designer rulings resolve the rest. CONFIRMED entries are designer-answered and authoritative.",
+  "rulings": {
+    "WIN_CONDITION": {
+      "question": "What ends a match and decides the winner?",
+      "default": "A round is a full battle; a team loses the round when all 3 of its heroes are dead (minions do not count). A match is best-of-N rounds. Between rounds each hero augments or fuses.",
+      "confidence": "CONFIRMED",
+      "designer_question": false,
+      "evidence": "Designer ruling: 'fresh battle each round'. Round = battle to elimination; match = best-of-N. (Exact N -> ROUNDS_PER_MATCH.)"
+    },
+    "ROUNDS_PER_MATCH": {
+      "question": "How many rounds in a match, and is it fixed or first-to-N?",
+      "default": "Up to 5 rounds; match ends early when one team has won a majority.",
+      "confidence": "LOW",
+      "designer_question": true,
+      "evidence": "Structure CONFIRMED (best-of-N battles); the exact N is still open. 5 augments/hero hints at up to 5 rounds."
+    },
+    "HP_CARRYOVER": {
+      "question": "Does hero HP persist between rounds, or reset each round?",
+      "default": "HP resets to full at the start of each round. A round is a fresh battle; the between-round choice is augment-or-fuse, not healing.",
+      "confidence": "CONFIRMED",
+      "designer_question": false,
+      "evidence": "Designer ruling: 'fresh battle each round'. MatchState resets HP + round-scoped state at ROUND_START."
+    },
+    "FIRST_PLAYER": {
+      "question": "Who acts first / how is initiative decided each turn?",
+      "default": "Both teams plan simultaneously each turn (simultaneous commit). Turn 1 of round 1 uses a seeded coin flip for any order-dependent tie; thereafter the same seed drives all ties.",
+      "confidence": "LOW",
+      "designer_question": true,
+      "evidence": "blackknight0 'acts alone' and keeperaurora1 ally-count scaling imply a commit-then-resolve turn, but initiative is unstated."
+    },
+    "RESOLUTION_ORDER": {
+      "question": "In what order do a turn's committed actions resolve?",
+      "default": "Player assignment (staging) order IS resolution order, interleaved between the two sides by initiative. Locked at commit.",
+      "confidence": "MED",
+      "designer_question": false,
+      "evidence": "keeperaurora1 (20/30/45 by ally act-count) and blackknight0 ('acts alone') only make sense if staging order is resolution order."
+    },
+    "DURATION_ANCHOR": {
+      "question": "'For N turns' — at whose turn-end does the counter decrement?",
+      "default": "Decrements at the end of the APPLIER's turn. An effect applied 'for 1 turn' lasts until the applier's next turn-end (one turn of value; the debuff persists through the opponent's upcoming turn).",
+      "confidence": "CONFIRMED",
+      "designer_question": false,
+      "evidence": "Designer ruling: applier's turn-end. Consistent anchor regardless of target. Drives DURATION_DECREMENT in the turn phase list."
+    },
+    "ENERGY_POOL_SCOPE": {
+      "question": "Is energy a per-hero or per-team pool?",
+      "default": "Per-team shared pool, keyed by element type plus generic. Any hero's skills draw from it; minions spend but generate none.",
+      "confidence": "CONFIRMED",
+      "designer_question": false,
+      "evidence": "Designer ruling: shared team pool. Enables cross-hero banking; fusion re-denomination changes what the shared pool must supply."
+    },
+    "ENERGY_INCOME": {
+      "question": "How much energy is generated, of what type, and when?",
+      "default": "At the start of a team's turn, each LIVING hero generates 1 energy into the shared pool: normally 1 GENERIC, but if the hero holds an Elemental Essence charge, that charge is CONSUMED to generate 1 energy of the hero's CURRENT element INSTEAD of the generic (not in addition). One conversion per hero per turn. Minions generate nothing. Silence prevents the Essence conversion (the silenced hero yields generic and keeps the charge).",
+      "confidence": "CONFIRMED",
+      "designer_question": false,
+      "evidence": "Designer ruling 2026-08-13: Essence is a consumable that swaps that hero's generic income for element income, not a standing +1. 'Current element' matters after fusion re-denominates. Silence-retention is inferred from the glossary (Silence stops the Essence generation)."
+    },
+    "MITIGATION_ORDER": {
+      "question": "Order of defender-side damage reduction stages.",
+      "default": "incoming damage-mods -> Damage Ignore -> (Shatter suppresses the next three) -> Damage Reduction -> Shield -> apply to HP (Immortal floors at 1).",
+      "confidence": "MED",
+      "designer_question": false,
+      "evidence": "Glossary defines Piercing (ignores DR, not Shield/boosts), Affliction (ignores DR and Shield), Shatter (voids DR/Invuln/Shield). The two-channel split (incoming-mods vs DR) is HIGH confidence; exact stage order is inferred."
+    },
+    "DAMAGE_CHANNELS": {
+      "question": "Are incoming damage-mods and Damage Reduction one number or two?",
+      "default": "TWO distinct defender-side channels. Incoming damage-mods (e.g. gommarwinter0 '+5 received') are bypassed only by True. Damage Reduction is bypassed by Piercing, Affliction and True, and suppressed by Shatter.",
+      "confidence": "HIGH",
+      "designer_question": false,
+      "evidence": "Piercing 'ignores Damage Reduction ... interacts normally with damage boosts' — proves DR and incoming-mods are separate. Merging them misprices all 53 Piercing skills."
+    },
+    "ROUNDING": {
+      "question": "How are fractional damage/heal values rounded?",
+      "default": "Values are integers; fractional results floor (round down). The '5-granularity' of base values is a design convention, not a runtime rule; keepermyth0's explicit 'round up to nearest 5' stays a skill-local instruction.",
+      "confidence": "CONFIRMED",
+      "designer_question": false,
+      "evidence": "Designer ruling 2026-08-13: round down (floor). e.g. gommarcrystal0 'half damage' on 25 -> 12."
+    },
+    "MULTIPLIER_COMPOSITION": {
+      "question": "How do multiple multipliers on one value compose, and relative to flat mods?",
+      "default": "Additive flats first, then multipliers applied MULTIPLICATIVELY (x2 then x2 = x4). Multiplier bus is keyed by target quantity (outgoing damage, incoming damage, DR), not global.",
+      "confidence": "CONFIRMED",
+      "designer_question": false,
+      "evidence": "Designer ruling 2026-08-13: multiplicative (two doublers = x4); flats applied before multipliers."
+    },
+    "PERMANENT_SCOPE": {
+      "question": "What does 'permanently' scope to?",
+      "default": "Round-scoped: 'permanent' effects reset at round end (a round is a fresh battle). Phrases 'this battle' / 'rest of the game' scope to the whole match.",
+      "confidence": "CONFIRMED",
+      "designer_question": false,
+      "evidence": "Follows from the CONFIRMED fresh-battle round model: a 'permanent' buff cannot outlive the battle it was gained in."
+    },
+    "IS_NEW": {
+      "question": "What counts as a 'new' Harmful/Helpful skill (for Invulnerable, Isolated, gates)?",
+      "default": "A skill instance being initiated during this resolution. Ongoing DoT ticks, Affliction ticks, and already-applied effects are NOT 'new'.",
+      "confidence": "MED",
+      "designer_question": false,
+      "evidence": "Invulnerable 'prevents targeting with NEW Harmful skills'; gommarcrystal0 scoped to 'new Harmful skills' must exclude DoT ticks."
+    },
+    "ACCUMULATORS_READ": {
+      "question": "When a skill scales off stored damage / a Shield pool, is the value read pre- or post-mitigation?",
+      "default": "Post-mitigation (the actual amount dealt/absorbed).",
+      "confidence": "LOW",
+      "designer_question": true,
+      "evidence": "riverdaughterblood1 scales off 'damage stored'; gaiamagnet1 'damage equal to the Shield removed'. Pre/post is unstated."
+    },
+    "FUSION_MODEL": {
+      "question": "Is fusion mutual, and how does a hero's kit change?",
+      "default": "UNILATERAL: only the initiating hero transforms. It picks a living teammate whose base element it borrows; its new element = recipe(hero.element, teammate.element). The teammate is unchanged (keeps its base kit). The fusing hero's fusion passive replaces slot 0, its fusion active is INSERTED at slot 4 (shifting the hero's defensive and ultimate to slots 5 and 6, matching the pre-fused-hero layout), its currentElement changes, and every 'specific' pip on ITS base skills, fusion skills and minions re-denominates to the fusion element. The teammate's pips are untouched.",
+      "confidence": "CONFIRMED",
+      "designer_question": false,
+      "evidence": "Designer ruling: unilateral. Only one hero changes per fusion. Every hero's per-element kit is still reachable (whenever THAT hero is the one initiating). Simpler team state than mutual."
+    },
+    "FUSION_PARTNER_RULES": {
+      "question": "Fusion frequency and partner requirements.",
+      "default": "CONFIRMED: a hero fuses at most ONCE per match and cannot revert (afterward it may only take augments). Still open: must the borrowed teammate be alive/present, does borrowing cost the partner anything, and does fusing void augments that keyed off the hero's old passive/element?",
+      "confidence": "MED",
+      "designer_question": true,
+      "evidence": "Designer ruling 2026-08-13: fuse once per match, no revert. Partner-alive/cost and augment-void-on-fusion remain open. 455/2925 3-hero teams can never fuse (no valid partner element pair)."
+    },
+    "MINION_CAP": {
+      "question": "How many minions per player, and do Trinity's Rangers count?",
+      "default": "6 minions per player. Trinity's three Prismari Rangers count normally toward the cap (she effectively starts a round at 3/6).",
+      "confidence": "CONFIRMED",
+      "designer_question": false,
+      "evidence": "Cap of 6 from the glossary Minion definition. Designer ruling 2026-08-13: the Rangers are ordinary minions and count."
+    },
+    "ENHANCED_AUGMENTED": {
+      "question": "Is 'Enhanced' / 'Augmented' a defined global mechanic?",
+      "default": "No. They are general-purpose words meaning a skill has an alternate (usually stronger) effect under some condition. There is NO shared 'Enhanced' status to model; each such skill defines its own conditional branch in its own effect logic.",
+      "confidence": "CONFIRMED",
+      "designer_question": false,
+      "evidence": "Designer ruling 2026-08-13. The 23 skills (Ando, Black Knight, Gommar, Saya) that say 'enhanced'/'augmented' use the words descriptively; nothing to implement globally."
+    },
+    "SKILL_TAXONOMY": {
+      "question": "How are a hero's skills classified (basic / defensive / ultimate / fusion), by slot?",
+      "default": "By slot. STANDARD heroes (6 base skills): 0 PASSIVE, 1-3 BASIC, 4 DEFENSIVE, 5 ULTIMATE. PRE-FUSED heroes (7 base skills): 0 PASSIVE, 1-3 BASIC, 4 FUSION, 5 DEFENSIVE, 6 ULTIMATE — the ultimate stays last; the fusion skill occupies the 4th active slot. Fusion-tree skills: slot 0 FUSION_PASSIVE, slot 1 FUSION. Minion skills are always BASIC. EXCEPTION Prisma Trinity: 0 PASSIVE, 1-3 BASIC, no defensive or ultimate; all her minion skills BASIC.",
+      "confidence": "CONFIRMED",
+      "designer_question": false,
+      "evidence": "Designer ruling 2026-08-13: non-fusion order = 3 basic, defensive, ultimate; fusion characters = 3 basic, fusion (4th slot), defensive, ultimate. Emitted as skill_class on every frozen skill."
+    },
+    "DEFAULT_STACK_POLICY": {
+      "question": "Re-applying a status: refresh, extend, or add magnitude?",
+      "default": "Refresh duration to the new value; do not add magnitude. UNLESS the text says 'stacks', in which case magnitude accumulates and each stack tracks its own duration.",
+      "confidence": "MED",
+      "designer_question": false,
+      "evidence": "117 texts mention 'stacks' as an explicit accumulating resource, implying non-stack statuses refresh."
+    },
+    "MINION_HP_SOURCE": {
+      "question": "On the 6 glossary-vs-database minion HP conflicts, which wins?",
+      "default": "Glossary values win (its _meta calls minion_references the authoritative minion_info table). Trinity Rangers = 65 each (195 effective), sayabattery=25, rolandspore=20, xyris=35.",
+      "confidence": "MED",
+      "designer_question": false,
+      "evidence": "glossary.json _meta explicitly labels its minion table authoritative; database minion HP is a 'gd-heuristic' text scan."
+    },
+    "IMMORTAL_SCOPE": {
+      "question": "Does Immortal floor HP at 1 against all sources, including non-damage health loss?",
+      "default": "Yes. Immortal floors HP at 1 against damage AND non-damage health loss AND other effects, per its glossary wording.",
+      "confidence": "MED",
+      "designer_question": false,
+      "evidence": "Glossary: 'cannot have their HP decreased lower than 1 through damage or other effects'."
+    },
+    "REDIRECT_DEPTH_CAP": {
+      "question": "Engine safety: how deep can counter/reflect redirection chain before it is a loop?",
+      "default": "Redirect depth capped at 4; 'user' is pinned to the original caster for a skill instance's life; replicated/split damage is flagged non-replicating.",
+      "confidence": "N/A-SAFETY",
+      "designer_question": false,
+      "evidence": "riverdaughtercurrent0 ships a hand-written per-skill loop guard in the export, proving the original engine hit reflect cycles."
+    }
+  }
+}
