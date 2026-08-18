@@ -7,7 +7,42 @@ import type { MatchState, TeamId, Unit, Status } from "../../engine/src/types.ts
 import type { SkillInstance } from "../../engine/src/skill.ts";
 import { totalShield } from "../../engine/src/damage.ts";
 import { canUse, effectiveCost } from "../../engine/src/scheduler.ts";
+import { ROSTER } from "../../engine/content/roster.generated.ts";
 import type { UiState } from "./main.ts";
+
+const shortName = (name: string) => name.split(",")[0]!.trim();
+const nameOf = (id: string) => shortName(ROSTER.find((h) => h.id === id)?.name ?? id);
+const rosterList = ROSTER.map((h) => ({ id: h.id, name: shortName(h.name), element: h.element }))
+  .sort((a, b) => a.element.localeCompare(b.element) || a.name.localeCompare(b.name));
+
+/** The pre-match team-select screen: pick 3 heroes; the AI's team is shown (re-rollable). */
+export function renderSetup(setup: { picked: string[]; oppo: string[] }): string {
+  const full = setup.picked.length >= 3;
+  const grid = rosterList.map((h) => {
+    const on = setup.picked.includes(h.id);
+    const dis = full && !on;
+    return `<button class="pick ${on ? "on" : ""}" data-pick="${h.id}" ${dis ? "disabled" : ""}>
+      <span class="pk-name">${esc(h.name)}</span><span class="pk-el">${esc(h.element)}</span></button>`;
+  }).join("");
+  const slots = [0, 1, 2].map((i) => {
+    const id = setup.picked[i];
+    return id ? `<button class="slot on" data-pick="${id}" title="remove">${esc(nameOf(id))} ✕</button>` : `<span class="slot empty">—</span>`;
+  }).join("");
+  return `<header>
+      <div class="brand">◆ Element Arena</div>
+      <div class="status">team select</div>
+    </header>
+    <div class="setup">
+      <h2>Choose your team <span class="count">${setup.picked.length}/3</span></h2>
+      <div class="roster">${grid}</div>
+      <div class="trays">
+        <div class="tray"><b>Your team</b><div class="slots">${slots}</div></div>
+        <div class="tray"><b>Opponent (AI)</b><div class="oppo">${setup.oppo.map((id) => `<span>${esc(nameOf(id))}</span>`).join("")}</div>
+          <button class="mini" data-reroll="1">🎲 re-roll</button></div>
+      </div>
+      <button class="start" data-start="1" ${setup.picked.length === 3 ? "" : "disabled"}>Start battle ▶</button>
+    </div>`;
+}
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
 
