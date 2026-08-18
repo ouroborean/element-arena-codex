@@ -1,0 +1,13 @@
+{
+  "name": "@arena/client",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Element Arena terminal client — plays the engine natively (no build step).",
+  "scripts": {
+    "play": "node cli.ts",
+    "demo": "node cli.ts --demo",
+    "test": "node --test",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  }
+}
