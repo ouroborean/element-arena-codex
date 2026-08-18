@@ -134,11 +134,12 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .fxpop b { display: block; font-size: 12.5px; margin-bottom: 2px; }
 .fxpop div { color: var(--dim); font-size: 11.5px; }
 
-/* ── skill overlay (while targeting) ───────────────────────────────────── */
-.skillcard { position: fixed; right: 14px; top: 50%; transform: translateY(-50%); z-index: 15; width: 300px; max-width: 90vw; background: #12151f; border: 1px solid var(--acc); border-radius: 12px; padding: 13px 15px; box-shadow: 0 10px 30px #000c; }
-.sc-head { display: grid; grid-template-columns: 42px 1fr; gap: 10px; align-items: center; margin-bottom: 9px; }
-.sc-head img { width: 42px; height: 42px; border-radius: 7px; object-fit: cover; background: var(--panel2); }
-.sc-name { font-weight: 800; font-size: 14.5px; }
-.sc-cost { color: var(--dim); font-size: 11.5px; }
-.sc-desc { color: var(--ink); font-size: 12.5px; line-height: 1.5; }
-.sc-foot { margin-top: 11px; padding-top: 9px; border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; color: var(--dim); font-size: 11.5px; }
+/* ── skill detail (shown IN the midbar while targeting — never over a portrait) ── */
+.skillpanel { display: flex; gap: 11px; align-items: flex-start; text-align: left; }
+.sp-icon { width: 46px; height: 46px; flex: 0 0 46px; border-radius: 8px; object-fit: cover; background: var(--panel2); border: 1px solid var(--acc); }
+.sp-body { min-width: 0; flex: 1; }
+.sp-name { font-weight: 800; font-size: 14.5px; color: var(--you); }
+.sp-cost { color: var(--dim); font-size: 11.5px; font-weight: 600; margin-left: 6px; }
+.sp-desc { color: var(--ink); font-size: 12px; line-height: 1.45; margin: 3px 0 5px; }
+.sp-foot { display: flex; gap: 10px; align-items: center; color: var(--dim); font-size: 11px; }
+.tile-abbr { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 11px; font-weight: 800; color: var(--dim); text-transform: capitalize; }

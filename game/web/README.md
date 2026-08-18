@@ -19,10 +19,12 @@ python -m http.server 8000     # run from the REPO ROOT, then open
 Start on the **team-select** screen: a portrait grid of all 27 heroes — click one to view
 its passive + skills (icons + descriptions), then **Add to team** (pick 3). The AI's team is
 shown and re-rollable. In battle, the board shows both teams as portrait cards (enemies top,
-you bottom); each of your heroes carries its skill icons — **click a skill** to see an overlay
-of what it does and highlight the portraits it can hit. **Every skill requires clicking a
-target** (even self/auto ones highlight and confirm on click). Active **effects** appear as
-small skill-art icons on a portrait; hover (or tap) one for a description of what it's doing.
+you bottom); each of your heroes carries its skill icons — **click a skill** to see its detail
+**in the midbar** (name, cost, what it does) and highlight the portraits it can hit. The panel
+lives between the lanes so it never covers a target. **Every skill requires clicking a target**
+(even self/auto ones highlight and confirm on click). Active **effects** appear as small
+skill-art icons on a portrait — the art of the skill/passive that applied them — hover (or tap)
+one for a description of what it's doing.
 The left panel is your shared **energy pool**; **Surrender** concedes. The AI uses
 `defaultPolicy`. First to 2 rounds wins; between rounds each team auto-drafts (draft UI TBD).
 
@@ -45,10 +47,23 @@ npm run typecheck    # tsc --noEmit
   `renderApp` (the two-lane board, skill tiles, energy pool) from `(MatchState, UiState)`.
 - `src/assets.ts` — portrait / skill-icon / minion-art URLs + a per-element colour.
 - `src/skilltext.generated.ts` — skill id → {name, description} (from `frozen/skills.json`).
-- `src/statussource.generated.ts` — status name → the skill/passive that applies it, so an
-  effect can show that skill's icon + prose (statuses carry no source id at runtime).
+- `src/statussource.generated.ts` — status name → the skill/passive that applies it (for
+  *named* effects, whatever path applied them).
+- `src/skillicon.generated.ts` — skill id → icon path, from `frozen/skills.json`'s `image`
+  field. Resolves hero **and** minion skill art in one map (the image field carries the
+  irregular minion filenames); `assets.ts` `iconOf()` falls back to the hero-folder path.
 - `src/minionart.generated.ts` — minion name → portrait art (from `frozen/minions.json`'s
   `image` field, which resolves the irregular minion-asset filenames).
+
+Effect-source resolution (`view.ts` `statusSource`) is most-precise-first: a named status →
+`statussource.generated`; else the engine-stamped `sourceId`. The engine records which skill
+applied each status across every path — direct casts, inline `useSkill`, **reactive/watch
+triggers** (a runtime-installed watch carries the installing skill's id; authored triggers fall
+back to the owner's current passive), and **scheduled** (delayed) effects — so even an unnamed
+effect from a fusion's watch-trigger shows that fusion skill's icon. Then a scoped cost/cooldown
+mod's `skillId`; else the applier's passive, so an effect is always at least hero-correct (no bare
+lettered chips). Regenerate the icon map with `python game/web/tools/gen_skillicon.py` after art
+changes.
 
 Reuses the engine + `game/client/{loop,draft}.ts`. `render.ts` in the terminal client is
 ANSI-specific; the browser has its own `view.ts`.

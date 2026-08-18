@@ -25,6 +25,8 @@ export interface Ctx {
   targets: Unit[];
   it: Unit | null;
   vars: Record<string, number>;
+  /** The skill / passive id currently executing — stamped onto any status it applies (provenance). */
+  skillId?: string;
   /** Set of unit ids this skill's effects touched (damaged/statused) — for "affected N targets" reads. */
   affected?: Set<string>;
   /** Present inside a trigger: the event that fired it. */
@@ -59,6 +61,12 @@ function teamUnits(state: MatchState, team: TeamId): Unit[] {
 
 function otherTeam(team: TeamId): TeamId {
   return team === "A" ? "B" : "A";
+}
+
+/** A unit's current passive id (base or fusion form) — the provenance for its statically authored
+ *  triggers, so a status they apply is attributed to the right passive icon. */
+function ownerPassiveId(u: Unit): string | undefined {
+  return u.heroId ? `${u.heroId}${u.fused ?? ""}0` : undefined;
 }
 
 // --------------------------------------------------------------------------- //
@@ -302,6 +310,7 @@ function buildStatus(spec: StatusSpec, ctx: Ctx) {
     duration: evalDuration(spec.duration, ctx),
     appliedBy: ctx.caster.id,
     appliedTurn: ctx.state.turn,
+    sourceId: ctx.skillId,
   };
 }
 
@@ -398,6 +407,7 @@ export function exec(effect: Effect, ctx: Ctx): void {
           duration,
           appliedBy: ctx.caster.id,
           appliedTurn: ctx.state.turn,
+          sourceId: ctx.skillId,
         });
       return;
     }
@@ -459,7 +469,7 @@ export function exec(effect: Effect, ctx: Ctx): void {
       const sk = (by?.skills ?? []).find((s) => s.id === effect.skillId);
       if (by && sk) {
         const targets = effect.on ? resolveSelector(effect.on, ctx) : ctx.targets;
-        runAll(sk.effects, { ...ctx, caster: by, self: by, targets, it: null }); // inline, shares the bus
+        runAll(sk.effects, { ...ctx, caster: by, self: by, targets, it: null, skillId: sk.id }); // inline, shares the bus
       }
       return;
     }
@@ -498,7 +508,7 @@ export function exec(effect: Effect, ctx: Ctx): void {
       const targets = (effect.to ? resolveSelector(effect.to, ctx) : ctx.targets).map((u) => u.id);
       ctx.state.scheduled.push({
         effect: effect.effect, caster: ctx.caster.id, targets,
-        turns: effect.delayTurns, appliedTurn: ctx.state.turn,
+        turns: effect.delayTurns, appliedTurn: ctx.state.turn, skillId: ctx.skillId,
       });
       return;
     }
@@ -592,7 +602,8 @@ export function createBus(state: MatchState, rng: Rng): Bus {
           if (!owner.alive && !ownDeath) continue;
           if (stealthSuppressed(state, event, owner)) continue;
           const tctx: Ctx = {
-            state, rng, caster: owner, self: owner, targets: [], it: null, vars: {}, event, emit: bus.emit,
+            state, rng, caster: owner, self: owner, targets: [], it: null, vars: {},
+            skillId: trig.sourceSkillId ?? ownerPassiveId(owner), event, emit: bus.emit,
           };
           if (trig.when && !evalCondition(trig.when, tctx)) continue;
           runAll(trig.effect, tctx);
@@ -684,7 +695,7 @@ export function resolveDeclaration(state: MatchState, caster: Unit, skill: Skill
       const event: GameEvent = { type: "skillDeclared", caster: caster.id, skillId: skill.id, tags: skill.tags, targets: current.map((t) => t.id) };
       const rep = findReplace(state, rng, bus, event);
       if (rep) {
-        const tctx: Ctx = { state, rng, caster: rep.owner, self: rep.owner, targets: [], it: null, vars: {}, event, emit: bus.emit };
+        const tctx: Ctx = { state, rng, caster: rep.owner, self: rep.owner, targets: [], it: null, vars: {}, skillId: rep.trig.sourceSkillId ?? ownerPassiveId(rep.owner), event, emit: bus.emit };
         runAll(rep.trig.effect, tctx);
         if (rep.trig.once) rep.owner.triggers = (rep.owner.triggers ?? []).filter((t) => t !== rep.trig);
         return { cancelled: true, finalTargets: current };
@@ -703,7 +714,7 @@ export function resolveDeclaration(state: MatchState, caster: Unit, skill: Skill
       const hit = findInterrupt(state, rng, bus, event);
       if (!hit) return { cancelled: false, finalTargets: current };
       const { owner, trig } = hit;
-      const tctx: Ctx = { state, rng, caster: owner, self: owner, targets: [], it: null, vars: {}, event, emit: bus.emit };
+      const tctx: Ctx = { state, rng, caster: owner, self: owner, targets: [], it: null, vars: {}, skillId: trig.sourceSkillId ?? ownerPassiveId(owner), event, emit: bus.emit };
       runAll(trig.effect, tctx);
       if (trig.once) owner.triggers = (owner.triggers ?? []).filter((t) => t !== trig);
       if ((trig.kind ?? "react") === "counter") {
@@ -727,7 +738,7 @@ export function resolveDeclaration(state: MatchState, caster: Unit, skill: Skill
 export function runEffects(
   state: MatchState,
   effects: Effect[],
-  opts: { caster: Unit; self?: Unit; targets?: Unit[] },
+  opts: { caster: Unit; self?: Unit; targets?: Unit[]; skillId?: string },
 ): string[] {
   const rng = Rng.fromState(state.rngState);
   const bus = createBus(state, rng);
@@ -739,6 +750,7 @@ export function runEffects(
     targets: opts.targets ?? [],
     it: null,
     vars: {},
+    skillId: opts.skillId,
     affected,
     emit: bus.emit,
   };

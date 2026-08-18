@@ -5,6 +5,7 @@
  */
 import { ROSTER } from "../../engine/content/roster.generated.ts";
 import { MINION_ART } from "./minionart.generated.ts";
+import { SKILL_ICON } from "./skillicon.generated.ts";
 
 const BASE = "../../assets/characters";
 
@@ -13,9 +14,16 @@ export function heroPortrait(heroId: string, fused?: string | null): string {
   return fused ? `${BASE}/${heroId}/${heroId}${fused}_portrait.png` : `${BASE}/${heroId}/${heroId}_portrait.png`;
 }
 
-/** A skill icon by its id (works for base + fusion skills, whose ids start with the hero id). */
-export function skillIcon(heroId: string, skillId: string): string {
-  return `${BASE}/${heroId}/${skillId}.png`;
+/**
+ * A skill/passive icon by its id — the one true resolver for hero, fusion AND minion skill art.
+ * Prefers the generated map (frozen `image` field, which resolves the irregular minion filenames);
+ * falls back to the hero-folder path for the few image-less skills. Returns null when nothing maps.
+ */
+export function iconOf(skillId: string, heroId?: string): string | null {
+  const mapped = SKILL_ICON[skillId];
+  if (mapped) return mapped;
+  const hid = heroId ?? heroIdOfSkill(skillId);
+  return hid ? `${BASE}/${hid}/${skillId}.png` : null;
 }
 
 /** A minion's portrait art, mapped from its display name (or null → use a labelled fallback). */

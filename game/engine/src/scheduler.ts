@@ -161,7 +161,7 @@ export function runChannels(state: MatchState, id: TeamId): void {
         continue;
       }
       const targets = (s.channelTargets ?? []).map((t) => state.units[t]).filter((t): t is Unit => !!t && t.alive);
-      runEffects(state, skill.effects, { caster: u, self: u, targets });
+      runEffects(state, skill.effects, { caster: u, self: u, targets, skillId: skill.id });
       if (s.magnitude !== undefined) {
         s.magnitude -= 1;
         if (s.magnitude <= 0) removeStatus(u, "channeling", s.name);
@@ -217,7 +217,7 @@ function fireScheduled(state: MatchState, id: TeamId): void {
         const caster = state.units[e.caster];
         if (caster) {
           const targets = e.targets.map((t) => state.units[t]).filter((t): t is Unit => !!t);
-          runEffects(state, e.effect, { caster, targets });
+          runEffects(state, e.effect, { caster, targets, skillId: e.skillId });
         }
         continue; // fired — drop
       }
@@ -256,7 +256,7 @@ export function endTurn(state: MatchState): void {
     if (status.onExpire && status.onExpire.length) {
       const u = state.units[unitId];
       const caster = state.units[status.appliedBy] ?? u;
-      if (u && caster) runEffects(state, status.onExpire, { caster, targets: [u] });
+      if (u && caster) runEffects(state, status.onExpire, { caster, targets: [u], skillId: status.sourceId });
     }
   }
   fireScheduled(state, team);
@@ -494,7 +494,7 @@ export function performAction(state: MatchState, action: Action): ActionResult {
   // Using a new skill cancels any active channel (unless this skill opts out).
   if (!skill.doesNotInterrupt) removeStatus(caster, "channeling");
 
-  const affected = runEffects(state, skill.effects, { caster, self: caster, targets: decl.finalTargets });
+  const affected = runEffects(state, skill.effects, { caster, self: caster, targets: decl.finalTargets, skillId: skill.id });
   skill.currentCd = effectiveCooldown(caster, skill);
   skill.cdSetTurn = state.turn; // birth turn — advanceCooldowns skips it (see below), so cooldown N blocks N turns
   caster.lastSkillId = skill.id; // the "used a skill" ledger (read by clone/last-skill mechanics)

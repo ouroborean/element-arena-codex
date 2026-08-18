@@ -7,7 +7,7 @@ import type { SkillInstance } from "../../engine/src/skill.ts";
 import { totalShield } from "../../engine/src/damage.ts";
 import { canUse, effectiveCost } from "../../engine/src/scheduler.ts";
 import { ROSTER } from "../../engine/content/roster.generated.ts";
-import { heroPortrait, skillIcon, minionPortrait, heroIdOfSkill, elColor } from "./assets.ts";
+import { heroPortrait, iconOf, minionPortrait, elColor } from "./assets.ts";
 import { SKILL_TEXT } from "./skilltext.generated.ts";
 import { STATUS_SOURCE } from "./statussource.generated.ts";
 import type { UiState } from "./main.ts";
@@ -23,7 +23,8 @@ const durStr = (s: Status) => s.duration === null ? "for the round" : typeof s.d
 /** A plain-language account of what a status is doing right now (for the hover popup). `src` is the id of
  *  the skill/passive that applied it (for the source name + a mark's descriptive fallback). */
 function effectDesc(s: Status, src?: string): { title: string; body: string } {
-  const title = s.name ?? s.kind.replace(/_/g, " ");
+  const srcName = src && SKILL_TEXT[src] ? SKILL_TEXT[src]!.n : undefined;
+  const title = s.name ?? srcName ?? s.kind.replace(/_/g, " ");
   const mag = s.magnitude ?? 0, dt = s.dtype ?? "affliction";
   let body: string;
   switch (s.kind) {
@@ -50,20 +51,35 @@ function effectDesc(s: Status, src?: string): { title: string; body: string } {
     case "mark": body = src && SKILL_TEXT[src] ? SKILL_TEXT[src]!.d : ""; break;
     default: body = src && SKILL_TEXT[src] ? SKILL_TEXT[src]!.d : "";
   }
-  if (src && SKILL_TEXT[src] && s.kind !== "mark" && s.kind !== "stack") body += ` (from ${SKILL_TEXT[src]!.n})`;
-  const d = durStr(s); if (d) body = `${body} ${d}.`.trim();
+  // Attribute the source, unless the title already IS the source name (avoids "Frost-Covered (from Frost-Covered)").
+  if (srcName && title !== srcName && s.kind !== "mark" && s.kind !== "stack") body += ` (from ${srcName})`;
+  const d = durStr(s); if (d) body = `${body.trim()} ${d.charAt(0).toUpperCase()}${d.slice(1)}.`;
   return { title, body: body.trim() };
 }
 
-/** Status icons on a portrait: the source skill's art (fallback to a lettered chip), each hover-describable. */
+/**
+ * The skill/passive id an effect should show the icon of, resolved most-precise first:
+ *  1. a named status → the content-scanned map (status name → applying skill/passive), authoritative;
+ *  2. an engine-stamped `sourceId` that is a real skill id (skill-cast provenance);
+ *  3. a skill-scoped cost/cooldown mod → the skill it discounts (its `skillId` field);
+ *  4. last resort — the applying unit's passive, so it's always at least hero-correct (never a bare letter).
+ */
+function statusSource(state: MatchState, s: Status): string | undefined {
+  if (s.name && STATUS_SOURCE[s.name]) return STATUS_SOURCE[s.name];
+  if (s.sourceId && SKILL_TEXT[s.sourceId]) return s.sourceId;
+  if (s.skillId && SKILL_TEXT[s.skillId]) return s.skillId;
+  const by = state.units[s.appliedBy];
+  return by?.heroId ? `${by.heroId}0` : undefined;
+}
+
+/** Status icons on a portrait: the source skill's art, each hover-describable. */
 function effectIcons(state: MatchState, u: Unit): string {
   const seen = new Set<string>(); const out: string[] = [];
   for (const s of u.statuses) {
     if (!(s.kind === "stack" || s.kind === "mark" || s.kind === "dot" || s.kind === "regen" || STATE_KINDS.has(s.kind))) continue;
     const key = `${s.kind}:${s.name ?? ""}`; if (seen.has(key)) continue; seen.add(key);
-    const src = s.sourceId ?? (s.name ? STATUS_SOURCE[s.name] : undefined);
-    const hid = src ? heroIdOfSkill(src) : undefined;
-    const icon = src && hid ? skillIcon(hid, src) : null;
+    const src = statusSource(state, s);
+    const icon = src ? iconOf(src) : null;
     const { title, body } = effectDesc(s, src);
     const cls = ["fx", s.kind === "dot" ? "bad" : s.kind === "regen" || s.kind === "stack" ? "good" : STATE_KINDS.has(s.kind) ? "state" : ""].filter(Boolean).join(" ");
     out.push(`<span class="${cls}" data-fxtitle="${esc(title)}" data-fxbody="${esc(body)}">${icon ? `<img src="${icon}" ${IMG_FALLBACK} />` : `<span class="fx-abbr">${esc((s.name ?? s.kind)[0]!.toUpperCase())}</span>`}${s.kind === "stack" && (s.magnitude ?? 0) > 1 ? `<span class="fx-n">${s.magnitude}</span>` : ""}</span>`);
@@ -87,8 +103,9 @@ function skillTiles(state: MatchState, u: Unit, ui: UiState): string {
     const text = SKILL_TEXT[s.id];
     const tip = `${text?.n ?? s.name} — ${costStr}${s.currentCd > 0 ? ` — on cooldown (${s.currentCd})` : ""}${text?.d ? `\n${text.d}` : ""}`;
     const cls = ["tile", ok ? "" : "off", chosen === s.id ? "chosen" : ""].filter(Boolean).join(" ");
+    const ic = iconOf(s.id, u.heroId ?? undefined);
     return `<button class="${cls}" ${ok ? `data-owner="${u.id}" data-skill="${s.id}"` : "disabled"} title="${esc(tip)}">
-      <img src="${skillIcon(u.heroId ?? "", s.id)}" alt="${esc(s.name)}" ${IMG_FALLBACK} />
+      ${ic ? `<img src="${ic}" alt="${esc(s.name)}" ${IMG_FALLBACK} />` : `<span class="tile-abbr">${esc(s.name.slice(0, 3))}</span>`}
       ${s.currentCd > 0 ? `<span class="cdbadge">${s.currentCd}</span>` : ""}</button>`;
   }).join("");
   return `<div class="tiles">${tiles}</div>`;
@@ -133,9 +150,13 @@ function energyPool(state: MatchState, ui: UiState): string {
 
 function midbar(state: MatchState, ui: UiState): string {
   const yourTurn = ui.phase === "plan";
-  const center = yourTurn
+  // While targeting, the skill detail lives HERE (between the lanes) — never over a portrait, so every
+  // highlighted target stays clickable. Otherwise: your-turn controls, or the AI's "acting…" bar.
+  const center = ui.targeting
+    ? skillPanel(state, ui)
+    : yourTurn
     ? `<div class="turn you">Your turn</div><div class="hint">${esc(ui.hint)}</div>
-       ${ui.targeting ? `<button class="mini" data-cancel="1">cancel targeting</button>` : `<button class="resolve" data-resolve="1">Resolve turn ▶</button>`}`
+       <button class="resolve" data-resolve="1">Resolve turn ▶</button>`
     : `<div class="turn foe">${esc(ui.phaseLabel)}</div><div class="bar"><div class="bar-fill"></div></div>`;
   return `<div class="midbar">
     <div class="mid-left">${energyPool(state, ui)}</div>
@@ -145,19 +166,22 @@ function midbar(state: MatchState, ui: UiState): string {
   </div>`;
 }
 
-/** The overlay panel that appears when a skill is picked: what it does, while you choose a target. */
-function skillOverlay(state: MatchState, ui: UiState): string {
+/** The skill detail shown in the midbar while a skill is picked: what it does, while you choose a target. */
+function skillPanel(state: MatchState, ui: UiState): string {
   const t = ui.targeting!;
   const u = state.units[t.unitId];
   const skill = (u?.skills ?? []).find((s) => s.id === t.skillId);
   const text = SKILL_TEXT[t.skillId];
+  const ic = iconOf(t.skillId, u?.heroId ?? undefined);
   const cost = u && skill ? effectiveCost(u, skill) : null;
   const costStr = cost ? ([cost.generic ? `${cost.generic} generic` : "", cost.specific ? `${cost.specific} ${skill!.element}` : ""].filter(Boolean).join(" + ") || "free") : "";
-  return `<div class="skillcard">
-    <div class="sc-head"><img src="${skillIcon(u?.heroId ?? "", t.skillId)}" ${IMG_FALLBACK} />
-      <div><div class="sc-name">${esc(text?.n ?? t.skillName)}</div><div class="sc-cost">${esc(costStr)}</div></div></div>
-    <div class="sc-desc">${esc(text?.d ?? "")}</div>
-    <div class="sc-foot">Click a highlighted target to use <button class="mini" data-cancel="1">cancel</button></div>
+  return `<div class="skillpanel">
+    ${ic ? `<img class="sp-icon" src="${ic}" ${IMG_FALLBACK} />` : ""}
+    <div class="sp-body">
+      <div class="sp-name">${esc(text?.n ?? t.skillName)} <span class="sp-cost">${esc(costStr)}</span></div>
+      <div class="sp-desc">${esc(text?.d ?? "")}</div>
+      <div class="sp-foot">▸ Click a highlighted target to use <button class="mini" data-cancel="1">cancel</button></div>
+    </div>
   </div>`;
 }
 
@@ -167,7 +191,7 @@ export function renderApp(state: MatchState, ui: UiState): string {
     ${sideRow(state, foe, ui, false)}
     ${midbar(state, ui)}
     ${sideRow(state, ui.you, ui, true)}
-  </div>${ui.targeting ? skillOverlay(state, ui) : ""}${ui.overlay ?? ""}`;
+  </div>${ui.overlay ?? ""}`;
 }
 
 // ── team select (with a skill viewer) ─────────────────────────────────────────────────────────────── //
@@ -178,7 +202,7 @@ function heroDetail(heroId: string, picked: string[]): string {
   const passive = SKILL_TEXT[`${heroId}0`];
   const skillRows = (def.skills ?? []).map((s) => {
     const t = SKILL_TEXT[s.id];
-    return `<div class="sv-row"><img src="${skillIcon(heroId, s.id)}" ${IMG_FALLBACK} />
+    return `<div class="sv-row"><img src="${iconOf(s.id, heroId) ?? ""}" ${IMG_FALLBACK} />
       <div><div class="sv-name">${esc(t?.n ?? s.name)}</div><div class="sv-desc">${esc(t?.d ?? "")}</div></div></div>`;
   }).join("");
   return `<div class="detail-head">
@@ -186,7 +210,7 @@ function heroDetail(heroId: string, picked: string[]): string {
       <div><h3>${esc(def.name)}</h3><span class="dp-el">${esc(def.element)}</span></div>
       <button class="addbtn ${on ? "rem" : ""}" data-pick="${heroId}" ${!on && picked.length >= 3 ? "disabled" : ""}>${on ? "− Remove" : "+ Add to team"}</button>
     </div>
-    ${passive ? `<div class="sv-row passive"><img src="${skillIcon(heroId, `${heroId}0`)}" ${IMG_FALLBACK} /><div><div class="sv-name">${esc(passive.n)} <i>passive</i></div><div class="sv-desc">${esc(passive.d)}</div></div></div>` : ""}
+    ${passive ? `<div class="sv-row passive"><img src="${iconOf(`${heroId}0`, heroId) ?? ""}" ${IMG_FALLBACK} /><div><div class="sv-name">${esc(passive.n)} <i>passive</i></div><div class="sv-desc">${esc(passive.d)}</div></div></div>` : ""}
     <div class="skillview">${skillRows}</div>`;
 }
 

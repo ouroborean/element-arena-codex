@@ -88,3 +88,35 @@ test("Stealth suppresses a stealthed attacker from setting off enemy triggers", 
   runEffects(state, [{ op: "damage", amount: 20, to: "target" }], { caster: attacker, targets: [w] });
   assert.equal(w.hp, 85);
 });
+
+test("a trigger-applied status is attributed to the owner's passive (effect provenance)", () => {
+  // Deferred trigger effects run in a fresh context; a status they apply must still learn its source.
+  // With no explicit sourceSkillId, it defaults to the owner's current passive id (base or fusion).
+  const trig: TriggeredEffect = {
+    on: "roundStart", owner: "a1", source: "Frostfang",
+    effect: [{ op: "applyStatus", to: "self", status: { kind: "taunt", duration: 1 } }],
+  };
+  const a = makeUnit({ id: "a1", team: "A", heroId: "gommar", triggers: [trig] });
+  const state = makeState([a], [makeUnit({ id: "b1", team: "B" })]);
+
+  emit(state, { type: "roundStart" });
+  assert.equal(a.statuses.find((s) => s.kind === "taunt")?.sourceId, "gommar0", "attributed to base passive");
+
+  a.fused = "aurora"; a.statuses = [];
+  emit(state, { type: "roundStart" });
+  assert.equal(a.statuses.find((s) => s.kind === "taunt")?.sourceId, "gommaraurora0", "attributed to the fusion passive");
+});
+
+test("an installed watch's status is attributed to the installing skill (sourceSkillId)", () => {
+  // A runtime-installed watch carries the id of the skill that installed it, so a status it applies
+  // later shows THAT skill's icon (not the owner's passive) — the precise watch-trigger case.
+  const watch: TriggeredEffect = {
+    on: "roundStart", owner: "a1", source: "Shadow Seekers", sourceSkillId: "sylninja1",
+    effect: [{ op: "applyStatus", to: "self", status: { kind: "stun", duration: 1 } }],
+  };
+  const a = makeUnit({ id: "a1", team: "A", heroId: "syl", triggers: [watch] });
+  const state = makeState([a], [makeUnit({ id: "b1", team: "B" })]);
+
+  emit(state, { type: "roundStart" });
+  assert.equal(a.statuses.find((s) => s.kind === "stun")?.sourceId, "sylninja1");
+});

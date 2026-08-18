@@ -62,8 +62,20 @@ export interface TriggeredEffect {
   duration?: number | null;
   appliedBy?: UnitId;
   appliedTurn?: number;
-  /** Provenance (the passive/skill id that registered it). */
+  /**
+   * A human-readable name handle for the registering passive/skill — used by augment surgery
+   * (removeTrigger / retunePassiveThreshold match on this string). NOT an id; do not use it for
+   * icon/text lookups. For effect provenance (which skill applied a status this trigger fires) use
+   * `sourceSkillId`.
+   */
   source: string;
+  /**
+   * The id of the skill/passive that installed this trigger, when known — set from `ctx.skillId`
+   * at runtime install (installWatch). Deferred trigger effects run in a fresh context, so this is
+   * how a status they apply learns its true source skill (for the client's effect icons). Absent for
+   * statically authored triggers, which fall back to the owner's current passive id.
+   */
+  sourceSkillId?: string;
   /**
    * Where the trigger came from — so a fusion can swap out the base passive's triggers while
    * KEEPING augment-added ones. Absent = base passive (the default for authored hero triggers).
