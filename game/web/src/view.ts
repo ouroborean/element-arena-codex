@@ -7,7 +7,7 @@ import type { SkillInstance } from "../../engine/src/skill.ts";
 import { totalShield } from "../../engine/src/damage.ts";
 import { canUse, effectiveCost } from "../../engine/src/scheduler.ts";
 import { ROSTER } from "../../engine/content/roster.generated.ts";
-import { heroPortrait, iconOf, minionPortrait, elColor } from "./assets.ts";
+import { heroPortrait, iconOf, minionPortrait, energyIcon, elColor } from "./assets.ts";
 import { SKILL_TEXT } from "./skilltext.generated.ts";
 import { STATUS_SOURCE } from "./statussource.generated.ts";
 import { EFFECT_DESC, EFFECT_HIDE } from "./effectdesc.generated.ts";
@@ -99,10 +99,16 @@ function statusSource(state: MatchState, s: Status): string | undefined {
 
 /** Status icons on a portrait: the source skill's art, each hover-describable. */
 function effectIcons(state: MatchState, u: Unit): string {
+  const shown = (s: Status) => !HIDDEN_KINDS.has(s.kind) && !(s.name && EFFECT_HIDE.has(s.name));
+  // A stack/mark is a carrier; when the same NAME also manifests as a concrete effect (a dot, a damage
+  // mod, …), that concrete chip already tells the story, so the carrier chip is redundant — drop it.
+  // (Burning Blood Serum = a stack + its +damage mod + its dot → show just the mod and the dot.)
+  const concreteNames = new Set<string>();
+  for (const s of u.statuses) if (shown(s) && s.name && s.kind !== "stack" && s.kind !== "mark") concreteNames.add(s.name);
   const seen = new Set<string>(); const out: string[] = [];
   for (const s of u.statuses) {
-    if (HIDDEN_KINDS.has(s.kind)) continue; // pure plumbing — no chip
-    if (s.name && EFFECT_HIDE.has(s.name)) continue; // internal bookkeeping flag (Acted, Proc Lock, …)
+    if (!shown(s)) continue;
+    if ((s.kind === "stack" || s.kind === "mark") && s.name && concreteNames.has(s.name)) continue; // redundant carrier
     const key = `${s.kind}:${s.name ?? ""}`; if (seen.has(key)) continue; seen.add(key);
     const src = statusSource(state, s);
     const icon = src ? iconOf(src) : null;
@@ -118,6 +124,15 @@ function hpBar(u: Unit): string {
   const shield = totalShield(u);
   return `<div class="hp"><div class="hp-fill" style="width:${pct}%"></div>
     <span class="hp-num">${Math.max(0, u.hp)}${shield > 0 ? `<i>+${shield}</i>` : ""}</span></div>`;
+}
+
+/** A skill's cost as a row of energy icons — one per unit, specific (element) then generic, no numbers/words. */
+function costIcons(cost: { generic: number; specific: number }, element: string): string {
+  const pip = (el: string) => `<img class="cost-ic" src="${energyIcon(el)}" alt="${esc(el)}" title="${esc(el)}" ${IMG_FALLBACK} />`;
+  const icons = element && cost.specific > 0 ? pip(element).repeat(cost.specific) : "";
+  const gen = cost.generic > 0 ? pip("generic").repeat(cost.generic) : "";
+  const all = icons + gen;
+  return all ? `<span class="cost-ics">${all}</span>` : `<span class="cost-free">Free</span>`;
 }
 
 function skillTiles(state: MatchState, u: Unit, ui: UiState): string {
@@ -202,7 +217,7 @@ function energyPool(state: MatchState, ui: UiState): string {
   for (const id of state.teams[ui.you].units) { const u = state.units[id]; if (u?.kind === "hero") els.add(u.currentElement); }
   for (const k of Object.keys(pool)) if ((pool[k] ?? 0) > 0) els.add(k);
   const rows = [...els].sort((a, b) => (a === "generic" ? -1 : b === "generic" ? 1 : a.localeCompare(b)))
-    .map((el) => `<div class="ep-row"><span class="ep-pip" style="background:${el === "generic" ? "#8a8fa8" : elColor(el)}">${el === "generic" ? "◆" : ""}</span>
+    .map((el) => `<div class="ep-row"><img class="ep-ic" src="${energyIcon(el)}" alt="${esc(el)}" title="${esc(el)}" ${IMG_FALLBACK} />
       <span class="ep-el">${esc(el)}</span><span class="ep-n">${pool[el] ?? 0}</span></div>`).join("");
   return `<div class="epool"><div class="ep-title">Energy Pool</div>${rows}</div>`;
 }
@@ -235,7 +250,7 @@ function skillPanel(state: MatchState, ui: UiState): string {
   const text = SKILL_TEXT[sel.skillId];
   const ic = iconOf(sel.skillId, u?.heroId ?? undefined);
   const cost = u && skill ? effectiveCost(u, skill) : null;
-  const costStr = cost ? ([cost.generic ? `${cost.generic} generic` : "", cost.specific ? `${cost.specific} ${skill!.element}` : ""].filter(Boolean).join(" + ") || "free") : "";
+  const costEl = cost ? costIcons(cost, skill!.element) : "";
   const name = text?.n ?? ui.targeting?.skillName ?? skill?.name ?? sel.skillId;
   const foot = examining
     ? `<span class="sp-warn">⚠ ${esc(ui.examine!.reason)}</span> <button class="mini" data-cancel="1">close</button>`
@@ -243,7 +258,7 @@ function skillPanel(state: MatchState, ui: UiState): string {
   return `<div class="skillpanel${examining ? " examine" : ""}">
     ${ic ? `<img class="sp-icon" src="${ic}" ${IMG_FALLBACK} />` : ""}
     <div class="sp-body">
-      <div class="sp-name">${esc(name)} <span class="sp-cost">${esc(costStr)}</span></div>
+      <div class="sp-name">${esc(name)} <span class="sp-cost">${costEl}</span></div>
       <div class="sp-desc">${esc(text?.d ?? "")}</div>
       <div class="sp-foot">${foot}</div>
     </div>
@@ -259,7 +274,7 @@ function energyPanel(ui: UiState): string {
   const rows = colors.map((c) => {
     const have = p.avail[c] ?? 0, put = p.alloc[c] ?? 0;
     return `<div class="alloc-row">
-      <span class="ep-pip" style="background:${c === "generic" ? "#8a8fa8" : elColor(c)}">${c === "generic" ? "◆" : ""}</span>
+      <img class="ep-ic" src="${energyIcon(c)}" alt="${esc(c)}" title="${esc(c)}" ${IMG_FALLBACK} />
       <span class="ac-el">${esc(c)}</span><span class="ac-avail">${have} available</span>
       <span class="ac-step"><button class="step" data-minus="${c}" ${put <= 0 ? "disabled" : ""}>−</button>
         <span class="ac-n">${put}</span>
@@ -297,7 +312,7 @@ function heroDetail(heroId: string, picked: string[]): string {
   const skillRows = (def.skills ?? []).map((s) => {
     const t = SKILL_TEXT[s.id];
     return `<div class="sv-row"><img src="${iconOf(s.id, heroId) ?? ""}" ${IMG_FALLBACK} />
-      <div><div class="sv-name">${esc(t?.n ?? s.name)}</div><div class="sv-desc">${esc(t?.d ?? "")}</div></div></div>`;
+      <div><div class="sv-name">${esc(t?.n ?? s.name)} <span class="sv-cost">${costIcons(s.cost, s.element)}</span></div><div class="sv-desc">${esc(t?.d ?? "")}</div></div></div>`;
   }).join("");
   return `<div class="detail-head">
       <img class="dp" src="${heroPortrait(heroId)}" ${IMG_FALLBACK} />

@@ -31,6 +31,11 @@ export function minionPortrait(name: string): string | null {
   return MINION_ART[name] ?? null;
 }
 
+/** The square energy icon for an element (or "generic") — for the energy pool + skill-cost pips. */
+export function energyIcon(el: string): string {
+  return `../../assets/energy_tooltips/${el}_energy.png`;
+}
+
 // hero ids longest-first, so "sayaaurora1" prefix-matches "saya" (not a shorter accidental match).
 const HERO_IDS = ROSTER.map((h) => h.id).sort((a, b) => b.length - a.length);
 /** The hero that owns a skill id (its icon lives under that hero's folder) — for effect source icons. */
