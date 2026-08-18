@@ -14,17 +14,28 @@ src = json.load(open(os.path.join(ROOT, "game/web/tools/effect_descriptions.json
 
 desc = {n: v["description"].strip() for n, v in sorted(src.items()) if v.get("description")}
 hide = sorted(n for n, v in src.items() if v.get("hide"))
+# A variant = alternate text shown only while the bearer holds a gating status (e.g. Saya's "Enhanced").
+variants = {n: v["variant"] for n, v in sorted(src.items()) if isinstance(v.get("variant"), dict) and v["variant"].get("when") and v["variant"].get("text")}
 
 lines = [
     "/**",
-    " * Per-effect STATE descriptions for named marks/stacks — what HOLDING the effect does, describing the",
-    " * effect itself (never the applying skill's action). Authored in effect_descriptions.json; regenerate",
-    " * with game/web/tools/gen_effect_desc.py. EFFECT_HIDE = internal bookkeeping flags that show no chip.",
+    " * Per-effect STATE descriptions for named marks/stacks — what HOLDING the effect does RIGHT NOW,",
+    " * describing the effect itself (never the applying skill's action, a fusion form, or a synergy).",
+    " * Text may contain {generic}/{fire}/… energy tokens, rendered as icons. A variant overrides the base",
+    " * while the bearer holds its `when` status. Authored in effect_descriptions.json; regenerate with",
+    " * gen_effect_desc.py. EFFECT_HIDE = internal bookkeeping flags that show no chip.",
     " */",
     "export const EFFECT_DESC: Record<string, string> = {",
 ]
 for n in sorted(desc):
     lines.append(f"  {json.dumps(n)}: {json.dumps(desc[n])},")
+lines.append("};")
+lines.append("")
+lines.append("export interface EffectVariant { when: string; text: string; }")
+lines.append("export const EFFECT_VARIANT: Record<string, EffectVariant> = {")
+for n in sorted(variants):
+    v = variants[n]
+    lines.append(f"  {json.dumps(n)}: {{ when: {json.dumps(v['when'])}, text: {json.dumps(v['text'])} }},")
 lines.append("};")
 lines.append("")
 lines.append("export const EFFECT_HIDE: ReadonlySet<string> = new Set([")
@@ -34,4 +45,4 @@ lines.append("]);")
 
 out = os.path.join(ROOT, "game/web/src/effectdesc.generated.ts")
 open(out, "w", encoding="utf-8", newline="\n").write("\n".join(lines) + "\n")
-print(f"wrote {out}: {len(desc)} descriptions, {len(hide)} hidden")
+print(f"wrote {out}: {len(desc)} descriptions, {len(variants)} variants, {len(hide)} hidden")

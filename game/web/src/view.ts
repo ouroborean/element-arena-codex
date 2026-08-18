@@ -10,7 +10,7 @@ import { ROSTER } from "../../engine/content/roster.generated.ts";
 import { heroPortrait, iconOf, minionPortrait, energyIcon, elColor } from "./assets.ts";
 import { SKILL_TEXT } from "./skilltext.generated.ts";
 import { STATUS_SOURCE } from "./statussource.generated.ts";
-import { EFFECT_DESC, EFFECT_HIDE } from "./effectdesc.generated.ts";
+import { EFFECT_DESC, EFFECT_VARIANT, EFFECT_HIDE } from "./effectdesc.generated.ts";
 import type { UiState } from "./main.ts";
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
@@ -31,7 +31,16 @@ const signed = (n: number) => `${n > 0 ? "+" : ""}${n}`;
 /** A precise, concise account of what THIS individual status is doing right now — keyed on the status's own
  *  fields (kind / magnitude / dtype / name / scope / unitRef), so two effects from one skill read distinctly.
  *  `src` is the id of the skill/passive that applied it (only used to attribute the source name). */
-function effectDesc(state: MatchState, s: Status, src?: string): { title: string; body: string; dur: string } {
+/** The authored text for a named mark/stack: its state-gated variant while the bearer `u` holds the
+ *  gating status (e.g. Saya's "Enhanced"), else the base. Undefined if the effect has no authored entry. */
+function authoredText(s: Status, u: Unit): string | undefined {
+  if (!s.name) return undefined;
+  const v = EFFECT_VARIANT[s.name];
+  if (v && u.statuses.some((x) => x.name === v.when || x.kind === (v.when.toLowerCase() as Status["kind"]))) return v.text;
+  return EFFECT_DESC[s.name];
+}
+
+function effectDesc(state: MatchState, u: Unit, s: Status, src?: string): { title: string; body: string; dur: string } {
   const srcName = skillName(src);
   const mag = s.magnitude ?? 0, dt = s.dtype ?? "affliction";
   const unitName = s.unitRef ? shortName(state.units[s.unitRef]?.name ?? "a unit") : undefined;
@@ -43,8 +52,8 @@ function effectDesc(state: MatchState, s: Status, src?: string): { title: string
     case "regen": body = `Restores ${mag} HP each turn.`; break;
     // Marks/stacks are opaque named effects; their meaning is authored (what HOLDING it does), not the
     // applying skill's action. The stack's live count shows on the chip badge, so the text describes the resource.
-    case "stack": body = (s.name && EFFECT_DESC[s.name]) || `${mag} stack${mag === 1 ? "" : "s"} of ${s.name ?? "a resource"}.`; break;
-    case "mark": body = (s.name && EFFECT_DESC[s.name]) || "A marker other skills read."; break;
+    case "stack": body = authoredText(s, u) || `${mag} stack${mag === 1 ? "" : "s"} of ${s.name ?? "a resource"}.`; break;
+    case "mark": body = authoredText(s, u) || "A marker other skills read."; break;
     case "stun": body = s.scope ? `Can't use ${s.scope.mode === "only" ? "" : "non-"}${s.scope.tag} skills.` : "Stunned — can't use skills."; break;
     case "blind": body = "Single-target skills strike a random target."; break;
     case "invulnerable": body = "Can't be targeted by new harmful skills."; break;
@@ -112,7 +121,7 @@ function effectIcons(state: MatchState, u: Unit): string {
     const key = `${s.kind}:${s.name ?? ""}`; if (seen.has(key)) continue; seen.add(key);
     const src = statusSource(state, s);
     const icon = src ? iconOf(src) : null;
-    const { title, body, dur } = effectDesc(state, s, src);
+    const { title, body, dur } = effectDesc(state, u, s, src);
     const tone = BAD_KINDS.has(s.kind) ? "bad" : GOOD_KINDS.has(s.kind) ? "good" : "state";
     out.push(`<span class="fx ${tone}" data-fxtitle="${esc(title)}" data-fxbody="${esc(body)}" data-fxdur="${esc(dur)}">${icon ? `<img src="${icon}" ${IMG_FALLBACK} />` : `<span class="fx-abbr">${esc((s.name ?? s.kind)[0]!.toUpperCase())}</span>`}${s.kind === "stack" && (s.magnitude ?? 0) > 1 ? `<span class="fx-n">${s.magnitude}</span>` : ""}</span>`);
   }

@@ -14,6 +14,7 @@ import { ROSTER } from "../../engine/content/roster.generated.ts";
 import { runMatch, type AsyncProvider } from "../../client/loop.ts";
 import { autoDraft, applyDraftChoice } from "../../client/draft.ts";
 import { renderApp, renderSetup } from "./view.ts";
+import { energyIcon } from "./assets.ts";
 
 export interface UiState {
   you: TeamId;
@@ -54,10 +55,21 @@ const ui: UiState = {
 const fxpop = document.createElement("div");
 fxpop.className = "fxpop"; fxpop.hidden = true;
 document.body.appendChild(fxpop);
+// Render authored text into `el`, turning {generic}/{fire}/… tokens into inline energy icons.
+function renderTokens(el: HTMLElement, text: string): void {
+  for (const part of text.split(/(\{[a-z]+\})/i)) {
+    const m = /^\{([a-z]+)\}$/i.exec(part);
+    if (m) {
+      const img = document.createElement("img");
+      img.className = "tt-en"; img.src = energyIcon(m[1]!.toLowerCase()); img.alt = m[1]!;
+      el.append(img);
+    } else if (part) el.append(document.createTextNode(part));
+  }
+}
 function showFx(el: HTMLElement): void {
   fxpop.textContent = "";
   const b = document.createElement("b"); b.textContent = el.dataset.fxtitle ?? "";
-  const body = document.createElement("div"); body.textContent = el.dataset.fxbody ?? "";
+  const body = document.createElement("div"); renderTokens(body, el.dataset.fxbody ?? "");
   fxpop.append(b, body);
   const dur = el.dataset.fxdur;
   if (dur) { const d = document.createElement("div"); d.className = "fxdur"; d.textContent = `⏳ ${dur}`; fxpop.append(d); }

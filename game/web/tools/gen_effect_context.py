@@ -17,6 +17,10 @@ skills = load("game/content/frozen/skills.json")
 augments = load("game/content/frozen/augments.json")
 SKILL = {s["id"]: s for s in skills}
 
+# Fusion skill ids — references from a fusion form are NOT part of the effect's base/current behavior.
+_fus = open(os.path.join(ROOT, "game/engine/content/fusions.generated.ts"), encoding="utf-8").read()
+FUSION_IDS = set(re.findall(r'"id":\s*"([a-z0-9]+)"', _fus))
+
 # statussource.generated.ts: status name -> applying skill/passive id
 sstxt = open(os.path.join(ROOT, "game/web/src/statussource.generated.ts"), encoding="utf-8").read()
 STATUS_SOURCE = json.loads(re.search(r"=\s*(\{.*\});", sstxt, re.S).group(1))
@@ -45,16 +49,18 @@ for name, kind in sorted(kinds.items()):
     applier_desc = (SKILL.get(applied_by, {}) or {}).get("description", "") if applied_by else ""
     mentions = []
     for nm, sid, d in DESCS:
-        if name in d:
+        if name in d and sid not in FUSION_IDS:  # base-kit references only; a fusion form is not current behavior
             mentions.append({"skill": nm, "id": sid, "desc": d})
     for nm, aid, d in AUG_DESCS:
         if name in d:
             mentions.append({"augment": nm, "id": aid, "desc": d})
+    cond = re.search(r"[Ww]hile ([A-Z][a-zA-Z][a-zA-Z -]*?)[,.]", applier_desc)
     ctx[name] = {
         "kind": kind,
         "appliedBy": applied_by,
         "applierName": (SKILL.get(applied_by, {}) or {}).get("name") if applied_by else None,
         "applierDesc": applier_desc,
+        "conditionalOn": cond.group(1).strip() if cond else None,  # a "While X" clause → a state-gated variant
         "mentions": mentions,
         "maybePlumbing": bool(PLUMBING.search(name)),
     }
