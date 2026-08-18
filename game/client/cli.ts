@@ -9,7 +9,7 @@
  * Runs the engine natively (Node type-strips the TS) — no build step. The between-round
  * augment/fusion draft is not wired yet (each round starts fresh); that's the next increment.
  */
-import * as readline from "node:readline/promises";
+import * as readline from "node:readline";
 import { stdin, stdout, argv, env, exit } from "node:process";
 import type { MatchState, TeamId, Unit } from "../engine/src/types.ts";
 import type { Action } from "../engine/src/scheduler.ts";
@@ -18,6 +18,8 @@ import { legalTargets } from "../engine/src/scheduler.ts";
 import { Rng } from "../engine/src/rng.ts";
 import { buildMatch, defaultPolicy, heroById } from "../engine/content/match.ts";
 import { runMatch, type AsyncProvider } from "./loop.ts";
+import { availableFusions, availableAugments } from "../engine/content/metagame.ts";
+import { draftableHeroes, hasDraftOptions, applyDraftChoice, autoDraft, type DraftChoice } from "./draft.ts";
 import * as R from "./render.ts";
 
 const PRESET = { A: ["pyrrha", "jarrik", "gommar"], B: ["keeper", "riverdaughter", "saya"] };
@@ -60,8 +62,19 @@ async function main(): Promise<void> {
   stdout.write(R.heading(`Element Arena — ${A.join("/")}  vs  ${B.join("/")}   ${R.dim(`(seed ${seed})`)}`));
   stdout.write(`\n ${R.dim(demo ? "AI vs AI demo." : `You control Team ${you}. Pick a skill number per unit; 0 to skip.`)}\n`);
 
-  const rl = readline.createInterface({ input: stdin, output: stdout });
-  const ask = (q: string) => rl.question(q);
+  // A robust line reader: readline/promises' rl.question hangs after the first question on piped
+  // (non-TTY) input, so we queue "line" events ourselves. Works for a real TTY and for piped input/tests.
+  const rl = readline.createInterface({ input: stdin });
+  const lineQ: string[] = [];
+  const waiters: ((l: string) => void)[] = [];
+  let stdinClosed = false;
+  rl.on("line", (l) => { const w = waiters.shift(); if (w) w(l); else lineQ.push(l); });
+  rl.on("close", () => { stdinClosed = true; while (waiters.length) waiters.shift()!(""); });
+  const ask = (q: string): Promise<string> => {
+    stdout.write(q);
+    if (lineQ.length) return Promise.resolve(lineQ.shift()!);
+    return stdinClosed ? Promise.resolve("") : new Promise((res) => waiters.push(res));
+  };
 
   const human: AsyncProvider = async (st, side) => {
     stdout.write(R.heading(`Round ${st.round} · Team ${side} — your move`));
@@ -89,6 +102,39 @@ async function main(): Promise<void> {
     return actions;
   };
 
+  // Interactive between-round draft: fuse a hero, augment a hero, or hold.
+  const humanDraft = async (st: MatchState, side: TeamId): Promise<DraftChoice> => {
+    stdout.write(R.heading(`Between rounds — Team ${side}, choose an upgrade`) + "\n");
+    for (const u of draftableHeroes(st, side)) {
+      const nf = availableFusions(st, u).length;
+      const na = availableAugments(u).length;
+      const fused = u.fused ? R.dim(` · fused:${u.fused}`) : "";
+      stdout.write(`  ${R.bold(`[${u.id.toUpperCase()}]`)} ${u.name}${fused}  ${R.dim(`— ${nf} fusion(s), ${na} augment(s)`)}\n`);
+    }
+    const mode = (await ask("\n  (f)use, (a)ugment, or (s)kip? > ")).trim().toLowerCase();
+    if (mode === "f" || mode === "fuse") {
+      const pool = draftableHeroes(st, side).filter((u) => availableFusions(st, u).length);
+      if (!pool.length) { stdout.write(R.dim("  no hero can fuse — held.\n")); return { kind: "skip" }; }
+      stdout.write(pool.map((u, i) => `   ${i + 1}) ${u.name} [${u.id.toUpperCase()}]`).join("\n") + "\n");
+      const u = pool[Number(await ask("  hero > ")) - 1] ?? pool[0]!;
+      const forms = availableFusions(st, u);
+      stdout.write(forms.map((f, i) => `   ${i + 1}) ${R.bold(f.key)} ${R.dim(`(${f.element})`)} — ${f.passive.name}: ${R.dim((f.passive.description ?? "").slice(0, 84))}`).join("\n") + "\n");
+      const f = forms[Number(await ask("  form > ")) - 1] ?? forms[0]!;
+      return { kind: "fuse", unitId: u.id, formKey: f.key };
+    }
+    if (mode === "a" || mode === "augment") {
+      const pool = draftableHeroes(st, side).filter((u) => availableAugments(u).length);
+      if (!pool.length) { stdout.write(R.dim("  no augments available — held.\n")); return { kind: "skip" }; }
+      stdout.write(pool.map((u, i) => `   ${i + 1}) ${u.name} [${u.id.toUpperCase()}]`).join("\n") + "\n");
+      const u = pool[Number(await ask("  hero > ")) - 1] ?? pool[0]!;
+      const augs = availableAugments(u);
+      stdout.write(augs.map((a, i) => `   ${i + 1}) ${R.bold(a.name)}: ${R.dim((a.description ?? "").slice(0, 92))}`).join("\n") + "\n");
+      const a = augs[Number(await ask("  augment > ")) - 1] ?? augs[0]!;
+      return { kind: "augment", unitId: u.id, augmentId: a.id };
+    }
+    return { kind: "skip" };
+  };
+
   const provide: AsyncProvider = demo
     ? (st, side) => defaultPolicy(st, side)
     : (st, side) => (side === you ? human(st, side) : defaultPolicy(st, side));
@@ -102,7 +148,17 @@ async function main(): Promise<void> {
       },
       onRoundEnd: (st, w) => stdout.write(R.heading(`Round ${st.round} won by Team ${w}   ${R.dim(`(${st.teams.A.roundsWon}–${st.teams.B.roundsWon})`)}`) + "\n"),
     },
-    onBetweenRounds: () => { stdout.write(R.dim("\n  (augment/fusion draft not yet implemented — next round is a fresh battle)\n")); },
+    onBetweenRounds: async (st, roundWinner) => {
+      const loser: TeamId = roundWinner === "A" ? "B" : "A";
+      stdout.write(R.heading(`Round ${st.round} decided — AUGMENT / FUSE draft`) + "\n");
+      for (const side of [loser, roundWinner]) { // the round's loser drafts first
+        if (!hasDraftOptions(st, side)) { stdout.write(R.dim(`  Team ${side}: no upgrades available.\n`)); continue; }
+        const choice = side === you && !demo ? await humanDraft(st, side) : autoDraft(st, side);
+        const res = applyDraftChoice(st, choice);
+        const who = side === you && !demo ? R.green(`Team ${side}`) : R.dim(`Team ${side} (AI)`);
+        stdout.write(`  ${who}: ${res.ok ? res.desc : R.dim("(" + res.desc + ")")}\n`);
+      }
+    },
   });
 
   rl.close();

@@ -119,6 +119,8 @@ export interface Unit {
   id: UnitId;
   kind: UnitKind;
   name: string;
+  /** The roster hero id this unit was loaded from (e.g. "syl") — for looking up its augments/fusion forms. */
+  heroId?: string;
   team: TeamId;
   hp: number;
   maxHp: number;
