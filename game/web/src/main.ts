@@ -6,6 +6,7 @@
  */
 import type { MatchState, TeamId, Unit } from "../../engine/src/types.ts";
 import type { Action } from "../../engine/src/scheduler.ts";
+import type { SkillInstance } from "../../engine/src/skill.ts";
 import { legalTargets } from "../../engine/src/scheduler.ts";
 import { Rng } from "../../engine/src/rng.ts";
 import { buildMatch, defaultPolicy, type Draft } from "../../engine/content/match.ts";
@@ -19,7 +20,7 @@ export interface UiState {
   phase: "plan" | "busy" | "over";
   phaseLabel: string;
   hint: string;
-  targeting?: { unitId: string; skillId: string; skillName: string };
+  targeting?: { unitId: string; skillId: string; skillName: string; single: boolean };
   legalTargets: Set<string>;
   planned: Map<string, Action>;
   plannedSkill: Map<string, string>; // unitId -> chosen skill id (to highlight its tile)
@@ -46,9 +47,26 @@ const ui: UiState = {
   legalTargets: new Set(), planned: new Map(), plannedSkill: new Map(),
 };
 
-function render(): void { app.innerHTML = renderApp(state, ui); }
+// A floating popup describing an effect icon, shown on hover/tap.
+const fxpop = document.createElement("div");
+fxpop.className = "fxpop"; fxpop.hidden = true;
+document.body.appendChild(fxpop);
+function showFx(el: HTMLElement): void {
+  fxpop.textContent = "";
+  const b = document.createElement("b"); b.textContent = el.dataset.fxtitle ?? "";
+  const body = document.createElement("div"); body.textContent = el.dataset.fxbody ?? "";
+  fxpop.append(b, body);
+  fxpop.hidden = false;
+  const r = el.getBoundingClientRect(), pw = fxpop.offsetWidth;
+  fxpop.style.left = `${Math.max(6, Math.min(window.innerWidth - pw - 6, r.left + r.width / 2 - pw / 2))}px`;
+  fxpop.style.top = `${r.bottom + 6}px`;
+}
+function hideFx(): void { fxpop.hidden = true; }
+
+function render(): void { hideFx(); app.innerHTML = renderApp(state, ui); }
 function showSetup(): void { setup = { picked: [], oppo: randomTeam([]), inspect: null }; app.innerHTML = renderSetup(setup); }
 
+/** Legal single-target set (Harmful→enemies, Helpful→allies, else either), run through targeting rules. */
 function targetsFor(u: Unit, skillId: string): Set<string> {
   const skill = (u.skills ?? []).find((s) => s.id === skillId)!;
   const enemy: TeamId = u.team === "A" ? "B" : "A";
@@ -56,6 +74,18 @@ function targetsFor(u: Unit, skillId: string): Set<string> {
     : skill.tags.includes("Helpful") ? living(state, u.team)
     : [...living(state, u.team), ...living(state, enemy)];
   return new Set(legalTargets(state, u, skill, pool, Rng.fromState(state.rngState)).map((x) => x.id));
+}
+
+/** The portraits to highlight for a skill — EVERY skill requires a target click, even self/auto ones. */
+function highlightSet(u: Unit, skill: SkillInstance): Set<string> {
+  const enemy: TeamId = u.team === "A" ? "B" : "A";
+  switch (skill.targeting) {
+    case "single": return targetsFor(u, skill.id);
+    case "all-enemies": return new Set(living(state, enemy).map((x) => x.id));
+    case "all-allies": return new Set(living(state, u.team).map((x) => x.id));
+    case "all": return new Set([...living(state, u.team), ...living(state, enemy)].map((x) => x.id));
+    default: return new Set([u.id]); // self / none — confirm on the caster
+  }
 }
 
 function queue(unitId: string, skillId: string, targets: string[] | undefined): void {
@@ -68,6 +98,8 @@ function queue(unitId: string, skillId: string, targets: string[] | undefined): 
 
 // ── interaction (event delegation) ───────────────────────────────────────────────────────────────── //
 app.addEventListener("click", (e) => {
+  const fxEl = (e.target as HTMLElement).closest<HTMLElement>(".fx");
+  if (fxEl) { if (fxpop.hidden) showFx(fxEl); else hideFx(); return; } // tap an effect icon to toggle its description
   const el = (e.target as HTMLElement).closest<HTMLElement>("[data-owner],[data-skill],[data-target],[data-cancel],[data-resolve],[data-surrender],[data-pick],[data-inspect],[data-reroll],[data-start]");
   if (!el) return;
   const d = el.dataset;
@@ -94,19 +126,20 @@ app.addEventListener("click", (e) => {
   if (ui.phase !== "plan") return;
   if (d.cancel) { ui.targeting = undefined; ui.legalTargets = new Set(); render(); return; }
   if (d.resolve) { commitTurn(); return; }
-  if (d.owner && d.skill) { // choose a skill on one of your heroes
+  if (d.owner && d.skill) { // pick a skill → show its overlay + highlight the portraits it can target
     const u = state.units[d.owner]!;
     const skill = (u.skills ?? []).find((s) => s.id === d.skill)!;
-    if (skill.targeting === "single") {
-      ui.targeting = { unitId: u.id, skillId: skill.id, skillName: skill.name };
-      ui.legalTargets = targetsFor(u, skill.id);
-      if (ui.legalTargets.size === 0) { queue(u.id, skill.id, []); return; } // taunt/blind-forced or no legal target
-      render();
-    } else queue(u.id, skill.id, undefined);
-  } else if (d.target && ui.targeting) {
-    queue(ui.targeting.unitId, ui.targeting.skillId, [d.target]);
+    ui.targeting = { unitId: u.id, skillId: skill.id, skillName: skill.name, single: skill.targeting === "single" };
+    ui.legalTargets = highlightSet(u, skill);
+    render();
+  } else if (d.target && ui.targeting) { // click a highlighted portrait to commit the skill
+    queue(ui.targeting.unitId, ui.targeting.skillId, ui.targeting.single ? [d.target] : undefined);
   }
 });
+
+// desktop hover: show an effect's description popup
+app.addEventListener("mouseover", (e) => { const fx = (e.target as HTMLElement).closest<HTMLElement>(".fx"); if (fx) showFx(fx); });
+app.addEventListener("mouseout", (e) => { if ((e.target as HTMLElement).closest(".fx")) hideFx(); });
 
 function commitTurn(): void {
   const actions = [...ui.planned.values()];
