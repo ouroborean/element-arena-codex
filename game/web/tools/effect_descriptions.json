@@ -1,0 +1,1102 @@
+{
+ "A Sprinkle of Recklessness": {
+  "confidence": "high",
+  "description": "An ally's helpful skills are cheaper and grant Elemental Essence when used; an enemy's Harmful skills cost more.",
+  "hide": false
+ },
+ "A Tale of Joy and Wonder": {
+  "confidence": "high",
+  "description": "For two turns, Keeper's allies gain Elemental Essence whenever they use a new skill.",
+  "hide": false
+ },
+ "Acceleration Serum": {
+  "confidence": "high",
+  "description": "A ticking dose that detonates for 40 affliction damage after 3 turns.",
+  "hide": false
+ },
+ "Acted": {
+  "confidence": "high",
+  "description": "Marks that Gommar has already taken an action this turn.",
+  "hide": true
+ },
+ "Aerie Essence Override": {
+  "confidence": "high",
+  "description": "While her starting Shield holds, Syl always triggers Two as One when she uses a skill, even acting alone.",
+  "hide": false
+ },
+ "Apprenticeborn Pathogen": {
+  "confidence": "high",
+  "description": "Dennis's spreading infection: it burns you now, saps your damage next turn, then stuns you after.",
+  "hide": false
+ },
+ "Arcadia, Enraged": {
+  "confidence": "high",
+  "description": "While Enraged, Arcadia's Thorn Prick is free and Enhanced, and every enemy burns for 5 each turn.",
+  "hide": false
+ },
+ "Arcadian Advancement": {
+  "confidence": "high",
+  "description": "Permanently extends the duration of Titania's effects — each stack makes them last one additional turn.",
+  "hide": false
+ },
+ "Arcadian Target": {
+  "confidence": "low",
+  "description": "Singled out and marked as a target for a hero's follow-up attack.",
+  "hide": false
+ },
+ "Banner of Consecration": {
+  "confidence": "high",
+  "description": "For 2 turns, anyone who damages Taryn or his allies takes 10 damage in return.",
+  "hide": false
+ },
+ "Banner of Harmony": {
+  "confidence": "high",
+  "description": "The enemy's Harmful skills reflect back onto Taryn, and damaging his allies leaves them open to double Inspiring Thrust damage.",
+  "hide": false
+ },
+ "Blackened Wounds": {
+  "confidence": "high",
+  "description": "Wounds that won't close — all incoming healing is ignored while marked.",
+  "hide": false
+ },
+ "Blessed Leylines": {
+  "confidence": "high",
+  "description": "Permanently receives 5 more healing from all sources.",
+  "hide": false
+ },
+ "Blood in the Water": {
+  "confidence": "high",
+  "description": "A reservoir of stored damage that Run Red empties to strike far harder.",
+  "hide": false
+ },
+ "Bloodrose Offering": {
+  "confidence": "high",
+  "description": "If this ally dies this turn, Maggie heals 10 HP for each Curse of Thorns stack she holds.",
+  "hide": false
+ },
+ "Bog Witch's Bargain": {
+  "confidence": "high",
+  "description": "Use a new skill to take 35 Affliction and permanently ignore non-damage effects, or stay idle and be stunned.",
+  "hide": false
+ },
+ "Boon: Save Your Friends": {
+  "confidence": "high",
+  "description": "This Hero's next Helpful skill heals its targets 15 HP and makes them Invulnerable for a turn.",
+  "hide": false
+ },
+ "Bottled Flame": {
+  "confidence": "high",
+  "description": "While Pyrrha holds it, damaging an enemy adds lingering Affliction damage.",
+  "hide": false
+ },
+ "Bounty": {
+  "confidence": "high",
+  "description": "Shattered, and any ally who deals damage to this enemy is healed for 10 health.",
+  "hide": false
+ },
+ "Bramblelash": {
+  "confidence": "high",
+  "description": "Snared by Maggie's thorns — damaging it feeds her Elemental Essence and it takes extra from Thornburst and Ghostlash.",
+  "hide": false
+ },
+ "Brimsteel Scabbard": {
+  "confidence": "high",
+  "description": "Jarrik's next Blade of Ashes deals triple damage, can't be countered, and spawns a Cinderling on Cinders-marked foes.",
+  "hide": false
+ },
+ "Brittle Ice": {
+  "confidence": "low",
+  "description": "A fragile coating of ice that leaves the bearer prone to shattering.",
+  "hide": false
+ },
+ "Burning Blood Serum": {
+  "confidence": "high",
+  "description": "The bearer deals extra damage each turn, but bleeds 10 damage per stack held.",
+  "hide": false
+ },
+ "Burning Order": {
+  "confidence": "high",
+  "description": "This Summer Courtesan deals triple damage this turn.",
+  "hide": false
+ },
+ "Bypass": {
+  "confidence": "low",
+  "description": "This damage ignores shields, Invulnerability, and other defenses that would otherwise block it.",
+  "hide": false
+ },
+ "Call Tides": {
+  "confidence": "high",
+  "description": "Zev'kir's rising tide — each stack empowers his water skills and unlocks stuns and Essence.",
+  "hide": false
+ },
+ "Capacitor Upgrade": {
+  "confidence": "high",
+  "description": "Stores bonus damage for Ando's next Expel Energy, then clears when it fires.",
+  "hide": false
+ },
+ "Catalytic Nova": {
+  "confidence": "high",
+  "description": "Stored power that adds damage to River Daughter's next Ripple, stacking infinitely.",
+  "hide": false
+ },
+ "Catalytic Nova Chain": {
+  "confidence": "medium",
+  "description": "River Daughter's next Ripple hits harder, and reusing Catalytic Nova next turn grants her Elemental Essence.",
+  "hide": false
+ },
+ "Chains of Atlantis": {
+  "confidence": "high",
+  "description": "Each stack bleeds 5 Affliction damage per turn and leaves the enemy open to Abyssal Grasp's stun.",
+  "hide": false
+ },
+ "Channel Earth": {
+  "confidence": "high",
+  "description": "Gaia's growing earth charge — each buildup strengthens Worldfist and Rampart's Shield and heals her minions.",
+  "hide": false
+ },
+ "Channel Vitality": {
+  "confidence": "high",
+  "description": "This ally is healed 10 HP whenever one of Gaia's minions acts this turn.",
+  "hide": false
+ },
+ "Charged": {
+  "confidence": "high",
+  "description": "Ando's skills are augmented and he ignores non-damage effects; using a skill Supercharges him for a stronger effect.",
+  "hide": false
+ },
+ "Chorus": {
+  "confidence": "high",
+  "description": "Ayana's angelic Chorus is active, sustained while either summoned Angel lives and ending when both fall.",
+  "hide": false
+ },
+ "Chronicle Deeds": {
+  "confidence": "high",
+  "description": "Invisibly watches this enemy — if it uses a new skill this turn, Tales to Tell gains 35 Shield.",
+  "hide": true
+ },
+ "Chronicle Fragments": {
+  "confidence": "high",
+  "description": "Stored shield salvage worth 10 each; Keeper of Fables' skills spend it and cost less per fragment.",
+  "hide": false
+ },
+ "Cinders": {
+  "confidence": "high",
+  "description": "Marked for Jarrik's flame — his skills Shatter, burn, and tax the bearer's Strategic skills.",
+  "hide": false
+ },
+ "Cinders Proc Lock": {
+  "confidence": "high",
+  "description": "Once-per-turn lock so Jarrik's Cinders bonus damage and Essence trigger only once each turn.",
+  "hide": true
+ },
+ "Cloister": {
+  "confidence": "high",
+  "description": "The Damage Reduction granted by Revered Daughter is doubled while this holds.",
+  "hide": false
+ },
+ "Cold and Alone": {
+  "confidence": "high",
+  "description": "Frost builds each turn spent Invulnerable or Isolated, stunning at 3 stacks and drawing Winter's Bite.",
+  "hide": false
+ },
+ "Compound Eyes": {
+  "confidence": "high",
+  "description": "Titania cannot be Blinded, Stunned, or have her skill costs changed.",
+  "hide": false
+ },
+ "Concealed": {
+  "confidence": "low",
+  "description": "The bearer is concealed, hidden from enemy view.",
+  "hide": false
+ },
+ "Corrosive Slam": {
+  "confidence": "high",
+  "description": "Charging a delayed 15 Affliction hit on the enemy team next turn — cancelled if this unit takes damage.",
+  "hide": false
+ },
+ "Curse of Darkness": {
+  "confidence": "high",
+  "description": "Each turn deals 15 Affliction and a Deepening Shadows stack; failing to act spreads the curse to an ally.",
+  "hide": false
+ },
+ "Curse of Fealty": {
+  "confidence": "high",
+  "description": "Deals 5 less non-Affliction damage while the Black Knight deals 5 more, and never counts as acting alongside him.",
+  "hide": false
+ },
+ "Curse of Thorns": {
+  "confidence": "high",
+  "description": "Burns Maggie for Affliction each turn, but fuels her shields and thorn skills.",
+  "hide": false
+ },
+ "Cursed Gift": {
+  "confidence": "high",
+  "description": "Either heals the bearer 20 HP each turn, or turns any healing they receive into Affliction damage.",
+  "hide": false
+ },
+ "Dancing Lights": {
+  "confidence": "high",
+  "description": "Jarrik is ablaze — Blade of Ashes strikes every enemy and his Cinder minions ignore harmful skills.",
+  "hide": false
+ },
+ "Dazzling Lights": {
+  "confidence": "high",
+  "description": "The first enemy to strike Frost-Covered Gommar has its skill costs spiked by 65 for a turn.",
+  "hide": false
+ },
+ "Dead or Alive": {
+  "confidence": "high",
+  "description": "The Black Knight ignores all new harmful skills, and while enhanced redirects allies' harmful skills onto himself.",
+  "hide": false
+ },
+ "Deal: Defeat Your Enemies": {
+  "confidence": "high",
+  "description": "The Hero deals more damage and ignores stuns and counters, but using a new skill burns them for Affliction.",
+  "hide": false
+ },
+ "Deal: Realize Your Potential": {
+  "confidence": "high",
+  "description": "The bearer's skills cost 1 less Specific and 1 less Generic, but using a new skill self-stuns them for a turn.",
+  "hide": false
+ },
+ "Deal: Save Your Friends": {
+  "confidence": "high",
+  "description": "This Hero's next Helpful skill also heals its targets 15 HP and makes them Invulnerable for a turn.",
+  "hide": false
+ },
+ "Deepening Shadows": {
+  "confidence": "high",
+  "description": "Amplifies Laria's night skills — each stack adds to their healing, damage, or detonation.",
+  "hide": false
+ },
+ "Deja Vu Watch": {
+  "confidence": "low",
+  "description": "A lingering sense of repetition, waiting for a past moment to recur.",
+  "hide": true
+ },
+ "Direct Energy Line": {
+  "confidence": "high",
+  "description": "Saya heals 10 whenever she gains Elemental Essence, and can be healed no other way.",
+  "hide": false
+ },
+ "Disarming Pitch": {
+  "confidence": "medium",
+  "description": "Scratch holds Shield and reflexively marks any enemy who uses a new skill on him for his Deal skills.",
+  "hide": false
+ },
+ "Dive": {
+  "confidence": "high",
+  "description": "River Daughter deals 10 piercing damage to enemies who use harmful skills, and empowers skills cast from it.",
+  "hide": false
+ },
+ "Dive Ripple": {
+  "confidence": "high",
+  "description": "Next turn River Daughter's skills surge — Ripple lasts longer, Undertow hits all enemies, and River Clone costs less.",
+  "hide": false
+ },
+ "Dive River Clone": {
+  "confidence": "high",
+  "description": "Next turn Ripple lingers longer, Undertow hits all enemies, and River Clone costs less.",
+  "hide": false
+ },
+ "Dive Undertow": {
+  "confidence": "high",
+  "description": "River Daughter's next-turn skills are empowered — Ripple lasts longer, Undertow hits all enemies, and River Clone costs less.",
+  "hide": false
+ },
+ "Divine Ire": {
+  "confidence": "high",
+  "description": "Ayana's Voice of Light deals 5 more damage per buildup, growing as enemies harm her allies.",
+  "hide": false
+ },
+ "Divinity Engine": {
+  "confidence": "high",
+  "description": "Sera ignores non-damage effects while her Synthetic Skyblade shields her and drains an extra Eyes of Vengeance stack.",
+  "hide": false
+ },
+ "Drakken": {
+  "confidence": "high",
+  "description": "Jarrik can no longer apply, trigger, or consume Cinders.",
+  "hide": false
+ },
+ "Drop of Moonglove": {
+  "confidence": "high",
+  "description": "If the marked enemy is healed, they permanently ignore healing and burn 15 Affliction each turn.",
+  "hide": false
+ },
+ "EMG Armed": {
+  "confidence": "low",
+  "description": "Armed and primed to release its stored effect.",
+  "hide": false
+ },
+ "EMG Fired": {
+  "confidence": "low",
+  "description": "Internal flag tracking that the EMG has already fired.",
+  "hide": true
+ },
+ "Eagle Acted": {
+  "confidence": "high",
+  "description": "Internal flag marking that Syl's Eagle has acted this turn.",
+  "hide": true
+ },
+ "Earth Pillar": {
+  "confidence": "high",
+  "description": "Marked for Roland's Boulders, which launch at it, and it can suffer Affliction over time.",
+  "hide": false
+ },
+ "Echoes of Desire": {
+  "confidence": "high",
+  "description": "The bearer's next skill will occur twice.",
+  "hide": false
+ },
+ "Electroblade": {
+  "confidence": "high",
+  "description": "Tagged for Ando's lightning — his skills chain to you, striking, Shattering, Bypassing, and Afflicting the marked.",
+  "hide": false
+ },
+ "Endless Night": {
+  "confidence": "high",
+  "description": "For two turns, every skill the allied team uses is Invisible.",
+  "hide": false
+ },
+ "Enhanced": {
+  "confidence": "high",
+  "description": "Saya's skills gain bonus effects while Enhanced.",
+  "hide": false
+ },
+ "Enhanced Saya Coil": {
+  "confidence": "high",
+  "description": "An empowered coil striking a random enemy for doubled damage each turn's end.",
+  "hide": false
+ },
+ "Ethereal Form": {
+  "confidence": "high",
+  "description": "The Black Knight's Ghostblade pierces, and he deals 10 extra damage the turn after ignoring a skill.",
+  "hide": false
+ },
+ "Evencoin": {
+  "confidence": "high",
+  "description": "The round's first killer's brand — tripling their effective Deepening Shadows and drawing extra Midnight Justice damage.",
+  "hide": false
+ },
+ "Evencoin Given": {
+  "confidence": "high",
+  "description": "Holding an Evencoin, the bearer counts as having triple its actual Deepening Shadows stacks.",
+  "hide": false
+ },
+ "Execution Sentence": {
+  "confidence": "high",
+  "description": "A death sentence — every skill the enemy uses burns a stack, and at zero they are instantly killed.",
+  "hide": false
+ },
+ "Exile": {
+  "confidence": "low",
+  "description": "Removed from the fight — using a skill would normally end this exiled state.",
+  "hide": false
+ },
+ "Eyes of Vengeance": {
+  "confidence": "high",
+  "description": "Marked for Sera's vengeance — her skills consume stacks for bonus damage, cooldown reductions, and effects.",
+  "hide": false
+ },
+ "Faustian Bargain": {
+  "confidence": "high",
+  "description": "Scratch's next deal withholds its positive effect from enemies and its Triggered effect from allies.",
+  "hide": false
+ },
+ "Faustian: no-trigger": {
+  "confidence": "low",
+  "description": "Internal bookkeeping lock that keeps the Faustian deal from triggering.",
+  "hide": true
+ },
+ "Final Breath": {
+  "confidence": "high",
+  "description": "The first time Jarrik would die, he becomes Immortal for one turn instead.",
+  "hide": false
+ },
+ "Five Plagues": {
+  "confidence": "high",
+  "description": "Each stack raises the chance Titania's Affliction damage inflicts a random plague effect.",
+  "hide": false
+ },
+ "Flames of Judgment": {
+  "confidence": "high",
+  "description": "Pyrrha's judgment mounting toward execution — at 7 stacks, Judgment Day instantly kills you.",
+  "hide": false
+ },
+ "Flat Design": {
+  "confidence": "medium",
+  "description": "Marks an ally Character Development already aided this round, so aiding them again earns Keeper no Essence.",
+  "hide": false
+ },
+ "Forced Harmony": {
+  "confidence": "high",
+  "description": "If it damages Taryn's allies, it takes double damage from her next Inspiring Thrust.",
+  "hide": false
+ },
+ "Fox Fire": {
+  "confidence": "high",
+  "description": "Marked by Fate's flame; using or receiving a Harmful skill burns enemies or heals allies.",
+  "hide": false
+ },
+ "Fox's Cunning": {
+  "confidence": "high",
+  "description": "Use a new skill and you catch Fox Fire; stay idle and your cooldowns are paralyzed for 2 turns.",
+  "hide": false
+ },
+ "Frost-Covered": {
+  "confidence": "high",
+  "description": "Gommar's skills are enhanced, and while frost clings to him he ignores non-damage effects.",
+  "hide": false
+ },
+ "Gift Malice": {
+  "confidence": "medium",
+  "description": "Titania's Gift from the Fae is toggled to its harmful version.",
+  "hide": false
+ },
+ "Godly Wisdom": {
+  "confidence": "high",
+  "description": "Counts enemy triggers of Voice of Light or Prayer; every third makes Ayana auto-cast Voice of Glory.",
+  "hide": false
+ },
+ "Grasping Vines": {
+  "confidence": "high",
+  "description": "Vines close in — the bearer takes 15 damage next turn and is stunned if they act.",
+  "hide": false
+ },
+ "Guardian Suppressed": {
+  "confidence": "medium",
+  "description": "Guardian at the Gates is switched off this turn because Taryn dealt damage.",
+  "hide": false
+ },
+ "HS-112 Fury Serum": {
+  "confidence": "high",
+  "description": "Anyone Dennis damages, or who damages Dennis, is Taunted for a turn.",
+  "hide": false
+ },
+ "HS-46 Ascendant Serum": {
+  "confidence": "high",
+  "description": "Dennis shrugs off non-damage effects while his Big Green Fist strikes for extra damage.",
+  "hide": false
+ },
+ "HS-88 Reconstitution Serum": {
+  "confidence": "high",
+  "description": "Heals Dennis 5 HP each turn, more with every stack.",
+  "hide": false
+ },
+ "Hallowed Proc Lock": {
+  "confidence": "high",
+  "description": "Internal once-per-turn lock for Hallowed Footsteps' bonus damage and healing.",
+  "hide": true
+ },
+ "Hand of Michael": {
+  "confidence": "high",
+  "description": "Doomed to take 30 damage next turn; using a harmful skill is Countered for 15 more.",
+  "hide": false
+ },
+ "Heavenly Parry": {
+  "confidence": "high",
+  "description": "Using a Harmful skill triggers 25 Piercing damage and an Eyes of Vengeance stack; the enemy also deals 10 reduced damage next turn.",
+  "hide": false
+ },
+ "Hive Formation": {
+  "confidence": "high",
+  "description": "Grants Compound Eyes and can absorb the Taunt redirect from Titania's Barbed Wit.",
+  "hide": false
+ },
+ "Hunger for Battle: Fed": {
+  "confidence": "high",
+  "description": "The Black Knight deals 5 more damage per stack, lost if he ends a turn dealing none.",
+  "hide": false
+ },
+ "Hysteria Serum": {
+  "confidence": "high",
+  "description": "Permanently Isolated, and takes 20 Affliction damage whenever they use a Helpful skill.",
+  "hide": false
+ },
+ "Icebite Briars": {
+  "confidence": "high",
+  "description": "Maggie's hits weaken enemy damage for a turn, while her own Curse of Thorns stops hurting her.",
+  "hide": false
+ },
+ "Iced Shelf": {
+  "confidence": "high",
+  "description": "Keeper of Fables and its target share a stun until any Helpful or Harmful skill breaks it for all.",
+  "hide": false
+ },
+ "Icy Shrapnel": {
+  "confidence": "low",
+  "description": "Embedded shards of ice that leave the bearer wounded and exposed.",
+  "hide": false
+ },
+ "Icy Smile": {
+  "confidence": "high",
+  "description": "If the marked enemy takes new damage this turn, they are stunned and the attacker gains Elemental Essence.",
+  "hide": false
+ },
+ "In Between CD": {
+  "confidence": "high",
+  "description": "Marks In Between on cooldown, blocking Laria's Harmful-ignore trigger.",
+  "hide": true
+ },
+ "Inspiring Thrust": {
+  "confidence": "high",
+  "description": "Allies who land a new harmful skill on this marked enemy gain Elemental Essence.",
+  "hide": false
+ },
+ "King's Saddle": {
+  "confidence": "high",
+  "description": "Bjorn is stunned but soaks the damage Gommar would take, answering consumed Frost-Covered with Sovereign's Howl.",
+  "hide": false
+ },
+ "Know Your Fate": {
+  "confidence": "high",
+  "description": "Ignores non-damage effects and pays no skill costs, then is killed when it expires.",
+  "hide": false
+ },
+ "Lens": {
+  "confidence": "high",
+  "description": "This Prismari Ranger is aiming; allies can reflect their skills through it, amplified.",
+  "hide": false
+ },
+ "Lens Applied": {
+  "confidence": "low",
+  "description": "A focusing lens is active, amplifying effects on the bearer.",
+  "hide": false
+ },
+ "Lens Target": {
+  "confidence": "medium",
+  "description": "Designated as the Prismari Rangers' Lens target, so their reflected and redirected skills strike this enemy.",
+  "hide": false
+ },
+ "Lens of the Deep": {
+  "confidence": "high",
+  "description": "For its next two turns it takes double damage from reflected skills.",
+  "hide": false
+ },
+ "Leyline Decay Suppressed": {
+  "confidence": "high",
+  "description": "Leyline Nest's cost falls when Stormchaser gains Elemental Essence instead of each turn.",
+  "hide": false
+ },
+ "Light of Raphael": {
+  "confidence": "high",
+  "description": "Zephyrex holds 20 Shield and his Elegant Sweep strikes instantly.",
+  "hide": false
+ },
+ "Lightning Rod": {
+  "confidence": "high",
+  "description": "Saya shocks a random enemy each turn, hitting harder as Elemental Essence energy charges the rod.",
+  "hide": false
+ },
+ "Lingering Spores": {
+  "confidence": "high",
+  "description": "Ticks 5 Affliction each turn on enemies (5 healing on allies) and hastens Dennis's Serums.",
+  "hide": false
+ },
+ "Living Stone": {
+  "confidence": "high",
+  "description": "Bound to Roland's stone — the bearer is shielded and healed each turn, empowering his stone skills on it.",
+  "hide": false
+ },
+ "Magnetized": {
+  "confidence": "high",
+  "description": "The marked Boulder taunts all enemies, then deals double damage to whatever it strikes next turn.",
+  "hide": false
+ },
+ "Mammon's Flame": {
+  "confidence": "high",
+  "description": "Each use escalates Mammon's Flame, raising its energy cost and the damage dealt to the target and Pyrrha.",
+  "hide": false
+ },
+ "Mark the Path": {
+  "confidence": "high",
+  "description": "Roland's allies Bypass defenses when attacking this enemy, and Final Warning can strike it.",
+  "hide": false
+ },
+ "Marked": {
+  "confidence": "medium",
+  "description": "Bound by one of Scratch's Deals — triggering it feeds him Essence, letting it expire feeds you.",
+  "hide": false
+ },
+ "Mentorship": {
+  "confidence": "high",
+  "description": "Gains 5 damage and 5 Damage Reduction, and gathers Elemental Essence from combat events.",
+  "hide": false
+ },
+ "Mentorship: dealt": {
+  "confidence": "high",
+  "description": "Internal counter tracking damage dealt for Keeper of Fables' mentorship.",
+  "hide": true
+ },
+ "Mentorship: invuln": {
+  "confidence": "low",
+  "description": "Internal flag tracking a mentorship-granted invulnerability between Keeper of Fables and his allies.",
+  "hide": true
+ },
+ "Mentorship: stunned": {
+  "confidence": "high",
+  "description": "Internal flag marking that this mentored ally already earned Essence from being stunned.",
+  "hide": true
+ },
+ "Mentorship: taken": {
+  "confidence": "high",
+  "description": "Internal counter tracking Mentorship damage taken.",
+  "hide": true
+ },
+ "Mindfog Serum": {
+  "confidence": "high",
+  "description": "Dennis ignores stuns and counters for 3 turns, though his cooldowns are raised.",
+  "hide": false
+ },
+ "Mirage Trap: Strategic": {
+  "confidence": "high",
+  "description": "Aramao will counter the first Strategic skill this enemy uses.",
+  "hide": false
+ },
+ "Mirage Trap: non-Strategic": {
+  "confidence": "high",
+  "description": "Aramao is poised to counter this enemy's next non-Strategic skill.",
+  "hide": false
+ },
+ "Mooncursed": {
+  "confidence": "high",
+  "description": "Strategic skills stunned, deals 5 more non-Affliction damage, and suffers 10 Affliction each turn.",
+  "hide": false
+ },
+ "Mutated Strain": {
+  "confidence": "high",
+  "description": "A reversed, supercharged pathogen: it stuns first, then doubly weakens, then deals fivefold damage.",
+  "hide": false
+ },
+ "Nightcloak Candle": {
+  "confidence": "high",
+  "description": "The marked ally's skills deal 5 more non-Affliction damage, and enemies who attack them are punished.",
+  "hide": false
+ },
+ "Not Today": {
+  "confidence": "high",
+  "description": "For 1 turn, harmful skills aimed at this ally are reflected onto Taryn instead.",
+  "hide": false
+ },
+ "Oathbreaker Primary": {
+  "confidence": "low",
+  "description": "Designates the primary target of Oathbreaker's effect.",
+  "hide": false
+ },
+ "Ominous Rumble": {
+  "confidence": "high",
+  "description": "Zephyrex's storm-marked target, automatically struck by Arcadian Duet and Jolt and feeding him Essence.",
+  "hide": false
+ },
+ "Once More: Revived": {
+  "confidence": "low",
+  "description": "Marks that a Once More revival has already been used.",
+  "hide": true
+ },
+ "Opposites Attract": {
+  "confidence": "high",
+  "description": "Helpful skills on this enemy reflect to Ando, and damage to Ando reflects back to it.",
+  "hide": false
+ },
+ "Overclock": {
+  "confidence": "high",
+  "description": "Ando loops his charge — each Supercharged skill drops him back to Charged and grants Elemental Essence.",
+  "hide": false
+ },
+ "Overwatch": {
+  "confidence": "high",
+  "description": "Marked for Orbital Strike, which deals 20 Bypassing damage to all Overwatch-marked enemies.",
+  "hide": false
+ },
+ "Pain Tolerance": {
+  "confidence": "high",
+  "description": "Each stack sharpens Dennis's Big Green Fist, adding 5 damage per stack.",
+  "hide": false
+ },
+ "Pain Tolerance Essence": {
+  "confidence": "high",
+  "description": "Hector treats this Hero as Dennis, redirecting his Dennis skills here and skipping his minion.",
+  "hide": false
+ },
+ "Panacea Cycle": {
+  "confidence": "high",
+  "description": "Counts down Ayana's cleanse cycle — every third turn she sheds all enemy effects at turn's end.",
+  "hide": false
+ },
+ "Panic Armed": {
+  "confidence": "high",
+  "description": "Saya's next Stroke of Genius will detonate all her inventions for Piercing damage and Shield.",
+  "hide": false
+ },
+ "Panic Spent": {
+  "confidence": "low",
+  "description": "Marks that Saya has already spent her panic bonus this battle.",
+  "hide": true
+ },
+ "Perfect Execution": {
+  "confidence": "medium",
+  "description": "Builds with each flawless piercing strike, sustaining Zephyrex's Perfection and his chain of executions.",
+  "hide": false
+ },
+ "Perfection": {
+  "confidence": "high",
+  "description": "Zephyrex is immune to stuns and keeps Perfect Execution usable; letting it expire disables that skill.",
+  "hide": false
+ },
+ "Perfection Locked": {
+  "confidence": "low",
+  "description": "Perfection is locked, preventing any further progress toward it.",
+  "hide": false
+ },
+ "Personal Magnetism": {
+  "confidence": "high",
+  "description": "Saya counters this enemy's next skill; on success it loses Elemental Essence and gains a matching Magnetic Charge.",
+  "hide": false
+ },
+ "Plasma Charge": {
+  "confidence": "medium",
+  "description": "Saya's charged shield absorbs affliction, and damage to it grants her Elemental Essence.",
+  "hide": false
+ },
+ "Prance": {
+  "confidence": "high",
+  "description": "Tracks Elemental Essence traded through Prance, spent by Summer Clique to summon Courtesans.",
+  "hide": false
+ },
+ "Prance Watch": {
+  "confidence": "high",
+  "description": "For one turn, the first unit to use a new skill on Titania gains Elemental Essence.",
+  "hide": false
+ },
+ "Prayer": {
+  "confidence": "high",
+  "description": "Ayana's blessing rests on this ally — if they take new damage next turn, Ayana gains Elemental Essence.",
+  "hide": false
+ },
+ "Prism Sentence": {
+  "confidence": "high",
+  "description": "Stunned for two turns, taking double damage from Voice of Light (which also spreads to allies); invisible skills become visible.",
+  "hide": false
+ },
+ "Prisma Launch: Bypass": {
+  "confidence": "low",
+  "description": "Internal flag that bypasses the Prisma Launch step.",
+  "hide": true
+ },
+ "Prisma Vault": {
+  "confidence": "medium",
+  "description": "Prisma Crimson is invulnerable for one turn behind the defensive vault.",
+  "hide": false
+ },
+ "Prisma Whirl": {
+  "confidence": "high",
+  "description": "The first enemy to use a Harmful skill takes 10 Piercing damage.",
+  "hide": false
+ },
+ "Prisma Whirl Barrage": {
+  "confidence": "low",
+  "description": "The bearer is caught in a whirling barrage of prismatic strikes.",
+  "hide": false
+ },
+ "Prod": {
+  "confidence": "high",
+  "description": "Goaded — the enemy's next skill used on Zephyrex deals 10 more damage.",
+  "hide": false
+ },
+ "Protect Me!": {
+  "confidence": "high",
+  "description": "Harmful skills used on Hector are reflected onto Dennis for the turn.",
+  "hide": false
+ },
+ "Radiant Glory": {
+  "confidence": "high",
+  "description": "The hero's Stalwart Shield and Inspiring Thrust also cast Refrain on their target.",
+  "hide": false
+ },
+ "RangersAlive": {
+  "confidence": "high",
+  "description": "Tracks the living Prismari Rangers; the hero falls only when all three are gone.",
+  "hide": false
+ },
+ "Reanimated": {
+  "confidence": "high",
+  "description": "Revived as the Black Knight's thrall with Strategic skills permanently stunned, granting him 15 DR.",
+  "hide": false
+ },
+ "Refrain": {
+  "confidence": "high",
+  "description": "On an enemy, silences their harmful skills; on an ally, heals them each time they act.",
+  "hide": false
+ },
+ "Repulse": {
+  "confidence": "high",
+  "description": "Zev'kir counters the first harmful skill the bearer receives.",
+  "hide": true
+ },
+ "Rev Uses": {
+  "confidence": "high",
+  "description": "Internal counter tracking Rev uses, scaling Capacitor Upgrade generation up to three.",
+  "hide": true
+ },
+ "Rising Geyser": {
+  "confidence": "high",
+  "description": "Linked to other marked enemies — all new damage you receive is replicated to them.",
+  "hide": false
+ },
+ "Rising Indignation": {
+  "confidence": "high",
+  "description": "Each stack cuts the cost of Gaia's Fury; at three stacks it fires automatically.",
+  "hide": false
+ },
+ "Ritual Power": {
+  "confidence": "high",
+  "description": "Charges a hero's Ritual toward the threshold that unleashes its devastating effect.",
+  "hide": false
+ },
+ "Ritual Unleashed": {
+  "confidence": "high",
+  "description": "Xyris gains Ritual Power on every Essence gain, cutting all cooldowns at 75.",
+  "hide": false
+ },
+ "Ritual of Agony": {
+  "confidence": "high",
+  "description": "Pyrrha's Ritual gains Ritual Power from every hit and death, building toward permanently doubled damage for all units.",
+  "hide": false
+ },
+ "River Clone": {
+  "confidence": "high",
+  "description": "An invisible clone counters the first harmful skill against the bearer, then triggers River Daughter's Ripple.",
+  "hide": false
+ },
+ "Sacred Grove": {
+  "confidence": "high",
+  "description": "Allies heal 5 each turn until they attack; enemy attackers get marked for Gaia's Expel Intruders.",
+  "hide": false
+ },
+ "Saya Coil": {
+  "confidence": "high",
+  "description": "Each active coil zaps a random enemy for 10 damage at the end of every turn.",
+  "hide": false
+ },
+ "Scan of the All-Knowing": {
+  "confidence": "high",
+  "description": "Eyes of Vengeance also triggers from Strategic skills while this lasts.",
+  "hide": false
+ },
+ "Shadow Cross": {
+  "confidence": "high",
+  "description": "Marked by Laria — Shadow Strike deals increased damage to this enemy until end of turn.",
+  "hide": false
+ },
+ "Shadow Rebound": {
+  "confidence": "high",
+  "description": "The first harmful skill used on this ally is reflected back at its caster.",
+  "hide": false
+ },
+ "Shadow Seekers": {
+  "confidence": "high",
+  "description": "New damage from Syl or her Eagle stuns the marked enemy's non-Strategic skills.",
+  "hide": false
+ },
+ "Silent Avenger": {
+  "confidence": "high",
+  "description": "Ando instantly Supercharges when an ally dies, and Penance strikes through Shield as Piercing.",
+  "hide": false
+ },
+ "Singularity": {
+  "confidence": "high",
+  "description": "For 2 turns, Ando casts Electroblade on enemies going Invulnerable and Flash Step on harmful attackers.",
+  "hide": false
+ },
+ "Skylance Empowered": {
+  "confidence": "low",
+  "description": "Skylance is empowered, strengthening its next use.",
+  "hide": false
+ },
+ "Somersault: Prisma Launch": {
+  "confidence": "low",
+  "description": "Internal flag noting a Prisma Launch somersault has fired this turn.",
+  "hide": true
+ },
+ "Somersault: Prisma Vault": {
+  "confidence": "low",
+  "description": "Internal flag marking the Prisma Vault somersault state.",
+  "hide": true
+ },
+ "Somersault: Prisma Whirl": {
+  "confidence": "low",
+  "description": "Flags that the Prismari Ranger's Prisma Whirl somersault is ready to react.",
+  "hide": true
+ },
+ "Somnic Watch": {
+  "confidence": "high",
+  "description": "Xyris will counter this enemy's next Harmful skill, spawning a Dream Reflection that copies it.",
+  "hide": false
+ },
+ "Soulsteal": {
+  "confidence": "high",
+  "description": "The bearer becomes Invulnerable for a turn at the end of each of their next three turns.",
+  "hide": false
+ },
+ "Spectral Growth": {
+  "confidence": "high",
+  "description": "Maggie's damaging skills consume these stacks to heal her 5 HP each.",
+  "hide": false
+ },
+ "Spider Mine": {
+  "confidence": "high",
+  "description": "An attached mine detonates for 15 damage the moment the bearer uses a new skill.",
+  "hide": false
+ },
+ "Spirit Away": {
+  "confidence": "high",
+  "description": "When Laria triggers In Between, its effects also strike the marked hero — enemies first take 25 true damage.",
+  "hide": false
+ },
+ "Stalwart Shield": {
+  "confidence": "high",
+  "description": "Shielded by Taryn — harmful skills against the bearer reflect back to him, and it can heal or grant invulnerability on ending.",
+  "hide": false
+ },
+ "Stonefield Stalker": {
+  "confidence": "high",
+  "description": "Charges built from Earth Pillars and Boulders, spent to extend how long Roland stays Mooncursed.",
+  "hide": false
+ },
+ "Stoneform": {
+  "confidence": "high",
+  "description": "Hardened to stone — Boulders launched by Strength From The Earth deal double damage.",
+  "hide": false
+ },
+ "Stun Immunity": {
+  "confidence": "high",
+  "description": "Jarrik cannot be stunned or countered.",
+  "hide": false
+ },
+ "Sulphur Vent": {
+  "confidence": "high",
+  "description": "Pyrrha counters the first enemy to use a skill on her, adding Fan the Flames to them.",
+  "hide": false
+ },
+ "Supercharged": {
+  "confidence": "high",
+  "description": "Ando is at peak charge — his skills are fully augmented, striking all enemies and dealing bonus damage.",
+  "hide": false
+ },
+ "Sweet Torment": {
+  "confidence": "high",
+  "description": "Permanently raises Maggie's non-Affliction damage by 5 per stack, gained each time she harms an ally.",
+  "hide": false
+ },
+ "Syl Acted": {
+  "confidence": "high",
+  "description": "Internal flag marking that Syl has acted this turn.",
+  "hide": true
+ },
+ "TINTE Armed": {
+  "confidence": "high",
+  "description": "The next lethal blow to Fate or an ally is denied, reviving them to 40 HP.",
+  "hide": false
+ },
+ "TINTE Spent": {
+  "confidence": "low",
+  "description": "Internal flag marking that Fate's TINTE has already been spent.",
+  "hide": true
+ },
+ "The Nightmare Rides": {
+  "confidence": "high",
+  "description": "The Black Knight is invulnerable while his Oathbreaker Strike hits every enemy, always enhanced.",
+  "hide": false
+ },
+ "The Storm Builds": {
+  "confidence": "high",
+  "description": "Storm charge that Galazax's skills relocate and consume to unleash Piercing damage.",
+  "hide": false
+ },
+ "The Whimsy Engine": {
+  "confidence": "high",
+  "description": "Skills misfire — any skill the bearer uses becomes a random one aimed at random targets.",
+  "hide": false
+ },
+ "This Is Not The End": {
+  "confidence": "high",
+  "description": "The next time Fate or an ally would die, they instead revive at 40 HP, healing more per Fox Fire.",
+  "hide": false
+ },
+ "To Your Health!": {
+  "confidence": "high",
+  "description": "For 2 turns, if this enemy uses any skill they take 15 Affliction damage and are stunned for 1 turn.",
+  "hide": false
+ },
+ "To the Skies": {
+  "confidence": "high",
+  "description": "While active, Talon Rake stuns its target and Soar lasts an extra turn.",
+  "hide": false
+ },
+ "Trial of the Sands": {
+  "confidence": "high",
+  "description": "For 3 turns Aramao's team Veils each turn while he counters attackers with Desert Knife.",
+  "hide": false
+ },
+ "Twisted Nightmares": {
+  "confidence": "high",
+  "description": "The enemy's AOE skills are reduced to single-target.",
+  "hide": false
+ },
+ "Undertow Stun": {
+  "confidence": "high",
+  "description": "Primes Undertow to stun its target next turn.",
+  "hide": false
+ },
+ "Universal Energy Conduit": {
+  "confidence": "high",
+  "description": "Each stack feeds Saya's Prismatic Energy Cannon for +10 damage while channeling Elemental Essence to her allies.",
+  "hide": false
+ },
+ "Verse of Accusation": {
+  "confidence": "high",
+  "description": "Until the end of Taryn's next turn, his Banner of Harmony reaches every enemy.",
+  "hide": false
+ },
+ "Voice of Glory": {
+  "confidence": "high",
+  "description": "Each stack permanently extends Voice of Light and Prayer by one turn.",
+  "hide": false
+ },
+ "Voice of Light": {
+  "confidence": "high",
+  "description": "Marked by Ayana's light; dealing new damage triggers her Essence gain and retribution.",
+  "hide": false
+ },
+ "Will-o'-wisp": {
+  "confidence": "high",
+  "description": "Fate's team holds 10 Shield, and enemies who strike them with new Harmful skills take 10 Affliction damage.",
+  "hide": false
+ },
+ "Wind Dancer": {
+  "confidence": "low",
+  "description": "The bearer moves with wind-swift, dancing grace.",
+  "hide": false
+ },
+ "Wind Step Window": {
+  "confidence": "low",
+  "description": "An open window during which a Wind Step response can be triggered.",
+  "hide": true
+ },
+ "Wraith in White": {
+  "confidence": "high",
+  "description": "Pyrrha ignores non-damage effects, burns the enemy team for 5 Affliction each turn, and empowers Pyrokinesis.",
+  "hide": false
+ },
+ "chargeHandled": {
+  "confidence": "high",
+  "description": "Internal flag marking that Ando's charge state has already been resolved this turn.",
+  "hide": true
+ },
+ "noOverclockConvert": {
+  "confidence": "low",
+  "description": "Internal flag blocking Ando's Overclock from converting his Charge state this step.",
+  "hide": true
+ }
+}

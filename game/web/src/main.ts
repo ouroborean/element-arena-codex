@@ -59,6 +59,8 @@ function showFx(el: HTMLElement): void {
   const b = document.createElement("b"); b.textContent = el.dataset.fxtitle ?? "";
   const body = document.createElement("div"); body.textContent = el.dataset.fxbody ?? "";
   fxpop.append(b, body);
+  const dur = el.dataset.fxdur;
+  if (dur) { const d = document.createElement("div"); d.className = "fxdur"; d.textContent = `⏳ ${dur}`; fxpop.append(d); }
   fxpop.hidden = false;
   const r = el.getBoundingClientRect(), pw = fxpop.offsetWidth;
   fxpop.style.left = `${Math.max(6, Math.min(window.innerWidth - pw - 6, r.left + r.width / 2 - pw / 2))}px`;

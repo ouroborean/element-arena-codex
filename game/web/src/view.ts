@@ -10,6 +10,7 @@ import { ROSTER } from "../../engine/content/roster.generated.ts";
 import { heroPortrait, iconOf, minionPortrait, elColor } from "./assets.ts";
 import { SKILL_TEXT } from "./skilltext.generated.ts";
 import { STATUS_SOURCE } from "./statussource.generated.ts";
+import { EFFECT_DESC, EFFECT_HIDE } from "./effectdesc.generated.ts";
 import type { UiState } from "./main.ts";
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
@@ -22,14 +23,15 @@ const HIDDEN_KINDS = new Set<Status["kind"]>(["conditional_bypass", "stack_read_
 // Kinds that read as a debuff (red) vs a buff (green); anything else is a neutral "state" chip.
 const BAD_KINDS = new Set<Status["kind"]>(["dot", "stun", "blind", "silence", "paralysis", "taunt", "heal_lock", "heal_becomes_damage", "dies_at_max", "veiled"]);
 const GOOD_KINDS = new Set<Status["kind"]>(["regen", "stack", "damage_reduction", "invulnerable", "immortal", "damage_ignore", "non_damage_ignore", "revive_ward", "uncounterable", "damage_becomes_heal", "elemental_essence"]);
-const durStr = (s: Status) => s.duration === null ? "for the round" : typeof s.duration === "number" && s.duration > 0 ? `${s.duration} turn${s.duration > 1 ? "s" : ""} left` : "";
+// A round-permanent effect (duration null) reads as "Permanent"; a timed one shows turns remaining.
+const durStr = (s: Status) => s.duration === null ? "Permanent" : typeof s.duration === "number" && s.duration > 0 ? `${s.duration} turn${s.duration > 1 ? "s" : ""} remaining` : "";
 const skillName = (id?: string) => (id && SKILL_TEXT[id] ? SKILL_TEXT[id]!.n : undefined);
 const signed = (n: number) => `${n > 0 ? "+" : ""}${n}`;
 
 /** A precise, concise account of what THIS individual status is doing right now — keyed on the status's own
  *  fields (kind / magnitude / dtype / name / scope / unitRef), so two effects from one skill read distinctly.
  *  `src` is the id of the skill/passive that applied it (only used to attribute the source name). */
-function effectDesc(state: MatchState, s: Status, src?: string): { title: string; body: string } {
+function effectDesc(state: MatchState, s: Status, src?: string): { title: string; body: string; dur: string } {
   const srcName = skillName(src);
   const mag = s.magnitude ?? 0, dt = s.dtype ?? "affliction";
   const unitName = s.unitRef ? shortName(state.units[s.unitRef]?.name ?? "a unit") : undefined;
@@ -39,8 +41,10 @@ function effectDesc(state: MatchState, s: Status, src?: string): { title: string
   switch (s.kind) {
     case "dot": body = `Deals ${mag} ${dt} damage each turn.`; break;
     case "regen": body = `Restores ${mag} HP each turn.`; break;
-    case "stack": body = `${mag} stack${mag === 1 ? "" : "s"} of ${s.name ?? "a resource"}.`; break;
-    case "mark": body = "A marker other skills read."; break;
+    // Marks/stacks are opaque named effects; their meaning is authored (what HOLDING it does), not the
+    // applying skill's action. The stack's live count shows on the chip badge, so the text describes the resource.
+    case "stack": body = (s.name && EFFECT_DESC[s.name]) || `${mag} stack${mag === 1 ? "" : "s"} of ${s.name ?? "a resource"}.`; break;
+    case "mark": body = (s.name && EFFECT_DESC[s.name]) || "A marker other skills read."; break;
     case "stun": body = s.scope ? `Can't use ${s.scope.mode === "only" ? "" : "non-"}${s.scope.tag} skills.` : "Stunned — can't use skills."; break;
     case "blind": body = "Single-target skills strike a random target."; break;
     case "invulnerable": body = "Can't be targeted by new harmful skills."; break;
@@ -75,8 +79,7 @@ function effectDesc(state: MatchState, s: Status, src?: string): { title: string
   }
   // Attribute the source, unless the title already IS the source name (avoids "Frost-Covered (from Frost-Covered)").
   if (srcName && title !== srcName && s.kind !== "mark" && s.kind !== "stack") body = `${body} (from ${srcName})`;
-  const d = durStr(s); if (d) body = `${body.trim()} ${d.charAt(0).toUpperCase()}${d.slice(1)}.`;
-  return { title, body: body.trim() };
+  return { title, body: body.trim(), dur: durStr(s) };
 }
 
 /**
@@ -99,12 +102,13 @@ function effectIcons(state: MatchState, u: Unit): string {
   const seen = new Set<string>(); const out: string[] = [];
   for (const s of u.statuses) {
     if (HIDDEN_KINDS.has(s.kind)) continue; // pure plumbing — no chip
+    if (s.name && EFFECT_HIDE.has(s.name)) continue; // internal bookkeeping flag (Acted, Proc Lock, …)
     const key = `${s.kind}:${s.name ?? ""}`; if (seen.has(key)) continue; seen.add(key);
     const src = statusSource(state, s);
     const icon = src ? iconOf(src) : null;
-    const { title, body } = effectDesc(state, s, src);
+    const { title, body, dur } = effectDesc(state, s, src);
     const tone = BAD_KINDS.has(s.kind) ? "bad" : GOOD_KINDS.has(s.kind) ? "good" : "state";
-    out.push(`<span class="fx ${tone}" data-fxtitle="${esc(title)}" data-fxbody="${esc(body)}">${icon ? `<img src="${icon}" ${IMG_FALLBACK} />` : `<span class="fx-abbr">${esc((s.name ?? s.kind)[0]!.toUpperCase())}</span>`}${s.kind === "stack" && (s.magnitude ?? 0) > 1 ? `<span class="fx-n">${s.magnitude}</span>` : ""}</span>`);
+    out.push(`<span class="fx ${tone}" data-fxtitle="${esc(title)}" data-fxbody="${esc(body)}" data-fxdur="${esc(dur)}">${icon ? `<img src="${icon}" ${IMG_FALLBACK} />` : `<span class="fx-abbr">${esc((s.name ?? s.kind)[0]!.toUpperCase())}</span>`}${s.kind === "stack" && (s.magnitude ?? 0) > 1 ? `<span class="fx-n">${s.magnitude}</span>` : ""}</span>`);
   }
   return out.length ? `<div class="fxrow">${out.slice(0, 6).join("")}</div>` : "";
 }
