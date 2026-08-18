@@ -19,11 +19,10 @@ export interface UiState {
   phase: "plan" | "busy" | "over";
   phaseLabel: string;
   hint: string;
-  selectedUnit?: string;
-  targeting?: { skillId: string; skillName: string };
+  targeting?: { unitId: string; skillId: string; skillName: string };
   legalTargets: Set<string>;
   planned: Map<string, Action>;
-  plannedLabel: Map<string, string>;
+  plannedSkill: Map<string, string>; // unitId -> chosen skill id (to highlight its tile)
   overlay?: string;
   resolveTurn?: (actions: Action[]) => void;
 }
@@ -41,14 +40,14 @@ const living = (s: MatchState, side: TeamId): Unit[] =>
 
 const app = document.getElementById("app")!;
 let state: MatchState;
-let setup: { picked: string[]; oppo: string[] } | null = null;
+let setup: { picked: string[]; oppo: string[]; inspect: string | null } | null = null;
 const ui: UiState = {
   you: "A", phase: "busy", phaseLabel: "starting…", hint: "",
-  legalTargets: new Set(), planned: new Map(), plannedLabel: new Map(),
+  legalTargets: new Set(), planned: new Map(), plannedSkill: new Map(),
 };
 
 function render(): void { app.innerHTML = renderApp(state, ui); }
-function showSetup(): void { setup = { picked: [], oppo: randomTeam([]) }; app.innerHTML = renderSetup(setup); }
+function showSetup(): void { setup = { picked: [], oppo: randomTeam([]), inspect: null }; app.innerHTML = renderSetup(setup); }
 
 function targetsFor(u: Unit, skillId: string): Set<string> {
   const skill = (u.skills ?? []).find((s) => s.id === skillId)!;
@@ -59,10 +58,9 @@ function targetsFor(u: Unit, skillId: string): Set<string> {
   return new Set(legalTargets(state, u, skill, pool, Rng.fromState(state.rngState)).map((x) => x.id));
 }
 
-function queue(unitId: string, skillId: string, targets: string[] | undefined, label: string): void {
+function queue(unitId: string, skillId: string, targets: string[] | undefined): void {
   ui.planned.set(unitId, { unit: unitId, skillId, targets });
-  ui.plannedLabel.set(unitId, label);
-  ui.selectedUnit = undefined;
+  ui.plannedSkill.set(unitId, skillId);
   ui.targeting = undefined;
   ui.legalTargets = new Set();
   render();
@@ -70,12 +68,13 @@ function queue(unitId: string, skillId: string, targets: string[] | undefined, l
 
 // ── interaction (event delegation) ───────────────────────────────────────────────────────────────── //
 app.addEventListener("click", (e) => {
-  const el = (e.target as HTMLElement).closest<HTMLElement>("[data-unit],[data-skill],[data-target],[data-cancel],[data-resolve],[data-pick],[data-reroll],[data-start]");
+  const el = (e.target as HTMLElement).closest<HTMLElement>("[data-owner],[data-skill],[data-target],[data-cancel],[data-resolve],[data-surrender],[data-pick],[data-inspect],[data-reroll],[data-start]");
   if (!el) return;
   const d = el.dataset;
 
   if (setup) { // team-select screen
-    if (d.pick) {
+    if (d.inspect) { setup.inspect = d.inspect; app.innerHTML = renderSetup(setup); }
+    else if (d.pick) { // add / remove (detail button or a tray slot)
       const i = setup.picked.indexOf(d.pick);
       if (i >= 0) setup.picked.splice(i, 1);
       else if (setup.picked.length < 3) setup.picked.push(d.pick);
@@ -91,22 +90,21 @@ app.addEventListener("click", (e) => {
     return;
   }
 
+  if (d.surrender) { if (confirm("Surrender this match?")) location.reload(); return; }
   if (ui.phase !== "plan") return;
-  if (d.unit) { ui.selectedUnit = d.unit; ui.targeting = undefined; render(); }
-  else if (d.cancel) { ui.targeting = undefined; ui.legalTargets = new Set(); render(); }
-  else if (d.resolve) commitTurn();
-  else if (d.skill && ui.selectedUnit) {
-    const u = state.units[ui.selectedUnit]!;
+  if (d.cancel) { ui.targeting = undefined; ui.legalTargets = new Set(); render(); return; }
+  if (d.resolve) { commitTurn(); return; }
+  if (d.owner && d.skill) { // choose a skill on one of your heroes
+    const u = state.units[d.owner]!;
     const skill = (u.skills ?? []).find((s) => s.id === d.skill)!;
     if (skill.targeting === "single") {
-      ui.targeting = { skillId: skill.id, skillName: skill.name };
+      ui.targeting = { unitId: u.id, skillId: skill.id, skillName: skill.name };
       ui.legalTargets = targetsFor(u, skill.id);
-      if (ui.legalTargets.size === 0) { queue(u.id, skill.id, [], skill.name); return; } // taunt/blind-forced or no target
+      if (ui.legalTargets.size === 0) { queue(u.id, skill.id, []); return; } // taunt/blind-forced or no legal target
       render();
-    } else queue(u.id, skill.id, undefined, skill.name);
-  } else if (d.target && ui.selectedUnit && ui.targeting) {
-    const tgt = state.units[d.target]!;
-    queue(ui.selectedUnit, ui.targeting.skillId, [d.target], `${ui.targeting.skillName} → ${tgt.name}`);
+    } else queue(u.id, skill.id, undefined);
+  } else if (d.target && ui.targeting) {
+    queue(ui.targeting.unitId, ui.targeting.skillId, [d.target]);
   }
 });
 
@@ -124,9 +122,9 @@ function commitTurn(): void {
 const human: AsyncProvider = (st, side) => new Promise<Action[]>((resolve) => {
   ui.phase = "plan";
   ui.phaseLabel = "your move";
-  ui.hint = "Click a hero, pick a skill, then a target. Leave a hero unpicked to hold it.";
-  ui.planned.clear(); ui.plannedLabel.clear();
-  ui.selectedUnit = undefined; ui.targeting = undefined; ui.legalTargets = new Set();
+  ui.hint = "Pick a skill on each hero, then a target. Skip a hero to hold it.";
+  ui.planned.clear(); ui.plannedSkill.clear();
+  ui.targeting = undefined; ui.legalTargets = new Set();
   ui.resolveTurn = resolve;
   render();
 });
