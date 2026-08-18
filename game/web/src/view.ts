@@ -7,8 +7,9 @@ import type { SkillInstance } from "../../engine/src/skill.ts";
 import { totalShield } from "../../engine/src/damage.ts";
 import { canUse, effectiveCost } from "../../engine/src/scheduler.ts";
 import { ROSTER } from "../../engine/content/roster.generated.ts";
-import { heroPortrait, skillIcon, elColor } from "./assets.ts";
+import { heroPortrait, skillIcon, minionPortrait, heroIdOfSkill, elColor } from "./assets.ts";
 import { SKILL_TEXT } from "./skilltext.generated.ts";
+import { STATUS_SOURCE } from "./statussource.generated.ts";
 import type { UiState } from "./main.ts";
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
@@ -16,20 +17,58 @@ const shortName = (name: string) => name.split(",")[0]!.trim();
 const nameOf = (id: string) => shortName(ROSTER.find((h) => h.id === id)?.name ?? id);
 const IMG_FALLBACK = `onerror="this.style.visibility='hidden'"`;
 
-const STATE_KINDS = new Set<Status["kind"]>(["stun", "blind", "invulnerable", "isolated", "untargetable", "taunt", "silence", "paralysis", "immortal", "shatter", "channeling"]);
-function statusPips(u: Unit): string {
-  const seen = new Set<string>(); const pips: string[] = [];
-  for (const s of u.statuses) {
-    let label: string | null = null, cls = "pip";
-    if (s.kind === "stack") { label = `${s.name} ${s.magnitude ?? 0}`; cls = "pip stack"; }
-    else if (s.kind === "dot") { label = s.name ?? "dot"; cls = "pip bad"; }
-    else if (s.kind === "regen") { label = s.name ?? "regen"; cls = "pip good"; }
-    else if (s.kind === "mark") { label = s.name ?? "mark"; }
-    else if (STATE_KINDS.has(s.kind)) { label = s.kind; cls = "pip state"; }
-    if (!label || seen.has(label)) continue; seen.add(label);
-    pips.push(`<span class="${cls}" title="${esc(label)}">${esc(label.length > 10 ? label.slice(0, 9) + "…" : label)}</span>`);
+const STATE_KINDS = new Set<Status["kind"]>(["stun", "blind", "invulnerable", "isolated", "untargetable", "taunt", "silence", "paralysis", "immortal", "shatter", "channeling", "elemental_essence", "damage_reduction", "incoming_damage_mod", "outgoing_damage_mod", "cost_mod", "cooldown_mod"]);
+const durStr = (s: Status) => s.duration === null ? "for the round" : typeof s.duration === "number" && s.duration > 0 ? `${s.duration} turn${s.duration > 1 ? "s" : ""} left` : "";
+
+/** A plain-language account of what a status is doing right now (for the hover popup). `src` is the id of
+ *  the skill/passive that applied it (for the source name + a mark's descriptive fallback). */
+function effectDesc(s: Status, src?: string): { title: string; body: string } {
+  const title = s.name ?? s.kind.replace(/_/g, " ");
+  const mag = s.magnitude ?? 0, dt = s.dtype ?? "affliction";
+  let body: string;
+  switch (s.kind) {
+    case "dot": body = `Deals ${mag} ${dt} damage each turn.`; break;
+    case "regen": body = `Restores ${mag} HP each turn.`; break;
+    case "stack": body = `${mag} stack${mag === 1 ? "" : "s"}.`; break;
+    case "stun": body = "Stunned — can't use skills."; break;
+    case "blind": body = "Blinded — single-target skills strike a random target."; break;
+    case "invulnerable": body = "Can't be targeted by new harmful skills."; break;
+    case "isolated": body = "Can't be targeted by new helpful skills."; break;
+    case "untargetable": body = "Can't be targeted by other units."; break;
+    case "taunt": body = "Forced to target the taunter."; break;
+    case "silence": body = "No Elemental Essence income."; break;
+    case "paralysis": body = "Cooldowns don't advance."; break;
+    case "immortal": body = "HP can't drop below 1."; break;
+    case "shatter": body = "Ignores DR / Invulnerable / Shield."; break;
+    case "damage_reduction": body = `Reduces incoming damage by ${mag}.`; break;
+    case "incoming_damage_mod": body = `Takes ${Math.abs(mag)} ${mag < 0 ? "less" : "more"} damage.`; break;
+    case "outgoing_damage_mod": body = `Deals ${Math.abs(mag)} ${mag < 0 ? "less" : "more"} damage.`; break;
+    case "cost_mod": body = `Skills cost ${mag > 0 ? "+" : ""}${mag} energy.`; break;
+    case "cooldown_mod": body = `Cooldowns ${mag > 0 ? "+" : ""}${mag} turns.`; break;
+    case "elemental_essence": body = "Next income is 1 energy of its element."; break;
+    case "channeling": body = "Channeling a skill each turn."; break;
+    case "mark": body = src && SKILL_TEXT[src] ? SKILL_TEXT[src]!.d : ""; break;
+    default: body = src && SKILL_TEXT[src] ? SKILL_TEXT[src]!.d : "";
   }
-  return pips.length ? `<div class="pips">${pips.slice(0, 5).join("")}</div>` : "";
+  if (src && SKILL_TEXT[src] && s.kind !== "mark" && s.kind !== "stack") body += ` (from ${SKILL_TEXT[src]!.n})`;
+  const d = durStr(s); if (d) body = `${body} ${d}.`.trim();
+  return { title, body: body.trim() };
+}
+
+/** Status icons on a portrait: the source skill's art (fallback to a lettered chip), each hover-describable. */
+function effectIcons(state: MatchState, u: Unit): string {
+  const seen = new Set<string>(); const out: string[] = [];
+  for (const s of u.statuses) {
+    if (!(s.kind === "stack" || s.kind === "mark" || s.kind === "dot" || s.kind === "regen" || STATE_KINDS.has(s.kind))) continue;
+    const key = `${s.kind}:${s.name ?? ""}`; if (seen.has(key)) continue; seen.add(key);
+    const src = s.sourceId ?? (s.name ? STATUS_SOURCE[s.name] : undefined);
+    const hid = src ? heroIdOfSkill(src) : undefined;
+    const icon = src && hid ? skillIcon(hid, src) : null;
+    const { title, body } = effectDesc(s, src);
+    const cls = ["fx", s.kind === "dot" ? "bad" : s.kind === "regen" || s.kind === "stack" ? "good" : STATE_KINDS.has(s.kind) ? "state" : ""].filter(Boolean).join(" ");
+    out.push(`<span class="${cls}" data-fxtitle="${esc(title)}" data-fxbody="${esc(body)}">${icon ? `<img src="${icon}" ${IMG_FALLBACK} />` : `<span class="fx-abbr">${esc((s.name ?? s.kind)[0]!.toUpperCase())}</span>`}${s.kind === "stack" && (s.magnitude ?? 0) > 1 ? `<span class="fx-n">${s.magnitude}</span>` : ""}</span>`);
+  }
+  return out.length ? `<div class="fxrow">${out.slice(0, 6).join("")}</div>` : "";
 }
 
 function hpBar(u: Unit): string {
@@ -58,11 +97,14 @@ function skillTiles(state: MatchState, u: Unit, ui: UiState): string {
 function heroCard(state: MatchState, u: Unit, ui: UiState, isYou: boolean): string {
   const targetable = ui.phase === "plan" && !!ui.targeting && ui.legalTargets.has(u.id);
   const cls = ["hero", u.alive ? "" : "dead", targetable ? "targetable" : "", ui.plannedSkill.has(u.id) ? "acted" : ""].filter(Boolean).join(" ");
+  const mart = u.kind === "minion" ? minionPortrait(u.name) : null;
   const portrait = u.heroId
     ? `<img class="portrait" src="${heroPortrait(u.heroId, u.fused)}" alt="${esc(u.name)}" ${IMG_FALLBACK} />`
+    : mart
+    ? `<img class="portrait" src="${mart}" alt="${esc(u.name)}" ${IMG_FALLBACK} />`
     : `<div class="portrait minion-art">${esc(shortName(u.name))}</div>`;
   const pcol = `<div class="pcol">
-    <div class="frame" style="--el:${elColor(u.currentElement)}" ${targetable ? `data-target="${u.id}"` : ""}>${portrait}${statusPips(u)}<div class="name">${esc(shortName(u.name))}</div></div>
+    <div class="frame" style="--el:${elColor(u.currentElement)}" ${targetable ? `data-target="${u.id}"` : ""}>${portrait}${effectIcons(state, u)}<div class="name">${esc(shortName(u.name))}</div></div>
     ${hpBar(u)}
   </div>`;
   return `<div class="${cls}">${pcol}${isYou && u.alive ? skillTiles(state, u, ui) : ""}</div>`;
@@ -103,13 +145,29 @@ function midbar(state: MatchState, ui: UiState): string {
   </div>`;
 }
 
+/** The overlay panel that appears when a skill is picked: what it does, while you choose a target. */
+function skillOverlay(state: MatchState, ui: UiState): string {
+  const t = ui.targeting!;
+  const u = state.units[t.unitId];
+  const skill = (u?.skills ?? []).find((s) => s.id === t.skillId);
+  const text = SKILL_TEXT[t.skillId];
+  const cost = u && skill ? effectiveCost(u, skill) : null;
+  const costStr = cost ? ([cost.generic ? `${cost.generic} generic` : "", cost.specific ? `${cost.specific} ${skill!.element}` : ""].filter(Boolean).join(" + ") || "free") : "";
+  return `<div class="skillcard">
+    <div class="sc-head"><img src="${skillIcon(u?.heroId ?? "", t.skillId)}" ${IMG_FALLBACK} />
+      <div><div class="sc-name">${esc(text?.n ?? t.skillName)}</div><div class="sc-cost">${esc(costStr)}</div></div></div>
+    <div class="sc-desc">${esc(text?.d ?? "")}</div>
+    <div class="sc-foot">Click a highlighted target to use <button class="mini" data-cancel="1">cancel</button></div>
+  </div>`;
+}
+
 export function renderApp(state: MatchState, ui: UiState): string {
   const foe = ui.you === "A" ? "B" : "A";
   return `<div class="arena">
     ${sideRow(state, foe, ui, false)}
     ${midbar(state, ui)}
     ${sideRow(state, ui.you, ui, true)}
-  </div>${ui.overlay ?? ""}`;
+  </div>${ui.targeting ? skillOverlay(state, ui) : ""}${ui.overlay ?? ""}`;
 }
 
 // ── team select (with a skill viewer) ─────────────────────────────────────────────────────────────── //

@@ -19,10 +19,12 @@ python -m http.server 8000     # run from the REPO ROOT, then open
 Start on the **team-select** screen: a portrait grid of all 27 heroes — click one to view
 its passive + skills (icons + descriptions), then **Add to team** (pick 3). The AI's team is
 shown and re-rollable. In battle, the board shows both teams as portrait cards (enemies top,
-you bottom); each of your heroes carries its skill icons — click a skill (unusable ones are
-dimmed), pick a target if it needs one (enemies glow), then **Resolve turn**. The left panel
-is your shared **energy pool**; **Surrender** concedes. The AI uses `defaultPolicy`. First to
-2 rounds wins; between rounds each team auto-drafts an upgrade (interactive draft UI TBD).
+you bottom); each of your heroes carries its skill icons — **click a skill** to see an overlay
+of what it does and highlight the portraits it can hit. **Every skill requires clicking a
+target** (even self/auto ones highlight and confirm on click). Active **effects** appear as
+small skill-art icons on a portrait; hover (or tap) one for a description of what it's doing.
+The left panel is your shared **energy pool**; **Surrender** concedes. The AI uses
+`defaultPolicy`. First to 2 rounds wins; between rounds each team auto-drafts (draft UI TBD).
 
 ## Build
 
@@ -41,9 +43,12 @@ npm run typecheck    # tsc --noEmit
   resolves the human turn from board clicks, AI from `defaultPolicy`.
 - `src/view.ts` — pure DOM rendering: `renderSetup` (portrait grid + skill viewer) and
   `renderApp` (the two-lane board, skill tiles, energy pool) from `(MatchState, UiState)`.
-- `src/assets.ts` — portrait / skill-icon URLs + a per-element colour.
-- `src/skilltext.generated.ts` — skill id → {name, description}, generated from
-  `content/frozen/skills.json` (the engine carries no prose; this is display-only).
+- `src/assets.ts` — portrait / skill-icon / minion-art URLs + a per-element colour.
+- `src/skilltext.generated.ts` — skill id → {name, description} (from `frozen/skills.json`).
+- `src/statussource.generated.ts` — status name → the skill/passive that applies it, so an
+  effect can show that skill's icon + prose (statuses carry no source id at runtime).
+- `src/minionart.generated.ts` — minion name → portrait art (from `frozen/minions.json`'s
+  `image` field, which resolves the irregular minion-asset filenames).
 
 Reuses the engine + `game/client/{loop,draft}.ts`. `render.ts` in the terminal client is
 ANSI-specific; the browser has its own `view.ts`.
