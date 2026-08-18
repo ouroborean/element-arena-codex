@@ -10,6 +10,7 @@ import { ROSTER } from "../../engine/content/roster.generated.ts";
 import { heroPortrait, iconOf, minionPortrait, elColor } from "./assets.ts";
 import { SKILL_TEXT } from "./skilltext.generated.ts";
 import { STATUS_SOURCE } from "./statussource.generated.ts";
+import { EFFECT_DESC, EFFECT_HIDE } from "./effectdesc.generated.ts";
 import type { UiState } from "./main.ts";
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
@@ -40,9 +41,10 @@ function effectDesc(state: MatchState, s: Status, src?: string): { title: string
   switch (s.kind) {
     case "dot": body = `Deals ${mag} ${dt} damage each turn.`; break;
     case "regen": body = `Restores ${mag} HP each turn.`; break;
-    case "stack": body = `${mag} stack${mag === 1 ? "" : "s"} of ${s.name ?? "a resource"}.`; break;
-    // A mark is an opaque flag; what it DOES lives in the skill that applies it, so show that skill's prose.
-    case "mark": body = src && SKILL_TEXT[src] ? SKILL_TEXT[src]!.d : "A marker other skills read."; break;
+    // Marks/stacks are opaque named effects; their meaning is authored (what HOLDING it does), not the
+    // applying skill's action. The stack's live count shows on the chip badge, so the text describes the resource.
+    case "stack": body = (s.name && EFFECT_DESC[s.name]) || `${mag} stack${mag === 1 ? "" : "s"} of ${s.name ?? "a resource"}.`; break;
+    case "mark": body = (s.name && EFFECT_DESC[s.name]) || "A marker other skills read."; break;
     case "stun": body = s.scope ? `Can't use ${s.scope.mode === "only" ? "" : "non-"}${s.scope.tag} skills.` : "Stunned — can't use skills."; break;
     case "blind": body = "Single-target skills strike a random target."; break;
     case "invulnerable": body = "Can't be targeted by new harmful skills."; break;
@@ -100,6 +102,7 @@ function effectIcons(state: MatchState, u: Unit): string {
   const seen = new Set<string>(); const out: string[] = [];
   for (const s of u.statuses) {
     if (HIDDEN_KINDS.has(s.kind)) continue; // pure plumbing — no chip
+    if (s.name && EFFECT_HIDE.has(s.name)) continue; // internal bookkeeping flag (Acted, Proc Lock, …)
     const key = `${s.kind}:${s.name ?? ""}`; if (seen.has(key)) continue; seen.add(key);
     const src = statusSource(state, s);
     const icon = src ? iconOf(src) : null;
