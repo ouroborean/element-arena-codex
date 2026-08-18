@@ -140,6 +140,7 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .fxpop b { display: block; font-size: 12.5px; margin-bottom: 2px; }
 .fxpop div { color: var(--dim); font-size: 11.5px; }
 .fxpop .fxdur { margin-top: 5px; color: var(--acc); font-size: 11px; font-weight: 600; }
+.fxpop .tt-en { width: 14px; height: 14px; border-radius: 3px; vertical-align: -2px; margin: 0 1px; object-fit: cover; }
 
 /* ── skill detail (shown IN the midbar while targeting — never over a portrait) ── */
 .skillpanel { display: flex; gap: 11px; align-items: flex-start; text-align: left; }

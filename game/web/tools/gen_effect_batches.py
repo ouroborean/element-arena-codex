@@ -30,8 +30,9 @@ def trim(name, c):
         "name": name,
         "kind": c["kind"],
         "appliedBy": c.get("applierName"),
-        "applierSays": (c["applierDesc"] or "")[:200],
-        "referencedBy": ms,  # how OTHER skills read/use this effect — where its meaning lives
+        "applierSays": (c["applierDesc"] or "")[:260],  # the effect's OWN description — the primary source
+        "conditionalOn": c.get("conditionalOn"),  # a "While X" state-gate → author a variant too
+        "referencedBy": ms,  # base-kit skills that read this effect — only for OPAQUE marks the applier doesn't explain
         "maybePlumbing": c["maybePlumbing"],
     }
 
