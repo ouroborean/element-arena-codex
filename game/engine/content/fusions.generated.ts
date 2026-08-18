@@ -14604,6 +14604,15 @@ export const FUSIONS: FusionForm[] = [
       "amount": 25,
       "to": "self",
       "duration": null
+     },
+     {
+      "op": "applyStatus",
+      "to": "self",
+      "status": {
+       "kind": "mark",
+       "name": "Aerie Essence Override",
+       "duration": null
+      }
      }
     ]
    },

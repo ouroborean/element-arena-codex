@@ -4201,6 +4201,7 @@
     },
     {
      "on": "skillUsed",
+     "origin": "innate",
      "when": {
       "sameUnit": [
        "eventSource",
@@ -4220,9 +4221,32 @@
       {
        "op": "if",
        "cond": {
-        "has": "mark",
-        "name": "Eagle Acted",
-        "of": "self"
+        "and": [
+         {
+          "has": "mark",
+          "name": "Eagle Acted",
+          "of": "self"
+         },
+         {
+          "not": {
+           "and": [
+            {
+             "has": "mark",
+             "name": "Aerie Essence Override",
+             "of": "self"
+            },
+            {
+             "cmp": ">",
+             "left": {
+              "ref": "shield",
+              "of": "self"
+             },
+             "right": 0
+            }
+           ]
+          }
+         }
+        ]
        },
        "then": [
         {
@@ -4236,10 +4260,12 @@
        ]
       }
      ],
-     "source": "Two as One"
+     "source": "Two as One",
+     "note": "origin 'innate' so the Syl+Eagle same-turn Essence gain survives fusion (else fused Syl keeps her Eagle but loses this half of Two as One). Suppressed only while syl:mechanic's 'Aerie Essence Override' mark AND its shield both hold — mechanic owns essence-on-every-skill while shielded, and the base resumes when the shield breaks."
     },
     {
      "on": "skillUsed",
+     "origin": "innate",
      "when": {
       "and": [
        {
@@ -4265,9 +4291,32 @@
       {
        "op": "if",
        "cond": {
-        "has": "mark",
-        "name": "Syl Acted",
-        "of": "self"
+        "and": [
+         {
+          "has": "mark",
+          "name": "Syl Acted",
+          "of": "self"
+         },
+         {
+          "not": {
+           "and": [
+            {
+             "has": "mark",
+             "name": "Aerie Essence Override",
+             "of": "self"
+            },
+            {
+             "cmp": ">",
+             "left": {
+              "ref": "shield",
+              "of": "self"
+             },
+             "right": 0
+            }
+           ]
+          }
+         }
+        ]
        },
        "then": [
         {
@@ -4282,7 +4331,7 @@
       }
      ],
      "source": "Two as One",
-     "note": "'self' is Syl (trigger owner); eventSource is her Eagle (her only base-kit allied minion, any growth stage)."
+     "note": "'self' is Syl (trigger owner); eventSource is her Eagle (her only base-kit allied minion, any growth stage). origin 'innate' so this half of Two as One survives fusion. Same Aerie-override+shield suppression as the Syl-acts trigger so syl:mechanic doesn't double-grant while shielded."
     },
     {
      "on": "turnStart",

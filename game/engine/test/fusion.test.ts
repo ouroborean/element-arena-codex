@@ -5,8 +5,51 @@ import { applyAugment } from "../content/augment.ts";
 import { loadHero } from "../content/hero.ts";
 import { buildMatch, defaultPolicy, heroById, playMatch } from "../content/match.ts";
 import { performAction, startRound } from "../src/scheduler.ts";
-import { makeState, skill } from "./helpers.ts";
+import { emit } from "../src/effects/interpret.ts";
+import { applyStatus } from "../src/status.ts";
+import { addShield } from "../src/damage.ts";
+import { makeState, makeUnit, skill, status } from "./helpers.ts";
 import type { Unit } from "../src/types.ts";
+
+// A minimal non-mechanic Syl fusion (replace mode) that does NOT re-declare essence — used to prove the
+// base "Two as One" essence gain survives fusion via the innate origin.
+const SYL_CLOUD: FusionForm = {
+  key: "cloud", hero: "syl", element: "cloud",
+  passive: { name: "Great Roc", description: "" },
+  passiveTriggers: [{ on: "roundStart", source: "Great Roc", effect: [{ op: "applyStatus", to: "self", status: { kind: "mark", name: "Great Roc", duration: null } }] }],
+  skill: skill("sylcloud1", [], { name: "Sky Drop", targeting: "single", tags: ["Harmful"] }),
+};
+const sylEssence = (u: Unit) => u.statuses.filter((s) => s.kind === "elemental_essence").length;
+const eagleOf = (id: string) => makeUnit({ id: `${id}:eagle`, team: "A", kind: "minion", name: "Hatchling Eagle", summoner: id });
+
+test("fused Syl (non-mechanic) keeps Two as One: Syl + Eagle acting the same turn grants Essence", () => {
+  const syl = loadHero(heroById("syl"), "A", "s1");
+  applyFusion(syl, SYL_CLOUD);
+  const st = makeState([syl, eagleOf("s1")], [makeUnit({ id: "e", team: "B" })]);
+  emit(st, { type: "skillUsed", caster: "s1", skillId: "syl2", targets: [], tags: [] });
+  assert.equal(sylEssence(syl), 0, "no essence yet — the Eagle hasn't acted");
+  emit(st, { type: "skillUsed", caster: "s1:eagle", skillId: "sylminion1", targets: [], tags: [] });
+  assert.ok(sylEssence(syl) >= 1, "essence granted once both acted (Two as One survived fusion)");
+});
+
+test("Two as One base essence is suppressed while syl:mechanic's Aerie override + shield both hold (no double)", () => {
+  const syl = loadHero(heroById("syl"), "A", "s1");
+  applyStatus(syl, status("mark", { name: "Aerie Essence Override", duration: null, appliedBy: "s1", appliedTurn: 0 }));
+  addShield(syl, 25, null, "s1", 0);
+  const st = makeState([syl, eagleOf("s1")], [makeUnit({ id: "e", team: "B" })]);
+  emit(st, { type: "skillUsed", caster: "s1", skillId: "syl2", targets: [], tags: [] });
+  emit(st, { type: "skillUsed", caster: "s1:eagle", skillId: "sylminion1", targets: [], tags: [] });
+  assert.equal(sylEssence(syl), 0, "base grant suppressed — The Aerie owns essence while shielded");
+});
+
+test("Two as One base essence resumes once the Aerie shield breaks (override mark alone does not suppress)", () => {
+  const syl = loadHero(heroById("syl"), "A", "s1");
+  applyStatus(syl, status("mark", { name: "Aerie Essence Override", duration: null, appliedBy: "s1", appliedTurn: 0 }));
+  const st = makeState([syl, eagleOf("s1")], [makeUnit({ id: "e", team: "B" })]); // no shield (broken)
+  emit(st, { type: "skillUsed", caster: "s1", skillId: "syl2", targets: [], tags: [] });
+  emit(st, { type: "skillUsed", caster: "s1:eagle", skillId: "sylminion1", targets: [], tags: [] });
+  assert.ok(sylEssence(syl) >= 1, "base same-turn grant resumes when the shield is down");
+});
 
 // Ando's "storm" fusion, transcribed from the frozen prose:
 //   passive (andostorm0): "Ando is permanently Blinded, but deals 10 Piercing to an additional

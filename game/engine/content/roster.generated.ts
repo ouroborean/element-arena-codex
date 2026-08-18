@@ -5687,6 +5687,7 @@ export const ROSTER: HeroDef[] = [
    },
    {
     "on": "skillUsed",
+    "origin": "innate",
     "when": {
      "sameUnit": [
       "eventSource",
@@ -5706,9 +5707,32 @@ export const ROSTER: HeroDef[] = [
      {
       "op": "if",
       "cond": {
-       "has": "mark",
-       "name": "Eagle Acted",
-       "of": "self"
+       "and": [
+        {
+         "has": "mark",
+         "name": "Eagle Acted",
+         "of": "self"
+        },
+        {
+         "not": {
+          "and": [
+           {
+            "has": "mark",
+            "name": "Aerie Essence Override",
+            "of": "self"
+           },
+           {
+            "cmp": ">",
+            "left": {
+             "ref": "shield",
+             "of": "self"
+            },
+            "right": 0
+           }
+          ]
+         }
+        }
+       ]
       },
       "then": [
        {
@@ -5726,6 +5750,7 @@ export const ROSTER: HeroDef[] = [
    },
    {
     "on": "skillUsed",
+    "origin": "innate",
     "when": {
      "and": [
       {
@@ -5751,9 +5776,32 @@ export const ROSTER: HeroDef[] = [
      {
       "op": "if",
       "cond": {
-       "has": "mark",
-       "name": "Syl Acted",
-       "of": "self"
+       "and": [
+        {
+         "has": "mark",
+         "name": "Syl Acted",
+         "of": "self"
+        },
+        {
+         "not": {
+          "and": [
+           {
+            "has": "mark",
+            "name": "Aerie Essence Override",
+            "of": "self"
+           },
+           {
+            "cmp": ">",
+            "left": {
+             "ref": "shield",
+             "of": "self"
+            },
+            "right": 0
+           }
+          ]
+         }
+        }
+       ]
       },
       "then": [
        {

@@ -14873,6 +14873,16 @@
        "to": "self",
        "duration": null,
        "note": "'Begins the game with 25 Shield' - a round-permanent 25 Shield (The Aerie)."
+      },
+      {
+       "op": "applyStatus",
+       "to": "self",
+       "status": {
+        "kind": "mark",
+        "name": "Aerie Essence Override",
+        "duration": null
+       },
+       "note": "Marks this fused Syl so the innate Two as One same-turn Essence grant is suppressed WHILE her Aerie shield holds (see the base Two as One triggers' shield-gated condition). While the mark + shield hold, essence comes solely from The Aerie's per-skill grant below (no double); once the shield breaks, the base same-turn grant resumes."
       }
      ]
     },

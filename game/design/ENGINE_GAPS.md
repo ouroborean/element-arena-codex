@@ -316,6 +316,14 @@ minion/summon variants, damage-link/redirect, cost/economy, etc.).
   icon** — should be `+1`) and `duration:1` (anchored to gommar's team, so it expired before biting the enemy's
   next turn); fixed to `magnitude:1, duration:2`. Added the `replace` TriggerKind to the validator allowlist.
   `test/fusion_effects.test.ts` + `test/fusion.test.ts`; **279 tests green, validators + tsc clean.**
+- **Two as One essence survives fusion ✅ (2026-08-17):** the eagle-wiring fix marked only the Eagle *summon*
+  innate, so a fused Syl kept her Eagle but lost the other half of Two as One (Syl + Eagle acting the same turn →
+  Essence — those two `skillUsed` triggers were still dropped by replace-mode). Marked both `innate`. Guarded the
+  double with syl:mechanic (which re-declares essence-on-every-skill while shielded): the base grant is suppressed
+  only while mechanic's round-permanent `Aerie Essence Override` mark **and** its Aerie shield both hold, so
+  mechanic owns essence while shielded and the base same-turn grant resumes once the shield breaks — no double,
+  no shield-down dead zone. (dur-0 "acted" marks persist ~2 turns, so a once-per-turn guard mark was not viable —
+  verified empirically.) `test/fusion.test.ts` (+3 cases); **282 tests green, validators + tsc clean.**
 
 ---
 
