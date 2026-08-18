@@ -1,0 +1,16 @@
+{
+  "name": "@arena/web",
+  "private": true,
+  "type": "module",
+  "description": "Element Arena — browser client (esbuild-bundled; the engine stays Node-native).",
+  "scripts": {
+    "build": "esbuild src/main.ts --bundle --format=esm --target=es2022 --minify --outfile=dist/app.js",
+    "watch": "npm run build -- --watch",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.0",
+    "typescript": "^5.9.3",
+    "@types/node": "^26.2.0"
+  }
+}
