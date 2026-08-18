@@ -13,8 +13,8 @@ export function setColor(on: boolean): void { COLOR = on; }
 const c = (code: string, s: string): string => (COLOR ? `\x1b[${code}m${s}\x1b[0m` : s);
 export const dim = (s: string) => c("2", s);
 export const bold = (s: string) => c("1", s);
+export const green = (s: string) => c("32", s);
 const red = (s: string) => c("31", s);
-const green = (s: string) => c("32", s);
 const yellow = (s: string) => c("33", s);
 const cyan = (s: string) => c("36", s);
 

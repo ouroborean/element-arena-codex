@@ -43,6 +43,7 @@ export function loadHero(def: HeroDef, team: TeamId, id: string = def.id): Unit 
     id,
     kind: "hero",
     name: def.name,
+    heroId: def.id,
     team,
     hp: def.maxHp,
     maxHp: def.maxHp,
