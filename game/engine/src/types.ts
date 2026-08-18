@@ -1,0 +1,186 @@
+/**
+ * Core domain types for the rules engine.
+ *
+ * MatchState is the single authoritative game-state object: fully serializable
+ * (no functions, no class instances beyond plain data), so it can be snapshotted,
+ * diffed, sent over the wire, and replayed. Effects operate on it; nothing mutates
+ * the DOM or reaches outside it.
+ */
+
+import type { SkillInstance } from "./skill.ts";
+import type { TriggeredEffect } from "./events.ts";
+import type { Effect } from "./effects/ast.ts";
+
+export type TeamId = "A" | "B";
+export type UnitId = string;
+export type UnitKind = "hero" | "minion";
+
+/** The four damage channels + a non-damage sibling handled outside this union. */
+export type DamageType = "normal" | "piercing" | "affliction" | "true";
+
+/** Which skill classes a Stun stops (Stun can be scoped, per the glossary). */
+export type SkillClass = "basic" | "defensive" | "ultimate" | "fusion" | "passive";
+
+export type StatusKind =
+  | "damage_reduction" // magnitude: flat DR
+  | "incoming_damage_mod" // magnitude: +N = takes N more (e.g. gommarwinter0)
+  | "outgoing_damage_mod" // magnitude: +N = the DEALER deals N more (normal/piercing only)
+  | "incoming_damage_mult" // magnitude: multiplier on incoming damage (0.5 = half, 2 = double); newDamageOnly gates to skill hits
+  | "outgoing_damage_mult" // magnitude: multiplier on the DEALER's outgoing damage (e.g. triple)
+  | "outgoing_dtype_override" // dtype: forces the holder's outgoing damage to this type (e.g. Piercing)
+  | "conditional_bypass" // the holder's damage ignores DR+Shield against targets that satisfy bypassCond
+  | "damage_becomes_heal" // inverted HP: incoming damage heals the holder instead
+  | "heal_becomes_damage" // inverted HP: incoming healing damages the holder instead
+  | "dies_at_max" // inverted HP: the holder dies at MAX hp, and does not die at 0
+  | "shatter" // voids DR / Invulnerable / Shield benefit
+  | "damage_ignore" // ignores all damage from any source
+  | "non_damage_ignore" // immune to harmful non-damage effects
+  | "immortal" // HP cannot drop below 1
+  | "revive_ward" // intercept a lethal hit: revive to `magnitude` HP and consume the ward
+  | "invulnerable" // cannot be targeted by NEW harmful skills
+  | "isolated" // cannot be targeted by NEW helpful skills
+  | "untargetable" // cannot be targeted by ANY of another unit's skills (self-targeting still works)
+  | "elemental_essence" // a one-shot charge: swaps the holder's next income from 1 generic to 1 of its element, then is consumed
+  | "cost_mod" // magnitude: delta added to the holder's skill costs (+N pricier, -N cheaper)
+  | "cooldown_mod" // magnitude: delta added to the cooldown the holder's skills go on when used
+  | "silence" // suppresses Elemental Essence income
+  | "paralysis" // cooldowns do not advance
+  | "stealth" // does not trigger enemy effects
+  | "veiled" // details hidden until a harmful skill is used
+  | "taunt" // forced to target a specific unit
+  | "blind" // single-target skills retarget at random
+  | "stun" // cannot use skills (optionally tag-scoped)
+  | "channeling" // caster is sustaining a Channel skill (name = skill id); re-runs each turn
+  | "dot" // named damage-over-time: deals `magnitude` `dtype` per applier turn
+  | "regen" // named heal-over-time: heals `magnitude` per applier turn (the twin of dot)
+  | "heal_lock" // blocks incoming heals (unitRef = the only allowed healer; absent = block all)
+  | "uncounterable" // the holder's skills cannot be countered/reflected
+  | "stack_read_mod" // adjusts the EFFECTIVE stackCount read of a named stack (mode: mult|floorZero|missingHp) — "treated as though they had N stacks"
+  | "instant_cast" // skillId-scoped: suppresses the named skill's channel so it resolves entirely on cast
+  | "mark" // a named marker (name required)
+  | "stack"; // a named accumulating resource (name required)
+
+/** A Stun can stop only, or all-but, skills carrying a given class tag ("Strategic"). */
+export interface StunScope {
+  tag: string;
+  mode: "only" | "except";
+}
+
+export interface Status {
+  kind: StatusKind;
+  /** Flat magnitude for DR / incoming-mod / stack count / dot tick. */
+  magnitude?: number;
+  /** Identifier for mark/stack/dot effects ("Fan the Flames", "Charge", ...). */
+  name?: string;
+  /** For a dot: the damage type it ticks (default affliction). */
+  dtype?: DamageType;
+  /** For a scoped Stun: which class tag it keys on (absent = stops all skills). */
+  scope?: StunScope;
+  /** For a Taunt: the unit the bearer is forced to target. */
+  unitRef?: UnitId;
+  /** For channeling: the targets the sustained skill re-runs against each turn. */
+  channelTargets?: UnitId[];
+  /** Effects to run when this status expires naturally (see onExpire). */
+  onExpire?: Effect[];
+  /** Turns remaining. null = lasts until end of round (a round-"permanent" effect). */
+  duration: number | null;
+  /** Unit that applied it — anchors duration ticking (DURATION_ANCHOR = applier). */
+  appliedBy: UnitId;
+  /** Global turn index at application (so it is not ticked on its own turn of birth). */
+  appliedTurn: number;
+  /** Skill / augment id that produced it, for provenance + dedupe. */
+  sourceId?: string;
+  /** For a cost_mod / cooldown_mod that applies to ONE skill only (absent = all skills). */
+  skillId?: string;
+  /** For an incoming_damage_mult: apply only to NEW skill hits (isNew), not ongoing DoT ticks. */
+  newDamageOnly?: boolean;
+  /** For a conditional_bypass: the target must hold this status (kind + optional name) for the bypass to apply. */
+  bypassCond?: { kind: StatusKind; name?: string };
+  /** For a stack_read_mod: how it adjusts the effective stack read. mult = actual x magnitude; floorZero =
+   *  if actual is 0, read magnitude; missingHp = actual + floor(missingHp / magnitude). */
+  mode?: "mult" | "floorZero" | "missingHp";
+  /** For a stack_read_mod: apply only while the holder has >=1 RAW stack of this named resource (a live gate). */
+  readModIf?: string;
+  /** For an outgoing_dtype_override: apply only while the holder has 0 RAW stacks of this named resource. */
+  overrideIfStackZero?: string;
+}
+
+/** One shield grant: a breakable, optionally-timed absorb pool. */
+export interface ShieldInstance {
+  amount: number;
+  /** Turns remaining; null = lasts the round. Ticks at the applier's turn-end. */
+  duration: number | null;
+  appliedBy: UnitId;
+  appliedTurn: number;
+  id?: string;
+}
+
+export interface Unit {
+  id: UnitId;
+  kind: UnitKind;
+  name: string;
+  team: TeamId;
+  hp: number;
+  maxHp: number;
+  /** Consumable shields (absorb before HP; not for Affliction/True). Total = sum of amounts. */
+  shields: ShieldInstance[];
+  /** Base element never changes; current element changes on fusion (heroes). */
+  baseElement: string;
+  currentElement: string;
+  /** Formation slot (0..2) within the team, for positional heroes; undefined for minions. */
+  slot?: number;
+  statuses: Status[];
+  alive: boolean;
+  /** The unit's usable skills (with live cooldowns). Optional for bare test units. */
+  skills?: SkillInstance[];
+  /** Reactive/interrupt triggers (from the unit's passive and lasting effects). */
+  triggers?: TriggeredEffect[];
+  /** For a minion: the hero that summoned it (referenced by its skills/triggers). */
+  summoner?: UnitId;
+  /** The id of the last skill this unit successfully used (set on cast, reset each round). */
+  lastSkillId?: string;
+  /** The fusion form this hero took, if any (once per match — the between-round metagame). */
+  fused?: string;
+  /** Augment ids applied to this hero so far (cumulative across rounds). */
+  augments?: string[];
+}
+
+/** Energy is a shared per-team pool (ENERGY_POOL_SCOPE = team). */
+export type EnergyPool = Record<string, number>; // element name | "generic" -> count
+
+export interface Team {
+  id: TeamId;
+  /** Hero + minion ids currently on the field. */
+  units: UnitId[];
+  energy: EnergyPool;
+  /** Rounds this team has won (match is best-of-N). */
+  roundsWon: number;
+}
+
+export interface MatchState {
+  round: number;
+  /** Monotonic turn counter across the whole match. */
+  turn: number;
+  activeTeam: TeamId;
+  units: Record<UnitId, Unit>;
+  teams: Record<TeamId, Team>;
+  /** Serialized RNG state (see Rng). */
+  rngState: number;
+  seed: number;
+  /** Monotonic counter for unique summoned-minion ids. */
+  minionSeq: number;
+  /** Deferred effects awaiting their fire turn (see the `schedule` effect). */
+  scheduled: ScheduledEntry[];
+  /** Unit ids that have taken an action during the current turn (cleared each turn start). */
+  actedThisTurn: UnitId[];
+  log: string[];
+}
+
+/** A deferred effect: fires after `turns` of the caster's turn-ends elapse. */
+export interface ScheduledEntry {
+  effect: Effect[];
+  caster: UnitId;
+  targets: UnitId[];
+  turns: number;
+  appliedTurn: number;
+}

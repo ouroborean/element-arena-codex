@@ -1,0 +1,158 @@
+{
+  "_note": "Every mutation the freeze applied to the raw export. Auditable.",
+  "count": 19,
+  "mutations": [
+    {
+      "kind": "element_retag",
+      "record": "skill:blackknightevil0",
+      "field": "element",
+      "from": "fire",
+      "to": "evil",
+      "reason": "fusion skill's element is authoritatively its fusion_element"
+    },
+    {
+      "kind": "element_retag",
+      "record": "skill:maggiedevil0",
+      "field": "element",
+      "from": "fire",
+      "to": "devil",
+      "reason": "fusion skill's element is authoritatively its fusion_element"
+    },
+    {
+      "kind": "element_retag",
+      "record": "skill:rolandmyth0",
+      "field": "element",
+      "from": "nomad",
+      "to": "myth",
+      "reason": "fusion skill's element is authoritatively its fusion_element"
+    },
+    {
+      "kind": "element_retag",
+      "record": "skill:rolandmyth1",
+      "field": "element",
+      "from": "nomad",
+      "to": "myth",
+      "reason": "fusion skill's element is authoritatively its fusion_element"
+    },
+    {
+      "kind": "minion_hp",
+      "record": "minion:rolandsporeminion",
+      "field": "base_hp",
+      "from": 25,
+      "to": 20,
+      "reason": "MINION_HP_SOURCE ruling: glossary minion table is authoritative"
+    },
+    {
+      "kind": "minion_hp",
+      "record": "minion:sayabatteryminion",
+      "field": "base_hp",
+      "from": 40,
+      "to": 25,
+      "reason": "MINION_HP_SOURCE ruling: glossary minion table is authoritative"
+    },
+    {
+      "kind": "minion_hp",
+      "record": "minion:trinityazureminion",
+      "field": "base_hp",
+      "from": 60,
+      "to": 65,
+      "reason": "MINION_HP_SOURCE ruling: glossary minion table is authoritative"
+    },
+    {
+      "kind": "minion_hp",
+      "record": "minion:trinitycrimsonminion",
+      "field": "base_hp",
+      "from": 60,
+      "to": 65,
+      "reason": "MINION_HP_SOURCE ruling: glossary minion table is authoritative"
+    },
+    {
+      "kind": "minion_hp",
+      "record": "minion:trinitysaffronminion",
+      "field": "base_hp",
+      "from": 60,
+      "to": 65,
+      "reason": "MINION_HP_SOURCE ruling: glossary minion table is authoritative"
+    },
+    {
+      "kind": "minion_hp",
+      "record": "minion:xyrisminion",
+      "field": "base_hp",
+      "from": null,
+      "to": 35,
+      "reason": "MINION_HP_SOURCE ruling: glossary minion table is authoritative"
+    },
+    {
+      "kind": "normalize",
+      "record": "skill:hectorevolution0",
+      "field": "description",
+      "from": "Hector consumes Dennis at the beginning of the round, gaining 50 Shield and 3 Elemental Essence. Hectors Serums now only target himself, and last 2 turns instead of 3.",
+      "to": "Hector consumes Dennis at the beginning of the round, gaining 50 Shield and 3 Elemental Essence. Hector's Serums now only target himself, and last 2 turns instead of 3.",
+      "reason": "safe transcription fix (reference_corrections.json)"
+    },
+    {
+      "kind": "normalize",
+      "record": "skill:keepercrystal0",
+      "field": "description",
+      "from": "Whenever the Shield from Tales to Tell is broken by damage, Keeper of Tales receives a stack of Chronicle Fragments. These Fragments are consumed by his abilities, counting as 10 Shield each.",
+      "to": "Whenever the Shield from Tales to Tell is broken by damage, Keeper of Fables receives a stack of Chronicle Fragments. These Fragments are consumed by his abilities, counting as 10 Shield each.",
+      "reason": "safe transcription fix (reference_corrections.json)"
+    },
+    {
+      "kind": "normalize",
+      "record": "skill:keepercrystal1",
+      "field": "description",
+      "from": "Keeper of Fables adds 60 Shield to Tales to Tell. This skill costs 1 less [65] for each stack of Chronicle Fragments on Keeper of Tales, with all stacks being consumed on use.",
+      "to": "Keeper of Fables adds 60 Shield to Tales to Tell. This skill costs 1 less [65] for each stack of Chronicle Fragments on Keeper of Fables, with all stacks being consumed on use.",
+      "reason": "safe transcription fix (reference_corrections.json)"
+    },
+    {
+      "kind": "normalize",
+      "record": "skill:keeperglacier0",
+      "field": "description",
+      "from": "Keeper of Tales begins the game with his skill costs increased by [65] [65]. Each turn for 2 turns, his skills will cost one less [65] permanently and Tales to Tell will gain 25 Shield.",
+      "to": "Keeper of Fables begins the game with his skill costs increased by [65] [65]. Each turn for 2 turns, his skills will cost one less [65] permanently and Tales to Tell will gain 25 Shield.",
+      "reason": "safe transcription fix (reference_corrections.json)"
+    },
+    {
+      "kind": "normalize",
+      "record": "skill:trinitysaffron1",
+      "field": "description",
+      "from": "Prisma Citrine prepares to redirect a teammate towards a targeted enemy. If a skill is redirected this way, the targeted enemy deals 5 less damage for 1 turn.",
+      "to": "Prisma Saffron prepares to redirect a teammate towards a targeted enemy. If a skill is redirected this way, the targeted enemy deals 5 less damage for 1 turn.",
+      "reason": "safe transcription fix (reference_corrections.json)"
+    },
+    {
+      "kind": "normalize",
+      "record": "skill:zevkir1",
+      "field": "description",
+      "from": "Zev'kir begins Channelling, gaining a stack of Call Tides each turn. These stacks are consumed on him using a new non-Strategic skill.",
+      "to": "Zev'kir begins Channeling, gaining a stack of Call Tides each turn. These stacks are consumed on him using a new non-Strategic skill.",
+      "reason": "safe transcription fix (reference_corrections.json)"
+    },
+    {
+      "kind": "normalize",
+      "record": "skill:zevkir4",
+      "field": "description",
+      "from": "Zev'kir counters the first harmful skill received by target ally. If a skill is countered, Zek'vir will automatically begin channeling Call Tides. This effect is invisible.",
+      "to": "Zev'kir counters the first harmful skill received by target ally. If a skill is countered, Zev'kir will automatically begin channeling Call Tides. This effect is invisible.",
+      "reason": "safe transcription fix (reference_corrections.json)"
+    },
+    {
+      "kind": "normalize",
+      "record": "aug:trinity1",
+      "field": "description",
+      "from": "Prisma Maneuver skills mark Prisma Scarlet for 3 turns when she uses them or they are used on her. If she is marked by all 3 Prisma Maneuver skills, Crimson Crash deals 40 more damage.",
+      "to": "Prisma Maneuver skills mark Prisma Crimson for 3 turns when she uses them or they are used on her. If she is marked by all 3 Prisma Maneuver skills, Crimson Crash deals 40 more damage.",
+      "reason": "safe transcription fix (reference_corrections.json)"
+    },
+    {
+      "kind": "normalize",
+      "record": "aug:zevkir1",
+      "field": "description",
+      "from": "While Zev'kir is Channelling Call Tides, he heals 5 HP per turn and ignores stuns.",
+      "to": "While Zev'kir is Channeling Call Tides, he heals 5 HP per turn and ignores stuns.",
+      "reason": "safe transcription fix (reference_corrections.json)"
+    }
+  ]
+}

@@ -1,0 +1,140 @@
+/**
+ * The skill effect DSL — a declarative, serializable AST.
+ *
+ * Every skill's behaviour is DATA (a tree of effect nodes), not a function. Two
+ * reasons this matters:
+ *   1. Augments and fusion passives are ordered PATCHES to a sibling skill. A patch
+ *      addresses a node by its `id` and rewrites it ("change the damage node's
+ *      amount from 10 to 15", "wrap the whole effect in a condition"). That is only
+ *      possible if effects are inspectable data.
+ *   2. The same tree runs on client and server and serializes into a replay.
+ *
+ * The primitives here were chosen from the measured mechanic frequency across the
+ * 762 descriptions (damage 30%, durations 22%, stacks 15%, conditionals 14%,
+ * per-each 9%, summon 4%). The `custom` escape hatch covers the ~3% that need
+ * bespoke native code.
+ */
+import type { DamageType, StatusKind, StunScope } from "../types.ts";
+
+/** Optional stable id so a patch can address this exact node. */
+export type NodeId = string;
+
+// --------------------------------------------------------------------------- //
+//  Values — numeric expressions evaluated against the resolution context.
+// --------------------------------------------------------------------------- //
+export type Value =
+  | number
+  | { ref: "stackCount"; name: string; of?: Selector }
+  | { ref: "missingHp"; of?: Selector }
+  | { ref: "currentHp"; of?: Selector }
+  | { ref: "shield"; of?: Selector }
+  | { ref: "count"; of: Selector }
+  | { ref: "statusDuration"; kind: StatusKind; name?: string; of?: Selector } // remaining turns (0 if absent/permanent)
+  | { ref: "sum"; metric: "missingHp" | "currentHp" | "shield"; of: Selector } // aggregate across a selector
+  | { ref: "var"; name: string }
+  | { op: "add" | "sub" | "mul" | "min" | "max"; args: Value[] }
+  | { op: "div"; num: Value; by: number; floor?: boolean };
+
+// --------------------------------------------------------------------------- //
+//  Selectors — resolve to a set of units.
+// --------------------------------------------------------------------------- //
+export type Faction = "allies" | "enemies" | "all";
+
+/** A status match: a bare kind, or a kind + a specific name (for marks/stacks/dots). */
+export type StatusMatch = StatusKind | { kind: StatusKind; name?: string };
+
+export type Selector =
+  | "self" // the acting unit (caster, or the minion for a minion skill)
+  | "caster" // the hero who owns the skill
+  | "target" // the skill's chosen primary target(s)
+  | "summoner" // for a minion: the hero that summoned it (else self)
+  | "it" // the current unit inside a forEach
+  | "eventSource" // in a trigger: the unit that caused the event (dealer/caster)
+  | "eventTarget" // in a trigger: the event's target
+  | "eventTargets" // in a trigger: ALL of a multi-target skill's targets
+  | "eventUnit" // in a trigger: the subject of a unit event (e.g. the unit that died)
+  | "across" // the living enemy hero in the SAME formation slot as self
+  | "adjacent" // living allied heroes in a neighbouring formation slot to self
+  // alive defaults to true (living units); alive:false selects the DEAD. `template`
+  // filters minions by their template name (e.g. only Seedlings).
+  | { faction: Faction; alive?: boolean; includeSelf?: boolean; kind?: "hero" | "minion"; template?: string }
+  | { pick: "random" | "lowestHp" | "highestHp"; from: Selector; count?: number }
+  | { filter: Selector; with?: StatusMatch; without?: StatusMatch };
+
+// --------------------------------------------------------------------------- //
+//  Conditions.
+// --------------------------------------------------------------------------- //
+export type Condition =
+  | { has: StatusKind; name?: string; of?: Selector }
+  | { cmp: ">" | ">=" | "<" | "<=" | "==" | "!="; left: Value; right: Value }
+  | { sameUnit: [Selector, Selector] } // identity equality of the first unit each resolves to
+  | { isFaction: Selector; faction: "ally" | "enemy" } // relative to the acting unit's team
+  | { isKind: Selector; kind: "hero" | "minion" } // is the selected unit a hero or a minion?
+  | { declaredTargetsSelf: true } // (skillDeclared) the trigger owner is among the declared targets
+  | { eventHasTag: string } // (skillDeclared/skillUsed) the skill carries this class tag
+  | { eventStatusKind: string; name?: string } // (statusApplied/statusExpired) the event's status kind (+name) matches
+  | { eventTeamIsSelf: true } // (turnStart/turnEnd) the event's team is the trigger owner's team ("my team's turn")
+  | { and: Condition[] }
+  | { or: Condition[] }
+  | { not: Condition }
+  | { chance: number }; // 0..1, draws from the deterministic rng
+
+// --------------------------------------------------------------------------- //
+//  Status specification (what applyStatus authors).
+// --------------------------------------------------------------------------- //
+export interface StatusSpec {
+  kind: StatusKind;
+  magnitude?: Value;
+  name?: string;
+  /** For a dot: the damage type it ticks (default affliction). */
+  dtype?: DamageType;
+  /** For a scoped stun. */
+  scope?: StunScope;
+  /** For a taunt: the unit to force the bearer to target (resolved at apply time). */
+  unitRef?: Selector;
+  /** Effects to run when this status expires naturally (duration lapse). */
+  onExpire?: Effect[];
+  /** Turns; null = round-permanent. May be a Value expression (computed at apply time). */
+  duration: Value | null;
+}
+
+// --------------------------------------------------------------------------- //
+//  Effects — executed for their side effects on MatchState.
+// --------------------------------------------------------------------------- //
+export type Effect =
+  | { op: "damage"; amount: Value; dtype?: DamageType; to?: Selector; id?: NodeId }
+  | { op: "heal"; amount: Value; to?: Selector; overheal?: boolean; id?: NodeId }
+  | { op: "healthLoss"; amount: Value; to?: Selector; id?: NodeId }
+  | { op: "grantShield"; amount: Value; to?: Selector; duration?: number | null; id?: NodeId }
+  | { op: "applyStatus"; status: StatusSpec; to?: Selector; id?: NodeId }
+  | { op: "removeStatus"; kind: StatusKind; name?: string; from?: Selector; id?: NodeId }
+  | { op: "modifyStatus"; kind: StatusKind; name?: string; magnitudeDelta?: Value; durationDelta?: Value; from?: Selector; id?: NodeId }
+  | { op: "addStack"; name: string; amount?: Value; duration?: Value | null; to?: Selector; id?: NodeId }
+  | { op: "grantEnergy"; element: string; amount: Value; id?: NodeId }
+  | { op: "modifyCooldown"; delta: Value; skillId?: string; of?: Selector; id?: NodeId }
+  | { op: "summon"; template: string; count?: Value; hp?: Value; id?: NodeId }
+  | { op: "defeat"; to?: Selector; id?: NodeId } // outright-kill a unit (not damage; bypasses shield/DR/immunity)
+  | { op: "revive"; to?: Selector; hp: Value; id?: NodeId } // bring a dead unit back at `hp`
+  | { op: "transform"; to?: Selector; template: string; keepHp?: boolean; id?: NodeId } // retemplate in place (no death)
+  | { op: "useSkill"; skillId: string; by?: Selector; on?: Selector; id?: NodeId } // invoke a named skill inline
+  | { op: "swapPositions"; a: Selector; b: Selector; id?: NodeId } // swap two units' formation slots
+  | { op: "shuffleTeam"; team?: "allies" | "enemies"; id?: NodeId } // randomly reassign a team's hero slots
+  | { op: "if"; cond: Condition; then: Effect[]; else?: Effect[]; id?: NodeId }
+  | { op: "forEach"; each: Selector; do: Effect[]; id?: NodeId }
+  | { op: "seq"; steps: Effect[]; id?: NodeId }
+  | { op: "schedule"; delayTurns: number; effect: Effect[]; to?: Selector; id?: NodeId }
+  | { op: "custom"; fn: string; args?: Record<string, unknown>; id?: NodeId };
+
+/** A skill's authored form: targeting + the effect tree its active use runs. */
+export interface SkillDef {
+  id: string;
+  name: string;
+  element: string;
+  /** How the primary target(s) are chosen when cast. */
+  targeting: "single" | "self" | "all-enemies" | "all-allies" | "all" | "none";
+  effects: Effect[];
+}
+
+// Node addressing (findNode / replaceNode / mapNode) lives in ./patch.ts — the single walker
+// that recurses every composite op (if/forEach/seq/schedule) AND applyStatus.onExpire. Keeping
+// one implementation avoids the divergence where a second copy silently misses a branch.

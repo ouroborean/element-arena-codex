@@ -1,0 +1,1910 @@
+{
+  "_note": "SUGGESTED augment->target map. Auto-derived by naming heuristic and NOT authoritative. Every entry with review_required=true must be confirmed by hand. There is no number-to-number augment/skill relationship.",
+  "_stats": {
+    "SKILL_PATCH": 78,
+    "MULTI_SKILL_PATCH": 34,
+    "RESOURCE_OR_UNIT": 7,
+    "UNIT_OR_GLOBAL": 12,
+    "EMPTY": 5,
+    "MINION_OR_TEMPLATE": 4
+  },
+  "_skills_patched_by_multiple_augments": {
+    "skill:ando1": [
+      "aug:ando2",
+      "aug:ando3"
+    ],
+    "skill:aramao4": [
+      "aug:aramao1",
+      "aug:aramao3"
+    ],
+    "skill:ayana3": [
+      "aug:ayana2",
+      "aug:ayana4",
+      "aug:ayana5"
+    ],
+    "skill:ayana1": [
+      "aug:ayana3",
+      "aug:ayana5"
+    ],
+    "skill:blackknight1": [
+      "aug:blackknight3",
+      "aug:blackknight5"
+    ],
+    "skill:dennis6": [
+      "aug:dennis2",
+      "aug:dennis5"
+    ],
+    "skill:fate6": [
+      "aug:fate1",
+      "aug:fate5"
+    ],
+    "skill:seedling1": [
+      "aug:gaia2",
+      "aug:gaia4"
+    ],
+    "skill:gommar1": [
+      "aug:gommar1",
+      "aug:gommar5"
+    ],
+    "skill:gommar0": [
+      "aug:gommar2",
+      "aug:gommar4"
+    ],
+    "skill:jarrik0": [
+      "aug:jarrik3",
+      "aug:jarrik4"
+    ],
+    "skill:keeper0": [
+      "aug:keeper1",
+      "aug:keeper4"
+    ],
+    "skill:laria0": [
+      "aug:laria1",
+      "aug:laria3",
+      "aug:laria4",
+      "aug:laria5"
+    ],
+    "skill:laria1": [
+      "aug:laria1",
+      "aug:laria2",
+      "aug:laria3"
+    ],
+    "skill:maggie0": [
+      "aug:maggie1",
+      "aug:maggie2"
+    ],
+    "skill:maggie1": [
+      "aug:maggie1",
+      "aug:maggie2",
+      "aug:maggie4",
+      "aug:maggie5"
+    ],
+    "skill:maggie2": [
+      "aug:maggie2",
+      "aug:maggie4"
+    ],
+    "skill:maggie3": [
+      "aug:maggie2",
+      "aug:maggie5"
+    ],
+    "skill:pyrrha1": [
+      "aug:pyrrha1",
+      "aug:pyrrha2",
+      "aug:pyrrha3"
+    ],
+    "skill:riverdaughter3": [
+      "aug:riverdaughter3",
+      "aug:riverdaughter5"
+    ],
+    "skill:roland1": [
+      "aug:roland3",
+      "aug:roland4"
+    ],
+    "skill:scratch1": [
+      "aug:scratch2",
+      "aug:scratch5"
+    ],
+    "skill:sera0": [
+      "aug:sera1",
+      "aug:sera3"
+    ],
+    "skill:taryn2": [
+      "aug:taryn4",
+      "aug:taryn5"
+    ],
+    "skill:xyris2": [
+      "aug:xyris3",
+      "aug:xyris4"
+    ],
+    "skill:zephyrex1": [
+      "aug:zephyrex1",
+      "aug:zephyrex2"
+    ],
+    "skill:zephyrex4": [
+      "aug:zephyrex3",
+      "aug:zephyrex5"
+    ],
+    "skill:zevkir1": [
+      "aug:zevkir1",
+      "aug:zevkir2",
+      "aug:zevkir3"
+    ]
+  },
+  "augments": {
+    "ando1": {
+      "owner": "ando",
+      "display_name": "Afterimage",
+      "targets": [
+        "skill:ando2"
+      ],
+      "named_skills": [
+        "Flash Step"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "If Ando uses Flash Step while Uncharged, he becomes invulnerable to non-strategic skills for 1 turn."
+    },
+    "ando2": {
+      "owner": "ando",
+      "display_name": "Static Repulsion",
+      "targets": [
+        "skill:ando1",
+        "skill:ando4"
+      ],
+      "named_skills": [
+        "Electroblade",
+        "Focus Power"
+      ],
+      "target_kind": "MULTI_SKILL_PATCH",
+      "review_required": true,
+      "description": "When Ando uses Focus Power, he gains 5 DR for 2 turns for each target marked by Electroblade."
+    },
+    "ando3": {
+      "owner": "ando",
+      "display_name": "Pulse Blade",
+      "targets": [
+        "skill:ando1",
+        "skill:ando3"
+      ],
+      "named_skills": [
+        "Electroblade",
+        "Expel Energy"
+      ],
+      "target_kind": "MULTI_SKILL_PATCH",
+      "review_required": true,
+      "description": "Expel Energy also marks its target and another random target with Electroblade."
+    },
+    "ando4": {
+      "owner": "ando",
+      "display_name": "On the Clock",
+      "targets": [
+        "skill:ando5"
+      ],
+      "named_skills": [
+        "Overclock"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Overclock is now permanent, but Ando receives 15 Affliction damage when he uses a Supercharged ability."
+    },
+    "ando5": {
+      "owner": "ando",
+      "display_name": "Singular Directive",
+      "targets": [],
+      "named_skills": [],
+      "target_kind": "RESOURCE_OR_UNIT",
+      "review_required": true,
+      "description": "While Ando is Charged or Supercharged, he ignores Counters and Reflects."
+    },
+    "aramao1": {
+      "owner": "aramao",
+      "display_name": "Veiled Beat",
+      "targets": [
+        "skill:aramao4",
+        "skill:aramao2"
+      ],
+      "named_skills": [
+        "Desert Veil",
+        "Sand Quake"
+      ],
+      "target_kind": "MULTI_SKILL_PATCH",
+      "review_required": true,
+      "description": "Sand Quake's cost is reduced by 1 [65], but Desert Veil only applies Veiled for 1 turn."
+    },
+    "aramao2": {
+      "owner": "aramao",
+      "display_name": "Hidden Oasis",
+      "targets": [
+        "skill:aramao3"
+      ],
+      "named_skills": [
+        "Mirage Trap"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "If Mirage Trap expires without being triggered, the affected enemy heals the allied Hero directly across from them for 25 HP."
+    },
+    "aramao3": {
+      "owner": "aramao",
+      "display_name": "Vanishing Act",
+      "targets": [
+        "skill:aramao4"
+      ],
+      "named_skills": [
+        "Desert Veil"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "After Desert Veil finishes applying Veiled, the untargeted allied Hero is Veiled for 2 turns."
+    },
+    "aramao4": {
+      "owner": "aramao",
+      "display_name": "Wraithblade",
+      "targets": [
+        "skill:aramao1"
+      ],
+      "named_skills": [
+        "Desert Knife"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "If Aramao is Veiled, Desert Knife deals 10 more damage and extends the duration of his Veiled effects by 1 turn."
+    },
+    "aramao5": {
+      "owner": "aramao",
+      "display_name": "Dune Step",
+      "targets": [],
+      "named_skills": [],
+      "target_kind": "UNIT_OR_GLOBAL",
+      "review_required": true,
+      "description": "Trial of Sands lasts 1 more turn. While it is active, all enemy Heroes are considered to be across from Aramao, and all allied Heroes are considered to be adjacent to him."
+    },
+    "ayana1": {
+      "owner": "ayana",
+      "display_name": "Honor Guard",
+      "targets": [],
+      "named_skills": [],
+      "target_kind": "UNIT_OR_GLOBAL",
+      "review_required": true,
+      "description": "The base damage reduction per ally is increased to 10"
+    },
+    "ayana2": {
+      "owner": "ayana",
+      "display_name": "Guarded Meditation",
+      "targets": [
+        "skill:ayana3"
+      ],
+      "named_skills": [
+        "Prayer"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Ayana gains 30 shield for 1 turn when she uses Prayer."
+    },
+    "ayana3": {
+      "owner": "ayana",
+      "display_name": "Stern Reminder",
+      "targets": [
+        "skill:ayana1"
+      ],
+      "named_skills": [
+        "Voice of Light"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "If an enemy triggers Voice of Light, it is automatically recast on them, ignoring invulnerability and counters"
+    },
+    "ayana4": {
+      "owner": "ayana",
+      "display_name": "Answered Prayers",
+      "targets": [
+        "skill:ayana3"
+      ],
+      "named_skills": [
+        "Prayer"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Prayer makes its target Invulnerable for 1 turn if used on a target below 20 HP."
+    },
+    "ayana5": {
+      "owner": "ayana",
+      "display_name": "Harsh Words",
+      "targets": [
+        "skill:ayana1",
+        "skill:ayana3"
+      ],
+      "named_skills": [
+        "Voice of Light",
+        "Prayer"
+      ],
+      "target_kind": "MULTI_SKILL_PATCH",
+      "review_required": true,
+      "description": "Prayer and Voice of Light cause 10 more healing or damage, but no longer have a secondary effect."
+    },
+    "blackknight1": {
+      "owner": "blackknight",
+      "display_name": "Obsidian Duelist",
+      "targets": [],
+      "named_skills": [],
+      "target_kind": "UNIT_OR_GLOBAL",
+      "review_required": true,
+      "description": "If the Black Knight defeats an enemy, his skills are enhanced for the following two turns"
+    },
+    "blackknight2": {
+      "owner": "blackknight",
+      "display_name": "Ebonsteel Charger",
+      "targets": [
+        "skill:blackknight5"
+      ],
+      "named_skills": [
+        "The Nightmare Rides"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "The turn after activating his passive, The Nightmare Rides costs one less [8]."
+    },
+    "blackknight3": {
+      "owner": "blackknight",
+      "display_name": "Devour Strength",
+      "targets": [
+        "skill:blackknight1",
+        "skill:blackknight3"
+      ],
+      "named_skills": [
+        "Oathbreaker Strike",
+        "Unholy Aura"
+      ],
+      "target_kind": "MULTI_SKILL_PATCH",
+      "review_required": true,
+      "description": "Oathbreaker Strike deals 15 additional damage to the primary target if Unholy Aura is affecting more than 3 targets"
+    },
+    "blackknight4": {
+      "owner": "blackknight",
+      "display_name": "Unholy Fortitude",
+      "targets": [
+        "skill:blackknight4"
+      ],
+      "named_skills": [
+        "Dead or Alive"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "If Dead or Alive successfully redirects an ability, the Black Knight gains Elemental Essence"
+    },
+    "blackknight5": {
+      "owner": "blackknight",
+      "display_name": "Oathbreaker's Blade",
+      "targets": [
+        "skill:blackknight1"
+      ],
+      "named_skills": [
+        "Oathbreaker Strike"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Oathbreaker Strike deals 10 damage to the target's allies while enhanced."
+    },
+    "darkness1": {
+      "owner": "darkness",
+      "display_name": null,
+      "targets": [],
+      "target_kind": "EMPTY",
+      "review_required": false,
+      "note": "empty description (darkness placeholder — excluded from roster)"
+    },
+    "darkness2": {
+      "owner": "darkness",
+      "display_name": null,
+      "targets": [],
+      "target_kind": "EMPTY",
+      "review_required": false,
+      "note": "empty description (darkness placeholder — excluded from roster)"
+    },
+    "darkness3": {
+      "owner": "darkness",
+      "display_name": null,
+      "targets": [],
+      "target_kind": "EMPTY",
+      "review_required": false,
+      "note": "empty description (darkness placeholder — excluded from roster)"
+    },
+    "darkness4": {
+      "owner": "darkness",
+      "display_name": null,
+      "targets": [],
+      "target_kind": "EMPTY",
+      "review_required": false,
+      "note": "empty description (darkness placeholder — excluded from roster)"
+    },
+    "darkness5": {
+      "owner": "darkness",
+      "display_name": null,
+      "targets": [],
+      "target_kind": "EMPTY",
+      "review_required": false,
+      "note": "empty description (darkness placeholder — excluded from roster)"
+    },
+    "dennis1": {
+      "owner": "dennis",
+      "display_name": "Auto-Injectors",
+      "targets": [
+        "skill:dennis3"
+      ],
+      "named_skills": [
+        "HS-46 Ascendant Serum"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Dennis will automatically use HS-46 Ascendant Serum on himself any time he receives a stun effect."
+    },
+    "dennis2": {
+      "owner": "dennis",
+      "display_name": "Rage Response",
+      "targets": [
+        "skill:dennis2",
+        "skill:dennis6"
+      ],
+      "named_skills": [
+        "HS-112 Fury Serum",
+        "End of Shift"
+      ],
+      "target_kind": "MULTI_SKILL_PATCH",
+      "review_required": true,
+      "description": "Dennis will automatically use HS-112 Fury Serum on himself if an allied Hero dies. If that Hero was Hector the Injector, Dennis uses End of Shift instead."
+    },
+    "dennis3": {
+      "owner": "dennis",
+      "display_name": "Long Memory",
+      "targets": [
+        "skill:dennis0"
+      ],
+      "named_skills": [
+        "Pain Tolerance"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Pain Tolerance now lasts for 2 turns."
+    },
+    "dennis4": {
+      "owner": "dennis",
+      "display_name": "Dennis So Popular Now",
+      "targets": [
+        "skill:dennis4"
+      ],
+      "named_skills": [
+        "Shared Agony"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Shared Agony now costs 1 Generic energy, but both parts of its activation now include all allied units."
+    },
+    "dennis5": {
+      "owner": "dennis",
+      "display_name": "Working for Weekend",
+      "targets": [
+        "skill:dennis1",
+        "skill:dennis6"
+      ],
+      "named_skills": [
+        "Big Green Fist",
+        "End of Shift"
+      ],
+      "target_kind": "MULTI_SKILL_PATCH",
+      "review_required": true,
+      "description": "Big Green Fist deals 5 more base damage, and decreases the remaining cooldown of End of Shift by 1 turn."
+    },
+    "fate1": {
+      "owner": "fate",
+      "display_name": "Resurgent Revival",
+      "targets": [
+        "skill:fate6"
+      ],
+      "named_skills": [
+        "This Is Not The End"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "If Fate is revived using This Is Not The End, he no longer prevents healing from his allies from affecting him."
+    },
+    "fate2": {
+      "owner": "fate",
+      "display_name": "Azure Lure",
+      "targets": [
+        "skill:fate2"
+      ],
+      "named_skills": [
+        "Will-o'-wisp"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Will-o'-wisp no longer gives Fate's team Shield. Instead, the enemy team has their Helpful skills stunned while it is active."
+    },
+    "fate3": {
+      "owner": "fate",
+      "display_name": "Vulpus Arcana",
+      "targets": [
+        "skill:fate4",
+        "skill:fate3"
+      ],
+      "named_skills": [
+        "Vulpus Crystallia",
+        "Vulpus Incendia"
+      ],
+      "target_kind": "MULTI_SKILL_PATCH",
+      "review_required": true,
+      "description": "Vulpus Incendia and Vulpus Crystallia can now be used without interrupting Channeling."
+    },
+    "fate4": {
+      "owner": "fate",
+      "display_name": "Deja Vu",
+      "targets": [
+        "skill:fate5"
+      ],
+      "named_skills": [
+        "Fox's Cunning"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Enemies that don't trigger Fox's Cunning during its duration will have their cooldowns paralyzed for 2 turns."
+    },
+    "fate5": {
+      "owner": "fate",
+      "display_name": "Once More, Together",
+      "targets": [
+        "skill:fate6"
+      ],
+      "named_skills": [
+        "This Is Not The End"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "This Is Not The End's trigger limit is now per allied Hero (each Hero can be revived once per round.)"
+    },
+    "gaia1": {
+      "owner": "gaia",
+      "display_name": "Yggdrasil's Guidance",
+      "targets": [],
+      "named_skills": [],
+      "target_kind": "MINION_OR_TEMPLATE",
+      "review_required": true,
+      "description": "At the start of the game, Gaia creates a Worldsprout minion instead of a Seedling."
+    },
+    "gaia2": {
+      "owner": "gaia",
+      "display_name": "Earthen Aid",
+      "targets": [
+        "skill:seedling1"
+      ],
+      "named_skills": [
+        "Channel Earth"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Channel Earth heals a random ally for 10 HP"
+    },
+    "gaia3": {
+      "owner": "gaia",
+      "display_name": "Stonepod Seedlings",
+      "targets": [],
+      "named_skills": [],
+      "target_kind": "MINION_OR_TEMPLATE",
+      "review_required": true,
+      "description": "Gaia's minions are created with 10 more maximum HP."
+    },
+    "gaia4": {
+      "owner": "gaia",
+      "display_name": "Destructive Divergence",
+      "targets": [
+        "skill:gaia3",
+        "skill:seedling1"
+      ],
+      "named_skills": [
+        "Channel Vitality",
+        "Channel Earth"
+      ],
+      "target_kind": "MULTI_SKILL_PATCH",
+      "review_required": true,
+      "description": "Each time Channel Vitality is triggered, Gaia gains a stack of Channel Earth."
+    },
+    "gaia5": {
+      "owner": "gaia",
+      "display_name": "Soul Channeling",
+      "targets": [],
+      "named_skills": [],
+      "target_kind": "MINION_OR_TEMPLATE",
+      "review_required": true,
+      "description": "Gaia now starts the round with 3 Seedlings"
+    },
+    "galazax1": {
+      "owner": "galazax",
+      "display_name": "Twin Storms",
+      "targets": [],
+      "named_skills": [],
+      "target_kind": "UNIT_OR_GLOBAL",
+      "review_required": true,
+      "description": "Galazax can now Channel up to 2 separate copies of The Skies Darken."
+    },
+    "galazax2": {
+      "owner": "galazax",
+      "display_name": "Chain Lightning",
+      "targets": [
+        "skill:galazax2"
+      ],
+      "named_skills": [
+        "Lightning Strikes"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Lightning Strikes now deals 10 damage to the primary target and 5 to all other enemies, and becomes Piercing."
+    },
+    "galazax3": {
+      "owner": "galazax",
+      "display_name": "The Voice Above",
+      "targets": [
+        "skill:galazax4"
+      ],
+      "named_skills": [
+        "The Heavens Speak"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "The Heavens Speak now costs [65] less and no longer cancels Channeled skills."
+    },
+    "galazax4": {
+      "owner": "galazax",
+      "display_name": "Deafening Silence",
+      "targets": [
+        "skill:galazax5"
+      ],
+      "named_skills": [
+        "Thunder Deafens"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Thunder Deafens has its cooldown reduced by 1, but it no longer causes Galazax to ignore damage."
+    },
+    "galazax5": {
+      "owner": "galazax",
+      "display_name": "Looming Grudge",
+      "targets": [
+        "skill:galazax0"
+      ],
+      "named_skills": [
+        "The Storm Builds"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "A random enemy Hero starts each round with 3 stacks of The Storm Builds."
+    },
+    "gommar1": {
+      "owner": "gommar",
+      "display_name": "Icy Shrapnel",
+      "targets": [
+        "skill:gommar2",
+        "skill:gommar1"
+      ],
+      "named_skills": [
+        "Foot of the Mountain",
+        "Iceblood Hammer"
+      ],
+      "target_kind": "MULTI_SKILL_PATCH",
+      "review_required": true,
+      "description": "Iceblood Hammer and Foot of the Mountain now mark a random enemy on use. The following turn, that enemy will take 20 damage."
+    },
+    "gommar2": {
+      "owner": "gommar",
+      "display_name": "Frozen Fortress",
+      "targets": [
+        "skill:gommar0"
+      ],
+      "named_skills": [
+        "Frost-Covered"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "While Frost-Covered, Gommar gains 10 points of DR"
+    },
+    "gommar3": {
+      "owner": "gommar",
+      "display_name": "Winter's Howl",
+      "targets": [
+        "skill:gommar3"
+      ],
+      "named_skills": [
+        "Breath of the North"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Breath of the North now lowers the targets damage by 15, lowered by 5 every time they use a skill."
+    },
+    "gommar4": {
+      "owner": "gommar",
+      "display_name": "Flashfreeze",
+      "targets": [
+        "skill:gommar0"
+      ],
+      "named_skills": [
+        "Frost-Covered"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "After Gommar consumes Frost-Covered, he regains it at the end of his next turn."
+    },
+    "gommar5": {
+      "owner": "gommar",
+      "display_name": "Brittle Ice",
+      "targets": [
+        "skill:gommar1"
+      ],
+      "named_skills": [
+        "Iceblood Hammer"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Iceblood Hammer deals 5 less damage and costs one fewer r each time it is used, stacking up to twice."
+    },
+    "hector1": {
+      "owner": "hector",
+      "display_name": "Overeager",
+      "targets": [
+        "skill:hector1"
+      ],
+      "named_skills": [
+        "Burning Blood Serum"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "At the start of each round, Hector automatically casts Burning Blood Serum on Dennis."
+    },
+    "hector2": {
+      "owner": "hector",
+      "display_name": "Calibrated Syringe Gun",
+      "targets": [],
+      "named_skills": [],
+      "target_kind": "RESOURCE_OR_UNIT",
+      "review_required": true,
+      "description": "Hector's Serum skills cannot be stunned."
+    },
+    "hector3": {
+      "owner": "hector",
+      "display_name": "Dilution",
+      "targets": [],
+      "named_skills": [],
+      "target_kind": "RESOURCE_OR_UNIT",
+      "review_required": true,
+      "description": "Serums now last for 2 additional turns, but their costs are increased by [65]."
+    },
+    "hector4": {
+      "owner": "hector",
+      "display_name": "Promotion",
+      "targets": [
+        "skill:hector0"
+      ],
+      "named_skills": [
+        "Dennis the Apprentice"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Dennis the Apprentice begins the game with 20 extra health, and under the effect of a random Serum"
+    },
+    "hector5": {
+      "owner": "hector",
+      "display_name": "Emergency Clinic",
+      "targets": [],
+      "named_skills": [],
+      "target_kind": "RESOURCE_OR_UNIT",
+      "review_required": true,
+      "description": "Hector may use his Serums on targets other than Dennis once Dennis has died."
+    },
+    "jarrik1": {
+      "owner": "jarrik",
+      "display_name": "Ashen Cleave",
+      "targets": [
+        "skill:jarrik1"
+      ],
+      "named_skills": [
+        "Blade of Ashes"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Blade of Ashes strikes an additional random enemy for 10 damage. Has no effect if Blade of Ashes is AOE."
+    },
+    "jarrik2": {
+      "owner": "jarrik",
+      "display_name": "Charred and Crumbling",
+      "targets": [],
+      "named_skills": [],
+      "target_kind": "UNIT_OR_GLOBAL",
+      "review_required": true,
+      "description": "Enemies affected by Blackened Wounds ignore healing for 1 turn."
+    },
+    "jarrik3": {
+      "owner": "jarrik",
+      "display_name": "Blazing Crescendo",
+      "targets": [
+        "skill:jarrik2",
+        "skill:jarrik0"
+      ],
+      "named_skills": [
+        "Cinderswell",
+        "Cinders"
+      ],
+      "target_kind": "MULTI_SKILL_PATCH",
+      "review_required": true,
+      "description": "If all enemies affected by Cinderswell are marked by Cinders, they have their non-Strategic skills stunned for 1 turn."
+    },
+    "jarrik4": {
+      "owner": "jarrik",
+      "display_name": "Blackened Soul",
+      "targets": [
+        "skill:jarrik0"
+      ],
+      "named_skills": [
+        "Cinders"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Jarrik splits all single-target damage received between him and any active Cinders."
+    },
+    "jarrik5": {
+      "owner": "jarrik",
+      "display_name": "Dazzling Lights",
+      "targets": [
+        "skill:jarrik5"
+      ],
+      "named_skills": [
+        "Blade of Dancing Lights"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "While Blade of Dancing Lights is active, Cinder minions ignore harmful skills."
+    },
+    "keeper1": {
+      "owner": "keeper",
+      "display_name": "Riveting Read",
+      "targets": [
+        "skill:keeper0",
+        "skill:keeper1"
+      ],
+      "named_skills": [
+        "Tales to Tell",
+        "Page-turner"
+      ],
+      "target_kind": "MULTI_SKILL_PATCH",
+      "review_required": true,
+      "description": "If Keeper of Fables still has Shield on Tales to Tell after using Page-turner, the targeted enemy is stunned for 1 turn. Page-turner's cooldown is increased by 1."
+    },
+    "keeper2": {
+      "owner": "keeper",
+      "display_name": "Flat Design",
+      "targets": [
+        "skill:keeper2"
+      ],
+      "named_skills": [
+        "Character Development"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "If Character Development targets an ally it hasn't targeted yet this round, Keeper of Fables gains Elemental Essence."
+    },
+    "keeper3": {
+      "owner": "keeper",
+      "display_name": "Plot Twist",
+      "targets": [
+        "skill:keeper5"
+      ],
+      "named_skills": [
+        "Hero's Return"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "If Keeper of Fables is the only living Hero you control, Hero's Return only consumes 50 Shield and costs one less [65]."
+    },
+    "keeper4": {
+      "owner": "keeper",
+      "display_name": "Good Pacing",
+      "targets": [
+        "skill:keeper0"
+      ],
+      "named_skills": [
+        "Tales to Tell"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Shield from Tales to Tell can only take a maximum of 20 damage from a single hit."
+    },
+    "keeper5": {
+      "owner": "keeper",
+      "display_name": "Nose in a Book",
+      "targets": [],
+      "named_skills": [],
+      "target_kind": "UNIT_OR_GLOBAL",
+      "review_required": true,
+      "description": "If Keeper of Fables doesn't act during his turn, he heals his team for 5 health."
+    },
+    "laria1": {
+      "owner": "laria",
+      "display_name": "Darkest Hour",
+      "targets": [
+        "skill:laria0",
+        "skill:laria1"
+      ],
+      "named_skills": [
+        "Deepening Shadows",
+        "Nightwrap"
+      ],
+      "target_kind": "MULTI_SKILL_PATCH",
+      "review_required": true,
+      "description": "If the target of Nightwrap has 4 Stacks of Deepening Shadows, they become Invulnerable if they are an ally or Stunned if they are an enemy. Effect lasts 1 turn."
+    },
+    "laria2": {
+      "owner": "laria",
+      "display_name": "Noble Thief",
+      "targets": [
+        "skill:laria1"
+      ],
+      "named_skills": [
+        "Nightwrap"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "If Laria uses Nightwrap on a target without Elemental Essence, she gives them Elemental Essence if they are an ally, and generates a Generic energy if they are an enemy."
+    },
+    "laria3": {
+      "owner": "laria",
+      "display_name": "Nightblade",
+      "targets": [
+        "skill:laria0",
+        "skill:laria1"
+      ],
+      "named_skills": [
+        "Deepening Shadows",
+        "Nightwrap"
+      ],
+      "target_kind": "MULTI_SKILL_PATCH",
+      "review_required": true,
+      "description": "Nightwrap now counts stacks of Deepening Shadows on Laria if she is using it on an enemy"
+    },
+    "laria4": {
+      "owner": "laria",
+      "display_name": "Nightwalker",
+      "targets": [
+        "skill:laria0"
+      ],
+      "named_skills": [
+        "Deepening Shadows"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Characters with 3 or more stacks of Deepening Shadows Bypass."
+    },
+    "laria5": {
+      "owner": "laria",
+      "display_name": "Vanishing Powder",
+      "targets": [
+        "skill:laria0",
+        "skill:laria4"
+      ],
+      "named_skills": [
+        "Deepening Shadows",
+        "Vanish"
+      ],
+      "target_kind": "MULTI_SKILL_PATCH",
+      "review_required": true,
+      "description": "When a character receives their 3rd stack of Deepening Shadows, they gain the effects of Vanish."
+    },
+    "maggie1": {
+      "owner": "maggie",
+      "display_name": "Leeching Briars",
+      "targets": [
+        "skill:maggie0",
+        "skill:maggie1"
+      ],
+      "named_skills": [
+        "Curse of Thorns",
+        "Bramblelash"
+      ],
+      "target_kind": "MULTI_SKILL_PATCH",
+      "review_required": true,
+      "description": "When Maggie gains Elemental Essence from Bramblelash, she heals 5 health for every stack of Curse of Thorns on her."
+    },
+    "maggie2": {
+      "owner": "maggie",
+      "display_name": "Fractal Thorns",
+      "targets": [
+        "skill:maggie0",
+        "skill:maggie2",
+        "skill:maggie1",
+        "skill:maggie3"
+      ],
+      "named_skills": [
+        "Curse of Thorns",
+        "Grasping Vines",
+        "Bramblelash",
+        "Thornburst"
+      ],
+      "target_kind": "MULTI_SKILL_PATCH",
+      "review_required": true,
+      "description": "Bramblelash, Thornburst, and Grasping Vines deal 5 additional damage if Maggie has 2 or more stacks of Curse of Thorns. This damage increases to 10 when she has 4 or more."
+    },
+    "maggie3": {
+      "owner": "maggie",
+      "display_name": "Mutual Assurance",
+      "targets": [],
+      "named_skills": [],
+      "target_kind": "RESOURCE_OR_UNIT",
+      "review_required": true,
+      "description": "When Maggie's Shield is damaged while Bramblebarrier is active, she deals 5 Piercing damage to the enemy team."
+    },
+    "maggie4": {
+      "owner": "maggie",
+      "display_name": "Hold Still",
+      "targets": [
+        "skill:maggie2",
+        "skill:maggie1"
+      ],
+      "named_skills": [
+        "Grasping Vines",
+        "Bramblelash"
+      ],
+      "target_kind": "MULTI_SKILL_PATCH",
+      "review_required": true,
+      "description": "Enemies stunned by Grasping Vines take 15 more damage from Bramblelash."
+    },
+    "maggie5": {
+      "owner": "maggie",
+      "display_name": "Scornful Thorns",
+      "targets": [
+        "skill:maggie1",
+        "skill:maggie3"
+      ],
+      "named_skills": [
+        "Bramblelash",
+        "Thornburst"
+      ],
+      "target_kind": "MULTI_SKILL_PATCH",
+      "review_required": true,
+      "description": "Targets marked by Bramblelash receive 10 additional damage from Thornburst."
+    },
+    "pyrrha1": {
+      "owner": "pyrrha",
+      "display_name": "Pyromania",
+      "targets": [
+        "skill:pyrrha1"
+      ],
+      "named_skills": [
+        "Fan the Flames"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Fan the Flames now costs 1 more [65], but deals 5 additional damage per tick."
+    },
+    "pyrrha2": {
+      "owner": "pyrrha",
+      "display_name": "Flickering Form",
+      "targets": [
+        "skill:pyrrha1"
+      ],
+      "named_skills": [
+        "Fan the Flames"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Pyrrha heals for 10 health any time Fan the Flames expires or is removed."
+    },
+    "pyrrha3": {
+      "owner": "pyrrha",
+      "display_name": "Unending Hunger",
+      "targets": [
+        "skill:pyrrha1",
+        "skill:pyrrha3"
+      ],
+      "named_skills": [
+        "Fan the Flames",
+        "Pyrokinesis"
+      ],
+      "target_kind": "MULTI_SKILL_PATCH",
+      "review_required": true,
+      "description": "Pyrokinesis will now consume Fan the Flames to deal 15 extra damage."
+    },
+    "pyrrha4": {
+      "owner": "pyrrha",
+      "display_name": "Concussive Force",
+      "targets": [
+        "skill:pyrrha4"
+      ],
+      "named_skills": [
+        "Flashbang"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Flashbang now fully stuns the targeted enemy"
+    },
+    "pyrrha5": {
+      "owner": "pyrrha",
+      "display_name": "World in Flames",
+      "targets": [
+        "skill:pyrrha5"
+      ],
+      "named_skills": [
+        "Wraith in White"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "While Wraith in White is active, Pyrrha deals 5 Affliction damage to the enemy team each turn."
+    },
+    "riverdaughter1": {
+      "owner": "riverdaughter",
+      "display_name": "Crushing Depths",
+      "targets": [
+        "skill:riverdaughter2"
+      ],
+      "named_skills": [
+        "Undertow"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Enemies who have been stunned by Undertow take 10 affliction damage each turn for the rest of the game."
+    },
+    "riverdaughter2": {
+      "owner": "riverdaughter",
+      "display_name": "Balm",
+      "targets": [
+        "skill:riverdaughter4"
+      ],
+      "named_skills": [
+        "Soothe"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "When Soothe expires, it will attempt to jump to an ally that doesn't currently have it."
+    },
+    "riverdaughter3": {
+      "owner": "riverdaughter",
+      "display_name": "Trickster Clone",
+      "targets": [
+        "skill:riverdaughter3"
+      ],
+      "named_skills": [
+        "River Clone"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "If River Clone expires without being triggered, it will attempt to jump to an ally that doesn't currently have it."
+    },
+    "riverdaughter4": {
+      "owner": "riverdaughter",
+      "display_name": "Restorative Retreat",
+      "targets": [
+        "skill:riverdaughter5"
+      ],
+      "named_skills": [
+        "Dive"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "River Daughter heals 20 health for 2 turns when she uses Dive."
+    },
+    "riverdaughter5": {
+      "owner": "riverdaughter",
+      "display_name": "River Within",
+      "targets": [
+        "skill:riverdaughter3",
+        "skill:riverdaughter1"
+      ],
+      "named_skills": [
+        "River Clone",
+        "Ripple"
+      ],
+      "target_kind": "MULTI_SKILL_PATCH",
+      "review_required": true,
+      "description": "Whenever River Clone is triggered, River Daughter casts Ripple."
+    },
+    "roland1": {
+      "owner": "roland",
+      "display_name": "Ricochet Rumble",
+      "targets": [],
+      "named_skills": [],
+      "target_kind": "MINION_OR_TEMPLATE",
+      "review_required": true,
+      "description": "Boulder minions are created with 60 HP."
+    },
+    "roland2": {
+      "owner": "roland",
+      "display_name": "Bedrock Bident",
+      "targets": [
+        "skill:roland2"
+      ],
+      "named_skills": [
+        "Earth Pillar"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Earth Pillar marks an additional random enemy each time it is used."
+    },
+    "roland3": {
+      "owner": "roland",
+      "display_name": "Stone Speaks To Stone",
+      "targets": [
+        "skill:roland1",
+        "skill:roland4"
+      ],
+      "named_skills": [
+        "Strength From The Earth",
+        "Stoneform"
+      ],
+      "target_kind": "MULTI_SKILL_PATCH",
+      "review_required": true,
+      "description": "Stoneform now lasts 1 additional turn, and while affected by it, Boulders deal double damage when launched with Strength From The Earth."
+    },
+    "roland4": {
+      "owner": "roland",
+      "display_name": "Sediment Shotgun",
+      "targets": [
+        "skill:roland1"
+      ],
+      "named_skills": [
+        "Strength From The Earth"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Boulders are now created with 25 less HP. If Roland destroys a Boulder with Strength From The Earth, he deals 25 Piercing damage to all enemies."
+    },
+    "roland5": {
+      "owner": "roland",
+      "display_name": "Rockslide",
+      "targets": [
+        "skill:roland3"
+      ],
+      "named_skills": [
+        "Form Stone"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Form Stone now creates two Boulders at a time."
+    },
+    "saya1": {
+      "owner": "saya",
+      "display_name": "Royalties",
+      "targets": [
+        "skill:saya1"
+      ],
+      "named_skills": [
+        "Universal Energy Conduit"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "When Saya gives an ally Elemental Essence with Universal Energy Conduit, she also gains Elemental Essence"
+    },
+    "saya2": {
+      "owner": "saya",
+      "display_name": "Link Coils",
+      "targets": [
+        "skill:saya2"
+      ],
+      "named_skills": [
+        "Saya Coil"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Saya Coil deals an additional 5 damage for every Saya Coil she has active"
+    },
+    "saya3": {
+      "owner": "saya",
+      "display_name": "What's Mine is Yours",
+      "targets": [
+        "skill:saya3"
+      ],
+      "named_skills": [
+        "Spider Mines"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Spider Mines now affects a single enemy, but only lasts for one turn."
+    },
+    "saya4": {
+      "owner": "saya",
+      "display_name": "Kinetic Converter",
+      "targets": [
+        "skill:saya4"
+      ],
+      "named_skills": [
+        "Plasma Shield"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Reduces the cooldown of Plasma Shield to 1 turn, but reduces the shield it grants to 25."
+    },
+    "saya5": {
+      "owner": "saya",
+      "display_name": "Hair Trigger",
+      "targets": [
+        "skill:saya0"
+      ],
+      "named_skills": [
+        "Well-Used Panic Button"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Well-Used Panic Button will now trigger when Saya falls below 60 health."
+    },
+    "scratch1": {
+      "owner": "scratch",
+      "display_name": "Sign In Blood",
+      "targets": [],
+      "named_skills": [],
+      "target_kind": "RESOURCE_OR_UNIT",
+      "review_required": true,
+      "description": "Allies receive 10 Affliction damage when triggering Scratch's Deal skills, but they gain Elemental Essence when doing so."
+    },
+    "scratch2": {
+      "owner": "scratch",
+      "display_name": "Absolute Power",
+      "targets": [
+        "skill:scratch1"
+      ],
+      "named_skills": [
+        "Deal: Defeat Your Enemies"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Heroes affected by Deal: Defeat Your Enemies ignore stuns and counters."
+    },
+    "scratch3": {
+      "owner": "scratch",
+      "display_name": "Everything Must Go",
+      "targets": [],
+      "named_skills": [],
+      "target_kind": "UNIT_OR_GLOBAL",
+      "review_required": true,
+      "description": "Each round, the first time Scratch falls below 30 HP, his next non-Ultimate Deal skill applies all other non-Ultimate Deal skills."
+    },
+    "scratch4": {
+      "owner": "scratch",
+      "display_name": "Bump Those Numbers",
+      "targets": [],
+      "named_skills": [],
+      "target_kind": "UNIT_OR_GLOBAL",
+      "review_required": true,
+      "description": "Scratch's Deal skills no longer have a cooldown, but can only affect each Hero once per round."
+    },
+    "scratch5": {
+      "owner": "scratch",
+      "display_name": "Dramatic Irony",
+      "targets": [
+        "skill:scratch1",
+        "skill:scratch2"
+      ],
+      "named_skills": [
+        "Deal: Defeat Your Enemies",
+        "Deal: Save Your Friends"
+      ],
+      "target_kind": "MULTI_SKILL_PATCH",
+      "review_required": true,
+      "description": "Deal: Defeat Your Enemies and Deal: Save Your Friends are now invisible until triggered."
+    },
+    "sera1": {
+      "owner": "sera",
+      "display_name": "Vengeful Tempest",
+      "targets": [
+        "skill:sera1",
+        "skill:sera0"
+      ],
+      "named_skills": [
+        "Synthetic Skyblade",
+        "Eyes of Vengeance"
+      ],
+      "target_kind": "MULTI_SKILL_PATCH",
+      "review_required": true,
+      "description": "Synthetic Skyblade deals 5 additional base damage, costs an additional Generic, and will consume 2 stacks of Eyes of Vengeance."
+    },
+    "sera2": {
+      "owner": "sera",
+      "display_name": "Proto-Prophecy",
+      "targets": [
+        "skill:sera3"
+      ],
+      "named_skills": [
+        "Heavenly Parry"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Enemies targeted by Heavenly Parry deal 10 reduced damage for their next turn. This effect is invisible."
+    },
+    "sera3": {
+      "owner": "sera",
+      "display_name": "Ire of the Storm",
+      "targets": [
+        "skill:sera2",
+        "skill:sera0"
+      ],
+      "named_skills": [
+        "Energized Wingstorm",
+        "Eyes of Vengeance"
+      ],
+      "target_kind": "MULTI_SKILL_PATCH",
+      "review_required": true,
+      "description": "If Energized Wingstorm consumes 3 or more stacks of Eyes of Vengeance, it will deal an additional 15 Piercing damage to each target the following turn."
+    },
+    "sera4": {
+      "owner": "sera",
+      "display_name": "Unto Others",
+      "targets": [
+        "skill:sera5"
+      ],
+      "named_skills": [
+        "Proactivity Protocol"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Proactivity Protocol now deals 15 normal Damage and heals for 25, but gains an additional 1 turn cooldown."
+    },
+    "sera5": {
+      "owner": "sera",
+      "display_name": "Fueled by Vengeance",
+      "targets": [
+        "skill:sera6"
+      ],
+      "named_skills": [
+        "Divinity Engine"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Divinity Engine lasts an additional turn for each of Sera's dead allies."
+    },
+    "syl1": {
+      "owner": "syl",
+      "display_name": "Voracious Growth",
+      "targets": [
+        "skill:syl5",
+        "skill:syl1"
+      ],
+      "named_skills": [
+        "Leyline Nest",
+        "Feed"
+      ],
+      "target_kind": "MULTI_SKILL_PATCH",
+      "review_required": true,
+      "description": "Successfully healing Syl's Eagle Minion with Feed lowers the cost of Leyline Nest by [4] until the next time it is used."
+    },
+    "syl2": {
+      "owner": "syl",
+      "display_name": "Wonder by Wonder",
+      "targets": [
+        "skill:syl3"
+      ],
+      "named_skills": [
+        "To the Skies!"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "To the Skies! now lasts an additional turn."
+    },
+    "syl3": {
+      "owner": "syl",
+      "display_name": "Plummet",
+      "targets": [
+        "skill:sylminion1"
+      ],
+      "named_skills": [
+        "Talon Rake"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Enemies stunned by Talon Rake receive 15 damage when the stun ends."
+    },
+    "syl4": {
+      "owner": "syl",
+      "display_name": "You and Me",
+      "targets": [
+        "skill:syl4"
+      ],
+      "named_skills": [
+        "Unbreakable Bond"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Unbreakable Bond now heals Syl and her Eagle for 10 health after health has been equalized."
+    },
+    "syl5": {
+      "owner": "syl",
+      "display_name": "Shish Kebab",
+      "targets": [
+        "skill:syl2"
+      ],
+      "named_skills": [
+        "Skylance"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Skylance now heals Syl's Eagle minion for 10 health. If her Eagle minion is at maximum life after the heal, she gains Elemental Essence."
+    },
+    "taryn1": {
+      "owner": "taryn",
+      "display_name": "Inspiring Sweep",
+      "targets": [
+        "skill:taryn3"
+      ],
+      "named_skills": [
+        "Inspiring Thrust"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Inspiring Thrust now targets all enemies but has an additional 1 turn cooldown."
+    },
+    "taryn2": {
+      "owner": "taryn",
+      "display_name": "Unbreakable Protector",
+      "targets": [
+        "skill:taryn0"
+      ],
+      "named_skills": [
+        "Protector of the Song"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Protector of the Song now also triggers when Taryn is stunned or countered."
+    },
+    "taryn3": {
+      "owner": "taryn",
+      "display_name": "Eternal Service",
+      "targets": [],
+      "named_skills": [],
+      "target_kind": "UNIT_OR_GLOBAL",
+      "review_required": true,
+      "description": "Taryn's Strategic skills cannot be stunned."
+    },
+    "taryn4": {
+      "owner": "taryn",
+      "display_name": "Mine is the Verse",
+      "targets": [
+        "skill:taryn2"
+      ],
+      "named_skills": [
+        "Refrain"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Allies affected by Refrain reflect harmful they receive to Taryn."
+    },
+    "taryn5": {
+      "owner": "taryn",
+      "display_name": "Hers is the Glory",
+      "targets": [
+        "skill:taryn2"
+      ],
+      "named_skills": [
+        "Refrain"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Refrain will now target a random ally when used on an enemy, or a random enemy when used on an ally."
+    },
+    "titania1": {
+      "owner": "titania",
+      "display_name": "In On The Joke",
+      "targets": [
+        "skill:titania2",
+        "skill:titania0"
+      ],
+      "named_skills": [
+        "Laughing Powder",
+        "Whimsy"
+      ],
+      "target_kind": "MULTI_SKILL_PATCH",
+      "review_required": true,
+      "description": "Allies affected by Laughing Powder also gain the effects of Whimsy."
+    },
+    "titania2": {
+      "owner": "titania",
+      "display_name": "Bloody Humor",
+      "targets": [
+        "skill:titania3"
+      ],
+      "named_skills": [
+        "Barbed Wit"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Enemies under the effect of Barbed Wit now receive 15 Affliction damage when they use a Harmful skill on Titania, and Barbed Wit no longer ends when this occurs."
+    },
+    "titania3": {
+      "owner": "titania",
+      "display_name": "Elderwood Sap",
+      "targets": [
+        "skill:titania1"
+      ],
+      "named_skills": [
+        "Thorn Prick"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Thorn Prick no longer deals initial damage, but its affliction damage is doubled."
+    },
+    "titania4": {
+      "owner": "titania",
+      "display_name": "Persistent Suitor",
+      "targets": [],
+      "named_skills": [],
+      "target_kind": "UNIT_OR_GLOBAL",
+      "review_required": true,
+      "description": "Titania starts each round with a Summer Courtesan, but her maximum is reduced to 1."
+    },
+    "titania5": {
+      "owner": "titania",
+      "display_name": "Jealousy",
+      "targets": [
+        "skill:titania4"
+      ],
+      "named_skills": [
+        "Prance"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "If Prance is triggered by one of Titania's allies, the following turn, the other ally will have their basic abilities' Specific costs changed to Generic"
+    },
+    "trinity1": {
+      "owner": "trinity",
+      "display_name": "Scarlet Somersault Crash",
+      "targets": [
+        "skill:trinity2",
+        "skill:trinitycrimson3"
+      ],
+      "named_skills": [
+        "Prisma Maneuver",
+        "Crimson Crash"
+      ],
+      "target_kind": "MULTI_SKILL_PATCH",
+      "review_required": true,
+      "description": "Prisma Maneuver skills mark Prisma Scarlet for 3 turns when she uses them or they are used on her. If she is marked by all 3 Prisma Maneuver skills, Crimson Crash deals 40 more damage."
+    },
+    "trinity2": {
+      "owner": "trinity",
+      "display_name": "Grand Sonata",
+      "targets": [
+        "skill:trinityazure2",
+        "skill:trinityazure3"
+      ],
+      "named_skills": [
+        "Prisma Whirl",
+        "Sonata Azure"
+      ],
+      "target_kind": "MULTI_SKILL_PATCH",
+      "review_required": true,
+      "description": "Prisma Whirl now applies Sonata Azure instead of its normal effect."
+    },
+    "trinity3": {
+      "owner": "trinity",
+      "display_name": "Golden Fantasia",
+      "targets": [
+        "skill:trinitysaffron3"
+      ],
+      "named_skills": [
+        "Saffron Beam"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Saffron Beam now affects all enemies, but using it Shatters Prisma Saffron for 1 turn."
+    },
+    "trinity4": {
+      "owner": "trinity",
+      "display_name": "The Power of Friendship",
+      "targets": [
+        "skill:trinity1"
+      ],
+      "named_skills": [
+        "Prisma Lens"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Prisma Lens skills deal 0 damage to their target, increased by 5 for each other Lens skill already used on them this turn."
+    },
+    "trinity5": {
+      "owner": "trinity",
+      "display_name": "Kibi, the Mascot",
+      "targets": [],
+      "named_skills": [],
+      "target_kind": "UNIT_OR_GLOBAL",
+      "review_required": true,
+      "description": "At the start of each round, a random Prismari Ranger has their maximum HP increased by 20."
+    },
+    "xyris1": {
+      "owner": "xyris",
+      "display_name": "Painful Memories",
+      "targets": [
+        "skill:xyris1"
+      ],
+      "named_skills": [
+        "Reveal Hidden Truth"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Reveal Hidden Truth lowers its targets damage dealt by 10 for 1 turn."
+    },
+    "xyris2": {
+      "owner": "xyris",
+      "display_name": "Somnic Adaptation",
+      "targets": [],
+      "named_skills": [],
+      "target_kind": "RESOURCE_OR_UNIT",
+      "review_required": true,
+      "description": "Xyris gains 5 permanent Shield each time he gains Elemental Essence."
+    },
+    "xyris3": {
+      "owner": "xyris",
+      "display_name": "Return to the Dream",
+      "targets": [
+        "skill:xyris2"
+      ],
+      "named_skills": [
+        "Enter the Dreamscape"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "If Xyris has Elemental Essence when he uses Enter the Dreamscape, its cooldown is set to 1."
+    },
+    "xyris4": {
+      "owner": "xyris",
+      "display_name": "Neverending Nightmares",
+      "targets": [
+        "skill:xyris2",
+        "skill:xyris3"
+      ],
+      "named_skills": [
+        "Enter the Dreamscape",
+        "Twisted Nightmares"
+      ],
+      "target_kind": "MULTI_SKILL_PATCH",
+      "review_required": true,
+      "description": "Twisted Nightmares becomes permanent if used on an enemy affected by Enter the Dreamscape."
+    },
+    "xyris5": {
+      "owner": "xyris",
+      "display_name": "Twisted Replica",
+      "targets": [
+        "skill:xyrisminion1"
+      ],
+      "named_skills": [
+        "Dream Reflection"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Dream Reflection minions are created with the countered enemy's current HP."
+    },
+    "zephyrex1": {
+      "owner": "zephyrex",
+      "display_name": "Blade of Romance",
+      "targets": [
+        "skill:zephyrex1"
+      ],
+      "named_skills": [
+        "Arcadian Duet"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "If Arcadian Duet targets a different enemy than its last target, Zephyrex gains Elemental Essence."
+    },
+    "zephyrex2": {
+      "owner": "zephyrex",
+      "display_name": "Blade of Symphonies",
+      "targets": [
+        "skill:zephyrex1",
+        "skill:zephyrex3"
+      ],
+      "named_skills": [
+        "Arcadian Duet",
+        "Sonic Thrust"
+      ],
+      "target_kind": "MULTI_SKILL_PATCH",
+      "review_required": true,
+      "description": "Using Sonic Thrust on an enemy will also use Arcadian Duet on them."
+    },
+    "zephyrex3": {
+      "owner": "zephyrex",
+      "display_name": "Wind Dancer",
+      "targets": [
+        "skill:zephyrex4"
+      ],
+      "named_skills": [
+        "Wind Step"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Wind Step now targets an enemy, lowering their non-Affliction damage by 10 for 1 turn. If that enemy uses a new harmful skill during this time, Zephyrex gains Elemental Essence. This effect is invisible."
+    },
+    "zephyrex4": {
+      "owner": "zephyrex",
+      "display_name": "Zephyr Blade",
+      "targets": [],
+      "named_skills": [],
+      "target_kind": "UNIT_OR_GLOBAL",
+      "review_required": true,
+      "description": "Perfection now grants Zephyrex immunity to Stuns."
+    },
+    "zephyrex5": {
+      "owner": "zephyrex",
+      "display_name": "Polite Denial",
+      "targets": [
+        "skill:zephyrex2",
+        "skill:zephyrex4"
+      ],
+      "named_skills": [
+        "Elegant Sweep",
+        "Wind Step"
+      ],
+      "target_kind": "MULTI_SKILL_PATCH",
+      "review_required": true,
+      "description": "Elegant Sweep is now invisible, and Zephyrex gains the effect of Wind Step while it is active."
+    },
+    "zevkir1": {
+      "owner": "zevkir",
+      "display_name": "Atlantean Waters",
+      "targets": [
+        "skill:zevkir1"
+      ],
+      "named_skills": [
+        "Call Tides"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "While Zev'kir is Channelling Call Tides, he heals 5 HP per turn and ignores stuns."
+    },
+    "zevkir2": {
+      "owner": "zevkir",
+      "display_name": "Airless Prison",
+      "targets": [
+        "skill:zevkir3",
+        "skill:zevkir1"
+      ],
+      "named_skills": [
+        "Bubble Prison",
+        "Call Tides"
+      ],
+      "target_kind": "MULTI_SKILL_PATCH",
+      "review_required": true,
+      "description": "If Zev'kir has 2 or more stacks of Call Tides, Bubble Prison increases affected enemy skill costs by 1 [65]. If he has 4 or more stacks, they are increased by 1 Energy of the target's Element instead."
+    },
+    "zevkir3": {
+      "owner": "zevkir",
+      "display_name": "Piercing Tide",
+      "targets": [
+        "skill:zevkir1",
+        "skill:zevkir2"
+      ],
+      "named_skills": [
+        "Call Tides",
+        "Riptide"
+      ],
+      "target_kind": "MULTI_SKILL_PATCH",
+      "review_required": true,
+      "description": "If Zev'kir has 2 or more stacks of Call Tides, Riptide deals Piercing damage. If he has 4 or more stacks, it deals Affliction damage instead."
+    },
+    "zevkir4": {
+      "owner": "zevkir",
+      "display_name": "Storm Surge",
+      "targets": [
+        "skill:zevkir5"
+      ],
+      "named_skills": [
+        "Tidal Wave"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "Tidal Wave deals 20 less damage, but its base cost is reduced by 2 Specific energy"
+    },
+    "zevkir5": {
+      "owner": "zevkir",
+      "display_name": "Arcane Barrier",
+      "targets": [
+        "skill:zevkir4"
+      ],
+      "named_skills": [
+        "Repulse"
+      ],
+      "target_kind": "SKILL_PATCH",
+      "review_required": true,
+      "description": "While Repulse is not on cooldown, Zev'kir gains 15 Shield that replenishes at the start of his turn."
+    }
+  }
+}
