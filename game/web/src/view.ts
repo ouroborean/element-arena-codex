@@ -17,42 +17,64 @@ const shortName = (name: string) => name.split(",")[0]!.trim();
 const nameOf = (id: string) => shortName(ROSTER.find((h) => h.id === id)?.name ?? id);
 const IMG_FALLBACK = `onerror="this.style.visibility='hidden'"`;
 
-const STATE_KINDS = new Set<Status["kind"]>(["stun", "blind", "invulnerable", "isolated", "untargetable", "taunt", "silence", "paralysis", "immortal", "shatter", "channeling", "elemental_essence", "damage_reduction", "incoming_damage_mod", "outgoing_damage_mod", "cost_mod", "cooldown_mod"]);
+// Kinds NOT worth a portrait chip — pure engine plumbing with no clear player-facing meaning.
+const HIDDEN_KINDS = new Set<Status["kind"]>(["conditional_bypass", "stack_read_mod", "instant_cast"]);
+// Kinds that read as a debuff (red) vs a buff (green); anything else is a neutral "state" chip.
+const BAD_KINDS = new Set<Status["kind"]>(["dot", "stun", "blind", "silence", "paralysis", "taunt", "heal_lock", "heal_becomes_damage", "dies_at_max", "veiled"]);
+const GOOD_KINDS = new Set<Status["kind"]>(["regen", "stack", "damage_reduction", "invulnerable", "immortal", "damage_ignore", "non_damage_ignore", "revive_ward", "uncounterable", "damage_becomes_heal", "elemental_essence"]);
 const durStr = (s: Status) => s.duration === null ? "for the round" : typeof s.duration === "number" && s.duration > 0 ? `${s.duration} turn${s.duration > 1 ? "s" : ""} left` : "";
+const skillName = (id?: string) => (id && SKILL_TEXT[id] ? SKILL_TEXT[id]!.n : undefined);
+const signed = (n: number) => `${n > 0 ? "+" : ""}${n}`;
 
-/** A plain-language account of what a status is doing right now (for the hover popup). `src` is the id of
- *  the skill/passive that applied it (for the source name + a mark's descriptive fallback). */
-function effectDesc(s: Status, src?: string): { title: string; body: string } {
-  const srcName = src && SKILL_TEXT[src] ? SKILL_TEXT[src]!.n : undefined;
-  const title = s.name ?? srcName ?? s.kind.replace(/_/g, " ");
+/** A precise, concise account of what THIS individual status is doing right now — keyed on the status's own
+ *  fields (kind / magnitude / dtype / name / scope / unitRef), so two effects from one skill read distinctly.
+ *  `src` is the id of the skill/passive that applied it (only used to attribute the source name). */
+function effectDesc(state: MatchState, s: Status, src?: string): { title: string; body: string } {
+  const srcName = skillName(src);
   const mag = s.magnitude ?? 0, dt = s.dtype ?? "affliction";
+  const unitName = s.unitRef ? shortName(state.units[s.unitRef]?.name ?? "a unit") : undefined;
+  // Marks/stacks/channels are self-naming; otherwise fall back to the source skill's name, then the kind.
+  const title = s.name ? (s.kind === "channeling" ? (skillName(s.name) ?? s.name) : s.name) : (srcName ?? s.kind.replace(/_/g, " "));
   let body: string;
   switch (s.kind) {
     case "dot": body = `Deals ${mag} ${dt} damage each turn.`; break;
     case "regen": body = `Restores ${mag} HP each turn.`; break;
-    case "stack": body = `${mag} stack${mag === 1 ? "" : "s"}.`; break;
-    case "stun": body = "Stunned — can't use skills."; break;
-    case "blind": body = "Blinded — single-target skills strike a random target."; break;
+    case "stack": body = `${mag} stack${mag === 1 ? "" : "s"} of ${s.name ?? "a resource"}.`; break;
+    case "mark": body = "A marker other skills read."; break;
+    case "stun": body = s.scope ? `Can't use ${s.scope.mode === "only" ? "" : "non-"}${s.scope.tag} skills.` : "Stunned — can't use skills."; break;
+    case "blind": body = "Single-target skills strike a random target."; break;
     case "invulnerable": body = "Can't be targeted by new harmful skills."; break;
     case "isolated": body = "Can't be targeted by new helpful skills."; break;
     case "untargetable": body = "Can't be targeted by other units."; break;
-    case "taunt": body = "Forced to target the taunter."; break;
+    case "taunt": body = `Forced to target ${unitName ?? "the taunter"}.`; break;
     case "silence": body = "No Elemental Essence income."; break;
     case "paralysis": body = "Cooldowns don't advance."; break;
     case "immortal": body = "HP can't drop below 1."; break;
-    case "shatter": body = "Ignores DR / Invulnerable / Shield."; break;
+    case "revive_ward": body = `Survives one lethal hit, reviving to ${mag} HP.`; break;
+    case "shatter": body = "Its hits ignore DR, Invulnerable, and Shields."; break;
+    case "damage_ignore": body = "Ignores all incoming damage."; break;
+    case "non_damage_ignore": body = "Immune to harmful non-damage effects."; break;
     case "damage_reduction": body = `Reduces incoming damage by ${mag}.`; break;
     case "incoming_damage_mod": body = `Takes ${Math.abs(mag)} ${mag < 0 ? "less" : "more"} damage.`; break;
     case "outgoing_damage_mod": body = `Deals ${Math.abs(mag)} ${mag < 0 ? "less" : "more"} damage.`; break;
-    case "cost_mod": body = `Skills cost ${mag > 0 ? "+" : ""}${mag} energy.`; break;
-    case "cooldown_mod": body = `Cooldowns ${mag > 0 ? "+" : ""}${mag} turns.`; break;
-    case "elemental_essence": body = "Next income is 1 energy of its element."; break;
-    case "channeling": body = "Channeling a skill each turn."; break;
-    case "mark": body = src && SKILL_TEXT[src] ? SKILL_TEXT[src]!.d : ""; break;
-    default: body = src && SKILL_TEXT[src] ? SKILL_TEXT[src]!.d : "";
+    case "incoming_damage_mult": body = `Takes ${mag}× damage${s.newDamageOnly ? " from skills" : ""}.`; break;
+    case "outgoing_damage_mult": body = `Deals ${mag}× damage.`; break;
+    case "outgoing_dtype_override": body = `Its damage is dealt as ${dt}.`; break;
+    case "damage_becomes_heal": body = "Incoming damage heals it instead."; break;
+    case "heal_becomes_damage": body = "Incoming healing damages it instead."; break;
+    case "dies_at_max": body = "Dies at full HP; survives at 0."; break;
+    case "heal_lock": body = unitName ? `Can only be healed by ${unitName}.` : "Can't be healed."; break;
+    case "uncounterable": body = "Its skills can't be countered or reflected."; break;
+    case "stealth": body = "Doesn't set off enemies' triggers."; break;
+    case "veiled": body = "Its details stay hidden until it uses a harmful skill."; break;
+    case "cost_mod": { const sk = skillName(s.skillId); body = `${sk ?? "Skills"} cost${sk ? "s" : ""} ${signed(mag)} energy.`; break; }
+    case "cooldown_mod": body = `Skills' cooldowns ${signed(mag)} turns.`; break;
+    case "elemental_essence": body = "Next energy income is 1 of its element (not generic)."; break;
+    case "channeling": body = `Channeling ${skillName(s.name) ?? "a skill"} each turn.`; break;
+    default: body = "";
   }
   // Attribute the source, unless the title already IS the source name (avoids "Frost-Covered (from Frost-Covered)").
-  if (srcName && title !== srcName && s.kind !== "mark" && s.kind !== "stack") body += ` (from ${srcName})`;
+  if (srcName && title !== srcName && s.kind !== "mark" && s.kind !== "stack") body = `${body} (from ${srcName})`;
   const d = durStr(s); if (d) body = `${body.trim()} ${d.charAt(0).toUpperCase()}${d.slice(1)}.`;
   return { title, body: body.trim() };
 }
@@ -76,13 +98,13 @@ function statusSource(state: MatchState, s: Status): string | undefined {
 function effectIcons(state: MatchState, u: Unit): string {
   const seen = new Set<string>(); const out: string[] = [];
   for (const s of u.statuses) {
-    if (!(s.kind === "stack" || s.kind === "mark" || s.kind === "dot" || s.kind === "regen" || STATE_KINDS.has(s.kind))) continue;
+    if (HIDDEN_KINDS.has(s.kind)) continue; // pure plumbing — no chip
     const key = `${s.kind}:${s.name ?? ""}`; if (seen.has(key)) continue; seen.add(key);
     const src = statusSource(state, s);
     const icon = src ? iconOf(src) : null;
-    const { title, body } = effectDesc(s, src);
-    const cls = ["fx", s.kind === "dot" ? "bad" : s.kind === "regen" || s.kind === "stack" ? "good" : STATE_KINDS.has(s.kind) ? "state" : ""].filter(Boolean).join(" ");
-    out.push(`<span class="${cls}" data-fxtitle="${esc(title)}" data-fxbody="${esc(body)}">${icon ? `<img src="${icon}" ${IMG_FALLBACK} />` : `<span class="fx-abbr">${esc((s.name ?? s.kind)[0]!.toUpperCase())}</span>`}${s.kind === "stack" && (s.magnitude ?? 0) > 1 ? `<span class="fx-n">${s.magnitude}</span>` : ""}</span>`);
+    const { title, body } = effectDesc(state, s, src);
+    const tone = BAD_KINDS.has(s.kind) ? "bad" : GOOD_KINDS.has(s.kind) ? "good" : "state";
+    out.push(`<span class="fx ${tone}" data-fxtitle="${esc(title)}" data-fxbody="${esc(body)}">${icon ? `<img src="${icon}" ${IMG_FALLBACK} />` : `<span class="fx-abbr">${esc((s.name ?? s.kind)[0]!.toUpperCase())}</span>`}${s.kind === "stack" && (s.magnitude ?? 0) > 1 ? `<span class="fx-n">${s.magnitude}</span>` : ""}</span>`);
   }
   return out.length ? `<div class="fxrow">${out.slice(0, 6).join("")}</div>` : "";
 }
@@ -104,16 +126,48 @@ function skillTiles(state: MatchState, u: Unit, ui: UiState): string {
     const tip = `${text?.n ?? s.name} — ${costStr}${s.currentCd > 0 ? ` — on cooldown (${s.currentCd})` : ""}${text?.d ? `\n${text.d}` : ""}`;
     const cls = ["tile", ok ? "" : "off", chosen === s.id ? "chosen" : ""].filter(Boolean).join(" ");
     const ic = iconOf(s.id, u.heroId ?? undefined);
-    return `<button class="${cls}" ${ok ? `data-owner="${u.id}" data-skill="${s.id}"` : "disabled"} title="${esc(tip)}">
+    // Always clickable — an unusable skill opens its detail (examine) instead of entering targeting.
+    return `<button class="${cls}" data-owner="${u.id}" data-skill="${s.id}" title="${esc(tip)}">
       ${ic ? `<img src="${ic}" alt="${esc(s.name)}" ${IMG_FALLBACK} />` : `<span class="tile-abbr">${esc(s.name.slice(0, 3))}</span>`}
       ${s.currentCd > 0 ? `<span class="cdbadge">${s.currentCd}</span>` : ""}</button>`;
   }).join("");
   return `<div class="tiles">${tiles}</div>`;
 }
 
-function heroCard(state: MatchState, u: Unit, ui: UiState, isYou: boolean): string {
+/** A readable label for where a queued skill lands when it has no explicit single target (AoE/self). */
+function aoeLabel(skill: SkillInstance | undefined): string {
+  switch (skill?.targeting) {
+    case "all-enemies": return "all enemies";
+    case "all-allies": return "all allies";
+    case "all": return "everyone";
+    default: return "self";
+  }
+}
+
+/** The banner on a queued hero's card: which skill it will use, and on whom. */
+function queuedBanner(state: MatchState, u: Unit, ui: UiState): string {
+  const a = ui.planned.get(u.id);
+  if (!a) return "";
+  const skill = (u.skills ?? []).find((s) => s.id === a.skillId);
+  const name = SKILL_TEXT[a.skillId]?.n ?? skill?.name ?? a.skillId;
+  const ic = iconOf(a.skillId, u.heroId ?? undefined);
+  const targets = a.targets && a.targets.length
+    ? a.targets.map((id) => shortName(state.units[id]?.name ?? "?")).join(", ")
+    : aoeLabel(skill);
+  return `<div class="queued">${ic ? `<img src="${ic}" ${IMG_FALLBACK} />` : ""}<span class="q-txt"><b>${esc(name)}</b> → ${esc(targets)}</span></div>`;
+}
+
+/** The ids of every unit some queued skill will hit (explicit single targets), for an "incoming" marker. */
+function queuedTargetIds(ui: UiState): Set<string> {
+  const ids = new Set<string>();
+  for (const a of ui.planned.values()) for (const t of a.targets ?? []) ids.add(t);
+  return ids;
+}
+
+function heroCard(state: MatchState, u: Unit, ui: UiState, isYou: boolean, targetedBy: Set<string>): string {
   const targetable = ui.phase === "plan" && !!ui.targeting && ui.legalTargets.has(u.id);
-  const cls = ["hero", u.alive ? "" : "dead", targetable ? "targetable" : "", ui.plannedSkill.has(u.id) ? "acted" : ""].filter(Boolean).join(" ");
+  const incoming = targetedBy.has(u.id);
+  const cls = ["hero", u.alive ? "" : "dead", targetable ? "targetable" : "", incoming ? "incoming" : "", ui.plannedSkill.has(u.id) ? "acted" : ""].filter(Boolean).join(" ");
   const mart = u.kind === "minion" ? minionPortrait(u.name) : null;
   const portrait = u.heroId
     ? `<img class="portrait" src="${heroPortrait(u.heroId, u.fused)}" alt="${esc(u.name)}" ${IMG_FALLBACK} />`
@@ -121,19 +175,20 @@ function heroCard(state: MatchState, u: Unit, ui: UiState, isYou: boolean): stri
     ? `<img class="portrait" src="${mart}" alt="${esc(u.name)}" ${IMG_FALLBACK} />`
     : `<div class="portrait minion-art">${esc(shortName(u.name))}</div>`;
   const pcol = `<div class="pcol">
-    <div class="frame" style="--el:${elColor(u.currentElement)}" ${targetable ? `data-target="${u.id}"` : ""}>${portrait}${effectIcons(state, u)}<div class="name">${esc(shortName(u.name))}</div></div>
+    <div class="frame" style="--el:${elColor(u.currentElement)}" ${targetable ? `data-target="${u.id}"` : ""}>${portrait}${effectIcons(state, u)}${incoming ? `<div class="incoming-tag">◎ targeted</div>` : ""}<div class="name">${esc(shortName(u.name))}</div></div>
     ${hpBar(u)}
+    ${isYou ? queuedBanner(state, u, ui) : ""}
   </div>`;
   return `<div class="${cls}">${pcol}${isYou && u.alive ? skillTiles(state, u, ui) : ""}</div>`;
 }
 
-function sideRow(state: MatchState, side: TeamId, ui: UiState, isYou: boolean): string {
+function sideRow(state: MatchState, side: TeamId, ui: UiState, isYou: boolean, targetedBy: Set<string>): string {
   const units = state.teams[side].units.map((id) => state.units[id]).filter((u): u is Unit => !!u);
   const heroes = units.filter((u) => u.kind === "hero");
   const minions = units.filter((u) => u.kind === "minion");
   return `<div class="lane ${isYou ? "you" : "foe"}">
-    <div class="heroes">${heroes.map((u) => heroCard(state, u, ui, isYou)).join("")}</div>
-    ${minions.length ? `<div class="minions">${minions.map((u) => heroCard(state, u, ui, isYou)).join("")}</div>` : ""}
+    <div class="heroes">${heroes.map((u) => heroCard(state, u, ui, isYou, targetedBy)).join("")}</div>
+    ${minions.length ? `<div class="minions">${minions.map((u) => heroCard(state, u, ui, isYou, targetedBy)).join("")}</div>` : ""}
   </div>`;
 }
 
@@ -152,7 +207,7 @@ function midbar(state: MatchState, ui: UiState): string {
   const yourTurn = ui.phase === "plan";
   // While targeting, the skill detail lives HERE (between the lanes) — never over a portrait, so every
   // highlighted target stays clickable. Otherwise: your-turn controls, or the AI's "acting…" bar.
-  const center = ui.targeting
+  const center = ui.targeting || ui.examine
     ? skillPanel(state, ui)
     : yourTurn
     ? `<div class="turn you">Your turn</div><div class="hint">${esc(ui.hint)}</div>
@@ -166,31 +221,38 @@ function midbar(state: MatchState, ui: UiState): string {
   </div>`;
 }
 
-/** The skill detail shown in the midbar while a skill is picked: what it does, while you choose a target. */
+/** The skill detail in the midbar — shown either while targeting a usable skill, or while merely
+ *  examining an unusable one (on cooldown / too costly), which shows the reason and does not target. */
 function skillPanel(state: MatchState, ui: UiState): string {
-  const t = ui.targeting!;
-  const u = state.units[t.unitId];
-  const skill = (u?.skills ?? []).find((s) => s.id === t.skillId);
-  const text = SKILL_TEXT[t.skillId];
-  const ic = iconOf(t.skillId, u?.heroId ?? undefined);
+  const sel = ui.targeting ?? ui.examine!;
+  const examining = !ui.targeting;
+  const u = state.units[sel.unitId];
+  const skill = (u?.skills ?? []).find((s) => s.id === sel.skillId);
+  const text = SKILL_TEXT[sel.skillId];
+  const ic = iconOf(sel.skillId, u?.heroId ?? undefined);
   const cost = u && skill ? effectiveCost(u, skill) : null;
   const costStr = cost ? ([cost.generic ? `${cost.generic} generic` : "", cost.specific ? `${cost.specific} ${skill!.element}` : ""].filter(Boolean).join(" + ") || "free") : "";
-  return `<div class="skillpanel">
+  const name = text?.n ?? ui.targeting?.skillName ?? skill?.name ?? sel.skillId;
+  const foot = examining
+    ? `<span class="sp-warn">⚠ ${esc(ui.examine!.reason)}</span> <button class="mini" data-cancel="1">close</button>`
+    : `▸ Click a highlighted target to use <button class="mini" data-cancel="1">cancel</button>`;
+  return `<div class="skillpanel${examining ? " examine" : ""}">
     ${ic ? `<img class="sp-icon" src="${ic}" ${IMG_FALLBACK} />` : ""}
     <div class="sp-body">
-      <div class="sp-name">${esc(text?.n ?? t.skillName)} <span class="sp-cost">${esc(costStr)}</span></div>
+      <div class="sp-name">${esc(name)} <span class="sp-cost">${esc(costStr)}</span></div>
       <div class="sp-desc">${esc(text?.d ?? "")}</div>
-      <div class="sp-foot">▸ Click a highlighted target to use <button class="mini" data-cancel="1">cancel</button></div>
+      <div class="sp-foot">${foot}</div>
     </div>
   </div>`;
 }
 
 export function renderApp(state: MatchState, ui: UiState): string {
   const foe = ui.you === "A" ? "B" : "A";
+  const targetedBy = queuedTargetIds(ui);
   return `<div class="arena">
-    ${sideRow(state, foe, ui, false)}
+    ${sideRow(state, foe, ui, false, targetedBy)}
     ${midbar(state, ui)}
-    ${sideRow(state, ui.you, ui, true)}
+    ${sideRow(state, ui.you, ui, true, targetedBy)}
   </div>${ui.overlay ?? ""}`;
 }
 

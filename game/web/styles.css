@@ -50,7 +50,8 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .tile img { width: 100%; height: 100%; object-fit: cover; }
 .tile:hover { border-color: var(--acc); }
 .tile.chosen { border-color: var(--you); box-shadow: 0 0 0 2px var(--you) inset; }
-.tile.off { opacity: .35; cursor: not-allowed; }
+.tile.off { opacity: .4; } /* unusable — still clickable to examine */
+.tile.off:hover { opacity: .6; border-color: var(--dim); }
 .tile .cdbadge { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #000b; color: #fff; font-weight: 800; font-size: 15px; }
 
 /* ── midbar ────────────────────────────────────────────────────────────── */
@@ -143,3 +144,16 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .sp-desc { color: var(--ink); font-size: 12px; line-height: 1.45; margin: 3px 0 5px; }
 .sp-foot { display: flex; gap: 10px; align-items: center; color: var(--dim); font-size: 11px; }
 .tile-abbr { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 11px; font-weight: 800; color: var(--dim); text-transform: capitalize; }
+/* examine mode: a muted panel for an unusable skill (no targeting) */
+.skillpanel.examine .sp-icon { border-color: var(--mid); filter: grayscale(.4); }
+.skillpanel.examine .sp-name { color: var(--ink); }
+.sp-warn { color: var(--acc); font-weight: 700; }
+
+/* ── queued-skill indicators (who queued what, on whom) ─────────────────── */
+.queued { display: flex; align-items: center; gap: 5px; margin-top: 5px; padding: 3px 5px; background: color-mix(in srgb, var(--you) 16%, transparent); border: 1px solid color-mix(in srgb, var(--you) 45%, transparent); border-radius: 6px; font-size: 10.5px; line-height: 1.2; }
+.queued img { width: 18px; height: 18px; border-radius: 4px; object-fit: cover; flex: 0 0 18px; }
+.queued .q-txt { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.queued b { color: var(--you); font-weight: 700; }
+.hero.acted .frame { outline: 2px solid color-mix(in srgb, var(--you) 55%, transparent); outline-offset: 1px; }
+.hero.incoming .frame { box-shadow: 0 0 0 2px var(--foe) inset, 0 0 12px color-mix(in srgb, var(--foe) 55%, transparent); }
+.incoming-tag { position: absolute; left: 3px; top: 3px; font-size: 9px; font-weight: 800; color: #fff; background: color-mix(in srgb, var(--foe) 85%, #000); padding: 1px 4px; border-radius: 4px; box-shadow: 0 1px 3px #0009; }
