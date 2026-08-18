@@ -128,10 +128,17 @@ export function grantIncome(state: MatchState, id: TeamId): void {
 }
 
 /** Advance the active team's cooldowns (gated per-unit by Paralysis). */
+/**
+ * Tick a team's skill cooldowns down by one, at the END of that team's turn. A skill used THIS turn is
+ * skipped (its `cdSetTurn` equals the current turn) — the same "don't tick on the birth turn" rule the
+ * status-duration ticker uses (appliedTurn < state.turn). Without that skip, a cooldown-1 skill would be
+ * back to 0 by its owner's very next turn (cooldown N would block only N−1 turns); with it, cooldown N
+ * blocks the caster's next N turns. Paralysis freezes cooldowns entirely.
+ */
 export function advanceCooldowns(state: MatchState, id: TeamId): void {
   for (const u of unitsOf(state, id)) {
     if (u.statuses.some((s) => s.kind === "paralysis")) continue;
-    for (const s of u.skills ?? []) if (s.currentCd > 0) s.currentCd -= 1;
+    for (const s of u.skills ?? []) if (s.currentCd > 0 && s.cdSetTurn !== state.turn) s.currentCd -= 1;
   }
 }
 
@@ -167,7 +174,6 @@ export function runChannels(state: MatchState, id: TeamId): void {
 export function startTurn(state: MatchState): void {
   state.actedThisTurn = []; // fresh ledger of who acts this turn (drives "acts alone")
   grantIncome(state, state.activeTeam);
-  advanceCooldowns(state, state.activeTeam);
   runChannels(state, state.activeTeam);
   emit(state, { type: "turnStart", team: state.activeTeam });
 }
@@ -240,6 +246,7 @@ export function tickTriggersForTeam(state: MatchState, team: TeamId): void {
 /** End the active team's turn: periodic ticks, expiries (+onExpire), scheduled effects, hand over. */
 export function endTurn(state: MatchState): void {
   const team = state.activeTeam;
+  advanceCooldowns(state, team); // tick this team's cooldowns (skips skills used this turn — state.turn not yet bumped)
   tickDots(state, team);
   const expired = tickDurationsForTeam(state, team);
   tickShieldsForTeam(state, team);
@@ -471,6 +478,7 @@ export function performAction(state: MatchState, action: Action): ActionResult {
     // Countered: the skill was used (cost consumed above) and goes on cooldown, but
     // its effects do not run. (Provisional ruling: a countered skill still pays its cost.)
     skill.currentCd = effectiveCooldown(caster, skill);
+    skill.cdSetTurn = state.turn;
     state.log.push(`${caster.name}'s ${skill.name} was countered`);
     removeDeadMinions(state);
     return { ok: true, countered: true };
@@ -488,6 +496,7 @@ export function performAction(state: MatchState, action: Action): ActionResult {
 
   const affected = runEffects(state, skill.effects, { caster, self: caster, targets: decl.finalTargets });
   skill.currentCd = effectiveCooldown(caster, skill);
+  skill.cdSetTurn = state.turn; // birth turn — advanceCooldowns skips it (see below), so cooldown N blocks N turns
   caster.lastSkillId = skill.id; // the "used a skill" ledger (read by clone/last-skill mechanics)
 
   // A Channel skill installs a sustained channel that re-runs at the caster's turns — unless an
