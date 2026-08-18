@@ -25,6 +25,8 @@ export interface Ctx {
   targets: Unit[];
   it: Unit | null;
   vars: Record<string, number>;
+  /** The skill / passive id currently executing — stamped onto any status it applies (provenance). */
+  skillId?: string;
   /** Set of unit ids this skill's effects touched (damaged/statused) — for "affected N targets" reads. */
   affected?: Set<string>;
   /** Present inside a trigger: the event that fired it. */
@@ -302,6 +304,7 @@ function buildStatus(spec: StatusSpec, ctx: Ctx) {
     duration: evalDuration(spec.duration, ctx),
     appliedBy: ctx.caster.id,
     appliedTurn: ctx.state.turn,
+    sourceId: ctx.skillId,
   };
 }
 
@@ -398,6 +401,7 @@ export function exec(effect: Effect, ctx: Ctx): void {
           duration,
           appliedBy: ctx.caster.id,
           appliedTurn: ctx.state.turn,
+          sourceId: ctx.skillId,
         });
       return;
     }
@@ -459,7 +463,7 @@ export function exec(effect: Effect, ctx: Ctx): void {
       const sk = (by?.skills ?? []).find((s) => s.id === effect.skillId);
       if (by && sk) {
         const targets = effect.on ? resolveSelector(effect.on, ctx) : ctx.targets;
-        runAll(sk.effects, { ...ctx, caster: by, self: by, targets, it: null }); // inline, shares the bus
+        runAll(sk.effects, { ...ctx, caster: by, self: by, targets, it: null, skillId: sk.id }); // inline, shares the bus
       }
       return;
     }
@@ -727,7 +731,7 @@ export function resolveDeclaration(state: MatchState, caster: Unit, skill: Skill
 export function runEffects(
   state: MatchState,
   effects: Effect[],
-  opts: { caster: Unit; self?: Unit; targets?: Unit[] },
+  opts: { caster: Unit; self?: Unit; targets?: Unit[]; skillId?: string },
 ): string[] {
   const rng = Rng.fromState(state.rngState);
   const bus = createBus(state, rng);
@@ -739,6 +743,7 @@ export function runEffects(
     targets: opts.targets ?? [],
     it: null,
     vars: {},
+    skillId: opts.skillId,
     affected,
     emit: bus.emit,
   };

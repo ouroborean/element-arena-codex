@@ -149,3 +149,31 @@ test("nodes are individually addressable (the patch bet)", () => {
   runEffects(state, skill, { caster, targets: [target] });
   assert.equal(target.hp, 85, "patched damage applied");
 });
+
+test("applied statuses carry sourceId = the casting skill's id (effect provenance)", () => {
+  // The web client shows each effect as the icon of the skill that applied it; that needs the
+  // status to remember its source. runEffects stamps ctx.skillId onto applyStatus / addStack.
+  const caster = makeUnit({ id: "a1", team: "A" });
+  const target = makeUnit({ id: "b1", team: "B", hp: 100 });
+  const state = makeState([caster], [target]);
+
+  const effects: Effect[] = [
+    { op: "applyStatus", to: "target", status: { kind: "dot", magnitude: 5, duration: 3 } },
+    { op: "addStack", to: "target", name: "Mark", amount: 2 },
+  ];
+  runEffects(state, effects, { caster, targets: [target], skillId: "gommar1" });
+
+  const dot = target.statuses.find((s) => s.kind === "dot");
+  const stack = target.statuses.find((s) => s.kind === "stack" && s.name === "Mark");
+  assert.equal(dot?.sourceId, "gommar1", "dot remembers its casting skill");
+  assert.equal(stack?.sourceId, "gommar1", "stack remembers its casting skill");
+});
+
+test("sourceId is absent when no skill id is threaded (e.g. bare/legacy calls)", () => {
+  const caster = makeUnit({ id: "a1", team: "A" });
+  const target = makeUnit({ id: "b1", team: "B", hp: 100 });
+  const state = makeState([caster], [target]);
+
+  runEffects(state, [{ op: "applyStatus", to: "target", status: { kind: "stun", duration: 1 } }], { caster, targets: [target] });
+  assert.equal(target.statuses.find((s) => s.kind === "stun")?.sourceId, undefined);
+});
