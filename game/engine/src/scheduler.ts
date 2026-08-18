@@ -342,10 +342,23 @@ export function canPay(pool: EnergyPool, element: string, cost: SkillInstance["c
   return poolTotal(pool) - cost.specific >= cost.generic;
 }
 
-/** Deduct a cost: specific from the element, generic from generic-first then elements. */
-function pay(pool: EnergyPool, element: string, cost: SkillInstance["cost"]): void {
+/**
+ * Deduct a cost: specific from the element; generic from the player's chosen colors first (`alloc`,
+ * a mutable remaining-budget consumed across the turn), then the default generic-first order for any
+ * remainder. Any color may pay generic; specific is never taken from the generic pool.
+ */
+function pay(pool: EnergyPool, element: string, cost: SkillInstance["cost"], alloc?: EnergyPool): void {
   pool[element] = (pool[element] ?? 0) - cost.specific;
   let generic = cost.generic;
+  if (alloc) {
+    for (const k of Object.keys(alloc)) {
+      if (generic <= 0) break;
+      const take = Math.min(generic, alloc[k] ?? 0, pool[k] ?? 0);
+      pool[k] = (pool[k] ?? 0) - take;
+      alloc[k] = (alloc[k] ?? 0) - take;
+      generic -= take;
+    }
+  }
   const order = ["generic", ...Object.keys(pool).filter((k) => k !== "generic")];
   for (const k of order) {
     if (generic <= 0) break;
@@ -469,7 +482,7 @@ export function performAction(state: MatchState, action: Action): ActionResult {
   if (!canPay(pool, caster.currentElement, cost)) {
     return { ok: false, reason: "insufficient-energy" };
   }
-  pay(pool, caster.currentElement, cost);
+  pay(pool, caster.currentElement, cost, state.genericPay);
   if (!state.actedThisTurn.includes(caster.id)) state.actedThisTurn.push(caster.id); // ledger: this unit acted
 
   // Declare phase: a Counter can negate the skill; a Reflect can redirect it.
@@ -519,5 +532,7 @@ export function performAction(state: MatchState, action: Action): ActionResult {
 
 /** Resolve a team's staged actions in submission order (RESOLUTION_ORDER). */
 export function resolveTurn(state: MatchState, actions: Action[]): ActionResult[] {
-  return actions.map((a) => performAction(state, a));
+  const results = actions.map((a) => performAction(state, a));
+  state.genericPay = undefined; // a generic-payment allocation applies to exactly one turn
+  return results;
 }
