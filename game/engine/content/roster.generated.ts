@@ -45,6 +45,345 @@ export const MINIONS: MinionTemplate[] = [
   "triggers": []
  },
  {
+  "name": "Bjorn, True King",
+  "maxHp": 80,
+  "element": "myth",
+  "skills": [
+   {
+    "id": "mythminion1",
+    "name": "Sovereign's Howl",
+    "element": "myth",
+    "targeting": "single",
+    "klass": "basic",
+    "tags": [
+     "Harmful",
+     "Instant"
+    ],
+    "cost": {
+     "generic": 0,
+     "specific": 1
+    },
+    "cooldown": 1,
+    "effects": [
+     {
+      "op": "applyStatus",
+      "to": "target",
+      "status": {
+       "kind": "dot",
+       "name": "Sovereign's Howl",
+       "magnitude": 10,
+       "duration": 2,
+       "dtype": "normal"
+      }
+     },
+     {
+      "op": "applyStatus",
+      "to": "target",
+      "status": {
+       "kind": "outgoing_damage_mod",
+       "name": "Sovereign's Howl",
+       "magnitude": -5,
+       "duration": null
+      }
+     }
+    ],
+    "currentCd": 0
+   },
+   {
+    "id": "mythminion2",
+    "name": "Might of the Bjorn",
+    "element": "myth",
+    "targeting": "single",
+    "klass": "basic",
+    "tags": [
+     "Helpful",
+     "Strategic",
+     "Instant"
+    ],
+    "cost": {
+     "generic": 1,
+     "specific": 0
+    },
+    "cooldown": 0,
+    "effects": [
+     {
+      "op": "applyStatus",
+      "to": "target",
+      "status": {
+       "kind": "outgoing_damage_mod",
+       "name": "Might of the Bjorn",
+       "magnitude": 5,
+       "duration": 2
+      }
+     },
+     {
+      "op": "applyStatus",
+      "to": "target",
+      "status": {
+       "kind": "damage_reduction",
+       "name": "Might of the Bjorn",
+       "magnitude": 10,
+       "duration": 2
+      }
+     }
+    ],
+    "currentCd": 0
+   }
+  ],
+  "triggers": []
+ },
+ {
+  "name": "Frozen Beast",
+  "maxHp": 50,
+  "element": "stasis",
+  "skills": [
+   {
+    "id": "stasisminion1",
+    "name": "Frozen Fangs",
+    "element": "stasis",
+    "targeting": "single",
+    "klass": "basic",
+    "tags": [
+     "Harmful",
+     "Instant"
+    ],
+    "cost": {
+     "generic": 1,
+     "specific": 0
+    },
+    "cooldown": 0,
+    "effects": [
+     {
+      "op": "damage",
+      "amount": 25,
+      "dtype": "piercing",
+      "to": "target"
+     }
+    ],
+    "currentCd": 0
+   }
+  ],
+  "triggers": []
+ },
+ {
+  "name": "Slime",
+  "maxHp": 15,
+  "element": "slime",
+  "skills": [
+   {
+    "id": "riverdaughterslimeminion1",
+    "name": "Corrosive Slam",
+    "element": "slime",
+    "targeting": "all-enemies",
+    "klass": "basic",
+    "tags": [
+     "Harmful",
+     "Control",
+     "Affliction"
+    ],
+    "cost": {
+     "generic": 1,
+     "specific": 0
+    },
+    "cooldown": 1,
+    "effects": [
+     {
+      "op": "applyStatus",
+      "to": "self",
+      "status": {
+       "kind": "mark",
+       "name": "Corrosive Slam",
+       "duration": null
+      }
+     },
+     {
+      "op": "schedule",
+      "delayTurns": 1,
+      "to": "self",
+      "effect": [
+       {
+        "op": "if",
+        "cond": {
+         "has": "mark",
+         "name": "Corrosive Slam",
+         "of": "self"
+        },
+        "then": [
+         {
+          "op": "damage",
+          "amount": 15,
+          "dtype": "affliction",
+          "to": {
+           "faction": "enemies"
+          }
+         },
+         {
+          "op": "removeStatus",
+          "kind": "mark",
+          "name": "Corrosive Slam",
+          "from": "self"
+         }
+        ]
+       }
+      ]
+     }
+    ],
+    "currentCd": 0
+   }
+  ],
+  "triggers": [
+   {
+    "on": "damageDealt",
+    "source": "Corrosive Slam",
+    "when": {
+     "sameUnit": [
+      "eventTarget",
+      "self"
+     ]
+    },
+    "effect": [
+     {
+      "op": "removeStatus",
+      "kind": "mark",
+      "name": "Corrosive Slam",
+      "from": "self"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "name": "Saya Cell",
+  "maxHp": 25,
+  "element": "battery",
+  "skills": [
+   {
+    "id": "sayabatteryminion1",
+    "name": "Divert Charge",
+    "element": "battery",
+    "targeting": "single",
+    "klass": "basic",
+    "tags": [
+     "Strategic",
+     "Instant"
+    ],
+    "cost": {
+     "generic": 1,
+     "specific": 0
+    },
+    "cooldown": 0,
+    "effects": [
+     {
+      "op": "applyStatus",
+      "to": "target",
+      "status": {
+       "kind": "elemental_essence",
+       "duration": null
+      }
+     },
+     {
+      "op": "defeat",
+      "to": "self"
+     }
+    ],
+    "currentCd": 0
+   }
+  ],
+  "triggers": []
+ },
+ {
+  "name": "Shady Assistant",
+  "maxHp": 25,
+  "element": "reanimation",
+  "skills": [
+   {
+    "id": "sayareanimationminion1",
+    "name": "Busy Work",
+    "element": "reanimation",
+    "targeting": "single",
+    "klass": "basic",
+    "tags": [
+     "Helpful",
+     "Instant"
+    ],
+    "cost": {
+     "generic": 0,
+     "specific": 0
+    },
+    "cooldown": 4,
+    "effects": [
+     {
+      "op": "applyStatus",
+      "to": "summoner",
+      "status": {
+       "kind": "cost_mod",
+       "magnitude": -1,
+       "duration": 2
+      }
+     }
+    ],
+    "currentCd": 0
+   }
+  ],
+  "triggers": []
+ },
+ {
+  "name": "Saya-Brand Monstrosity",
+  "maxHp": 100,
+  "element": "reanimation",
+  "skills": [
+   {
+    "id": "sayareanimationminion2",
+    "name": "Mad Mash",
+    "element": "reanimation",
+    "targeting": "single",
+    "klass": "basic",
+    "tags": [
+     "Harmful",
+     "Instant"
+    ],
+    "cost": {
+     "generic": 1,
+     "specific": 0
+    },
+    "cooldown": 1,
+    "effects": [
+     {
+      "op": "damage",
+      "amount": 40,
+      "to": "target"
+     }
+    ],
+    "currentCd": 0
+   },
+   {
+    "id": "sayareanimationminion3",
+    "name": "Embedded Restoration",
+    "element": "reanimation",
+    "targeting": "self",
+    "klass": "basic",
+    "tags": [
+     "Strategic",
+     "Instant"
+    ],
+    "cost": {
+     "generic": 1,
+     "specific": 0
+    },
+    "cooldown": 0,
+    "effects": [
+     {
+      "op": "heal",
+      "amount": 15,
+      "to": "self"
+     }
+    ],
+    "currentCd": 0
+   }
+  ],
+  "triggers": []
+ },
+ {
   "name": "Hatchling Eagle",
   "maxHp": 60,
   "element": "wind",
@@ -385,6 +724,40 @@ export const MINIONS: MinionTemplate[] = [
   "triggers": []
  },
  {
+  "name": "Sparrowrider",
+  "maxHp": 15,
+  "element": "faerie",
+  "skills": [
+   {
+    "id": "sylfaerieminion1",
+    "name": "Nettle Strike",
+    "element": "faerie",
+    "targeting": "single",
+    "klass": "basic",
+    "tags": [
+     "Harmful",
+     "Instant",
+     "Affliction"
+    ],
+    "cost": {
+     "generic": 0,
+     "specific": 0
+    },
+    "cooldown": 0,
+    "effects": [
+     {
+      "op": "damage",
+      "amount": 5,
+      "dtype": "affliction",
+      "to": "target"
+     }
+    ],
+    "currentCd": 0
+   }
+  ],
+  "triggers": []
+ },
+ {
   "name": "Dennis the Apprentice",
   "maxHp": 80,
   "element": "poison",
@@ -432,6 +805,66 @@ export const MINIONS: MinionTemplate[] = [
         }
        }
       ]
+     }
+    ],
+    "currentCd": 0
+   }
+  ],
+  "triggers": []
+ },
+ {
+  "name": "Synthesizer",
+  "maxHp": 40,
+  "element": "battery",
+  "skills": [
+   {
+    "id": "batteryminion1",
+    "name": "Synthesize Serum",
+    "element": "battery",
+    "targeting": "single",
+    "klass": "basic",
+    "tags": [
+     "Strategic",
+     "Instant"
+    ],
+    "cost": {
+     "generic": 0,
+     "specific": 0
+    },
+    "cooldown": 1,
+    "effects": [
+     {
+      "op": "custom",
+      "fn": "synthesizeSerum",
+      "args": {
+       "from": "target"
+      }
+     }
+    ],
+    "currentCd": 0
+   },
+   {
+    "id": "batteryminion2",
+    "name": "Catalyze Serum",
+    "element": "battery",
+    "targeting": "single",
+    "klass": "basic",
+    "tags": [
+     "Strategic",
+     "Instant"
+    ],
+    "cost": {
+     "generic": 0,
+     "specific": 0
+    },
+    "cooldown": 0,
+    "effects": [
+     {
+      "op": "custom",
+      "fn": "catalyzeSerum",
+      "args": {
+       "to": "target"
+      }
      }
     ],
     "currentCd": 0
@@ -603,10 +1036,468 @@ export const MINIONS: MinionTemplate[] = [
   "triggers": []
  },
  {
+  "name": "Mushroom",
+  "maxHp": 20,
+  "element": "spore",
+  "skills": [
+   {
+    "id": "gaiamushroomminion1",
+    "name": "Poison Puff",
+    "element": "spore",
+    "targeting": "single",
+    "klass": "basic",
+    "tags": [
+     "Harmful",
+     "Instant",
+     "Affliction"
+    ],
+    "cost": {
+     "generic": 0,
+     "specific": 0
+    },
+    "cooldown": 0,
+    "effects": [
+     {
+      "op": "damage",
+      "amount": 5,
+      "dtype": "affliction",
+      "to": "target"
+     }
+    ],
+    "currentCd": 0
+   }
+  ],
+  "triggers": []
+ },
+ {
+  "name": "World Tree",
+  "maxHp": 80,
+  "element": "myth",
+  "skills": [
+   {
+    "id": "gaiaworldtreeminion1",
+    "name": "Fruit of the World Tree",
+    "element": "myth",
+    "targeting": "single",
+    "klass": "basic",
+    "tags": [
+     "Helpful",
+     "Instant"
+    ],
+    "cost": {
+     "generic": 1,
+     "specific": 0
+    },
+    "cooldown": 1,
+    "effects": [
+     {
+      "op": "heal",
+      "amount": 20,
+      "to": "target"
+     }
+    ],
+    "currentCd": 0
+   },
+   {
+    "id": "gaiaworldtreeminion2",
+    "name": "Ancient Roots",
+    "element": "myth",
+    "targeting": "single",
+    "klass": "basic",
+    "tags": [
+     "Harmful",
+     "Instant"
+    ],
+    "cost": {
+     "generic": 0,
+     "specific": 1
+    },
+    "cooldown": 0,
+    "effects": [
+     {
+      "op": "damage",
+      "amount": 30,
+      "dtype": "normal",
+      "to": "target"
+     }
+    ],
+    "currentCd": 0
+   }
+  ],
+  "triggers": []
+ },
+ {
+  "name": "Gaia's Fury",
+  "maxHp": 100,
+  "element": "moon",
+  "skills": [
+   {
+    "id": "gaiafury1",
+    "name": "Killing Frenzy",
+    "element": "moon",
+    "targeting": "all-enemies",
+    "klass": "basic",
+    "tags": [
+     "Harmful",
+     "Instant"
+    ],
+    "cost": {
+     "generic": 1,
+     "specific": 0
+    },
+    "cooldown": 0,
+    "effects": [
+     {
+      "op": "damage",
+      "amount": 15,
+      "dtype": "piercing",
+      "to": {
+       "faction": "enemies"
+      }
+     }
+    ],
+    "currentCd": 0
+   },
+   {
+    "id": "gaiafury2",
+    "name": "Moon Spike",
+    "element": "moon",
+    "targeting": "single",
+    "klass": "basic",
+    "tags": [
+     "Harmful",
+     "Instant"
+    ],
+    "cost": {
+     "generic": 0,
+     "specific": 1
+    },
+    "cooldown": 0,
+    "effects": [
+     {
+      "op": "damage",
+      "amount": {
+       "op": "add",
+       "args": [
+        25,
+        {
+         "op": "mul",
+         "args": [
+          5,
+          {
+           "op": "div",
+           "num": {
+            "ref": "missingHp",
+            "of": "summoner"
+           },
+           "by": 10
+          }
+         ]
+        }
+       ]
+      },
+      "dtype": "piercing",
+      "to": "target"
+     }
+    ],
+    "currentCd": 0
+   }
+  ],
+  "triggers": []
+ },
+ {
   "name": "Boulder",
   "maxHp": 50,
   "element": "earth",
   "skills": [],
+  "triggers": []
+ },
+ {
+  "name": "Zombie",
+  "maxHp": 40,
+  "element": "grave",
+  "skills": [
+   {
+    "id": "rolandzombieminion1",
+    "name": "Shambling Smash",
+    "element": "grave",
+    "targeting": "single",
+    "klass": "basic",
+    "tags": [
+     "Harmful",
+     "Instant"
+    ],
+    "cost": {
+     "generic": 1,
+     "specific": 0
+    },
+    "cooldown": 0,
+    "effects": [
+     {
+      "op": "damage",
+      "amount": 10,
+      "dtype": "normal",
+      "to": "target",
+      "id": "rolandzombieminion1.hit"
+     }
+    ],
+    "currentCd": 0
+   }
+  ],
+  "triggers": []
+ },
+ {
+  "name": "Troll Stonethrower",
+  "maxHp": 40,
+  "element": "myth",
+  "skills": [
+   {
+    "id": "rolandstonethrower1",
+    "name": "Hurl",
+    "element": "myth",
+    "targeting": "single",
+    "klass": "basic",
+    "tags": [
+     "Harmful",
+     "Instant"
+    ],
+    "cost": {
+     "generic": 1,
+     "specific": 0
+    },
+    "cooldown": 1,
+    "effects": [
+     {
+      "op": "if",
+      "cond": {
+       "cmp": ">=",
+       "left": {
+        "ref": "count",
+        "of": {
+         "faction": "allies",
+         "kind": "minion",
+         "template": "Boulder"
+        }
+       },
+       "right": 1
+      },
+      "then": [
+       {
+        "op": "if",
+        "cond": {
+         "has": "mark",
+         "name": "Earth Pillar",
+         "of": "self"
+        },
+        "then": [
+         {
+          "op": "damage",
+          "amount": 40,
+          "dtype": "normal",
+          "to": "target"
+         }
+        ],
+        "else": [
+         {
+          "op": "damage",
+          "amount": 30,
+          "dtype": "normal",
+          "to": "target"
+         }
+        ]
+       },
+       {
+        "op": "defeat",
+        "to": {
+         "pick": "random",
+         "from": {
+          "faction": "allies",
+          "kind": "minion",
+          "template": "Boulder"
+         },
+         "count": 1
+        }
+       }
+      ],
+      "else": [
+       {
+        "op": "if",
+        "cond": {
+         "has": "mark",
+         "name": "Earth Pillar",
+         "of": "self"
+        },
+        "then": [
+         {
+          "op": "damage",
+          "amount": 20,
+          "dtype": "normal",
+          "to": "target"
+         }
+        ],
+        "else": [
+         {
+          "op": "damage",
+          "amount": 10,
+          "dtype": "normal",
+          "to": "target"
+         }
+        ]
+       }
+      ]
+     }
+    ],
+    "currentCd": 0
+   }
+  ],
+  "triggers": []
+ },
+ {
+  "name": "Slimeball",
+  "maxHp": 30,
+  "element": "slime",
+  "skills": [],
+  "triggers": []
+ },
+ {
+  "name": "Stonecap Mushroom",
+  "maxHp": 20,
+  "element": "spore",
+  "skills": [],
+  "triggers": []
+ },
+ {
+  "name": "Angel",
+  "maxHp": 30,
+  "element": "angel",
+  "skills": [],
+  "triggers": []
+ },
+ {
+  "name": "Grave",
+  "maxHp": 30,
+  "element": "grave",
+  "skills": [
+   {
+    "id": "blackknightgraveminion1",
+    "name": "Arise!",
+    "element": "grave",
+    "targeting": "single",
+    "klass": "basic",
+    "tags": [
+     "Strategic",
+     "Instant"
+    ],
+    "cost": {
+     "generic": 1,
+     "specific": 0
+    },
+    "cooldown": 0,
+    "effects": [
+     {
+      "op": "summon",
+      "template": "Zombie",
+      "count": 1
+     },
+     {
+      "op": "defeat",
+      "to": "self"
+     }
+    ],
+    "currentCd": 0
+   }
+  ],
+  "triggers": []
+ },
+ {
+  "name": "Skeleton",
+  "maxHp": 10,
+  "element": "lich",
+  "skills": [
+   {
+    "id": "blackknightskeletonminion1",
+    "name": "Bonechill",
+    "element": "lich",
+    "targeting": "single",
+    "klass": "basic",
+    "tags": [
+     "Harmful",
+     "Instant"
+    ],
+    "cost": {
+     "generic": 0,
+     "specific": 0
+    },
+    "cooldown": 1,
+    "effects": [
+     {
+      "op": "damage",
+      "amount": 10,
+      "dtype": "normal",
+      "to": "target"
+     }
+    ],
+    "currentCd": 0
+   }
+  ],
+  "triggers": []
+ },
+ {
+  "name": "Revenant",
+  "maxHp": 25,
+  "element": "lich",
+  "skills": [],
+  "triggers": []
+ },
+ {
+  "name": "Shadow Clone",
+  "maxHp": 5,
+  "element": "ninja",
+  "skills": [
+   {
+    "id": "shadowclone1",
+    "name": "Shadow Strike",
+    "element": "ninja",
+    "targeting": "single",
+    "klass": "basic",
+    "tags": [
+     "Harmful",
+     "Instant"
+    ],
+    "cost": {
+     "generic": 0,
+     "specific": 0
+    },
+    "cooldown": 0,
+    "effects": [
+     {
+      "op": "if",
+      "cond": {
+       "has": "mark",
+       "name": "Shadow Cross",
+       "of": "target"
+      },
+      "then": [
+       {
+        "op": "damage",
+        "amount": 15,
+        "dtype": "piercing",
+        "to": "target"
+       }
+      ],
+      "else": [
+       {
+        "op": "damage",
+        "amount": 5,
+        "dtype": "piercing",
+        "to": "target"
+       }
+      ]
+     }
+    ],
+    "currentCd": 0
+   }
+  ],
   "triggers": []
  },
  {
@@ -630,6 +1521,13 @@ export const MINIONS: MinionTemplate[] = [
     "currentCd": 0
    }
   ],
+  "triggers": []
+ },
+ {
+  "name": "Simulacrum",
+  "maxHp": 30,
+  "element": "shadow",
+  "skills": [],
   "triggers": []
  },
  {

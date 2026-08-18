@@ -1081,7 +1081,7 @@ export const FUSIONS: FusionForm[] = [
     "effect": [
      {
       "op": "summon",
-      "template": "ayanaangelminion",
+      "template": "Angel",
       "count": 2
      },
      {
@@ -1115,7 +1115,7 @@ export const FUSIONS: FusionForm[] = [
         "of": {
          "faction": "allies",
          "kind": "minion",
-         "template": "ayanaangelminion",
+         "template": "Angel",
          "alive": true
         }
        },
@@ -8908,7 +8908,7 @@ export const FUSIONS: FusionForm[] = [
      },
      {
       "op": "summon",
-      "template": "larianinjaminion",
+      "template": "Shadow Clone",
       "count": 1
      }
     ]
@@ -8940,7 +8940,7 @@ export const FUSIONS: FusionForm[] = [
     },
     {
      "op": "summon",
-     "template": "larianinjaminion",
+     "template": "Shadow Clone",
      "count": 1
     },
     {
@@ -10061,6 +10061,14 @@ export const FUSIONS: FusionForm[] = [
       "template": "Revenant",
       "count": 1,
       "hp": 25
+     },
+     {
+      "op": "custom",
+      "fn": "cloneBasicSkillsOntoRevenant",
+      "args": {
+       "copyFrom": "eventUnit",
+       "minionTemplate": "Revenant"
+      }
      }
     ]
    },
@@ -12297,7 +12305,7 @@ export const FUSIONS: FusionForm[] = [
     "effect": [
      {
       "op": "summon",
-      "template": "riverdaughterslimeminion",
+      "template": "Slime",
       "count": 2
      }
     ]
@@ -12394,7 +12402,7 @@ export const FUSIONS: FusionForm[] = [
       "to": {
        "faction": "allies",
        "kind": "minion",
-       "template": "riverdaughterslimeminion"
+       "template": "Slime"
       }
      }
     }
@@ -14512,7 +14520,7 @@ export const FUSIONS: FusionForm[] = [
    "effects": [
     {
      "op": "summon",
-     "template": "sylfaerieminion",
+     "template": "Sparrowrider",
      "count": 2
     }
    ],
@@ -17489,12 +17497,6 @@ export const FUSIONS: FusionForm[] = [
    },
    "cooldown": 4,
    "effects": [
-    {
-     "op": "summon",
-     "template": "Simulacrum",
-     "count": 1,
-     "hp": 30
-    },
     {
      "op": "custom",
      "fn": "cloneBasicSkillsOntoSimulacrum",

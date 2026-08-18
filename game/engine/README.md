@@ -7,7 +7,7 @@ run on the client (prediction) and the server (authority).
 ## Run
 
 ```bash
-node --test          # 230 golden tests, zero install (Node 24 type-strips TS)
+node --test          # 288 golden tests, zero install (Node 24 type-strips TS)
 npm run typecheck    # strict tsc --noEmit (needs `npm i` once, for typescript)
 ```
 

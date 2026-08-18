@@ -324,6 +324,28 @@ minion/summon variants, damage-link/redirect, cost/economy, etc.).
   mechanic owns essence while shielded and the base same-turn grant resumes once the shield breaks — no double,
   no shield-down dead zone. (dur-0 "acted" marks persist ~2 turns, so a once-per-turn guard mark was not viable —
   verified empirically.) `test/fusion.test.ts` (+3 cases); **282 tests green, validators + tsc clean.**
+- **Fusion-summoned minions authored ✅ (2026-08-17):** a content audit against the frozen export found the
+  hero/skill/augment/fusion-form layers complete, but **21 fusion-summoned minion templates were referenced by
+  `summon`/`transform` yet never registered** — so ~20 of the 200 fusion forms spawned broken 1-HP placeholder
+  stubs (the Syl-Eagle bug class, at scale). Authored all 21 (Mushroom, World Tree, Gaia's Fury, Zombie, Troll
+  Stonethrower, Slimeball, Stonecap, Grave, Skeleton, Saya Cell, Shady Assistant, Saya-Brand Monstrosity, Bjorn,
+  Frozen Beast, Synthesizer, Simulacrum, Revenant, Angel, Shadow Clone, Slime, Sparrowrider) to their exact
+  frozen skills, added to each owner hero's `minions[]`. Self-sacrifice minions (Grave's Arise!, Saya Cell's
+  Divert Charge) use the native `{op:"defeat",to:"self"}`; Moon Spike scales via the existing `div` op. Three new
+  handlers: `synthesizeSerum`/`catalyzeSerum` (the Synthesizer stores/re-applies Hector's serums via its
+  summoner) and `cloneBasicSkillsOntoRevenant` (Maggie's Revenant copies a killed hero's basics). Fixed 4
+  made-up-id summon refs (→ display names) and removed xyris:mirror's double Simulacrum summon. **0 unregistered
+  summon templates remain.** `test/fusion_minions.test.ts`; **288 tests green, validators + tsc clean.**
+- **Adversarial review of the minions (2026-08-18):** 4 areas, each finding verified (6 → **4 CONFIRMED, 0
+  uncertain**). **All fixed:** (1,2) HIGH — the summon-ref retargets updated the `summon` op but not *sibling
+  selectors* that referenced the same minion by its old id: ayana:angel's Chorus death-guard counted
+  `template:"ayanaangelminion"` (always 0 → Chorus ended while an Angel still lived) and rd:slime's Congeal
+  healed `template:"riverdaughterslimeminion"` (matched nothing → healed no Slime); a full recursive audit found
+  exactly these two and both are retargeted to the display name. (3) MED — Troll's Hurl was three additive damage
+  nodes (per-instance DR + up to 3× `damageDealt` reactions); rebuilt as one combined hit per branch (10/20/30/40)
+  plus the single Boulder destroy. (4) LOW — the Revenant/Simulacrum clone finder could overwrite an older
+  populated instance when the summon no-op'd at the minion cap; both now filter to empty-skilled (un-populated)
+  minions, and the Revenant template is authored skill-less (dropping the invented placeholder id).
 
 ---
 

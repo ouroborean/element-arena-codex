@@ -1053,6 +1053,125 @@
       }
      ]
     }
+   ],
+   "minions": [
+    {
+     "name": "Bjorn, True King",
+     "maxHp": 80,
+     "element": "myth",
+     "skills": [
+      {
+       "id": "mythminion1",
+       "name": "Sovereign's Howl",
+       "element": "myth",
+       "targeting": "single",
+       "klass": "basic",
+       "tags": [
+        "Harmful",
+        "Instant"
+       ],
+       "cost": {
+        "generic": 0,
+        "specific": 1
+       },
+       "cooldown": 1,
+       "effects": [
+        {
+         "op": "applyStatus",
+         "to": "target",
+         "status": {
+          "kind": "dot",
+          "name": "Sovereign's Howl",
+          "magnitude": 10,
+          "duration": 2,
+          "dtype": "normal"
+         }
+        },
+        {
+         "op": "applyStatus",
+         "to": "target",
+         "status": {
+          "kind": "outgoing_damage_mod",
+          "name": "Sovereign's Howl",
+          "magnitude": -5,
+          "duration": null
+         }
+        }
+       ],
+       "note": "'Deals 10 damage to target enemy for 2 turns' = a 2-turn normal dot (magnitude 10, duration 2); prose says 'for 2 turns' so no separate immediate hit. 'lowers the damage they deal by 5 permanently' = a permanent (duration null) outgoing_damage_mod of -5."
+      },
+      {
+       "id": "mythminion2",
+       "name": "Might of the Bjorn",
+       "element": "myth",
+       "targeting": "single",
+       "klass": "basic",
+       "tags": [
+        "Helpful",
+        "Strategic",
+        "Instant"
+       ],
+       "cost": {
+        "generic": 1,
+        "specific": 0
+       },
+       "cooldown": 0,
+       "effects": [
+        {
+         "op": "applyStatus",
+         "to": "target",
+         "status": {
+          "kind": "outgoing_damage_mod",
+          "name": "Might of the Bjorn",
+          "magnitude": 5,
+          "duration": 2
+         }
+        },
+        {
+         "op": "applyStatus",
+         "to": "target",
+         "status": {
+          "kind": "damage_reduction",
+          "name": "Might of the Bjorn",
+          "magnitude": 10,
+          "duration": 2
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Frozen Beast",
+     "maxHp": 50,
+     "element": "stasis",
+     "skills": [
+      {
+       "id": "stasisminion1",
+       "name": "Frozen Fangs",
+       "element": "stasis",
+       "targeting": "single",
+       "klass": "basic",
+       "tags": [
+        "Harmful",
+        "Instant"
+       ],
+       "cost": {
+        "generic": 1,
+        "specific": 0
+       },
+       "cooldown": 0,
+       "effects": [
+        {
+         "op": "damage",
+         "amount": 25,
+         "dtype": "piercing",
+         "to": "target"
+        }
+       ]
+      }
+     ]
+    }
    ]
   },
   {
@@ -1776,6 +1895,95 @@
       }
      ],
      "note": "Invulnerable 1 turn. Applies three 1-turn empowerment marks read by next turn's skills: Dive Ripple (Ripple lasts two turns), Dive Undertow (Undertow hits all enemies), Dive River Clone (River Clone cost becomes 1 generic)."
+    }
+   ],
+   "minions": [
+    {
+     "name": "Slime",
+     "maxHp": 15,
+     "element": "slime",
+     "skills": [
+      {
+       "id": "riverdaughterslimeminion1",
+       "name": "Corrosive Slam",
+       "element": "slime",
+       "targeting": "all-enemies",
+       "klass": "basic",
+       "tags": [
+        "Harmful",
+        "Control",
+        "Affliction"
+       ],
+       "cost": {
+        "generic": 1,
+        "specific": 0
+       },
+       "cooldown": 1,
+       "note": "'Deals 15 Affliction damage to the enemy team on the following turn. If this unit takes damage, this skill is cancelled.' Frozen Channel:false, so modeled with schedule (not the Channel class): on cast it marks itself with a permanent 'Corrosive Slam' pending mark and schedules the AOE for its following turn (delayTurns:1, matching Dive Ripple's 'following turn'). The scheduled payload lands only if the pending mark still exists, and self-removes on fire. The minion's damageDealt trigger strips the mark whenever the Slime takes damage, cancelling the pending strike; the Slime dying also cancels it (scheduled entry finds no live caster). Mark is duration:null (not 1) so tickDurations does not expire it before fireScheduled runs in the same turn-end.",
+       "effects": [
+        {
+         "op": "applyStatus",
+         "to": "self",
+         "status": {
+          "kind": "mark",
+          "name": "Corrosive Slam",
+          "duration": null
+         }
+        },
+        {
+         "op": "schedule",
+         "delayTurns": 1,
+         "to": "self",
+         "effect": [
+          {
+           "op": "if",
+           "cond": {
+            "has": "mark",
+            "name": "Corrosive Slam",
+            "of": "self"
+           },
+           "then": [
+            {
+             "op": "damage",
+             "amount": 15,
+             "dtype": "affliction",
+             "to": {
+              "faction": "enemies"
+             }
+            },
+            {
+             "op": "removeStatus",
+             "kind": "mark",
+             "name": "Corrosive Slam",
+             "from": "self"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ],
+     "triggers": [
+      {
+       "on": "damageDealt",
+       "source": "Corrosive Slam",
+       "when": {
+        "sameUnit": [
+         "eventTarget",
+         "self"
+        ]
+       },
+       "effect": [
+        {
+         "op": "removeStatus",
+         "kind": "mark",
+         "name": "Corrosive Slam",
+         "from": "self"
+        }
+       ]
+      }
+     ]
     }
    ]
   },
@@ -2955,6 +3163,139 @@
        ]
       }
      ]
+    }
+   ],
+   "minions": [
+    {
+     "name": "Saya Cell",
+     "maxHp": 25,
+     "element": "battery",
+     "skills": [
+      {
+       "id": "sayabatteryminion1",
+       "name": "Divert Charge",
+       "element": "battery",
+       "targeting": "single",
+       "klass": "basic",
+       "tags": [
+        "Strategic",
+        "Instant"
+       ],
+       "cost": {
+        "generic": 1,
+        "specific": 0
+       },
+       "cooldown": 0,
+       "effects": [
+        {
+         "op": "applyStatus",
+         "to": "target",
+         "status": {
+          "kind": "elemental_essence",
+          "duration": null
+         }
+        },
+        {
+         "op": "defeat",
+         "to": "self"
+        }
+       ],
+       "note": "'Target Hero gains Elemental Essence. After using this skill, the Saya Cell minion dies.' Grants the target the one-shot Elemental Essence charge, then the Cell defeats itself via the native defeat op (bypasses shield/DR, no self-damage)."
+      }
+     ],
+     "note": "Battery fusion (saya:battery) minion. Summoned 1-at-a-time by the Saya Cell fusion skill (sayabattery1, template \"Saya Cell\")."
+    },
+    {
+     "name": "Shady Assistant",
+     "maxHp": 25,
+     "element": "reanimation",
+     "skills": [
+      {
+       "id": "sayareanimationminion1",
+       "name": "Busy Work",
+       "element": "reanimation",
+       "targeting": "single",
+       "klass": "basic",
+       "tags": [
+        "Helpful",
+        "Instant"
+       ],
+       "cost": {
+        "generic": 0,
+        "specific": 0
+       },
+       "cooldown": 4,
+       "effects": [
+        {
+         "op": "applyStatus",
+         "to": "summoner",
+         "status": {
+          "kind": "cost_mod",
+          "magnitude": -1,
+          "duration": 2
+         }
+        }
+       ],
+       "note": "'Reduces the cost of Saya's skills by 1 Generic for her next 2 turns.' Global cost_mod (magnitude -1, no skillId) on the summoner (Saya) for 2 turns; the -1 delta applies to generic, spilling to specific per the cost engine. targeting kept as frozen 'single'; effect pinned to 'summoner'."
+      }
+     ],
+     "note": "Reanimation fusion (saya:reanimation) minion. Summoned each round by the Shady Assistants fusion passive (sayareanimation0, roundStart summon template \"Shady Assistant\")."
+    },
+    {
+     "name": "Saya-Brand Monstrosity",
+     "maxHp": 100,
+     "element": "reanimation",
+     "skills": [
+      {
+       "id": "sayareanimationminion2",
+       "name": "Mad Mash",
+       "element": "reanimation",
+       "targeting": "single",
+       "klass": "basic",
+       "tags": [
+        "Harmful",
+        "Instant"
+       ],
+       "cost": {
+        "generic": 1,
+        "specific": 0
+       },
+       "cooldown": 1,
+       "effects": [
+        {
+         "op": "damage",
+         "amount": 40,
+         "to": "target"
+        }
+       ],
+       "note": "'The Monstrosity deals 40 damage to target enemy.' Normal-type damage."
+      },
+      {
+       "id": "sayareanimationminion3",
+       "name": "Embedded Restoration",
+       "element": "reanimation",
+       "targeting": "self",
+       "klass": "basic",
+       "tags": [
+        "Strategic",
+        "Instant"
+       ],
+       "cost": {
+        "generic": 1,
+        "specific": 0
+       },
+       "cooldown": 0,
+       "effects": [
+        {
+         "op": "heal",
+         "amount": 15,
+         "to": "self"
+        }
+       ],
+       "note": "'Heals the Monstrosity for 15 HP.' Self-heal; the Monstrosity is the caster (frozen sayareanimationminion3, targeting self)."
+      }
+     ],
+     "note": "Reanimation fusion (saya:reanimation) minion. Summoned by the Saya-Brand Monstrosity fusion skill (sayareanimation1, template \"Saya-Brand Monstrosity\")."
     }
    ]
   },
@@ -4713,6 +5054,39 @@
        ]
       }
      ]
+    },
+    {
+     "name": "Sparrowrider",
+     "maxHp": 15,
+     "element": "faerie",
+     "skills": [
+      {
+       "id": "sylfaerieminion1",
+       "name": "Nettle Strike",
+       "element": "faerie",
+       "targeting": "single",
+       "klass": "basic",
+       "tags": [
+        "Harmful",
+        "Instant",
+        "Affliction"
+       ],
+       "cost": {
+        "generic": 0,
+        "specific": 0
+       },
+       "cooldown": 0,
+       "note": "'Deals 5 Affliction damage to target enemy.' The fusion clause that these count as Syl's Eagle for Two as One is a fusion-layer engine gap already noted on the sylfaerieminion summon, not part of this skill.",
+       "effects": [
+        {
+         "op": "damage",
+         "amount": 5,
+         "dtype": "affliction",
+         "to": "target"
+        }
+       ]
+      }
+     ]
     }
    ],
    "customCount": 2
@@ -5271,6 +5645,65 @@
          ]
         }
        ]
+      }
+     ]
+    },
+    {
+     "name": "Synthesizer",
+     "maxHp": 40,
+     "element": "battery",
+     "skills": [
+      {
+       "id": "batteryminion1",
+       "name": "Synthesize Serum",
+       "element": "battery",
+       "targeting": "single",
+       "klass": "basic",
+       "tags": [
+        "Strategic",
+        "Instant"
+       ],
+       "cost": {
+        "generic": 0,
+        "specific": 0
+       },
+       "cooldown": 1,
+       "effects": [
+        {
+         "op": "custom",
+         "fn": "synthesizeSerum",
+         "args": {
+          "from": "target"
+         }
+        }
+       ],
+       "note": "'The Synthesizer stores a permanent copy of all Serums on the target that it does not currently hold.' For each of Hector's three Serums present on the target that the Synthesizer does not already hold, record a permanent stored-serum mark on the Synthesizer (dedup by serum type). Needs custom fn synthesizeSerum."
+      },
+      {
+       "id": "batteryminion2",
+       "name": "Catalyze Serum",
+       "element": "battery",
+       "targeting": "single",
+       "klass": "basic",
+       "tags": [
+        "Strategic",
+        "Instant"
+       ],
+       "cost": {
+        "generic": 0,
+        "specific": 0
+       },
+       "cooldown": 0,
+       "effects": [
+        {
+         "op": "custom",
+         "fn": "catalyzeSerum",
+         "args": {
+          "to": "target"
+         }
+        }
+       ],
+       "note": "'The Synthesizer applies all of its stored serums to target unit.' For each stored serum, re-run the corresponding Hector serum skill effect on the target (via the summoner Hector's skills). Stored serums are permanent, not consumed. Needs custom fn catalyzeSerum."
       }
      ]
     }
@@ -6434,6 +6867,168 @@
        "note": "Heals the target ally for the Worldsprout's current HP, then the Worldsprout dies (defeat self, not damage). Heal resolves before the self-defeat so the pre-death HP is transferred."
       }
      ]
+    },
+    {
+     "name": "Mushroom",
+     "maxHp": 20,
+     "element": "spore",
+     "skills": [
+      {
+       "id": "gaiamushroomminion1",
+       "name": "Poison Puff",
+       "element": "spore",
+       "targeting": "single",
+       "klass": "basic",
+       "tags": [
+        "Harmful",
+        "Instant",
+        "Affliction"
+       ],
+       "cost": {
+        "generic": 0,
+        "specific": 0
+       },
+       "cooldown": 0,
+       "effects": [
+        {
+         "op": "damage",
+         "amount": 5,
+         "dtype": "affliction",
+         "to": "target"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "World Tree",
+     "maxHp": 80,
+     "element": "myth",
+     "skills": [
+      {
+       "id": "gaiaworldtreeminion1",
+       "name": "Fruit of the World Tree",
+       "element": "myth",
+       "targeting": "single",
+       "klass": "basic",
+       "tags": [
+        "Helpful",
+        "Instant"
+       ],
+       "cost": {
+        "generic": 1,
+        "specific": 0
+       },
+       "cooldown": 1,
+       "effects": [
+        {
+         "op": "heal",
+         "amount": 20,
+         "to": "target"
+        }
+       ]
+      },
+      {
+       "id": "gaiaworldtreeminion2",
+       "name": "Ancient Roots",
+       "element": "myth",
+       "targeting": "single",
+       "klass": "basic",
+       "tags": [
+        "Harmful",
+        "Instant"
+       ],
+       "cost": {
+        "generic": 0,
+        "specific": 1
+       },
+       "cooldown": 0,
+       "effects": [
+        {
+         "op": "damage",
+         "amount": 30,
+         "dtype": "normal",
+         "to": "target"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Gaia's Fury",
+     "maxHp": 100,
+     "element": "moon",
+     "skills": [
+      {
+       "id": "gaiafury1",
+       "name": "Killing Frenzy",
+       "element": "moon",
+       "targeting": "all-enemies",
+       "klass": "basic",
+       "tags": [
+        "Harmful",
+        "Instant"
+       ],
+       "cost": {
+        "generic": 1,
+        "specific": 0
+       },
+       "cooldown": 0,
+       "effects": [
+        {
+         "op": "damage",
+         "amount": 15,
+         "dtype": "piercing",
+         "to": {
+          "faction": "enemies"
+         }
+        }
+       ]
+      },
+      {
+       "id": "gaiafury2",
+       "name": "Moon Spike",
+       "element": "moon",
+       "targeting": "single",
+       "klass": "basic",
+       "tags": [
+        "Harmful",
+        "Instant"
+       ],
+       "cost": {
+        "generic": 0,
+        "specific": 1
+       },
+       "cooldown": 0,
+       "effects": [
+        {
+         "op": "damage",
+         "amount": {
+          "op": "add",
+          "args": [
+           25,
+           {
+            "op": "mul",
+            "args": [
+             5,
+             {
+              "op": "div",
+              "num": {
+               "ref": "missingHp",
+               "of": "summoner"
+              },
+              "by": 10
+             }
+            ]
+           }
+          ]
+         },
+         "dtype": "piercing",
+         "to": "target"
+        }
+       ]
+      }
+     ]
     }
    ]
   },
@@ -6832,6 +7427,158 @@
      "element": "earth",
      "skills": [],
      "note": "Inert projectile minion summoned by Form Stone; no skills or triggers of its own. Strength From The Earth strikes it, launches it for its remaining HP, and destroys it."
+    },
+    {
+     "name": "Zombie",
+     "maxHp": 40,
+     "element": "grave",
+     "skills": [
+      {
+       "id": "rolandzombieminion1",
+       "name": "Shambling Smash",
+       "element": "grave",
+       "targeting": "single",
+       "klass": "basic",
+       "tags": [
+        "Harmful",
+        "Instant"
+       ],
+       "cost": {
+        "generic": 1,
+        "specific": 0
+       },
+       "cooldown": 0,
+       "note": "'Using this skill does not deactivate Exile' is a Black Knight carryover — Exile is the Black Knight's passive (blackknight0), not a Roland mechanic — so the clause is a no-op for Roland's Zombie and needs no custom handler.",
+       "effects": [
+        {
+         "op": "damage",
+         "amount": 10,
+         "dtype": "normal",
+         "to": "target",
+         "id": "rolandzombieminion1.hit"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Troll Stonethrower",
+     "maxHp": 40,
+     "element": "myth",
+     "skills": [
+      {
+       "id": "rolandstonethrower1",
+       "name": "Hurl",
+       "element": "myth",
+       "targeting": "single",
+       "klass": "basic",
+       "tags": [
+        "Harmful",
+        "Instant"
+       ],
+       "cost": {
+        "generic": 1,
+        "specific": 0
+       },
+       "cooldown": 1,
+       "note": "Full frozen prose (three clauses): base 10; +20 if an ally Boulder exists, destroying one Boulder; +10 if the caster is affected by an Earth Pillar mark (reachable via the myth fusion's Earth Pillar, Spires of the North). Authored as ONE combined damage hit per branch (nested ifs) rather than three additive damage nodes, so the target takes a single instance (one DR pass, one damageDealt reaction) totalling 10/20/30/40; the Boulder is destroyed once when the +20 applies.",
+       "effects": [
+        {
+         "op": "if",
+         "cond": {
+          "cmp": ">=",
+          "left": {
+           "ref": "count",
+           "of": {
+            "faction": "allies",
+            "kind": "minion",
+            "template": "Boulder"
+           }
+          },
+          "right": 1
+         },
+         "then": [
+          {
+           "op": "if",
+           "cond": {
+            "has": "mark",
+            "name": "Earth Pillar",
+            "of": "self"
+           },
+           "then": [
+            {
+             "op": "damage",
+             "amount": 40,
+             "dtype": "normal",
+             "to": "target"
+            }
+           ],
+           "else": [
+            {
+             "op": "damage",
+             "amount": 30,
+             "dtype": "normal",
+             "to": "target"
+            }
+           ]
+          },
+          {
+           "op": "defeat",
+           "to": {
+            "pick": "random",
+            "from": {
+             "faction": "allies",
+             "kind": "minion",
+             "template": "Boulder"
+            },
+            "count": 1
+           }
+          }
+         ],
+         "else": [
+          {
+           "op": "if",
+           "cond": {
+            "has": "mark",
+            "name": "Earth Pillar",
+            "of": "self"
+           },
+           "then": [
+            {
+             "op": "damage",
+             "amount": 20,
+             "dtype": "normal",
+             "to": "target"
+            }
+           ],
+           "else": [
+            {
+             "op": "damage",
+             "amount": 10,
+             "dtype": "normal",
+             "to": "target"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Slimeball",
+     "maxHp": 30,
+     "element": "slime",
+     "skills": [],
+     "note": "Body minion with no active skill of its own (no frozen skill references rolandslimeminion). Summoned two-per-Boulder by the slime fusion passive Oozeshaping (rolandslime0); made damage-immune fodder by Call to the Mire (rolandslime1) and launchable by Strength From The Earth — all of which live on Roland's fusion, not on the minion."
+    },
+    {
+     "name": "Stonecap Mushroom",
+     "maxHp": 20,
+     "element": "spore",
+     "skills": [],
+     "note": "Body minion with no active skill of its own (no frozen skill references rolandsporeminion; Loamwrecker rolandspore1 is Roland's fusion skill, not the minion's). Created on Boulder destruction by the spore fusion passive Scattered Spores (rolandspore0); consumed by Strength From The Earth for a 15 Affliction AoE + self-destroy, and counted by Loamwrecker — all on Roland's fusion, not on the minion."
     }
    ]
   },
@@ -7410,6 +8157,15 @@
        "duration": null
       }
      ]
+    }
+   ],
+   "minions": [
+    {
+     "name": "Angel",
+     "maxHp": 30,
+     "element": "angel",
+     "note": "Body-only minion (no own skill). Ayana's fusion passive Choir On High (ayanaangel0) summons two Angels; while either is alive Chorus is permanent, and the passive's alive-count selector reads these bodies. Providence (ayanaangel1) is Ayana's angel fusion active, not the Angel's skill.",
+     "skills": []
     }
    ]
   },
@@ -8167,7 +8923,74 @@
      "note": "'For 2 turns, the Black Knight is invulnerable. During this time, Oathbreaker Strike will target all enemies and is always enhanced.' invulnerable = cannot be targeted by new harmful skills. The 2-turn 'The Nightmare Rides' mark is read by blackknight1's override branch (all enemies + always 25 piercing). targeting kept 'single' per frozen data; Strategic-only so no target is required."
     }
    ],
-   "minions": []
+   "minions": [
+    {
+     "name": "Grave",
+     "maxHp": 30,
+     "element": "grave",
+     "skills": [
+      {
+       "id": "blackknightgraveminion1",
+       "name": "Arise!",
+       "element": "grave",
+       "targeting": "single",
+       "klass": "basic",
+       "tags": [
+        "Strategic",
+        "Instant"
+       ],
+       "cost": {
+        "generic": 1,
+        "specific": 0
+       },
+       "cooldown": 0,
+       "effects": [
+        {
+         "op": "summon",
+         "template": "Zombie",
+         "count": 1
+        },
+        {
+         "op": "defeat",
+         "to": "self"
+        }
+       ],
+       "note": "'Sacrifices this minion to create a Zombie Minion (40 HP, r: Deals 10 damage to 1 enemy.)' Summons one 'Zombie' (template maxHp 40) then defeats self. Order is summon-then-sacrifice so the Zombie is created before the Grave dies; the engine 'defeat' op (to:'self') IS the sacrifice, so no custom fn is needed. Strategic/Instant per frozen classes_active (not Harmful). No hp override on the summon because the Zombie template's maxHp is already 40; the '(40 HP...)' parenthetical just describes the created Zombie's stats, which its own template carries."
+      }
+     ]
+    },
+    {
+     "name": "Skeleton",
+     "maxHp": 10,
+     "element": "lich",
+     "skills": [
+      {
+       "id": "blackknightskeletonminion1",
+       "name": "Bonechill",
+       "element": "lich",
+       "targeting": "single",
+       "klass": "basic",
+       "tags": [
+        "Harmful",
+        "Instant"
+       ],
+       "cost": {
+        "generic": 0,
+        "specific": 0
+       },
+       "cooldown": 1,
+       "effects": [
+        {
+         "op": "damage",
+         "amount": 10,
+         "dtype": "normal",
+         "to": "target"
+        }
+       ]
+      }
+     ]
+    }
+   ]
   },
   {
    "id": "maggie",
@@ -8536,6 +9359,16 @@
       }
      ],
      "note": "For 2 turns Maggie ignores her own Curse of Thorns damage (damage_ignore name-scoped to 'Curse of Thorns'). Each of those 2 turns she deals damage = her Curse of Thorns damage (5 x stacks) to every other targetable unit (enemies + allies). Modeled as an immediate pulse (cast turn) + one scheduled pulse (next turn). Outgoing type left normal: prose says only 'damage', and it is the amount (not the affliction property) that equals her curse damage."
+    }
+   ],
+   "minions": [
+    {
+     "name": "Revenant",
+     "maxHp": 25,
+     "element": "lich",
+     "skills": [],
+     "triggers": [],
+     "note": "Fusion-created construct (maggie:lich, Lash of Servitude / maggielich0: 'If Maggie kills an enemy Hero, she creates a Revenant minion with their 3 Basic skills and 25 HP.'). Summoned by the existing Lash of Servitude unitDied trigger; the cloneBasicSkillsOntoRevenant handler then replaces the placeholder with the killed hero's 3 Basic (klass==='basic') skills. Element 'lich' comes from maggielich0 (the fusion that creates it) — the guide's 'grave/lich' resolves to lich, since Lash of Servitude is the lich fusion's passive (maggie also has a separate maggiegrave fusion). maggie currently has NO minions[] array (entry spans roster.authored.json 8173-8949) — a minions[] array must be created to hold this template. Skills authored empty (no invented placeholder id); cloneBasicSkillsOntoRevenant fills them from the killed hero, and the empty-skills state is how the handler finds the fresh Revenant."
     }
    ]
   },
@@ -8944,6 +9777,58 @@
      ],
      "note": "Every character takes 5 damage (enemies) or healing (allies, incl. Laria) per Deepening Shadows stack they have, THEN all become invulnerable for 1 turn. Damage/heal is applied before invulnerable so Nightfall's own hit is not blocked (invulnerable only stops NEW harmful skills per IS_NEW ruling). Stacks are not consumed."
     }
+   ],
+   "minions": [
+    {
+     "name": "Shadow Clone",
+     "maxHp": 5,
+     "element": "ninja",
+     "skills": [
+      {
+       "id": "shadowclone1",
+       "name": "Shadow Strike",
+       "element": "ninja",
+       "targeting": "single",
+       "klass": "basic",
+       "tags": [
+        "Harmful",
+        "Instant"
+       ],
+       "cost": {
+        "generic": 0,
+        "specific": 0
+       },
+       "cooldown": 0,
+       "note": "Base frozen prose: 'Deals 5 Piercing damage to target enemy.' Laria's fusion skill Shadow Cross (larianinja1) frozen prose adds 'Until the end of the turn, Shadow Strike damage to that target is increased by 10', carried on the 'Shadow Cross' mark it places on the target. This skill reads that mark and deals 15 instead of 5 while present (same owner-mark-read pattern as Syl's Talon Rake reading 'To the Skies'). Mark is not consumed, so every clone's strike that turn is empowered until the mark expires.",
+       "effects": [
+        {
+         "op": "if",
+         "cond": {
+          "has": "mark",
+          "name": "Shadow Cross",
+          "of": "target"
+         },
+         "then": [
+          {
+           "op": "damage",
+           "amount": 15,
+           "dtype": "piercing",
+           "to": "target"
+          }
+         ],
+         "else": [
+          {
+           "op": "damage",
+           "amount": 5,
+           "dtype": "piercing",
+           "to": "target"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
    ]
   },
   {
@@ -9269,6 +10154,14 @@
        "effects": []
       }
      ]
+    },
+    {
+     "name": "Simulacrum",
+     "maxHp": 30,
+     "element": "shadow",
+     "skills": [],
+     "triggers": [],
+     "note": "Fusion-created construct (xyris:mirror, xyrismirror1 'Simulacrum': 'Xyris targets one ally or enemy and creates a Simulacrum minion that possesses their Basic skills. Simulacrums are created with 30 HP and their specific costs are the same as Xyris's.'). No skills of its own: the EXISTING cloneBasicSkillsOntoSimulacrum handler overwrites the whole skills array with deep-clones of the target's Basic (klass==='basic') skills and re-elements specific costs to Xyris at summon time. Empty skills[] follows the Boulder pattern; this handler does not look up any placeholder id, so none is authored. Element 'shadow' = Xyris's base element (matches the frozen Dream Reflection minion). Append to xyris's existing minions[] array, next to Dream Reflection (roster.authored.json ~9250)."
     }
    ]
   },

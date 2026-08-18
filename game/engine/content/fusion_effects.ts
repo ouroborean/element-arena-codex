@@ -1010,7 +1010,9 @@ registerCustom("cloneBasicSkillsOntoSimulacrum", (ctx, a) => {
   const template = a.minionTemplate as string;
   runInContext([{ op: "summon", template, count: 1, hp: 30 }], ctx);
   const mine = Object.values(ctx.state.units)
-    .filter((u) => u.kind === "minion" && u.name === template && u.summoner === ctx.self.id)
+    // empty skills = the fresh Simulacrum just summoned; if the summon no-op'd at the minion cap this is
+    // empty and the handler bails rather than re-copying onto an older, already-populated Simulacrum.
+    .filter((u) => u.kind === "minion" && u.name === template && u.summoner === ctx.self.id && (u.skills ?? []).length === 0)
     .sort((x, y) => Number(x.id.split(":").pop()) - Number(y.id.split(":").pop()));
   const sim = mine[mine.length - 1];
   const src = resolveSelector((a.copyFrom as Selector) ?? "target", ctx)[0];
@@ -1672,4 +1674,52 @@ registerCustom("ionCoilRules", (ctx, a) => {
     if (req && typeof req === "object" && "cmp" in req) req.right = num(a.maxStack, 2);
     s2.requires = req;
   }
+});
+
+// ── Fusion-minion custom handlers ────────────────────────────────────────────────────────────────── //
+
+// hector:battery (Synthesizer). Synthesize Serum: "stores a permanent copy of all Serums on the target that
+// it does not currently have." For each Hector serum present on the source that the Synthesizer lacks, record
+// a permanent "Stored Serum: <name>" mark on the Synthesizer (deduped by serum type).
+registerCustom("synthesizeSerum", (ctx, a) => {
+  const src = resolveSelector((a.from as Selector) ?? "target", ctx)[0];
+  if (!src) return;
+  for (const sid of SERUM_SKILL_IDS) {
+    const name = SERUM_NAME_BY_SKILL[sid]!;
+    const stored = `Stored Serum: ${name}`;
+    const srcHas = src.statuses.some((s) => s.name === name);
+    const alreadyStored = ctx.self.statuses.some((s) => s.kind === "mark" && s.name === stored);
+    if (srcHas && !alreadyStored) applyStatus(ctx.self, { kind: "mark", name: stored, duration: null, appliedBy: ctx.self.id, appliedTurn: ctx.state.turn });
+  }
+});
+
+// hector:battery (Synthesizer). Catalyze Serum: "applies all of its stored serums to target unit." Re-runs
+// the summoner Hector's serum skill for each stored serum (stored serums are permanent, not consumed). The
+// Synthesizer does not own hector1/2/3, so the serum effects are sourced from the summoner.
+registerCustom("catalyzeSerum", (ctx, a) => {
+  const target = resolveSelector((a.to as Selector) ?? "target", ctx)[0];
+  const hector = resolveSelector("summoner", ctx)[0];
+  if (!target || !hector) return;
+  for (const sid of SERUM_SKILL_IDS) {
+    const stored = `Stored Serum: ${SERUM_NAME_BY_SKILL[sid]}`;
+    if (!ctx.self.statuses.some((s) => s.kind === "mark" && s.name === stored)) continue;
+    const skill = (hector.skills ?? []).find((s) => s.id === sid);
+    if (skill) runInContext(skill.effects, { ...ctx, caster: hector, self: hector, targets: [target], it: null });
+  }
+});
+
+// maggie:lich (Lash of Servitude): the Revenant raised when Maggie kills an enemy Hero copies that hero's 3
+// Basic skills. The unitDied trigger's summon op already created the Revenant (hp 25); this only fills the
+// freshest one's kit with deep-clones of the dead hero's basics (no re-summon, no re-element per the prose).
+registerCustom("cloneBasicSkillsOntoRevenant", (ctx, a) => {
+  const src = resolveSelector((a.copyFrom as Selector) ?? "eventUnit", ctx)[0];
+  const template = (a.minionTemplate as string) ?? "Revenant";
+  const revenant = Object.values(ctx.state.units)
+    // empty skills = a fresh, un-populated Revenant; if the summon no-op'd at the minion cap this yields
+    // none (rather than overwriting an older, already-populated Revenant).
+    .filter((u) => u.kind === "minion" && u.name === template && u.summoner === ctx.self.id && (u.skills ?? []).length === 0)
+    .sort((x, y) => Number(x.id.split(":").pop()) - Number(y.id.split(":").pop()))
+    .pop();
+  if (!src || !revenant) return;
+  revenant.skills = (src.skills ?? []).filter((s) => s.klass === "basic").map((s) => ({ ...JSON.parse(JSON.stringify(s)) as SkillInstance, currentCd: 0 }));
 });

@@ -1091,7 +1091,7 @@
      "effect": [
       {
        "op": "summon",
-       "template": "ayanaangelminion",
+       "template": "Angel",
        "count": 2
       },
       {
@@ -1125,7 +1125,7 @@
          "of": {
           "faction": "allies",
           "kind": "minion",
-          "template": "ayanaangelminion",
+          "template": "Angel",
           "alive": true
          }
         },
@@ -5365,7 +5365,10 @@
      "on": "energyFromEssence",
      "source": "Borrowed Time",
      "when": {
-      "sameUnit": ["eventUnit", "self"]
+      "sameUnit": [
+       "eventUnit",
+       "self"
+      ]
      },
      "effect": [
       {
@@ -9059,7 +9062,7 @@
       },
       {
        "op": "summon",
-       "template": "larianinjaminion",
+       "template": "Shadow Clone",
        "count": 1
       }
      ],
@@ -9092,7 +9095,7 @@
      },
      {
       "op": "summon",
-      "template": "larianinjaminion",
+      "template": "Shadow Clone",
       "count": 1
      },
      {
@@ -10229,6 +10232,15 @@
        "count": 1,
        "hp": 25,
        "note": "On unitDied, eventSource binds to the killer, so sameUnit(eventSource, self) means Maggie landed the kill. She raises a Revenant at 25 HP. The Revenant inheriting the dead hero's 3 Basic skills is not expressible via summon (no skill-copy primitive), so the 'Revenant' template stands in and the inherited kit is a documented gap."
+      },
+      {
+       "op": "custom",
+       "fn": "cloneBasicSkillsOntoRevenant",
+       "args": {
+        "copyFrom": "eventUnit",
+        "minionTemplate": "Revenant"
+       },
+       "note": "Populate the just-summoned Revenant with deep-clones of the killed heros 3 Basic skills (klass basic). The summon op above already created it; this only fills its kit (no re-summon)."
       }
      ]
     },
@@ -12522,7 +12534,7 @@
      "effect": [
       {
        "op": "summon",
-       "template": "riverdaughterslimeminion",
+       "template": "Slime",
        "count": 2
       }
      ],
@@ -12623,7 +12635,7 @@
        "to": {
         "faction": "allies",
         "kind": "minion",
-        "template": "riverdaughterslimeminion"
+        "template": "Slime"
        }
       },
       "note": "Restores 15 HP to all Slime minions; any healing past a minion's max HP is instead added to its Max HP. No primitive converts overheal into Max HP, hence custom. targeting 'all-allies' from the frozen 'all' + Helpful; effect is scoped to Slime minions. This skill is also auto-cast whenever Healing Tears activates (see passive triggers)."
@@ -14778,7 +14790,7 @@
     "effects": [
      {
       "op": "summon",
-      "template": "sylfaerieminion",
+      "template": "Sparrowrider",
       "count": 2,
       "note": "Summons 2 Sparrowrider minions (template sylfaerieminion). Their 'count as Syl's Eagle for triggering Two as One' clause hooks the base Two as One triggers, which fusion's default replace-semantics removes - an engine-gap noted, not re-implemented here."
      }
@@ -17433,7 +17445,10 @@
      "on": "skillUsed",
      "source": "Before I Wake",
      "when": {
-      "sameUnit": ["eventSource", "self"]
+      "sameUnit": [
+       "eventSource",
+       "self"
+      ]
      },
      "effect": [
       {
@@ -17823,12 +17838,6 @@
     },
     "cooldown": 4,
     "effects": [
-     {
-      "op": "summon",
-      "template": "Simulacrum",
-      "count": 1,
-      "hp": 30
-     },
      {
       "op": "custom",
       "fn": "cloneBasicSkillsOntoSimulacrum",
@@ -18500,7 +18509,10 @@
      "on": "damageDealt",
      "source": "Fae Prince",
      "when": {
-      "sameUnit": ["eventTarget", "self"]
+      "sameUnit": [
+       "eventTarget",
+       "self"
+      ]
      },
      "effect": [
       {
