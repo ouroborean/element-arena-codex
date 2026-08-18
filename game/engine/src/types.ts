@@ -175,6 +175,12 @@ export interface MatchState {
   scheduled: ScheduledEntry[];
   /** Unit ids that have taken an action during the current turn (cleared each turn start). */
   actedThisTurn: UnitId[];
+  /**
+   * Optional per-color budget (remaining) the active team chose to cover this turn's GENERIC costs —
+   * any color may pay generic. `pay` drains generic from these colors first, then the default order for
+   * any remainder. Set before resolving a turn; cleared by resolveTurn. Absent = the default auto order.
+   */
+  genericPay?: EnergyPool;
   log: string[];
 }
 

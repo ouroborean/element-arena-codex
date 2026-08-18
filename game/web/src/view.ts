@@ -246,6 +246,34 @@ function skillPanel(state: MatchState, ui: UiState): string {
   </div>`;
 }
 
+/** The end-of-turn panel: choose which energy colors cover the generic costs spent this turn. */
+function energyPanel(ui: UiState): string {
+  const p = ui.energyPanel!;
+  const sum = Object.values(p.alloc).reduce((a, b) => a + b, 0);
+  const covered = sum === p.generic;
+  const colors = Object.keys(p.avail).sort((a, b) => (a === "generic" ? -1 : b === "generic" ? 1 : a.localeCompare(b)));
+  const rows = colors.map((c) => {
+    const have = p.avail[c] ?? 0, put = p.alloc[c] ?? 0;
+    return `<div class="alloc-row">
+      <span class="ep-pip" style="background:${c === "generic" ? "#8a8fa8" : elColor(c)}">${c === "generic" ? "◆" : ""}</span>
+      <span class="ac-el">${esc(c)}</span><span class="ac-avail">${have} available</span>
+      <span class="ac-step"><button class="step" data-minus="${c}" ${put <= 0 ? "disabled" : ""}>−</button>
+        <span class="ac-n">${put}</span>
+        <button class="step" data-plus="${c}" ${put >= have || covered ? "disabled" : ""}>+</button></span>
+    </div>`;
+  }).join("");
+  return `<div class="overlay"><div class="modal energy-modal">
+    <h2>Cover generic costs</h2>
+    <p>You spent <b>${p.generic}</b> generic energy this turn — any color can pay it. Choose which to spend.</p>
+    <div class="alloc-rows">${rows}</div>
+    <div class="alloc-total ${covered ? "ok" : "short"}">Allocated ${sum} / ${p.generic}</div>
+    <div class="modal-foot">
+      <button class="mini" data-energy-cancel="1">◀ Back</button>
+      <button class="resolve" data-energy-confirm="1" ${covered ? "" : "disabled"}>Confirm &amp; resolve ▶</button>
+    </div>
+  </div></div>`;
+}
+
 export function renderApp(state: MatchState, ui: UiState): string {
   const foe = ui.you === "A" ? "B" : "A";
   const targetedBy = queuedTargetIds(ui);
@@ -253,7 +281,7 @@ export function renderApp(state: MatchState, ui: UiState): string {
     ${sideRow(state, foe, ui, false, targetedBy)}
     ${midbar(state, ui)}
     ${sideRow(state, ui.you, ui, true, targetedBy)}
-  </div>${ui.overlay ?? ""}`;
+  </div>${ui.energyPanel ? energyPanel(ui) : ""}${ui.overlay ?? ""}`;
 }
 
 // ── team select (with a skill viewer) ─────────────────────────────────────────────────────────────── //

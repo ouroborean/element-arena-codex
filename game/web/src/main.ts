@@ -25,6 +25,8 @@ export interface UiState {
   legalTargets: Set<string>;
   planned: Map<string, Action>;
   plannedSkill: Map<string, string>; // unitId -> chosen skill id (to highlight its tile)
+  // The end-of-turn generic-payment allocation panel: how much of each color pays the turn's generic.
+  energyPanel?: { actions: Action[]; generic: number; avail: Record<string, number>; alloc: Record<string, number> };
   overlay?: string;
   resolveTurn?: (actions: Action[]) => void;
 }
@@ -108,9 +110,19 @@ function unusableReason(u: Unit, skill: SkillInstance): string {
 app.addEventListener("click", (e) => {
   const fxEl = (e.target as HTMLElement).closest<HTMLElement>(".fx");
   if (fxEl) { if (fxpop.hidden) showFx(fxEl); else hideFx(); return; } // tap an effect icon to toggle its description
-  const el = (e.target as HTMLElement).closest<HTMLElement>("[data-owner],[data-skill],[data-target],[data-cancel],[data-resolve],[data-surrender],[data-pick],[data-inspect],[data-reroll],[data-start]");
+  const el = (e.target as HTMLElement).closest<HTMLElement>("[data-owner],[data-skill],[data-target],[data-cancel],[data-resolve],[data-surrender],[data-pick],[data-inspect],[data-reroll],[data-start],[data-plus],[data-minus],[data-energy-confirm],[data-energy-cancel]");
   if (!el) return;
   const d = el.dataset;
+
+  if (ui.energyPanel) { // the generic-payment modal is up — only its controls respond
+    const p = ui.energyPanel;
+    const sum = () => Object.values(p.alloc).reduce((a, b) => a + b, 0);
+    if (d.plus && sum() < p.generic) { p.alloc[d.plus] = Math.min((p.alloc[d.plus] ?? 0) + 1, p.avail[d.plus] ?? 0); render(); }
+    else if (d.minus) { p.alloc[d.minus] = Math.max((p.alloc[d.minus] ?? 0) - 1, 0); render(); }
+    else if (d.energyConfirm && sum() === p.generic) finalizeTurn(p.actions, p.alloc);
+    else if (d.energyCancel) { ui.energyPanel = undefined; render(); } // back to planning
+    return;
+  }
 
   if (setup) { // team-select screen
     if (d.inspect) { setup.inspect = d.inspect; app.innerHTML = renderSetup(setup); }
@@ -155,13 +167,60 @@ app.addEventListener("click", (e) => {
 app.addEventListener("mouseover", (e) => { const fx = (e.target as HTMLElement).closest<HTMLElement>(".fx"); if (fx) showFx(fx); });
 app.addEventListener("mouseout", (e) => { if ((e.target as HTMLElement).closest(".fx")) hideFx(); });
 
+/** The turn's total generic cost, and how much of each color is free to pay it (pool minus the specific
+ *  each element must reserve). Generic energy is fully available; it can only ever pay generic. */
+function planGeneric(actions: Action[]): { generic: number; avail: Record<string, number> } {
+  const pool = state.teams[ui.you].energy;
+  let generic = 0;
+  const reservedSpecific: Record<string, number> = {};
+  for (const a of actions) {
+    const u = state.units[a.unit];
+    const sk = (u?.skills ?? []).find((s) => s.id === a.skillId);
+    if (!u || !sk) continue;
+    const c = effectiveCost(u, sk);
+    generic += c.generic;
+    if (c.specific > 0) reservedSpecific[u.currentElement] = (reservedSpecific[u.currentElement] ?? 0) + c.specific;
+  }
+  const avail: Record<string, number> = {};
+  for (const color of Object.keys(pool)) {
+    const free = (pool[color] ?? 0) - (color === "generic" ? 0 : reservedSpecific[color] ?? 0);
+    if (free > 0) avail[color] = free;
+  }
+  return { generic, avail };
+}
+
+/** Pre-fill the allocation the way the engine would auto-pay: generic pool first, then colors. */
+function defaultAlloc(generic: number, avail: Record<string, number>): Record<string, number> {
+  const alloc: Record<string, number> = {};
+  let rem = generic;
+  for (const c of ["generic", ...Object.keys(avail).filter((k) => k !== "generic").sort()]) {
+    if (rem <= 0) break;
+    const take = Math.min(rem, avail[c] ?? 0);
+    if (take > 0) { alloc[c] = take; rem -= take; }
+  }
+  return alloc;
+}
+
 function commitTurn(): void {
   const actions = [...ui.planned.values()];
+  const { generic, avail } = planGeneric(actions);
+  const totalAvail = Object.values(avail).reduce((a, b) => a + b, 0);
+  // Ask the player to allocate only when there's a real choice (>1 color) and it's affordable.
+  if (generic > 0 && Object.keys(avail).length >= 2 && totalAvail >= generic) {
+    ui.energyPanel = { actions, generic, avail, alloc: defaultAlloc(generic, avail) };
+    render();
+    return;
+  }
+  finalizeTurn(actions, undefined);
+}
+
+function finalizeTurn(actions: Action[], alloc: Record<string, number> | undefined): void {
+  if (alloc) state.genericPay = { ...alloc }; // the engine drains generic from these colors first
   const resolve = ui.resolveTurn;
   ui.resolveTurn = undefined;
   ui.phase = "busy";
   ui.phaseLabel = "resolving…";
-  ui.targeting = undefined; ui.examine = undefined; ui.legalTargets = new Set();
+  ui.targeting = undefined; ui.examine = undefined; ui.energyPanel = undefined; ui.legalTargets = new Set();
   ui.planned.clear(); ui.plannedSkill.clear(); // queued banners clear once the turn is committed
   render();
   resolve?.(actions);
