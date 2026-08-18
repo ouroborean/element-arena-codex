@@ -106,20 +106,29 @@ export function endRound(state: MatchState, winner: TeamId, roundsToWin: number)
 //  Turn lifecycle
 // --------------------------------------------------------------------------- //
 
+/** The middle formation slot (0..2). Its hero permanently generates elemental income (see grantIncome). */
+export const MIDDLE_SLOT = 1;
+
+/** A hero has Elemental Essence income this turn if it holds a charge OR sits in the middle slot (a
+ *  permanent source), and isn't Silenced. The middle-slot rule needs no charge and consumes none. */
+export function hasEssenceIncome(hero: Unit): boolean {
+  if (hero.statuses.some((s) => s.kind === "silence")) return false;
+  return hero.slot === MIDDLE_SLOT || hero.statuses.some((s) => s.kind === "elemental_essence");
+}
+
 /**
  * Grant energy income to a team (ENERGY_INCOME, CONFIRMED). Each living hero yields 1
- * energy: normally 1 GENERIC, but an un-Silenced Elemental Essence charge is CONSUMED to
- * yield 1 of the hero's CURRENT element INSTEAD (not in addition). Silence yields generic
- * and keeps the charge. Minions generate nothing.
+ * energy: normally 1 GENERIC, but Elemental Essence yields 1 of the hero's CURRENT element
+ * INSTEAD (not in addition). Essence comes from a one-shot charge (CONSUMED on use) or from
+ * sitting in the MIDDLE slot (permanent, consumes nothing). Silence yields generic and keeps
+ * any charge. Minions generate nothing.
  */
 export function grantIncome(state: MatchState, id: TeamId): void {
   const pool = team(state, id).energy;
   for (const hero of livingHeroes(state, id)) {
-    const essence = hero.statuses.some((s) => s.kind === "elemental_essence");
-    const silenced = hero.statuses.some((s) => s.kind === "silence");
-    if (essence && !silenced) {
+    if (hasEssenceIncome(hero)) {
       pool[hero.currentElement] = (pool[hero.currentElement] ?? 0) + 1;
-      removeStatus(hero, "elemental_essence"); // the charge is consumed by the swap
+      removeStatus(hero, "elemental_essence"); // consume the one-shot charge (a no-op for the middle-slot source)
       emit(state, { type: "energyFromEssence", unit: hero.id, element: hero.currentElement });
     } else {
       pool.generic = (pool.generic ?? 0) + GENERIC_PER_LIVING_HERO;
