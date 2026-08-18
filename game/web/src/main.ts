@@ -7,7 +7,7 @@
 import type { MatchState, TeamId, Unit } from "../../engine/src/types.ts";
 import type { Action } from "../../engine/src/scheduler.ts";
 import type { SkillInstance } from "../../engine/src/skill.ts";
-import { legalTargets } from "../../engine/src/scheduler.ts";
+import { legalTargets, canUse, canPay, effectiveCost } from "../../engine/src/scheduler.ts";
 import { Rng } from "../../engine/src/rng.ts";
 import { buildMatch, defaultPolicy, type Draft } from "../../engine/content/match.ts";
 import { ROSTER } from "../../engine/content/roster.generated.ts";
@@ -21,6 +21,7 @@ export interface UiState {
   phaseLabel: string;
   hint: string;
   targeting?: { unitId: string; skillId: string; skillName: string; single: boolean };
+  examine?: { unitId: string; skillId: string; reason: string }; // read-only inspect of an unusable skill
   legalTargets: Set<string>;
   planned: Map<string, Action>;
   plannedSkill: Map<string, string>; // unitId -> chosen skill id (to highlight its tile)
@@ -96,6 +97,13 @@ function queue(unitId: string, skillId: string, targets: string[] | undefined): 
   render();
 }
 
+/** Why a skill can't be used right now — shown in the examine panel for an unusable tile. */
+function unusableReason(u: Unit, skill: SkillInstance): string {
+  if (skill.currentCd > 0) return `On cooldown — ${skill.currentCd} turn${skill.currentCd > 1 ? "s" : ""} remaining.`;
+  if (!canPay(state.teams[u.team].energy, u.currentElement, effectiveCost(u, skill))) return "Not enough energy in the pool.";
+  return "Can't be used right now (stunned, silenced, or no valid target).";
+}
+
 // ── interaction (event delegation) ───────────────────────────────────────────────────────────────── //
 app.addEventListener("click", (e) => {
   const fxEl = (e.target as HTMLElement).closest<HTMLElement>(".fx");
@@ -124,13 +132,19 @@ app.addEventListener("click", (e) => {
 
   if (d.surrender) { if (confirm("Surrender this match?")) location.reload(); return; }
   if (ui.phase !== "plan") return;
-  if (d.cancel) { ui.targeting = undefined; ui.legalTargets = new Set(); render(); return; }
+  if (d.cancel) { ui.targeting = undefined; ui.examine = undefined; ui.legalTargets = new Set(); render(); return; }
   if (d.resolve) { commitTurn(); return; }
-  if (d.owner && d.skill) { // pick a skill → show its overlay + highlight the portraits it can target
+  if (d.owner && d.skill) { // pick a skill → target it (if usable) or just examine it (if not)
     const u = state.units[d.owner]!;
     const skill = (u.skills ?? []).find((s) => s.id === d.skill)!;
-    ui.targeting = { unitId: u.id, skillId: skill.id, skillName: skill.name, single: skill.targeting === "single" };
-    ui.legalTargets = highlightSet(u, skill);
+    if (canUse(state, u, skill)) {
+      ui.examine = undefined;
+      ui.targeting = { unitId: u.id, skillId: skill.id, skillName: skill.name, single: skill.targeting === "single" };
+      ui.legalTargets = highlightSet(u, skill);
+    } else { // on cooldown / unaffordable / no target → show its detail, but do NOT enter targeting
+      ui.targeting = undefined; ui.legalTargets = new Set();
+      ui.examine = { unitId: u.id, skillId: skill.id, reason: unusableReason(u, skill) };
+    }
     render();
   } else if (d.target && ui.targeting) { // click a highlighted portrait to commit the skill
     queue(ui.targeting.unitId, ui.targeting.skillId, ui.targeting.single ? [d.target] : undefined);
@@ -147,6 +161,8 @@ function commitTurn(): void {
   ui.resolveTurn = undefined;
   ui.phase = "busy";
   ui.phaseLabel = "resolving…";
+  ui.targeting = undefined; ui.examine = undefined; ui.legalTargets = new Set();
+  ui.planned.clear(); ui.plannedSkill.clear(); // queued banners clear once the turn is committed
   render();
   resolve?.(actions);
 }
@@ -157,7 +173,7 @@ const human: AsyncProvider = (st, side) => new Promise<Action[]>((resolve) => {
   ui.phaseLabel = "your move";
   ui.hint = "Pick a skill on each hero, then a target. Skip a hero to hold it.";
   ui.planned.clear(); ui.plannedSkill.clear();
-  ui.targeting = undefined; ui.legalTargets = new Set();
+  ui.targeting = undefined; ui.examine = undefined; ui.legalTargets = new Set();
   ui.resolveTurn = resolve;
   render();
 });
