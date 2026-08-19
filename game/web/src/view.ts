@@ -369,8 +369,8 @@ function draftOptions(state: MatchState, u: Unit): string {
     ? augs.map((a) => `<button class="do-card" data-aug-unit="${u.id}" data-aug-id="${esc(a.id)}">
         <span class="do-txt"><span class="do-name">★ ${esc(a.name)}</span><span class="do-desc">${esc(a.description)}</span></span></button>`).join("")
     : `<div class="do-note">All of this hero's augments are taken.</div>`;
-  return `<div class="do-sec"><h4>Fusion <span>(re-elements the hero, new passive + skill)</span></h4>${fusion}</div>
-    <div class="do-sec"><h4>Augments <span>(a permanent tweak; cumulative)</span></h4>${augment}</div>`;
+  return `<div class="do-sec fusion"><h4>Fusion <span>(re-elements the hero, new passive + skill)</span></h4>${fusion}</div>
+    <div class="do-sec augment"><h4>Augments <span>(a permanent tweak; cumulative)</span></h4>${augment}</div>`;
 }
 
 /** The between-round draft modal: pick one hero and one upgrade (fuse / augment), or hold. */

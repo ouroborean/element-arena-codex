@@ -45,8 +45,8 @@ ${c.d}`:""}`,p=["tile",r?"":"off",n===i.id?"chosen":""].filter(Boolean).join(" "
         <span class="do-txt"><span class="do-name">Fuse \u2192 <b style="color:${Be(o.element)}">${k(o.element)}</b></span>
           <span class="do-sub">${k(o.passive.name)}</span>
           <span class="do-desc">${k(o.passive.description)}</span></span></button>`).join(""):'<div class="do-note">No fusion available \u2014 needs a teammate whose element forms a recipe.</div>',r=s.length?s.map(o=>`<button class="do-card" data-aug-unit="${a.id}" data-aug-id="${k(o.id)}">
-        <span class="do-txt"><span class="do-name">\u2605 ${k(o.name)}</span><span class="do-desc">${k(o.description)}</span></span></button>`).join(""):`<div class="do-note">All of this hero's augments are taken.</div>`;return`<div class="do-sec"><h4>Fusion <span>(re-elements the hero, new passive + skill)</span></h4>${i}</div>
-    <div class="do-sec"><h4>Augments <span>(a permanent tweak; cumulative)</span></h4>${r}</div>`}function Dn(e,a){let t=a.draft,n=oe(e,t.side),s=n.find(r=>r.id===t.inspect)??n[0],i=n.map(r=>{let o=r.fused?0:ie(e,r).length,l=re(r).length;return`<button class="dh ${s?.id===r.id?"on":""}" data-draft-inspect="${r.id}">
+        <span class="do-txt"><span class="do-name">\u2605 ${k(o.name)}</span><span class="do-desc">${k(o.description)}</span></span></button>`).join(""):`<div class="do-note">All of this hero's augments are taken.</div>`;return`<div class="do-sec fusion"><h4>Fusion <span>(re-elements the hero, new passive + skill)</span></h4>${i}</div>
+    <div class="do-sec augment"><h4>Augments <span>(a permanent tweak; cumulative)</span></h4>${r}</div>`}function Dn(e,a){let t=a.draft,n=oe(e,t.side),s=n.find(r=>r.id===t.inspect)??n[0],i=n.map(r=>{let o=r.fused?0:ie(e,r).length,l=re(r).length;return`<button class="dh ${s?.id===r.id?"on":""}" data-draft-inspect="${r.id}">
       <img src="${ge(r.heroId??"",r.fused)}" ${F} />
       <span class="dh-name">${k(ee(r.name))}</span>
       <span class="dh-opts">${r.fused?`fused:${k(r.fused)}`:`${o} \u269B`} \xB7 ${l} \u2605</span></button>`}).join("");return`<div class="overlay"><div class="modal draft-modal">
