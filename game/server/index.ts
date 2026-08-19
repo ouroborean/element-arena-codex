@@ -11,9 +11,9 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { randomUUID } from "node:crypto";
 import { attachWebSocketServer, type WsConn } from "./ws.ts";
-import { Match, type MatchClient } from "./session.ts";
-import { AccountStore } from "./accounts.ts";
-import { parseMessage, PROTOCOL_VERSION, TEAM_SIZE, DEFAULT_PORT, type ClientMsg, type ServerMsg, type Profile } from "../net/protocol.ts";
+import { Match, type MatchClient, type RatingChanges } from "./session.ts";
+import { AccountStore, START_RATING, elo, type ResultKind } from "./accounts.ts";
+import { parseMessage, PROTOCOL_VERSION, TEAM_SIZE, DEFAULT_PORT, type ClientMsg, type ServerMsg } from "../net/protocol.ts";
 import type { TeamId } from "../engine/src/types.ts";
 import { ROSTER } from "../engine/content/roster.generated.ts";
 // Register every native effect handler so fused/augmented/custom skills resolve server-side.
@@ -24,6 +24,12 @@ import "../engine/content/augment_effects.ts";
 const HEARTBEAT_MS = 30_000;
 const MAX_CONNS = 4096; // a coarse global cap so a client can't farm unbounded sockets
 const HERO_IDS = new Set(ROSTER.map((h) => h.id));
+
+// Ranked matchmaking: the acceptable rating gap starts at RANKED_BASE_WINDOW and widens by
+// RANKED_WIDEN_PER_SEC per second either player has waited, so a match is always found eventually.
+const RANKED_BASE_WINDOW = 100;
+const RANKED_WIDEN_PER_SEC = 60;
+const RANKED_TICK_MS = 2000; // re-run ranked pairing so widening windows match waiters without a new join
 
 /** A valid Quick Match team: exactly TEAM_SIZE distinct heroes that exist in the roster. */
 function validTeam(team: unknown): team is string[] {
@@ -45,6 +51,7 @@ class Seat implements MatchClient {
   side?: TeamId;
   playerId?: string;
   name?: string;
+  rating: number; // captured at match start; the Elo update reads these pre-match ratings
   token = randomUUID();
   matchId: string;
   pendingTurn?: MatchClient["pendingTurn"];
@@ -60,6 +67,7 @@ class Seat implements MatchClient {
     this.conn = owner.ws;
     this.playerId = owner.playerId;
     this.name = owner.name;
+    this.rating = owner.rating ?? START_RATING;
   }
 
   send(msg: ServerMsg): void {
@@ -76,6 +84,9 @@ class Conn {
   team: string[] = []; // when queued
   playerId?: string; // set once authenticated
   name?: string;
+  rating?: number; // from the authenticated profile
+  ranked = false; // which queue this connection is in
+  queuedAt = 0; // epoch-ms it entered the queue (drives the ranked rating window)
   seat?: Seat; // when playing (invariant while current: seat.owner === this && seat.conn === this.ws)
 
   constructor(ws: WsConn) {
@@ -88,7 +99,8 @@ class Conn {
 }
 
 export class MatchServer {
-  private queue: Conn[] = [];
+  private queue: Conn[] = []; // casual (Quick Match), FIFO
+  private rankedQueue: Conn[] = []; // ranked, rating-window matchmaking
   private conns = new Set<Conn>();
   private matches = new Map<string, Match>();
   private seats = new Map<string, Seat>(); // by rejoin token
@@ -135,6 +147,7 @@ export class MatchServer {
       if (!profile) { conn.send({ t: "authError", message: "that player id is taken by someone else" }); return; }
       conn.playerId = profile.playerId;
       conn.name = profile.name;
+      conn.rating = profile.rating;
       conn.send({ t: "authed", profile });
     } catch {
       conn.send({ t: "authError", message: "sign-in failed, please retry" }); // a DB fault must not crash the server
@@ -157,14 +170,18 @@ export class MatchServer {
     }
     conn.team = [...msg.team];
     conn.phase = "queued";
-    this.queue.push(conn);
+    conn.ranked = !!msg.ranked;
+    conn.queuedAt = Date.now();
     conn.send({ t: "queued" });
-    this.tryPair();
+    if (conn.ranked) { this.rankedQueue.push(conn); this.matchmakeRanked(); }
+    else { this.queue.push(conn); this.tryPair(); }
   }
 
   private dequeue(conn: Conn): void {
-    const i = this.queue.indexOf(conn);
-    if (i >= 0) this.queue.splice(i, 1);
+    for (const q of [this.queue, this.rankedQueue]) {
+      const i = q.indexOf(conn);
+      if (i >= 0) q.splice(i, 1);
+    }
     if (conn.phase === "queued") conn.phase = "idle";
   }
 
@@ -189,7 +206,7 @@ export class MatchServer {
     seat.match.onSeatReconnect(seat);
   }
 
-  /** Pair waiting players FIFO — but never pair two connections that share one identity (self-collusion). */
+  /** Pair casual players FIFO — but never pair two connections that share one identity (self-collusion). */
   private tryPair(): void {
     while (this.queue.length >= 2) {
       const ca = this.queue[0]!;
@@ -198,31 +215,75 @@ export class MatchServer {
       const cb = this.queue[bi]!;
       this.queue.splice(bi, 1); // remove cb (higher index) first…
       this.queue.shift(); // …then ca at the front
-      const matchId = randomUUID();
-      const seatA = new Seat(ca.team, matchId, ca);
-      const seatB = new Seat(cb.team, matchId, cb);
-      ca.phase = cb.phase = "playing";
-      ca.seat = seatA;
-      cb.seat = seatB;
-      this.seats.set(seatA.token, seatA);
-      this.seats.set(seatB.token, seatB);
-      const seed = Math.floor(Math.random() * 1e9); // server-authoritative seed — the client never sets it
-      const match = new Match(seatA, seatB, seed);
-      seatA.match = seatB.match = match;
-      this.matches.set(matchId, match);
-      match.onResult = (winner) => this.recordResults(seatA, seatB, winner);
-      match.onEnd = () => this.endMatch(matchId, [seatA, seatB]);
-      // Fire-and-forget; the match drives itself via the provider callbacks and its own timers.
-      void match.run();
+      this.pairAndStart(ca, cb, false);
     }
   }
 
-  /** Persist the outcome to both players' records (a stalemate is a draw for both). */
-  private recordResults(a: Seat, b: Seat, winner: TeamId | null): void {
-    for (const seat of [a, b]) {
-      if (!seat.playerId) continue;
-      this.store.recordResult(seat.playerId, winner === null ? "draw" : seat.side === winner ? "win" : "loss");
+  /** The acceptable rating gap for a connection that has waited `waitedMs` — widens without bound over time. */
+  private rankedWindow(waitedMs: number): number {
+    return RANKED_BASE_WINDOW + (Math.max(0, waitedMs) / 1000) * RANKED_WIDEN_PER_SEC;
+  }
+
+  /**
+   * Pair ranked players by rating proximity. Sorted by rating so the closest pairs are adjacent; two are
+   * matched when their gap fits the WIDER of their two windows (so a long-waiter isn't held back by a fresh
+   * arrival). Runs on each ranked enqueue and on a periodic tick so widening windows eventually match anyone.
+   */
+  matchmakeRanked(): void {
+    const now = Date.now();
+    const q = this.rankedQueue;
+    q.sort((a, b) => (a.rating ?? START_RATING) - (b.rating ?? START_RATING));
+    for (let i = 0; i < q.length - 1; ) {
+      const a = q[i]!, b = q[i + 1]!;
+      if (a.playerId === b.playerId) { i++; continue; } // never self-pair
+      const gap = Math.abs((a.rating ?? START_RATING) - (b.rating ?? START_RATING));
+      const window = Math.max(this.rankedWindow(now - a.queuedAt), this.rankedWindow(now - b.queuedAt));
+      if (gap <= window) {
+        q.splice(i, 2); // remove the pair
+        this.pairAndStart(a, b, true);
+      } else {
+        i++;
+      }
     }
+  }
+
+  /** Create the seats + Match for a pair and start it. `ranked` decides how the result updates records/ratings. */
+  private pairAndStart(ca: Conn, cb: Conn, ranked: boolean): void {
+    const matchId = randomUUID();
+    const seatA = new Seat(ca.team, matchId, ca);
+    const seatB = new Seat(cb.team, matchId, cb);
+    ca.phase = cb.phase = "playing";
+    ca.seat = seatA;
+    cb.seat = seatB;
+    this.seats.set(seatA.token, seatA);
+    this.seats.set(seatB.token, seatB);
+    const seed = Math.floor(Math.random() * 1e9); // server-authoritative seed — the client never sets it
+    const match = new Match(seatA, seatB, seed);
+    seatA.match = seatB.match = match;
+    this.matches.set(matchId, match);
+    match.onResult = (winner) => this.recordResults(seatA, seatB, winner, ranked);
+    match.onEnd = () => this.endMatch(matchId, [seatA, seatB]);
+    void match.run(); // fire-and-forget; the match drives itself via the provider callbacks and its own timers
+  }
+
+  /**
+   * Persist the outcome. Casual: just tally W/L/D. Ranked: apply Elo from the pre-match ratings, update both
+   * records + ratings, and return each side's new rating + delta to fold into matchEnd.
+   */
+  private recordResults(a: Seat, b: Seat, winner: TeamId | null, ranked: boolean): RatingChanges | void {
+    const resultFor = (seat: Seat): ResultKind => (winner === null ? "draw" : seat.side === winner ? "win" : "loss");
+    if (!ranked) {
+      for (const seat of [a, b]) if (seat.playerId) this.store.recordResult(seat.playerId, resultFor(seat));
+      return;
+    }
+    const sa = winner === null ? 0.5 : a.side === winner ? 1 : 0;
+    const [na, nb] = elo(a.rating, b.rating, sa);
+    if (a.playerId) this.store.recordRankedResult(a.playerId, resultFor(a), na);
+    if (b.playerId) this.store.recordRankedResult(b.playerId, resultFor(b), nb);
+    const changes: RatingChanges = {};
+    changes[a.side!] = { rating: na, delta: na - a.rating };
+    changes[b.side!] = { rating: nb, delta: nb - b.rating };
+    return changes;
   }
 
   /** Tear down a finished match: forget its seats and free both connections to requeue. */
@@ -306,6 +367,8 @@ export function startServer(port = Number(process.env.ARENA_PORT) || DEFAULT_POR
   attachWebSocketServer(http, (conn) => matchServer.accept(conn));
   const beat = setInterval(() => matchServer.heartbeat(), HEARTBEAT_MS);
   beat.unref?.(); // don't keep the process alive on the heartbeat alone
+  const rankedTick = setInterval(() => matchServer.matchmakeRanked(), RANKED_TICK_MS);
+  rankedTick.unref?.(); // widening rating windows pair waiters even without a new join
   http.listen(port, () => {
     const addr = http.address();
     const bound = addr && typeof addr === "object" ? addr.port : port;
@@ -316,6 +379,7 @@ export function startServer(port = Number(process.env.ARENA_PORT) || DEFAULT_POR
     http,
     stop: () => {
       clearInterval(beat);
+      clearInterval(rankedTick);
       http.close();
       store.close();
     },

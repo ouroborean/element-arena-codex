@@ -13,6 +13,16 @@ import { promisify } from "node:util";
 import { MAX_NAME_LEN, type Profile } from "../net/protocol.ts";
 
 export const START_RATING = 1000;
+export const ELO_K = 32; // rating movement per game — brisk, suited to a small player pool
+
+/** The two players' new Elo ratings after a game. `sa` is player A's score: 1 = win, 0.5 = draw, 0 = loss. */
+export function elo(ratingA: number, ratingB: number, sa: number, k = ELO_K): [number, number] {
+  const ea = 1 / (1 + Math.pow(10, (ratingB - ratingA) / 400));
+  const na = Math.round(ratingA + k * (sa - ea));
+  const nb = Math.round(ratingB + k * ((1 - sa) - (1 - ea)));
+  return [na, nb];
+}
+
 const MAX_SECRET_LEN = 512; // a legitimate secret is a ~36-char UUID; bound it so a huge input can't inflate hashing
 const MAX_PROFILES = 200_000; // coarse cap so unauthenticated create-on-first-use can't fill the disk without bound
 export type ResultKind = "win" | "loss" | "draw";
@@ -109,10 +119,16 @@ export class AccountStore {
     }
   }
 
-  /** Tally a match result for a player (identity must already exist). No-op for an unknown id. */
+  /** Tally an (unranked) match result for a player. No-op for an unknown id. */
   recordResult(playerId: string, result: ResultKind): void {
     const col = result === "win" ? "wins" : result === "loss" ? "losses" : "draws";
     this.db.prepare(`UPDATE profiles SET ${col} = ${col} + 1, updated = ? WHERE playerId = ?`).run(Date.now(), playerId);
+  }
+
+  /** Tally a ranked result AND set the new Elo rating in one update. */
+  recordRankedResult(playerId: string, result: ResultKind, newRating: number): void {
+    const col = result === "win" ? "wins" : result === "loss" ? "losses" : "draws";
+    this.db.prepare(`UPDATE profiles SET ${col} = ${col} + 1, rating = ?, updated = ? WHERE playerId = ?`).run(newRating, Date.now(), playerId);
   }
 
   getProfile(playerId: string): Profile | null {

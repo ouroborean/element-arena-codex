@@ -494,7 +494,7 @@ export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: 
       <div class="cs-mid">
         <div class="cs-modes">
           <button class="cs-mode" data-quick="1" ${full ? "" : "disabled"}>Quick Match</button>
-          <button class="cs-mode" disabled>Ranked Match</button>
+          <button class="cs-mode" data-ranked="1" ${full ? "" : "disabled"}>Ranked Match</button>
           <button class="cs-mode wide" disabled>Hero Challenge Trials</button>
           <button class="cs-mode start" data-start="1" ${full ? "" : "disabled"}>Bot Match</button>
           <button class="cs-mode" disabled>Private Match</button>

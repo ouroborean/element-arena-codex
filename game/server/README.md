@@ -40,8 +40,15 @@ client --WS--> [ FIFO queue ] --pair--> [ Match: authoritative engine ] --state-
 
 Each player holds a client-generated `{playerId, secret}` (in `localStorage`). Trust-on-first-use: the first
 `auth` for an id creates a profile bound to a scrypt hash of its secret; later calls verify it. Profiles hold
-a display name, a W/L/D record, and a `rating` (seeded 1000) that anchors future Ranked. The match server
-records each result to both players; the team-select screen reads a profile over `POST /profile`.
+a display name, a W/L/D record, and an Elo `rating` (seeded 1000). The match server records each result to
+both players; the team-select screen reads a profile over `POST /profile`.
+
+## Ranked
+
+A `queue` with `ranked: true` enters a separate ranked queue. Matchmaking pairs by **rating proximity**: the
+acceptable gap starts at 100 and widens ~60/sec each player waits (so a match is always found eventually), and
+it never self-pairs one identity. On a ranked result both players' Elo updates (K=32) from their pre-match
+ratings and the change rides out on `matchEnd`. Quick Match stays unranked (record only, rating untouched).
 
 ## Test
 
@@ -61,9 +68,9 @@ The web client stores the token in `sessionStorage`, so even a full page reload 
 
 ## Scope (MVP)
 
-Quick Match: queue → team reveal → alternating turns → between-round draft → win/forfeit, plus turn timeout,
-disconnect handling, **reconnection**, and **guest accounts** (name + persisted record). Ranked/MMR is next
-(the `rating` column is in place). Anti-cheat
+Quick Match + Ranked: queue → team reveal → alternating turns → between-round draft → win/forfeit, plus turn
+timeout, disconnect handling, **reconnection**, **guest accounts** (name + persisted record), and **Ranked**
+(Elo + rating-window matchmaking). Anti-cheat
 covers the two things a client controls — the seed is server-held (RNG can't be precomputed) and every
 action is validated by the same engine the UI uses (illegal moves are rejected). Hidden-info redaction is a
 no-op today because the engine has no visibility primitive (invisible statuses are display-only).
