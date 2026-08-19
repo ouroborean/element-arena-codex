@@ -425,6 +425,9 @@ export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: 
     return `<button class="cs-sicon" data-skname="${esc(t?.n ?? id)}" data-skmeta="${esc(meta)}" data-skdesc="${esc(t?.d ?? "")}" data-skgen="${sk?.cost.generic ?? 0}" data-skspec="${sk?.cost.specific ?? 0}" data-skel="${esc(sk?.element ?? "")}" title="${esc(t?.n ?? id)}"><img src="${iconOf(id, def.id) ?? ""}" ${IMG_FALLBACK} /></button>`;
   };
   const byClass = (k: string) => (def.skills ?? []).filter((s) => s.klass === k).map((s) => skTile(s.id)).join("");
+  // Render a section only when the hero actually has that class of skill (Trinity has no defensive/ultimate;
+  // only the fusion-element heroes carry a built-in "fusion" skill, since they can't fuse).
+  const section = (label: string, cls: string, icons: string) => icons ? `<div class="cs-sk ${cls}"><h4>${label}</h4><div class="cs-icons">${icons}</div></div>` : "";
 
   const heroCard = (id: string) => {
     const h = ROSTER.find((x) => x.id === id)!;
@@ -457,10 +460,11 @@ export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: 
       <div class="cs-art"><img src="${heroPortrait(inspectId)}" alt="${esc(shortName(def.name))}" ${IMG_FALLBACK} /></div>
       <div class="cs-skills">
         <div class="cs-sk-title">Kit</div>
-        <div class="cs-sk passive"><h4>Passive</h4><div class="cs-icons">${skTile(`${def.id}0`)}</div></div>
-        <div class="cs-sk basic"><h4>Basic</h4><div class="cs-icons">${byClass("basic")}</div></div>
-        <div class="cs-sk defensive"><h4>Defensive</h4><div class="cs-icons">${byClass("defensive")}</div></div>
-        <div class="cs-sk ultimate"><h4>Ultimate</h4><div class="cs-icons">${byClass("ultimate")}</div></div>
+        ${section("Passive", "passive", skTile(`${def.id}0`))}
+        ${section("Basic", "basic", byClass("basic"))}
+        ${section("Fusion", "fusion", byClass("fusion"))}
+        ${section("Defensive", "defensive", byClass("defensive"))}
+        ${section("Ultimate", "ultimate", byClass("ultimate"))}
       </div>
     </div>
 
