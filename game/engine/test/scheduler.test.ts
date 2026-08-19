@@ -113,10 +113,11 @@ test("stun: 'non-Strategic' scope stops harmful skills but not Strategic ones (F
 });
 
 test("income: 1/hero — Essence SWAPS generic→element and is consumed; Silence keeps generic+charge; dead give nothing", () => {
-  const h1 = makeUnit({ id: "a1", team: "A", currentElement: "fire", statuses: [status("elemental_essence")] });
-  const h2 = makeUnit({ id: "a2", team: "A" });
-  const dead = makeUnit({ id: "a3", team: "A", alive: false, hp: 0 });
-  const state = makeState([h1, h2, dead], [makeUnit({ id: "b1", team: "B" })]);
+  // Slots 0 and 2 so neither test hero is the middle (slot 1), whose permanent essence is covered separately.
+  const h1 = makeUnit({ id: "a1", team: "A", slot: 0, currentElement: "fire", statuses: [status("elemental_essence")] });
+  const h2 = makeUnit({ id: "a2", team: "A", slot: 2 });
+  const dead = makeUnit({ id: "a3", team: "A", slot: 1, alive: false, hp: 0 });
+  const state = makeState([h1, h2, dead], [makeUnit({ id: "b1", team: "B", slot: 0 })]);
 
   grantIncome(state, "A");
   assert.equal(state.teams.A.energy.generic, 1, "only the non-essence hero yields generic");
@@ -130,6 +131,28 @@ test("income: 1/hero — Essence SWAPS generic→element and is consumed; Silenc
   assert.equal(state.teams.A.energy.fire, undefined, "silence suppresses the swap");
   assert.equal(state.teams.A.energy.generic, 2, "both heroes yield generic");
   assert.ok(h1.statuses.some((s) => s.kind === "elemental_essence"), "silenced hero keeps its charge");
+});
+
+test("income: the MIDDLE hero (slot 1) always yields its element — no charge, never consumed, unless Silenced", () => {
+  const mid = makeUnit({ id: "a2", team: "A", slot: 1, currentElement: "water" });
+  const edge = makeUnit({ id: "a1", team: "A", slot: 0 });
+  const state = makeState([edge, mid], [makeUnit({ id: "b1", team: "B", slot: 0 })]);
+
+  grantIncome(state, "A");
+  assert.equal(state.teams.A.energy.water, 1, "middle hero yields 1 of its element with no charge");
+  assert.equal(state.teams.A.energy.generic, 1, "the edge hero still yields generic");
+
+  // Permanent: a second turn yields element again (nothing was consumed).
+  state.teams.A.energy = {};
+  grantIncome(state, "A");
+  assert.equal(state.teams.A.energy.water, 1, "still elemental the next turn");
+
+  // Silence suppresses even the middle-slot source.
+  mid.statuses.push(status("silence"));
+  state.teams.A.energy = {};
+  grantIncome(state, "A");
+  assert.equal(state.teams.A.energy.water, undefined, "silenced middle hero falls back to generic");
+  assert.equal(state.teams.A.energy.generic, 2);
 });
 
 test('debuff "for 1 turn" survives the opponent\'s turn, expires at applier\'s next turn-end', () => {

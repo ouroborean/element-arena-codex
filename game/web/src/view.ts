@@ -5,7 +5,7 @@
 import type { MatchState, TeamId, Unit, Status } from "../../engine/src/types.ts";
 import type { SkillInstance } from "../../engine/src/skill.ts";
 import { totalShield } from "../../engine/src/damage.ts";
-import { canUse, effectiveCost } from "../../engine/src/scheduler.ts";
+import { canUse, effectiveCost, hasEssenceIncome } from "../../engine/src/scheduler.ts";
 import { ROSTER } from "../../engine/content/roster.generated.ts";
 import { heroPortrait, iconOf, minionPortrait, energyIcon, elColor } from "./assets.ts";
 import { SKILL_TEXT } from "./skilltext.generated.ts";
@@ -18,8 +18,8 @@ const shortName = (name: string) => name.split(",")[0]!.trim();
 const nameOf = (id: string) => shortName(ROSTER.find((h) => h.id === id)?.name ?? id);
 const IMG_FALLBACK = `onerror="this.style.visibility='hidden'"`;
 
-// Kinds NOT worth a portrait chip — pure engine plumbing with no clear player-facing meaning.
-const HIDDEN_KINDS = new Set<Status["kind"]>(["conditional_bypass", "stack_read_mod", "instant_cast"]);
+// Kinds NOT worth a portrait chip — pure engine plumbing, or (elemental_essence) shown as a glow instead.
+const HIDDEN_KINDS = new Set<Status["kind"]>(["conditional_bypass", "stack_read_mod", "instant_cast", "elemental_essence"]);
 // Kinds that read as a debuff (red) vs a buff (green); anything else is a neutral "state" chip.
 const BAD_KINDS = new Set<Status["kind"]>(["dot", "stun", "blind", "silence", "paralysis", "taunt", "heal_lock", "heal_becomes_damage", "dies_at_max", "veiled"]);
 const GOOD_KINDS = new Set<Status["kind"]>(["regen", "stack", "damage_reduction", "invulnerable", "immortal", "damage_ignore", "non_damage_ignore", "revive_ward", "uncounterable", "damage_becomes_heal", "elemental_essence"]);
@@ -195,7 +195,8 @@ function queuedTargetIds(ui: UiState): Set<string> {
 function heroCard(state: MatchState, u: Unit, ui: UiState, isYou: boolean, targetedBy: Set<string>): string {
   const targetable = ui.phase === "plan" && !!ui.targeting && ui.legalTargets.has(u.id);
   const incoming = targetedBy.has(u.id);
-  const cls = ["hero", u.alive ? "" : "dead", targetable ? "targetable" : "", incoming ? "incoming" : "", ui.plannedSkill.has(u.id) ? "acted" : ""].filter(Boolean).join(" ");
+  const essence = u.kind === "hero" && u.alive && hasEssenceIncome(u); // element glow — has an Essence charge, or is the middle hero
+  const cls = ["hero", u.alive ? "" : "dead", targetable ? "targetable" : "", incoming ? "incoming" : "", essence ? "essence" : "", ui.plannedSkill.has(u.id) ? "acted" : ""].filter(Boolean).join(" ");
   const mart = u.kind === "minion" ? minionPortrait(u.name) : null;
   const portrait = u.heroId
     ? `<img class="portrait" src="${heroPortrait(u.heroId, u.fused)}" alt="${esc(u.name)}" ${IMG_FALLBACK} />`
