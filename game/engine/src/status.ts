@@ -41,9 +41,12 @@ export function applyStatus(unit: Unit, status: Status): void {
     existing.appliedTurn = status.appliedTurn;
     return;
   }
-  // Refresh.
+  // Refresh: the new application's values win (DEFAULT_STACK_POLICY). `scope` is copied verbatim —
+  // including clearing it — so a full (unscoped) stun overrides an earlier scoped one on the same slot
+  // rather than inheriting its narrower scope (e.g. Gommar's Absolute Zero self-stun over its own AOE).
   existing.duration = status.duration;
   if (status.magnitude !== undefined) existing.magnitude = status.magnitude;
+  existing.scope = status.scope;
   existing.appliedBy = status.appliedBy;
   existing.appliedTurn = status.appliedTurn;
   existing.sourceId = status.sourceId;

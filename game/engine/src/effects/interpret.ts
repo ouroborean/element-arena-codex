@@ -35,6 +35,11 @@ export interface Ctx {
   emit: (e: GameEvent) => void;
 }
 
+/** Harmful non-damage control/debuff effects — those a `non_damage_ignore` holder shrugs off when an
+ *  enemy applies them (Pyrrha's Wraith in White). Damage-over-time is damage, not a non-damage effect;
+ *  ambiguous marks/stacks are not blanket-blocked. */
+const HARMFUL_NON_DAMAGE = new Set<string>(["stun", "taunt", "blind", "isolated", "silence", "paralysis", "heal_lock"]);
+
 /** Native escape-hatch functions for the ~3% of skills that need bespoke code. */
 export type CustomFn = (ctx: Ctx, args: Record<string, unknown>) => void;
 const CUSTOM = new Map<string, CustomFn>();
@@ -390,8 +395,11 @@ export function exec(effect: Effect, ctx: Ctx): void {
     }
     case "applyStatus": {
       for (const u of effectTargets(effect.to, ctx)) {
-        ctx.affected?.add(u.id);
         const st = buildStatus(effect.status, ctx);
+        // non_damage_ignore (Wraith in White): shrug off an incoming harmful non-damage effect from
+        // another unit. Self-inflicted effects (e.g. a self-stun) are not blocked.
+        if (u.id !== ctx.caster.id && HARMFUL_NON_DAMAGE.has(st.kind) && u.statuses.some((s) => s.kind === "non_damage_ignore")) continue;
+        ctx.affected?.add(u.id);
         applyStatus(u, st);
         ctx.emit({ type: "statusApplied", unit: u.id, source: ctx.caster.id, kind: st.kind, name: st.name });
       }
