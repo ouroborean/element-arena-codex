@@ -36,6 +36,19 @@ export const RECONNECT_GRACE_MS = 45_000;
 /** Why a match ended — a clean best-of-N decision, or one side dropping out. */
 export type EndReason = "decided" | "forfeit" | "opponent-left" | "stalemate";
 
+/** A guest player's public profile: a persistent identity + display name + record (rating anchors Ranked). */
+export interface Profile {
+  playerId: string;
+  name: string;
+  wins: number;
+  losses: number;
+  draws: number;
+  rating: number;
+}
+
+/** Max display-name length (server-clamped). */
+export const MAX_NAME_LEN = 20;
+
 // --------------------------------------------------------------------------- //
 //  Client → server
 // --------------------------------------------------------------------------- //
@@ -51,19 +64,25 @@ export type ClientMsg =
   /** Leave the queue before being matched. */
   | { t: "cancelQueue" }
   /** Rejoin an in-progress match after a disconnect (a new socket presenting the seat's rejoin token). */
-  | { t: "rejoin"; matchId: string; token: string; protocolVersion: number };
+  | { t: "rejoin"; matchId: string; token: string; protocolVersion: number }
+  /** Authenticate a guest identity on this connection (create-or-verify). Sent before queue/rejoin. */
+  | { t: "auth"; playerId: string; secret: string; name: string; protocolVersion: number };
 
 // --------------------------------------------------------------------------- //
 //  Server → client
 // --------------------------------------------------------------------------- //
 export type ServerMsg =
+  /** Your guest identity was accepted; here is the persisted profile (name + record + rating). */
+  | { t: "authed"; profile: Profile }
+  /** Authentication was refused (the player id exists with a different secret). */
+  | { t: "authError"; message: string }
   /** Acknowledged: you are waiting in the queue. */
   | { t: "queued" }
   /** Matched. `you` is your team id; `state` is the initial board; `matchId`/`token` let you rejoin on a drop. */
-  | { t: "start"; you: TeamId; opponentTeam: string[]; state: MatchState; matchId: string; token: string }
+  | { t: "start"; you: TeamId; opponentTeam: string[]; opponentName: string; state: MatchState; matchId: string; token: string }
   /** A successful rejoin: here is where the match stands, what you should be doing, and whether the
    *  opponent is currently disconnected (so a double-disconnect resumes with an accurate banner). */
-  | { t: "resumed"; you: TeamId; state: MatchState; control: "turn" | "wait" | "draft" | "waitDraft"; deadline?: number; opponentDisconnected: boolean }
+  | { t: "resumed"; you: TeamId; state: MatchState; control: "turn" | "wait" | "draft" | "waitDraft"; deadline?: number; opponentDisconnected: boolean; opponentName: string }
   /** Your opponent's connection dropped; the match is held open `graceMs` for them to return. */
   | { t: "opponentDisconnected"; graceMs: number }
   /** Your opponent reconnected — carry on. */

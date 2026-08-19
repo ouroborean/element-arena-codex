@@ -12,7 +12,8 @@ import { createServer, type IncomingMessage, type ServerResponse } from "node:ht
 import { randomUUID } from "node:crypto";
 import { attachWebSocketServer, type WsConn } from "./ws.ts";
 import { Match, type MatchClient } from "./session.ts";
-import { parseMessage, PROTOCOL_VERSION, TEAM_SIZE, DEFAULT_PORT, type ClientMsg, type ServerMsg } from "../net/protocol.ts";
+import { AccountStore } from "./accounts.ts";
+import { parseMessage, PROTOCOL_VERSION, TEAM_SIZE, DEFAULT_PORT, type ClientMsg, type ServerMsg, type Profile } from "../net/protocol.ts";
 import type { TeamId } from "../engine/src/types.ts";
 import { ROSTER } from "../engine/content/roster.generated.ts";
 // Register every native effect handler so fused/augmented/custom skills resolve server-side.
@@ -42,6 +43,8 @@ function validTeam(team: unknown): team is string[] {
 class Seat implements MatchClient {
   team: string[];
   side?: TeamId;
+  playerId?: string;
+  name?: string;
   token = randomUUID();
   matchId: string;
   pendingTurn?: MatchClient["pendingTurn"];
@@ -55,6 +58,8 @@ class Seat implements MatchClient {
     this.matchId = matchId;
     this.owner = owner;
     this.conn = owner.ws;
+    this.playerId = owner.playerId;
+    this.name = owner.name;
   }
 
   send(msg: ServerMsg): void {
@@ -69,6 +74,8 @@ class Conn {
   ws: WsConn;
   phase: Phase = "idle";
   team: string[] = []; // when queued
+  playerId?: string; // set once authenticated
+  name?: string;
   seat?: Seat; // when playing (invariant while current: seat.owner === this && seat.conn === this.ws)
 
   constructor(ws: WsConn) {
@@ -85,6 +92,11 @@ export class MatchServer {
   private conns = new Set<Conn>();
   private matches = new Map<string, Match>();
   private seats = new Map<string, Seat>(); // by rejoin token
+  private store: AccountStore;
+
+  constructor(store: AccountStore) {
+    this.store = store;
+  }
 
   /** Register a fresh connection and wire its message/close handling. */
   accept(ws: WsConn): void {
@@ -98,15 +110,34 @@ export class MatchServer {
   private route(conn: Conn, raw: string): void {
     const msg = parseMessage<ClientMsg>(raw);
     if (!msg) return;
-    switch (msg.t) {
-      case "queue": this.enqueue(conn, msg); return;
-      case "cancelQueue": this.dequeue(conn); return;
-      case "rejoin": this.rejoin(conn, msg); return;
-      case "turn":
-      case "draftChoice":
-      case "surrender":
-        conn.seat?.match.handleMessage(conn.seat, msg);
-        return;
+    try {
+      switch (msg.t) {
+        case "auth": void this.authenticate(conn, msg); return;
+        case "queue": this.enqueue(conn, msg); return;
+        case "cancelQueue": this.dequeue(conn); return;
+        case "rejoin": this.rejoin(conn, msg); return;
+        case "turn":
+        case "draftChoice":
+        case "surrender":
+          conn.seat?.match.handleMessage(conn.seat, msg);
+          return;
+      }
+    } catch {
+      /* a malformed message must never crash the server; drop it */
+    }
+  }
+
+  /** Verify (or create) the connection's guest identity and bind it for this session. */
+  private async authenticate(conn: Conn, msg: Extract<ClientMsg, { t: "auth" }>): Promise<void> {
+    if (msg.protocolVersion !== PROTOCOL_VERSION) { conn.send({ t: "authError", message: "protocol mismatch" }); return; }
+    try {
+      const profile = await this.store.authenticate(msg.playerId, msg.secret, msg.name);
+      if (!profile) { conn.send({ t: "authError", message: "that player id is taken by someone else" }); return; }
+      conn.playerId = profile.playerId;
+      conn.name = profile.name;
+      conn.send({ t: "authed", profile });
+    } catch {
+      conn.send({ t: "authError", message: "sign-in failed, please retry" }); // a DB fault must not crash the server
     }
   }
 
@@ -114,6 +145,10 @@ export class MatchServer {
     if (conn.phase !== "idle") return; // already queued or in a match
     if (msg.protocolVersion !== PROTOCOL_VERSION) {
       conn.send({ t: "error", message: `protocol mismatch (server v${PROTOCOL_VERSION})` });
+      return;
+    }
+    if (!conn.playerId) {
+      conn.send({ t: "error", message: "authenticate before queueing" });
       return;
     }
     if (!validTeam(msg.team)) {
@@ -154,11 +189,15 @@ export class MatchServer {
     seat.match.onSeatReconnect(seat);
   }
 
-  /** Pair waiting players FIFO and start their matches. */
+  /** Pair waiting players FIFO — but never pair two connections that share one identity (self-collusion). */
   private tryPair(): void {
     while (this.queue.length >= 2) {
-      const ca = this.queue.shift()!;
-      const cb = this.queue.shift()!;
+      const ca = this.queue[0]!;
+      const bi = this.queue.findIndex((c, i) => i > 0 && c.playerId !== ca.playerId);
+      if (bi === -1) break; // only same-identity connections are waiting — hold until a distinct player arrives
+      const cb = this.queue[bi]!;
+      this.queue.splice(bi, 1); // remove cb (higher index) first…
+      this.queue.shift(); // …then ca at the front
       const matchId = randomUUID();
       const seatA = new Seat(ca.team, matchId, ca);
       const seatB = new Seat(cb.team, matchId, cb);
@@ -171,9 +210,18 @@ export class MatchServer {
       const match = new Match(seatA, seatB, seed);
       seatA.match = seatB.match = match;
       this.matches.set(matchId, match);
+      match.onResult = (winner) => this.recordResults(seatA, seatB, winner);
       match.onEnd = () => this.endMatch(matchId, [seatA, seatB]);
       // Fire-and-forget; the match drives itself via the provider callbacks and its own timers.
       void match.run();
+    }
+  }
+
+  /** Persist the outcome to both players' records (a stalemate is a draw for both). */
+  private recordResults(a: Seat, b: Seat, winner: TeamId | null): void {
+    for (const seat of [a, b]) {
+      if (!seat.playerId) continue;
+      this.store.recordResult(seat.playerId, winner === null ? "draw" : seat.side === winner ? "win" : "loss");
     }
   }
 
@@ -221,12 +269,38 @@ export class MatchServer {
   }
 }
 
+const CORS = {
+  "access-control-allow-origin": "*", // the static client is served from a different origin (GitHub Pages / :8140)
+  "access-control-allow-methods": "POST, GET, OPTIONS",
+  "access-control-allow-headers": "content-type",
+};
+
 /** Start the HTTP+WS server. Returns the underlying http server + a stop() (used by tests; pass port 0 for ephemeral). */
 export function startServer(port = Number(process.env.ARENA_PORT) || DEFAULT_PORT): { stop: () => void; server: MatchServer; http: ReturnType<typeof createServer> } {
-  const matchServer = new MatchServer();
+  const store = new AccountStore();
+  const matchServer = new MatchServer(store);
   const http = createServer((req: IncomingMessage, res: ServerResponse) => {
-    // A tiny health endpoint; everything real happens over the WebSocket upgrade.
-    res.writeHead(req.url === "/" ? 200 : 404, { "content-type": "text/plain" });
+    if (req.method === "OPTIONS") { res.writeHead(204, CORS); res.end(); return; }
+    // POST /profile {playerId, secret, name} -> the guest profile (create-or-verify). Lets the team-select
+    // screen show a name + record without opening a match socket.
+    if (req.method === "POST" && req.url === "/profile") {
+      let body = "";
+      req.on("data", (c) => { body += c; if (body.length > 4096) req.destroy(); });
+      req.on("end", async () => {
+        try {
+          const { playerId, secret, name } = JSON.parse(body) as { playerId?: string; secret?: string; name?: string };
+          const profile = await store.authenticate(playerId ?? "", secret ?? "", name ?? "");
+          res.writeHead(profile ? 200 : 401, { ...CORS, "content-type": "application/json" });
+          res.end(JSON.stringify(profile ? { profile } : { error: "authentication failed" }));
+        } catch {
+          res.writeHead(400, { ...CORS, "content-type": "application/json" });
+          res.end(JSON.stringify({ error: "bad request" }));
+        }
+      });
+      return;
+    }
+    // A tiny health endpoint; the match itself runs over the WebSocket upgrade.
+    res.writeHead(req.url === "/" ? 200 : 404, { ...CORS, "content-type": "text/plain" });
     res.end(req.url === "/" ? "Element Arena match server — connect via WebSocket." : "not found");
   });
   attachWebSocketServer(http, (conn) => matchServer.accept(conn));
@@ -243,6 +317,7 @@ export function startServer(port = Number(process.env.ARENA_PORT) || DEFAULT_POR
     stop: () => {
       clearInterval(beat);
       http.close();
+      store.close();
     },
   };
 }

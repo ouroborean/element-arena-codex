@@ -24,6 +24,9 @@ export interface MatchClient {
   team: string[];
   /** Assigned by the match at start (the coin-flip who-goes-first). */
   side?: TeamId;
+  /** The authenticated guest identity (for recording results + showing the opponent a name). */
+  playerId?: string;
+  name?: string;
   /** Rejoin credentials, set by the server before run(); echoed to the client in `start` so it can reconnect. */
   token?: string;
   matchId?: string;
@@ -107,6 +110,9 @@ export class Match {
   private pending: Record<TeamId, { control: Control; deadline?: number }> = { A: { control: "wait" }, B: { control: "wait" } };
   /** Set by the owner (server) to detach client→match routing once the match ends. */
   onEnd?: () => void;
+  /** Called once with the winning side (null = stalemate) when the match reaches a real result, so the
+   *  server can record win/loss/draw. NOT called for an internal error teardown. */
+  onResult?: (winner: TeamId | null) => void;
 
   constructor(a: MatchClient, b: MatchClient, seed: number, opts: { turnMs?: number; draftMs?: number; graceMs?: number } = {}) {
     this.a = a;
@@ -167,7 +173,7 @@ export class Match {
     if (timer) { clearTimeout(timer); delete this.graceTimers[side]; }
     const wasDisconnected = this.disconnected.delete(side);
     const p = this.pending[side];
-    seat.send({ t: "resumed", you: side, state: this.wireState(), control: p.control, deadline: p.deadline, opponentDisconnected: this.disconnected.has(other(side)) });
+    seat.send({ t: "resumed", you: side, state: this.wireState(), control: p.control, deadline: p.deadline, opponentDisconnected: this.disconnected.has(other(side)), opponentName: this.bySide[other(side)].name ?? "Opponent" });
     if (wasDisconnected) this.bySide[other(side)].send({ t: "opponentReconnected" });
   }
 
@@ -197,8 +203,8 @@ export class Match {
   }
 
   async run(): Promise<void> {
-    this.a.send({ t: "start", you: this.a.side!, opponentTeam: this.b.team, state: this.wireState(), matchId: this.a.matchId ?? "", token: this.a.token ?? "" });
-    this.b.send({ t: "start", you: this.b.side!, opponentTeam: this.a.team, state: this.wireState(), matchId: this.b.matchId ?? "", token: this.b.token ?? "" });
+    this.a.send({ t: "start", you: this.a.side!, opponentTeam: this.b.team, opponentName: this.b.name ?? "Opponent", state: this.wireState(), matchId: this.a.matchId ?? "", token: this.a.token ?? "" });
+    this.b.send({ t: "start", you: this.b.side!, opponentTeam: this.a.team, opponentName: this.a.name ?? "Opponent", state: this.wireState(), matchId: this.b.matchId ?? "", token: this.b.token ?? "" });
 
     let outcome: MatchOutcome | null = null;
     try {
@@ -290,6 +296,7 @@ export class Match {
     this.clearGraceTimers();
     this.a.send({ t: "matchEnd", outcome, reason, you: this.a.side! });
     this.b.send({ t: "matchEnd", outcome, reason, you: this.b.side! });
+    this.onResult?.(outcome.winner); // a real result — record it (a stalemate is a draw for both)
     this.onEnd?.();
   }
 

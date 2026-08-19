@@ -15,8 +15,8 @@ import { runMatch, type AsyncProvider } from "../../client/loop.ts";
 import { autoDraft, applyDraftChoice, hasDraftOptions, draftableHeroes, type DraftChoice } from "../../client/draft.ts";
 import { renderApp, renderSetup } from "./view.ts";
 import { energyIcon, elementRank } from "./assets.ts";
-import { MatchSocket, serverUrl } from "./net.ts";
-import { PROTOCOL_VERSION, type ServerMsg } from "../../net/protocol.ts";
+import { MatchSocket, serverUrl, fetchProfile } from "./net.ts";
+import { PROTOCOL_VERSION, MAX_NAME_LEN, type ServerMsg, type Profile } from "../../net/protocol.ts";
 
 export interface UiState {
   you: TeamId;
@@ -36,6 +36,8 @@ export interface UiState {
   overlay?: string;
   /** A thin fixed banner over the board (e.g. "opponent disconnected — waiting…"). */
   notice?: string;
+  /** The opponent's display name in a networked match (shown in the midbar). */
+  opponentName?: string;
   resolveTurn?: (actions: Action[]) => void;
 }
 
@@ -56,12 +58,44 @@ let setup: { picked: string[]; oppo: string[]; inspect: string | null; augfuse?:
 // A live Quick Match (PvP) session. Non-null only in networked play; in bot mode it stays null and the
 // local runMatch loop drives everything. When set, the turn/draft/concede commit points send to the server
 // instead of resolving locally, and the server's state broadcasts drive the board.
+/** What a match socket should do once its guest identity is authenticated. */
+type Intent = { kind: "queue"; team: string[] } | { kind: "rejoin"; matchId: string; token: string };
 let pvp:
-  | { sock: MatchSocket; you: TeamId; over: boolean; started: boolean; token?: string; matchId?: string; reconnecting: boolean; attempts: number }
+  | { sock: MatchSocket; you: TeamId; over: boolean; started: boolean; token?: string; matchId?: string; reconnecting: boolean; attempts: number; intent: Intent; opponentName?: string }
   | null = null;
 const MAX_RECONNECT_ATTEMPTS = 6;
 const RECONNECT_DELAY_MS = 2500;
 const STORED_MATCH_KEY = "arenaMatch"; // sessionStorage: lets a page reload rejoin an in-progress match
+
+// ── guest identity (persistent, client-held) ────────────────────────────────────────────────────────── //
+let profile: Profile | null = null; // the authoritative profile from the server (name + record), when reachable
+interface Identity { playerId: string; secret: string; name: string; }
+let cachedCreds: { playerId: string; secret: string } | null = null; // memoized so a session keeps ONE identity even if storage is blocked
+
+/** A random token that works even outside a secure context (crypto.randomUUID is undefined over LAN http). */
+function uuid(): string {
+  const c = globalThis.crypto as Crypto | undefined;
+  if (c?.randomUUID) return c.randomUUID();
+  const b = new Uint8Array(16);
+  if (c?.getRandomValues) c.getRandomValues(b);
+  else for (let i = 0; i < 16; i++) b[i] = Math.floor(Math.random() * 256);
+  return "g-" + Array.from(b, (x) => x.toString(16).padStart(2, "0")).join("");
+}
+
+function identity(): Identity {
+  if (!cachedCreds) {
+    try { const c = JSON.parse(localStorage.getItem("arenaIdentity") ?? "null"); if (c?.playerId && c?.secret) cachedCreds = c; } catch { /* blocked */ }
+    if (!cachedCreds) {
+      cachedCreds = { playerId: uuid(), secret: uuid() };
+      try { localStorage.setItem("arenaIdentity", JSON.stringify(cachedCreds)); } catch { /* private mode — the memo keeps it stable this session */ }
+    }
+  }
+  const name = (() => { try { return localStorage.getItem("arenaName") || "Guest"; } catch { return "Guest"; } })();
+  return { ...cachedCreds, name };
+}
+function setStoredName(name: string): void { try { localStorage.setItem("arenaName", name.slice(0, MAX_NAME_LEN)); } catch { /* ignore */ } }
+/** The `auth` message every match socket sends first, from the stored identity. */
+function authMsg() { const id = identity(); return { t: "auth" as const, playerId: id.playerId, secret: id.secret, name: id.name, protocolVersion: PROTOCOL_VERSION }; }
 const escHtml = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
 const ui: UiState = {
   you: "A", phase: "busy", phaseLabel: "starting…", hint: "",
@@ -121,7 +155,34 @@ function showSkpop(el: HTMLElement): void {
 function hideSkpop(): void { skpop.hidden = true; }
 
 function render(): void { hideFx(); app.innerHTML = renderApp(state, ui); }
-function showSetup(): void { setup = { picked: [], oppo: randomTeam([]), inspect: null }; app.innerHTML = renderSetup(setup); }
+/** The team-select screen, with the guest-profile bar (name + record) pinned in the corner. */
+function renderSetupScreen(): void { app.innerHTML = renderSetup(setup!) + profileBar(); }
+function showSetup(): void { setup = { picked: [], oppo: randomTeam([]), inspect: null }; renderSetupScreen(); }
+
+/** A small fixed corner panel showing the guest identity (an editable name) and its win/loss record. */
+function profileBar(): string {
+  const name = profile?.name ?? identity().name;
+  const rec = profile ? `${profile.wins}W · ${profile.losses}L${profile.draws ? ` · ${profile.draws}D` : ""}` : "offline";
+  return `<div style="position:fixed;top:8px;right:10px;z-index:40;background:rgba(18,18,26,.92);color:#eee;padding:6px 10px;font:13px system-ui;border:1px solid #333;border-radius:8px;display:flex;gap:8px;align-items:center${profile ? "" : ";opacity:.7"}">
+    <span title="Your guest profile">👤</span>
+    <input data-name-input maxlength="${MAX_NAME_LEN}" value="${escHtml(name)}" placeholder="Guest" title="Your display name — edit to rename" style="background:#22222c;border:1px solid #444;color:#fff;border-radius:4px;padding:3px 6px;width:110px;font:13px system-ui" />
+    <span style="opacity:.85;white-space:nowrap">${escHtml(rec)}</span>
+  </div>`;
+}
+
+/** Fetch the guest profile from the server (create-or-verify); re-render the team-select if it's up. */
+async function refreshProfile(): Promise<void> {
+  const id = identity();
+  profile = await fetchProfile(id.playerId, id.secret, id.name);
+  if (setup) renderSetupScreen();
+}
+
+/** App entry: resume an in-progress match if one is stored, else fetch the profile and show team-select. */
+async function boot(): Promise<void> {
+  if (tryResumeStoredMatch()) return; // an accidental reload rejoins the live match first
+  await refreshProfile();
+  showSetup();
+}
 
 /** Legal single-target set (Harmful→enemies, Helpful→allies, else either), run through targeting rules. */
 function targetsFor(u: Unit, skillId: string): Set<string> {
@@ -197,7 +258,7 @@ app.addEventListener("click", (e) => {
 
   if (setup?.augfuse) { // the Fusions & Augments preview is open — only Close / the backdrop respond
     const t = e.target as HTMLElement;
-    if (t.closest("[data-augfuse-close]") || t.classList.contains("overlay")) { setup.augfuse = false; app.innerHTML = renderSetup(setup); }
+    if (t.closest("[data-augfuse-close]") || t.classList.contains("overlay")) { setup.augfuse = false; renderSetupScreen(); }
     return;
   }
   const el = (e.target as HTMLElement).closest<HTMLElement>("[data-owner],[data-skill],[data-target],[data-cancel],[data-resolve],[data-surrender],[data-pick],[data-inspect],[data-reroll],[data-start],[data-quick],[data-quick-cancel],[data-plus],[data-minus],[data-energy-confirm],[data-energy-cancel],[data-draft-inspect],[data-fuse-unit],[data-aug-unit],[data-draft-hold],[data-concede],[data-keep],[data-augfuse]");
@@ -234,16 +295,16 @@ app.addEventListener("click", (e) => {
   }
 
   if (setup) { // team-select screen
-    if (d.augfuse) { setup.augfuse = true; app.innerHTML = renderSetup(setup); }
-    else if (d.inspect) { setup.inspect = d.inspect; app.innerHTML = renderSetup(setup); }
+    if (d.augfuse) { setup.augfuse = true; renderSetupScreen(); }
+    else if (d.inspect) { setup.inspect = d.inspect; renderSetupScreen(); }
     else if (d.pick) { // add / remove (detail button or a tray slot)
       const i = setup.picked.indexOf(d.pick);
       if (i >= 0) setup.picked.splice(i, 1);
       else if (setup.picked.length < 3) setup.picked.push(d.pick);
-      app.innerHTML = renderSetup(setup);
+      renderSetupScreen();
     } else if (d.reroll) {
       setup.oppo = randomTeam(setup.picked);
-      app.innerHTML = renderSetup(setup);
+      renderSetupScreen();
     } else if (d.quick && setup.picked.length === 3) {
       startQuickMatch([...setup.picked]); // networked PvP — matchmaking + an authoritative server
     } else if (d.start && setup.picked.length === 3) {
@@ -438,6 +499,14 @@ function onDrop(): void {
   attemptReconnect();
 }
 
+/** Wire a match socket: authenticate first; the `authed` handler then acts on pvp.intent (queue/rejoin). */
+function wireSocket(sock: MatchSocket): void {
+  sock.onOpen = () => sock.send(authMsg());
+  sock.onMessage = handleServerMsg;
+  sock.onError = () => { /* wait for close */ };
+  sock.onClose = onDrop;
+}
+
 /** Open a fresh socket and present the rejoin token to resume the in-progress match. */
 function attemptReconnect(): void {
   if (!pvp || pvp.over || !pvp.reconnecting) return;
@@ -449,22 +518,16 @@ function attemptReconnect(): void {
   showModal(`<h2>Reconnecting…</h2><p>Attempt ${pvp.attempts} of ${MAX_RECONNECT_ATTEMPTS}…</p>`);
   const sock = new MatchSocket(serverUrl());
   pvp.sock = sock;
-  const { token, matchId } = pvp;
-  sock.onOpen = () => sock.send({ t: "rejoin", matchId: matchId!, token: token!, protocolVersion: PROTOCOL_VERSION });
-  sock.onMessage = handleServerMsg;
-  sock.onError = () => { /* wait for close */ };
-  sock.onClose = onDrop;
+  pvp.intent = { kind: "rejoin", matchId: pvp.matchId, token: pvp.token };
+  wireSocket(sock);
 }
 
 /** Connect, join the queue with `team`, and let server messages drive the match from here on. */
 function startQuickMatch(team: string[]): void {
   const sock = new MatchSocket(serverUrl());
-  pvp = { sock, you: "A", over: false, started: false, reconnecting: false, attempts: 0 };
+  pvp = { sock, you: "A", over: false, started: false, reconnecting: false, attempts: 0, intent: { kind: "queue", team } };
   setup = null;
-  sock.onOpen = () => sock.send({ t: "queue", team, protocolVersion: PROTOCOL_VERSION });
-  sock.onMessage = handleServerMsg;
-  sock.onError = () => { /* wait for close */ };
-  sock.onClose = onDrop;
+  wireSocket(sock);
   showSearching("Connecting…");
 }
 
@@ -475,11 +538,8 @@ function tryResumeStoredMatch(): boolean {
   if (typeof stored.matchId !== "string" || typeof stored.token !== "string") return false;
   const matchId = stored.matchId, token = stored.token;
   const sock = new MatchSocket(serverUrl());
-  pvp = { sock, you: "A", over: false, started: false, token, matchId, reconnecting: true, attempts: 0 };
-  sock.onOpen = () => sock.send({ t: "rejoin", matchId, token, protocolVersion: PROTOCOL_VERSION });
-  sock.onMessage = handleServerMsg;
-  sock.onError = () => { /* wait for close */ };
-  sock.onClose = onDrop;
+  pvp = { sock, you: "A", over: false, started: false, token, matchId, reconnecting: true, attempts: 0, intent: { kind: "rejoin", matchId, token } };
+  wireSocket(sock);
   showModal(`<h2>Reconnecting…</h2><p>Rejoining your match…</p>`);
   return true;
 }
@@ -518,32 +578,42 @@ function pvpBusy(label: string): void {
 
 /** Resume the board at the given control state — shared by yourTurn/opponentTurn/… and a reconnect. */
 function applyControl(control: "turn" | "wait" | "draft" | "waitDraft"): void {
+  const foe = ui.opponentName ?? "Opponent";
   if (control === "turn") enterPvpPlanning();
   else if (control === "draft") openPvpDraft(pvp!.you);
-  else if (control === "waitDraft") pvpBusy("Opponent is choosing an upgrade…");
-  else pvpBusy("Opponent is acting…");
+  else if (control === "waitDraft") pvpBusy(`${foe} is choosing an upgrade…`);
+  else pvpBusy(`${foe} is acting…`);
 }
 
 function handleServerMsg(msg: ServerMsg): void {
   if (!pvp) return;
   switch (msg.t) {
+    case "authed":
+      profile = msg.profile; // freshest name + record
+      if (pvp.intent.kind === "queue") pvp.sock.send({ t: "queue", team: pvp.intent.team, protocolVersion: PROTOCOL_VERSION });
+      else pvp.sock.send({ t: "rejoin", matchId: pvp.intent.matchId, token: pvp.intent.token, protocolVersion: PROTOCOL_VERSION });
+      break;
+    case "authError":
+      pvp.over = true; pvp.sock.close(); pvp = null; clearStoredMatch();
+      showModal(`<h2>Sign-in problem</h2><p>${escHtml(msg.message)}</p><button onclick="location.reload()">Back</button>`);
+      break;
     case "queued": showSearching("Searching for an opponent…"); break;
     case "start":
-      pvp.started = true; pvp.you = msg.you; ui.you = msg.you; state = msg.state;
+      pvp.started = true; pvp.you = msg.you; ui.you = msg.you; state = msg.state; pvp.opponentName = msg.opponentName; ui.opponentName = msg.opponentName;
       pvp.token = msg.token; pvp.matchId = msg.matchId; storeMatch(msg.matchId, msg.token);
-      pvpBusy("Match found — get ready…");
+      pvpBusy(`Matched vs ${msg.opponentName} — get ready…`);
       break;
     case "resumed":
       pvp.started = true; pvp.reconnecting = false; pvp.attempts = 0;
-      pvp.you = msg.you; ui.you = msg.you; state = msg.state;
-      ui.notice = msg.opponentDisconnected ? "Opponent disconnected — waiting for them to reconnect…" : undefined;
+      pvp.you = msg.you; ui.you = msg.you; state = msg.state; pvp.opponentName = msg.opponentName; ui.opponentName = msg.opponentName;
+      ui.notice = msg.opponentDisconnected ? `${msg.opponentName} disconnected — waiting for them to reconnect…` : undefined;
       applyControl(msg.control);
       break;
-    case "opponentTurn": state = msg.state; pvpBusy("Opponent is acting…"); break;
+    case "opponentTurn": state = msg.state; pvpBusy(`${ui.opponentName ?? "Opponent"} is acting…`); break;
     case "yourTurn": state = msg.state; enterPvpPlanning(); break;
-    case "opponentDraft": state = msg.state; pvpBusy("Opponent is choosing an upgrade…"); break;
+    case "opponentDraft": state = msg.state; pvpBusy(`${ui.opponentName ?? "Opponent"} is choosing an upgrade…`); break;
     case "yourDraft": state = msg.state; openPvpDraft(pvp.you); break; // a player always drafts for its own team
-    case "opponentDisconnected": ui.notice = "Opponent disconnected — waiting for them to reconnect…"; render(); break;
+    case "opponentDisconnected": ui.notice = `${ui.opponentName ?? "Opponent"} disconnected — waiting for them to reconnect…`; render(); break;
     case "opponentReconnected": ui.notice = undefined; render(); break;
     case "matchEnd": {
       pvp.over = true; clearStoredMatch(); ui.notice = undefined;
@@ -571,4 +641,13 @@ function handleServerMsg(msg: ServerMsg): void {
 }
 
 // Start at team select — unless a match from this tab is still in progress (an accidental reload), which we rejoin.
-if (!tryResumeStoredMatch()) showSetup();
+// Rename: committing the profile-bar name input stores it and re-verifies with the server.
+app.addEventListener("change", (e) => {
+  const t = e.target as HTMLElement;
+  if (t instanceof HTMLInputElement && t.hasAttribute("data-name-input")) {
+    setStoredName(t.value.trim() || "Guest");
+    void refreshProfile();
+  }
+});
+
+void boot(); // start at team-select — or rejoin an in-progress match after a reload
