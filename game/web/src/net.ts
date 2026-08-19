@@ -4,7 +4,7 @@
  * which subscribes to `onMessage` and drives the existing board rendering from the server's authoritative
  * state. Nothing here simulates the game.
  */
-import type { ClientMsg, ServerMsg } from "../../net/protocol.ts";
+import type { ClientMsg, Profile, ServerMsg } from "../../net/protocol.ts";
 import { DEFAULT_PORT, parseMessage } from "../../net/protocol.ts";
 
 export class MatchSocket {
@@ -47,4 +47,24 @@ export function serverUrl(): string {
   if (stored) return stored;
   const host = location.hostname || "localhost";
   return `ws://${host}:${DEFAULT_PORT}`;
+}
+
+/** The http(s) origin matching serverUrl (ws→http, wss→https) — for the /profile endpoint. */
+export function httpBase(): string {
+  return serverUrl().replace(/^ws/, "http").replace(/\/+$/, "");
+}
+
+/**
+ * Fetch (create-or-verify) the guest profile over HTTP, so the team-select screen can show a name + record
+ * without opening a match socket. Returns null if the server is unreachable or the identity is refused.
+ */
+export async function fetchProfile(playerId: string, secret: string, name: string): Promise<Profile | null> {
+  try {
+    // text/plain avoids a CORS preflight; the server reads the body as JSON.
+    const res = await fetch(`${httpBase()}/profile`, { method: "POST", headers: { "content-type": "text/plain" }, body: JSON.stringify({ playerId, secret, name }) });
+    if (!res.ok) return null;
+    return ((await res.json()) as { profile: Profile }).profile ?? null;
+  } catch {
+    return null;
+  }
 }

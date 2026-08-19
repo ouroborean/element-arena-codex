@@ -8,8 +8,27 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { once } from "node:events";
 import type { AddressInfo } from "node:net";
+import { PROTOCOL_VERSION, type Profile, type ServerMsg } from "../net/protocol.ts";
 import { startServer } from "./index.ts";
-import { PROTOCOL_VERSION, type ServerMsg } from "../net/protocol.ts";
+
+// Importing index.ts does NOT open a database (the store is created inside startServer). This runs before
+// any test calls startServer, so the server uses an in-memory db and never writes a real file.
+process.env.ARENA_DB = ":memory:";
+
+type Client = { ws: WebSocket; msgs: ServerMsg[]; wait: (t: ServerMsg["t"]) => Promise<ServerMsg> };
+
+/** Authenticate a guest identity, then join the queue with a team. */
+async function authQueue(p: Client, team: string[], playerId: string, secret: string, name: string): Promise<void> {
+  p.ws.send(JSON.stringify({ t: "auth", playerId, secret, name, protocolVersion: PROTOCOL_VERSION }));
+  await p.wait("authed");
+  p.ws.send(JSON.stringify({ t: "queue", team, protocolVersion: PROTOCOL_VERSION }));
+}
+
+/** Fetch a profile via the HTTP endpoint (the same path the team-select screen uses). */
+async function fetchProfile(port: number, playerId: string, secret: string, name: string): Promise<Profile> {
+  const res = await fetch(`http://127.0.0.1:${port}/profile`, { method: "POST", headers: { "content-type": "text/plain" }, body: JSON.stringify({ playerId, secret, name }) });
+  return (await res.json() as { profile: Profile }).profile;
+}
 
 /** Open a WebSocket, collecting parsed server messages; resolves the socket once open. */
 function connect(url: string): Promise<{ ws: WebSocket; msgs: ServerMsg[]; wait: (t: ServerMsg["t"]) => Promise<ServerMsg> }> {
@@ -43,14 +62,16 @@ test("two real WebSocket clients are matched and driven to a result over TCP", a
   try {
     [p1, p2] = await Promise.all([connect(url), connect(url)]);
 
-    // Both queue with valid teams; the second one triggers the pairing.
-    p1.ws.send(JSON.stringify({ t: "queue", team: ["pyrrha", "jarrik", "gommar"], protocolVersion: PROTOCOL_VERSION }));
-    p2.ws.send(JSON.stringify({ t: "queue", team: ["ando", "syl", "riverdaughter"], protocolVersion: PROTOCOL_VERSION }));
+    // Both authenticate then queue; the second queue triggers the pairing.
+    await authQueue(p1, ["pyrrha", "jarrik", "gommar"], "e2e-alice", "sec-a", "Alice");
+    await authQueue(p2, ["ando", "syl", "riverdaughter"], "e2e-bob", "sec-b", "Bob");
 
     const s1 = (await p1.wait("start")) as Extract<ServerMsg, { t: "start" }>;
     const s2 = (await p2.wait("start")) as Extract<ServerMsg, { t: "start" }>;
     assert.notEqual(s1.you, s2.you, "the two clients are on opposite sides");
     assert.ok(s1.state && s1.state.units, "the start message carries a full MatchState (round-tripped over the wire)");
+    assert.equal(s1.opponentName, "Bob", "each side sees the opponent's name");
+    assert.equal(s2.opponentName, "Alice");
 
     // Team A always takes the first turn; that player surrenders, so Team B must win by forfeit.
     const firstMover = s1.you === "A" ? p1 : p2;
@@ -76,11 +97,46 @@ test("the server rejects a malformed team", async () => {
   let p: Awaited<ReturnType<typeof connect>> | undefined;
   try {
     p = await connect(`ws://127.0.0.1:${port}`);
+    p.ws.send(JSON.stringify({ t: "auth", playerId: "e2e-mal", secret: "s", name: "Mal", protocolVersion: PROTOCOL_VERSION }));
+    await p.wait("authed");
     p.ws.send(JSON.stringify({ t: "queue", team: ["pyrrha", "pyrrha", "pyrrha"], protocolVersion: PROTOCOL_VERSION })); // duplicates
     const err = (await p.wait("error")) as Extract<ServerMsg, { t: "error" }>;
     assert.match(err.message, /invalid team/i);
   } finally {
     p?.ws.close();
+    stop();
+  }
+});
+
+test("a completed match is recorded to both players' profiles (auth → play → record → /profile)", async () => {
+  const { stop, http } = startServer(0);
+  await once(http, "listening");
+  const port = (http.address() as AddressInfo).port;
+  const url = `ws://127.0.0.1:${port}`;
+  let p1: Client | undefined;
+  let p2: Client | undefined;
+  try {
+    [p1, p2] = await Promise.all([connect(url), connect(url)]);
+    await authQueue(p1, ["pyrrha", "jarrik", "gommar"], "rec-1", "s1", "Player One");
+    await authQueue(p2, ["ando", "syl", "riverdaughter"], "rec-2", "s2", "Player Two");
+    const s1 = (await p1.wait("start")) as Extract<ServerMsg, { t: "start" }>;
+    await p2.wait("start");
+
+    // Team A takes the first turn and surrenders — so Team A's player loses, the other wins.
+    const firstMover = s1.you === "A" ? p1 : p2;
+    await firstMover.wait("yourTurn");
+    firstMover.ws.send(JSON.stringify({ t: "surrender" }));
+    await Promise.all([p1.wait("matchEnd"), p2.wait("matchEnd")]);
+
+    const loser = s1.you === "A" ? { id: "rec-1", sec: "s1", n: "Player One" } : { id: "rec-2", sec: "s2", n: "Player Two" };
+    const winner = s1.you === "A" ? { id: "rec-2", sec: "s2", n: "Player Two" } : { id: "rec-1", sec: "s1", n: "Player One" };
+    const loserProfile = await fetchProfile(port, loser.id, loser.sec, loser.n);
+    const winnerProfile = await fetchProfile(port, winner.id, winner.sec, winner.n);
+    assert.deepEqual([loserProfile.wins, loserProfile.losses], [0, 1], "the surrendering player has a recorded loss");
+    assert.deepEqual([winnerProfile.wins, winnerProfile.losses], [1, 0], "the opponent has a recorded win");
+  } finally {
+    p1?.ws.close();
+    p2?.ws.close();
     stop();
   }
 });

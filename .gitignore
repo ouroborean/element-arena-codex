@@ -6,3 +6,8 @@ node_modules/
 *.tsbuildinfo
 game/web/tools/effect_context.json
 game/web/tools/batches/
+
+# Quick Match server data
+game/server/*.db
+game/server/*.db-journal
+arena.db

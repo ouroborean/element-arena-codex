@@ -271,7 +271,7 @@ function midbar(state: MatchState, ui: UiState): string {
   return `<div class="midbar">
     <div class="mid-left">${energyPool(state, ui)}</div>
     <div class="mid-center">${center}</div>
-    <div class="mid-right"><div class="score">${state.teams.A.roundsWon}–${state.teams.B.roundsWon} · R${state.round}</div>
+    <div class="mid-right">${ui.opponentName ? `<div style="font-size:12px;opacity:.85;margin-bottom:2px">vs ${esc(ui.opponentName)}</div>` : ""}<div class="score">${state.teams.A.roundsWon}–${state.teams.B.roundsWon} · R${state.round}</div>
       <button class="surrender" data-surrender="1">Surrender</button></div>
   </div>`;
 }
