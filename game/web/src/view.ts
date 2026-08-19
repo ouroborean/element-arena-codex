@@ -7,6 +7,8 @@ import type { SkillInstance } from "../../engine/src/skill.ts";
 import { totalShield } from "../../engine/src/damage.ts";
 import { canUse, effectiveCost, hasEssenceIncome } from "../../engine/src/scheduler.ts";
 import { availableFusions, availableAugments } from "../../engine/content/metagame.ts";
+import { fusionsFor } from "../../engine/content/fusions.generated.ts";
+import { augmentsFor } from "../../engine/content/augments.generated.ts";
 import { draftableHeroes } from "../../client/draft.ts";
 import { ROSTER } from "../../engine/content/roster.generated.ts";
 import { heroPortrait, iconOf, minionPortrait, energyIcon, characterButton, elColor } from "./assets.ts";
@@ -332,7 +334,7 @@ function draftOptions(state: MatchState, u: Unit): string {
   const forms = availableFusions(state, u);
   const augs = availableAugments(u);
   const fusion = u.fused
-    ? `<div class="do-note">Already fused into <b>${esc(u.fused)}</b> — a hero fuses once per match.</div>`
+    ? `<div class="do-note">Already fused into <b>${esc(cap(u.fused))}</b> — a hero fuses once per match.</div>`
     : forms.length
     ? forms.map((f) => {
         const passIc = iconOf(`${hid}${f.key}0`, hid);
@@ -344,7 +346,7 @@ function draftOptions(state: MatchState, u: Unit): string {
         return `<button class="do-card fusion-card" data-fuse-unit="${u.id}" data-fuse-form="${esc(f.key)}">
           <img class="fc-port" src="${heroPortrait(hid, f.key)}" ${IMG_FALLBACK} />
           <span class="fc-body">
-            <span class="fc-head">Fuse → <b style="color:${elColor(f.element)}">${esc(f.element)}</b></span>
+            <span class="fc-head">Fuse → <b style="color:${elColor(f.element)}">${esc(cap(f.element))}</b></span>
             ${block("New passive", passIc, f.passive.name, f.passive.description)}
             ${block("New skill", skIc, skText?.n ?? sk.name, skText?.d ?? "")}
           </span></button>`;
@@ -369,7 +371,7 @@ function draftPanel(state: MatchState, ui: UiState): string {
     return `<button class="dh ${sel?.id === h.id ? "on" : ""}" data-draft-inspect="${h.id}">
       <img src="${heroPortrait(h.heroId ?? "", h.fused)}" ${IMG_FALLBACK} />
       <span class="dh-name">${esc(shortName(h.name))}</span>
-      <span class="dh-opts">${h.fused ? `fused:${esc(h.fused)}` : `${nf} ⚛`} · ${na} ★</span></button>`;
+      <span class="dh-opts">${h.fused ? `fused: ${esc(cap(h.fused))}` : `${nf} ⚛`} · ${na} ★</span></button>`;
   }).join("");
   return `<div class="overlay"><div class="modal draft-modal">
     <h2>Round ${state.round} — choose an upgrade</h2>
@@ -410,7 +412,7 @@ const RIGHT_ROWS = [
 ];
 const ROSTER_ORDER = [...LEFT_ROWS.flat(), ...RIGHT_ROWS.flat()];
 
-export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: string | null }): string {
+export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: string | null; augfuse?: boolean }): string {
   const inspectId = setup.inspect ?? ROSTER_ORDER[0]!;
   const def = ROSTER.find((h) => h.id === inspectId)!;
   const on = setup.picked.includes(inspectId);
@@ -455,7 +457,7 @@ export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: 
         <div class="cs-hel">${esc(cap(def.element))} Element</div>
         <button class="cs-abtn ${on ? "rem" : ""}" data-pick="${inspectId}" ${!on && full ? "disabled" : ""}>${on ? "Remove Hero" : "Add to Team"}</button>
         <button class="cs-abtn" disabled title="Not available yet">Mastery</button>
-        <button class="cs-abtn" disabled title="Fusions & augments are drafted between rounds">Fusions &amp; Augments</button>
+        <button class="cs-abtn" data-augfuse="1" title="Preview this hero's fusion forms and augments">Fusions &amp; Augments</button>
       </div>
       <div class="cs-art"><img src="${heroPortrait(inspectId)}" alt="${esc(shortName(def.name))}" ${IMG_FALLBACK} /></div>
       <div class="cs-skills">
@@ -484,5 +486,39 @@ export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: 
       </div>
       <div class="cs-roster right">${panelRows(RIGHT_ROWS)}</div>
     </div>
-  </div>`;
+  </div>${setup.augfuse ? augFuseModal(inspectId) : ""}`;
+}
+
+/** A read-only modal previewing every fusion form (by partner element) and every augment a base hero
+ *  can take — the character-select "Fusions & Augments" view. Reuses the between-round draft card styles. */
+function augFuseModal(heroId: string): string {
+  const def = ROSTER.find((h) => h.id === heroId)!;
+  const forms = fusionsFor(heroId);
+  const augs = augmentsFor(heroId);
+  const block = (label: string, ic: string | null, name: string, meta: string, desc: string) =>
+    `<span class="fc-block"><span class="fc-label">${label}</span>
+      <span class="fc-line">${ic ? `<img src="${ic}" ${IMG_FALLBACK} />` : ""}<b>${esc(name)}</b></span>
+      ${meta}<span class="fc-desc">${esc(desc)}</span></span>`;
+  const fusion = forms.map((f) => {
+    const sk = f.skill, skText = SKILL_TEXT[sk.id];
+    const cd = sk.cooldown > 0 ? `${sk.cooldown}-turn cooldown` : "no cooldown";
+    const skMeta = `<span class="fc-meta">${costIcons(sk.cost, sk.element)}<span class="fc-cd">${esc(cd)}</span></span>`;
+    return `<div class="do-card fusion-card">
+      <img class="fc-port" src="${heroPortrait(heroId, f.key)}" ${IMG_FALLBACK} />
+      <span class="fc-body">
+        <span class="fc-head">Fuse → <b style="color:${elColor(f.element)}">${esc(cap(f.element))}</b></span>
+        ${block("New passive", iconOf(`${heroId}${f.key}0`, heroId), f.passive.name, "", f.passive.description)}
+        ${block("New skill", iconOf(sk.id, heroId), skText?.n ?? sk.name, skMeta, skText?.d ?? "")}
+      </span></div>`;
+  }).join("");
+  const augment = augs.map((a) => `<div class="do-card"><span class="do-txt"><span class="do-name">★ ${esc(a.name)}</span><span class="do-desc">${esc(a.description)}</span></span></div>`).join("");
+  return `<div class="overlay"><div class="modal draft-modal augfuse-modal">
+    <h2>${esc(shortName(def.name))} — Fusions &amp; Augments</h2>
+    <p class="draft-sub">Every fusion form (one per partner element) and every augment this hero can take.</p>
+    <div class="draft-options">
+      <div class="do-sec fusion"><h4>Fusion forms <span>(${forms.length})</span></h4>${fusion || `<div class="do-note">None.</div>`}</div>
+      <div class="do-sec augment"><h4>Augments <span>(${augs.length})</span></h4>${augment || `<div class="do-note">None.</div>`}</div>
+    </div>
+    <div class="modal-foot"><button class="mini" data-augfuse-close="1">Close</button></div>
+  </div></div>`;
 }

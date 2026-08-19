@@ -48,7 +48,7 @@ const living = (s: MatchState, side: TeamId): Unit[] =>
 
 const app = document.getElementById("app")!;
 let state: MatchState;
-let setup: { picked: string[]; oppo: string[]; inspect: string | null } | null = null;
+let setup: { picked: string[]; oppo: string[]; inspect: string | null; augfuse?: boolean } | null = null;
 const ui: UiState = {
   you: "A", phase: "busy", phaseLabel: "starting…", hint: "",
   legalTargets: new Set(), planned: new Map(), plannedSkill: new Map(),
@@ -180,7 +180,13 @@ app.addEventListener("click", (e) => {
   const skEl = (e.target as HTMLElement).closest<HTMLElement>(".cs-sicon");
   if (skEl) { showSkpop(skEl); return; } // tap a skill icon → pop off its info
   hideSkpop(); // any other click dismisses the skill popup
-  const el = (e.target as HTMLElement).closest<HTMLElement>("[data-owner],[data-skill],[data-target],[data-cancel],[data-resolve],[data-surrender],[data-pick],[data-inspect],[data-reroll],[data-start],[data-plus],[data-minus],[data-energy-confirm],[data-energy-cancel],[data-draft-inspect],[data-fuse-unit],[data-aug-unit],[data-draft-hold],[data-concede],[data-keep]");
+
+  if (setup?.augfuse) { // the Fusions & Augments preview is open — only Close / the backdrop respond
+    const t = e.target as HTMLElement;
+    if (t.closest("[data-augfuse-close]") || t.classList.contains("overlay")) { setup.augfuse = false; app.innerHTML = renderSetup(setup); }
+    return;
+  }
+  const el = (e.target as HTMLElement).closest<HTMLElement>("[data-owner],[data-skill],[data-target],[data-cancel],[data-resolve],[data-surrender],[data-pick],[data-inspect],[data-reroll],[data-start],[data-plus],[data-minus],[data-energy-confirm],[data-energy-cancel],[data-draft-inspect],[data-fuse-unit],[data-aug-unit],[data-draft-hold],[data-concede],[data-keep],[data-augfuse]");
   if (!el) return;
   const d = el.dataset;
 
@@ -203,7 +209,8 @@ app.addEventListener("click", (e) => {
   }
 
   if (setup) { // team-select screen
-    if (d.inspect) { setup.inspect = d.inspect; app.innerHTML = renderSetup(setup); }
+    if (d.augfuse) { setup.augfuse = true; app.innerHTML = renderSetup(setup); }
+    else if (d.inspect) { setup.inspect = d.inspect; app.innerHTML = renderSetup(setup); }
     else if (d.pick) { // add / remove (detail button or a tray slot)
       const i = setup.picked.indexOf(d.pick);
       if (i >= 0) setup.picked.splice(i, 1);
