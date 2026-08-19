@@ -484,11 +484,16 @@ export function performAction(state: MatchState, action: Action): ActionResult {
   if (!skill) return { ok: false, reason: "skill-not-found" };
   if (skill.currentCd > 0) return { ok: false, reason: "on-cooldown" };
   if (isStunnedFor(caster, skill)) return { ok: false, reason: "stunned" };
-  if (skill.requires && !evalSkillCondition(state, caster, skill.requires)) return { ok: false, reason: "requirements-not-met" };
 
   // Targeting legality (before paying cost — an illegal action can't be declared).
   const rng = Rng.fromState(state.rngState);
-  const targets = legalTargets(state, caster, skill, resolveTargets(state, caster, skill, action.targets), rng);
+  const declared = resolveTargets(state, caster, skill, action.targets);
+  // `requires` is evaluated with the declared target bound, so a gate can veto a specific pick
+  // (e.g. Echoes of Desire "cannot target Xyris himself" = target != caster).
+  if (skill.requires && !evalSkillCondition(state, caster, skill.requires, declared)) {
+    return { ok: false, reason: "requirements-not-met" };
+  }
+  const targets = legalTargets(state, caster, skill, declared, rng);
   state.rngState = rng.state;
   const needsTarget = skill.targeting === "single" && (skill.tags.includes("Harmful") || skill.tags.includes("Helpful"));
   if (needsTarget && targets.length === 0) return { ok: false, reason: "no-legal-target" };

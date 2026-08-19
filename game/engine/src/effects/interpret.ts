@@ -175,8 +175,18 @@ function resolveOne(sel: Selector | undefined, ctx: Ctx): Unit {
  *  dropped (AOE/faction selectors bypass legalTargets, so enforce it here too, mirroring the single-target
  *  rule); same-team and self effects are unaffected, as are a hero's own linked-member mechanics. */
 function effectTargets(to: Selector | undefined, ctx: Ctx): Unit[] {
-  const units = to ? resolveSelector(to, ctx) : ctx.targets;
-  return units.filter((u) => u.team === ctx.caster.team || !u.statuses.some((s) => s.kind === "untargetable"));
+  let units = to ? resolveSelector(to, ctx) : ctx.targets;
+  units = units.filter((u) => u.team === ctx.caster.team || !u.statuses.some((s) => s.kind === "untargetable"));
+  // Twisted Nightmares (xyris3): while the acting unit is marked, an AOE (faction) selector lands on
+  // only its first unit — "their AOE skills become single-target". Scoped to effect application, so
+  // count/condition reads (which call resolveSelector directly) are unaffected.
+  if (
+    units.length > 1 && to && typeof to === "object" && "faction" in to &&
+    ctx.caster.statuses.some((s) => s.kind === "mark" && s.name === "Twisted Nightmares")
+  ) {
+    units = units.slice(0, 1);
+  }
+  return units;
 }
 
 // --------------------------------------------------------------------------- //
@@ -628,11 +638,12 @@ export function createBus(state: MatchState, rng: Rng): Bus {
   return bus;
 }
 
-/** Evaluate a standalone condition against a caster (for skill `requires` gates). */
-export function evalSkillCondition(state: MatchState, caster: Unit, cond: Condition): boolean {
+/** Evaluate a standalone condition against a caster (for skill `requires` gates). The declared targets are
+ *  bound so a gate can reference the chosen `target` (e.g. "cannot target self"). */
+export function evalSkillCondition(state: MatchState, caster: Unit, cond: Condition, targets: Unit[] = []): boolean {
   const rng = Rng.fromState(state.rngState);
   const bus = createBus(state, rng);
-  const ctx: Ctx = { state, rng, caster, self: caster, targets: [], it: null, vars: {}, emit: bus.emit };
+  const ctx: Ctx = { state, rng, caster, self: caster, targets, it: null, vars: {}, emit: bus.emit };
   const result = evalCondition(cond, ctx);
   state.rngState = rng.state;
   return result;

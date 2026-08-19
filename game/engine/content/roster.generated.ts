@@ -10994,10 +10994,7 @@ export const ROSTER: HeroDef[] = [
        "right": 1
       },
       {
-       "sameUnit": [
-        "eventTarget",
-        "self"
-       ]
+       "declaredTargetsSelf": true
       }
      ]
     },
