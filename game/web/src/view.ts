@@ -6,6 +6,8 @@ import type { MatchState, TeamId, Unit, Status } from "../../engine/src/types.ts
 import type { SkillInstance } from "../../engine/src/skill.ts";
 import { totalShield } from "../../engine/src/damage.ts";
 import { canUse, effectiveCost, hasEssenceIncome } from "../../engine/src/scheduler.ts";
+import { availableFusions, availableAugments } from "../../engine/content/metagame.ts";
+import { draftableHeroes } from "../../client/draft.ts";
 import { ROSTER } from "../../engine/content/roster.generated.ts";
 import { heroPortrait, iconOf, minionPortrait, energyIcon, elColor } from "./assets.ts";
 import { SKILL_TEXT } from "./skilltext.generated.ts";
@@ -174,10 +176,11 @@ function aoeLabel(skill: SkillInstance | undefined): string {
   }
 }
 
-/** The banner on a queued hero's card: which skill it will use, and on whom. */
+/** The banner on a queued hero's card: which skill it will use, and on whom. The empty slot is always
+ *  rendered (fixed height) so queuing a skill fills it in place instead of shoving the skill tiles down. */
 function queuedBanner(state: MatchState, u: Unit, ui: UiState): string {
   const a = ui.planned.get(u.id);
-  if (!a) return "";
+  if (!a) return `<div class="queued empty"></div>`;
   const skill = (u.skills ?? []).find((s) => s.id === a.skillId);
   const name = SKILL_TEXT[a.skillId]?.n ?? skill?.name ?? a.skillId;
   const ic = iconOf(a.skillId, u.heroId ?? undefined);
@@ -347,6 +350,53 @@ function energyPanel(ui: UiState): string {
   </div></div>`;
 }
 
+/** The fusion/augment options for one hero — fused portraits + new element + passive for each fusion form,
+ *  and name + prose for each untaken augment. One click commits the whole team's single upgrade this round. */
+function draftOptions(state: MatchState, u: Unit): string {
+  const hid = u.heroId ?? "";
+  const forms = availableFusions(state, u);
+  const augs = availableAugments(u);
+  const fusion = u.fused
+    ? `<div class="do-note">Already fused into <b>${esc(u.fused)}</b> — a hero fuses once per match.</div>`
+    : forms.length
+    ? forms.map((f) => `<button class="do-card" data-fuse-unit="${u.id}" data-fuse-form="${esc(f.key)}">
+        <img class="do-port" src="${heroPortrait(hid, f.key)}" ${IMG_FALLBACK} />
+        <span class="do-txt"><span class="do-name">Fuse → <b style="color:${elColor(f.element)}">${esc(f.element)}</b></span>
+          <span class="do-sub">${esc(f.passive.name)}</span>
+          <span class="do-desc">${esc(f.passive.description)}</span></span></button>`).join("")
+    : `<div class="do-note">No fusion available — needs a teammate whose element forms a recipe.</div>`;
+  const augment = augs.length
+    ? augs.map((a) => `<button class="do-card" data-aug-unit="${u.id}" data-aug-id="${esc(a.id)}">
+        <span class="do-txt"><span class="do-name">★ ${esc(a.name)}</span><span class="do-desc">${esc(a.description)}</span></span></button>`).join("")
+    : `<div class="do-note">All of this hero's augments are taken.</div>`;
+  return `<div class="do-sec fusion"><h4>Fusion <span>(re-elements the hero, new passive + skill)</span></h4>${fusion}</div>
+    <div class="do-sec augment"><h4>Augments <span>(a permanent tweak; cumulative)</span></h4>${augment}</div>`;
+}
+
+/** The between-round draft modal: pick one hero and one upgrade (fuse / augment), or hold. */
+function draftPanel(state: MatchState, ui: UiState): string {
+  const d = ui.draft!;
+  const heroes = draftableHeroes(state, d.side);
+  const sel = heroes.find((h) => h.id === d.inspect) ?? heroes[0];
+  const heroList = heroes.map((h) => {
+    const nf = h.fused ? 0 : availableFusions(state, h).length;
+    const na = availableAugments(h).length;
+    return `<button class="dh ${sel?.id === h.id ? "on" : ""}" data-draft-inspect="${h.id}">
+      <img src="${heroPortrait(h.heroId ?? "", h.fused)}" ${IMG_FALLBACK} />
+      <span class="dh-name">${esc(shortName(h.name))}</span>
+      <span class="dh-opts">${h.fused ? `fused:${esc(h.fused)}` : `${nf} ⚛`} · ${na} ★</span></button>`;
+  }).join("");
+  return `<div class="overlay"><div class="modal draft-modal">
+    <h2>Round ${state.round} — choose an upgrade</h2>
+    <p class="draft-sub">Fuse or augment <b>one</b> hero, or hold. This is your team's single upgrade for the round.</p>
+    <div class="draft-body">
+      <div class="draft-heroes">${heroList}</div>
+      <div class="draft-options">${sel ? draftOptions(state, sel) : ""}</div>
+    </div>
+    <div class="modal-foot"><button class="mini" data-draft-hold="1">Hold — no upgrade ▶</button></div>
+  </div></div>`;
+}
+
 export function renderApp(state: MatchState, ui: UiState): string {
   const foe = ui.you === "A" ? "B" : "A";
   const incoming = incomingBy(state, ui);
@@ -354,7 +404,7 @@ export function renderApp(state: MatchState, ui: UiState): string {
     ${sideRow(state, foe, ui, false, incoming)}
     ${midbar(state, ui)}
     ${sideRow(state, ui.you, ui, true, incoming)}
-  </div>${ui.energyPanel ? energyPanel(ui) : ""}${ui.overlay ?? ""}`;
+  </div>${ui.energyPanel ? energyPanel(ui) : ""}${ui.draft ? draftPanel(state, ui) : ""}${ui.overlay ?? ""}`;
 }
 
 // ── team select (with a skill viewer) ─────────────────────────────────────────────────────────────── //

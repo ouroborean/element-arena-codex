@@ -3153,7 +3153,7 @@ export const ROSTER: HeroDef[] = [
   "passive": {
    "name": "Frost-Covered",
    "description": "At the start of each round, Gommar gains Frost-Covered, enhancing his skills. If Gommar damages an enemy with reduced damage, he gains Elemental Essence.",
-   "pending": "Frost-Covered is a round-permanent self mark (duration null) that his actives read via `has mark Frost-Covered`. Re-granted by Ice Body and checked for absence by Absolute Zero; the oracle never says it is consumed on use, so it is not. 'reduced damage' = an enemy carrying a negative outgoing_damage_mod; the engine has no status-magnitude condition, so the trigger keys on `has outgoing_damage_mod` on the damaged enemy (Gommar's own -5 debuffs from Iceblood Hammer / Breath of the North are the only source in his base kit, so the sign is always negative)."
+   "pending": "Frost-Covered is a self mark (duration null) his actives read via 'has mark Frost-Covered'. It is an enhance CHARGE: consumed when Gommar uses any active except Ice Body (gommar4), which re-grants it (and grants Essence if he already had it). Re-granted at round start by the passive. Absolute Zero self-stuns if he has no charge. 'reduced damage' = an enemy carrying a negative outgoing_damage_mod; the engine has no status-magnitude condition, so the trigger keys on 'has outgoing_damage_mod' (his -5 debuffs are the only base-kit source, always negative)."
   },
   "skills": [
    {
@@ -3204,6 +3204,12 @@ export const ROSTER: HeroDef[] = [
         }
        }
       ]
+     },
+     {
+      "op": "removeStatus",
+      "kind": "mark",
+      "name": "Frost-Covered",
+      "from": "caster"
      }
     ],
     "currentCd": 0
@@ -3255,6 +3261,12 @@ export const ROSTER: HeroDef[] = [
         }
        }
       ]
+     },
+     {
+      "op": "removeStatus",
+      "kind": "mark",
+      "name": "Frost-Covered",
+      "from": "caster"
      }
     ],
     "currentCd": 0
@@ -3307,6 +3319,12 @@ export const ROSTER: HeroDef[] = [
        "magnitude": -5,
        "duration": 1
       }
+     },
+     {
+      "op": "removeStatus",
+      "kind": "mark",
+      "name": "Frost-Covered",
+      "from": "caster"
      }
     ],
     "uncounterableIf": {
@@ -3419,6 +3437,12 @@ export const ROSTER: HeroDef[] = [
         }
        }
       ]
+     },
+     {
+      "op": "removeStatus",
+      "kind": "mark",
+      "name": "Frost-Covered",
+      "from": "caster"
      }
     ],
     "currentCd": 0

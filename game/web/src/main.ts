@@ -12,7 +12,7 @@ import { Rng } from "../../engine/src/rng.ts";
 import { buildMatch, defaultPolicy, type Draft } from "../../engine/content/match.ts";
 import { ROSTER } from "../../engine/content/roster.generated.ts";
 import { runMatch, type AsyncProvider } from "../../client/loop.ts";
-import { autoDraft, applyDraftChoice } from "../../client/draft.ts";
+import { autoDraft, applyDraftChoice, hasDraftOptions, draftableHeroes } from "../../client/draft.ts";
 import { renderApp, renderSetup } from "./view.ts";
 import { energyIcon } from "./assets.ts";
 
@@ -28,6 +28,9 @@ export interface UiState {
   plannedSkill: Map<string, string>; // unitId -> chosen skill id (to highlight its tile)
   // The end-of-turn generic-payment allocation panel: how much of each color pays the turn's generic.
   energyPanel?: { actions: Action[]; generic: number; avail: Record<string, number>; alloc: Record<string, number> };
+  // The between-round fusion/augment draft: which of your heroes' options are shown, and the resolver to
+  // settle once you commit a choice (or hold).
+  draft?: { side: TeamId; inspect: string | null; resolve: () => void };
   overlay?: string;
   resolveTurn?: (actions: Action[]) => void;
 }
@@ -120,15 +123,48 @@ function unusableReason(u: Unit, skill: SkillInstance): string {
   return "Can't be used right now (stunned, silenced, or no valid target).";
 }
 
+// Between-round draft: show your heroes' fusion/augment options and await one choice (or hold).
+function humanDraft(st: MatchState, side: TeamId): Promise<void> {
+  return new Promise((resolve) => {
+    ui.phase = "busy";
+    ui.phaseLabel = "choose your upgrade";
+    ui.draft = { side, inspect: draftableHeroes(st, side)[0]?.id ?? null, resolve };
+    render();
+  });
+}
+function finishDraft(): void {
+  const resolve = ui.draft?.resolve;
+  ui.draft = undefined;
+  resolve?.();
+}
+function logDraft(res: { ok: boolean; desc: string }): void { state.log.push(`draft — ${res.desc}`); }
+
+// In-app surrender confirmation (native confirm() is unreliable in embedded/sandboxed browser contexts).
+const SURRENDER_CONFIRM = `<div class="overlay"><div class="modal">
+  <h2>Surrender?</h2>
+  <p>You'll concede the match and return to team select.</p>
+  <div class="modal-foot">
+    <button class="mini" data-keep="1">Keep playing</button>
+    <button data-concede="1">Concede</button>
+  </div></div></div>`;
+
 // ── interaction (event delegation) ───────────────────────────────────────────────────────────────── //
 app.addEventListener("click", (e) => {
   const tgtEl = (e.target as HTMLElement).closest<HTMLElement>(".tgt");
   if (tgtEl) { const c = tgtEl.dataset.dequeue; if (c) { ui.planned.delete(c); ui.plannedSkill.delete(c); render(); } return; } // click a targeting icon → dequeue that skill
   const fxEl = (e.target as HTMLElement).closest<HTMLElement>(".fx");
   if (fxEl) { if (fxpop.hidden) showFx(fxEl); else hideFx(); return; } // tap an effect icon to toggle its description
-  const el = (e.target as HTMLElement).closest<HTMLElement>("[data-owner],[data-skill],[data-target],[data-cancel],[data-resolve],[data-surrender],[data-pick],[data-inspect],[data-reroll],[data-start],[data-plus],[data-minus],[data-energy-confirm],[data-energy-cancel]");
+  const el = (e.target as HTMLElement).closest<HTMLElement>("[data-owner],[data-skill],[data-target],[data-cancel],[data-resolve],[data-surrender],[data-pick],[data-inspect],[data-reroll],[data-start],[data-plus],[data-minus],[data-energy-confirm],[data-energy-cancel],[data-draft-inspect],[data-fuse-unit],[data-aug-unit],[data-draft-hold],[data-concede],[data-keep]");
   if (!el) return;
   const d = el.dataset;
+
+  if (ui.draft) { // the between-round draft modal is up — only its controls respond
+    if (d.draftInspect) { ui.draft.inspect = d.draftInspect; render(); }
+    else if (d.fuseUnit && d.fuseForm) { logDraft(applyDraftChoice(state, { kind: "fuse", unitId: d.fuseUnit, formKey: d.fuseForm })); finishDraft(); }
+    else if (d.augUnit && d.augId) { logDraft(applyDraftChoice(state, { kind: "augment", unitId: d.augUnit, augmentId: d.augId })); finishDraft(); }
+    else if (d.draftHold) { finishDraft(); }
+    return;
+  }
 
   if (ui.energyPanel) { // the generic-payment modal is up — only its controls respond
     const p = ui.energyPanel;
@@ -158,7 +194,9 @@ app.addEventListener("click", (e) => {
     return;
   }
 
-  if (d.surrender) { if (confirm("Surrender this match?")) location.reload(); return; }
+  if (d.surrender) { ui.overlay = SURRENDER_CONFIRM; render(); return; }
+  if (d.concede) { location.reload(); return; }
+  if (d.keep) { ui.overlay = undefined; render(); return; }
   if (ui.phase !== "plan") return;
   if (d.cancel) { ui.targeting = undefined; ui.examine = undefined; ui.legalTargets = new Set(); render(); return; }
   if (d.resolve) { commitTurn(); return; }
@@ -275,12 +313,16 @@ async function startMatch(draft: Draft): Promise<void> {
     onBetweenRounds: async (st, w) => {
       ui.phase = "busy"; ui.phaseLabel = "between-round draft…";
       for (const side of [w === "A" ? "B" : "A", w] as TeamId[]) { // loser drafts first
-        const choice = autoDraft(st, side);
-        const res = applyDraftChoice(st, choice);
-        if (choice.kind !== "skip") st.log.push(`draft — Team ${side}: ${res.desc}`);
+        if (side === ui.you && hasDraftOptions(st, side)) {
+          await humanDraft(st, side); // interactive — awaits your fuse/augment/hold choice
+        } else {
+          const choice = autoDraft(st, side);
+          const res = applyDraftChoice(st, choice);
+          if (choice.kind !== "skip") st.log.push(`draft — Team ${side}: ${res.desc}`);
+        }
+        render();
+        await delay(side === ui.you ? 200 : 900); // brief beat after yours; let the AI's read
       }
-      render();
-      await delay(1400);
     },
   });
   ui.phase = "over";
