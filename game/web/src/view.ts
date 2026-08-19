@@ -8,10 +8,12 @@ import { totalShield } from "../../engine/src/damage.ts";
 import { canUse, effectiveCost, hasEssenceIncome } from "../../engine/src/scheduler.ts";
 import { availableFusions, availableAugments } from "../../engine/content/metagame.ts";
 import { fusionsFor } from "../../engine/content/fusions.generated.ts";
+import { fusionResult } from "../../engine/content/recipes.generated.ts";
 import { augmentsFor } from "../../engine/content/augments.generated.ts";
+import type { FusionForm } from "../../engine/content/fusion.ts";
 import { draftableHeroes } from "../../client/draft.ts";
 import { ROSTER } from "../../engine/content/roster.generated.ts";
-import { heroPortrait, iconOf, minionPortrait, energyIcon, characterButton, elColor } from "./assets.ts";
+import { heroPortrait, iconOf, minionPortrait, energyIcon, characterButton, elColor, ELEMENT_ORDER, elementRank } from "./assets.ts";
 import { SKILL_TEXT } from "./skilltext.generated.ts";
 import { STATUS_SOURCE } from "./statussource.generated.ts";
 import { EFFECT_DESC, EFFECT_VARIANT, EFFECT_HIDE } from "./effectdesc.generated.ts";
@@ -250,7 +252,7 @@ function energyPool(state: MatchState, ui: UiState): string {
   const els = new Set<string>(["generic"]);
   for (const id of state.teams[ui.you].units) { const u = state.units[id]; if (u?.kind === "hero") els.add(u.currentElement); }
   for (const k of Object.keys(pool)) if ((pool[k] ?? 0) > 0) els.add(k);
-  const rows = [...els].sort((a, b) => (a === "generic" ? -1 : b === "generic" ? 1 : a.localeCompare(b)))
+  const rows = [...els].sort((a, b) => elementRank(a) - elementRank(b) || a.localeCompare(b))
     .map((el) => `<div class="ep-row"><img class="ep-ic" src="${energyIcon(el)}" alt="${esc(el)}" title="${esc(el)}" ${IMG_FALLBACK} />
       <span class="ep-el">${esc(el)}</span><span class="ep-n">${pool[el] ?? 0}</span></div>`).join("");
   return `<div class="epool"><div class="ep-title">Energy Pool</div>${rows}</div>`;
@@ -304,7 +306,7 @@ function energyPanel(ui: UiState): string {
   const p = ui.energyPanel!;
   const sum = Object.values(p.alloc).reduce((a, b) => a + b, 0);
   const covered = sum === p.generic;
-  const colors = Object.keys(p.avail).sort((a, b) => (a === "generic" ? -1 : b === "generic" ? 1 : a.localeCompare(b)));
+  const colors = Object.keys(p.avail).sort((a, b) => elementRank(a) - elementRank(b) || a.localeCompare(b));
   const rows = colors.map((c) => {
     const have = p.avail[c] ?? 0, put = p.alloc[c] ?? 0;
     return `<div class="alloc-row">
@@ -327,11 +329,25 @@ function energyPanel(ui: UiState): string {
   </div></div>`;
 }
 
+/** The base element `base` fuses WITH to reach the form keyed `result` — for "Fire/Water → Alchemy" labels. */
+function fusionPartner(base: string, result: string): string | undefined {
+  return ELEMENT_ORDER.find((p) => fusionResult(base, p) === result);
+}
+/** Fusion forms ordered by the partner element's fixed rank (never alphabetical). */
+function orderFusions(base: string, forms: FusionForm[]): FusionForm[] {
+  return forms.slice().sort((a, b) => elementRank(fusionPartner(base, a.key) ?? "") - elementRank(fusionPartner(base, b.key) ?? ""));
+}
+/** The "components → result" heading for a fusion card, e.g. "Fire/Water → Alchemy". */
+function fusionHead(base: string, f: FusionForm): string {
+  const p = fusionPartner(base, f.key);
+  return `${esc(cap(base))}${p ? `/${esc(cap(p))}` : ""} → <b style="color:${elColor(f.element)}">${esc(cap(f.element))}</b>`;
+}
+
 /** The fusion/augment options for one hero — fused portraits + new element + passive for each fusion form,
  *  and name + prose for each untaken augment. One click commits the whole team's single upgrade this round. */
 function draftOptions(state: MatchState, u: Unit): string {
   const hid = u.heroId ?? "";
-  const forms = availableFusions(state, u);
+  const forms = orderFusions(u.baseElement, availableFusions(state, u));
   const augs = availableAugments(u);
   const fusion = u.fused
     ? `<div class="do-note">Already fused into <b>${esc(cap(u.fused))}</b> — a hero fuses once per match.</div>`
@@ -346,7 +362,7 @@ function draftOptions(state: MatchState, u: Unit): string {
         return `<button class="do-card fusion-card" data-fuse-unit="${u.id}" data-fuse-form="${esc(f.key)}">
           <img class="fc-port" src="${heroPortrait(hid, f.key)}" ${IMG_FALLBACK} />
           <span class="fc-body">
-            <span class="fc-head">Fuse → <b style="color:${elColor(f.element)}">${esc(cap(f.element))}</b></span>
+            <span class="fc-head">${fusionHead(u.baseElement, f)}</span>
             ${block("New passive", passIc, f.passive.name, f.passive.description)}
             ${block("New skill", skIc, skText?.n ?? sk.name, skText?.d ?? "")}
           </span></button>`;
@@ -493,7 +509,7 @@ export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: 
  *  can take — the character-select "Fusions & Augments" view. Reuses the between-round draft card styles. */
 function augFuseModal(heroId: string): string {
   const def = ROSTER.find((h) => h.id === heroId)!;
-  const forms = fusionsFor(heroId);
+  const forms = orderFusions(def.element, fusionsFor(heroId));
   const augs = augmentsFor(heroId);
   const block = (label: string, ic: string | null, name: string, meta: string, desc: string) =>
     `<span class="fc-block"><span class="fc-label">${label}</span>
@@ -506,7 +522,7 @@ function augFuseModal(heroId: string): string {
     return `<div class="do-card fusion-card">
       <img class="fc-port" src="${heroPortrait(heroId, f.key)}" ${IMG_FALLBACK} />
       <span class="fc-body">
-        <span class="fc-head">Fuse → <b style="color:${elColor(f.element)}">${esc(cap(f.element))}</b></span>
+        <span class="fc-head">${fusionHead(def.element, f)}</span>
         ${block("New passive", iconOf(`${heroId}${f.key}0`, heroId), f.passive.name, "", f.passive.description)}
         ${block("New skill", iconOf(sk.id, heroId), skText?.n ?? sk.name, skMeta, skText?.d ?? "")}
       </span></div>`;
