@@ -59,7 +59,7 @@ let setup: { picked: string[]; oppo: string[]; inspect: string | null; augfuse?:
 // local runMatch loop drives everything. When set, the turn/draft/concede commit points send to the server
 // instead of resolving locally, and the server's state broadcasts drive the board.
 /** What a match socket should do once its guest identity is authenticated. */
-type Intent = { kind: "queue"; team: string[] } | { kind: "rejoin"; matchId: string; token: string };
+type Intent = { kind: "queue"; team: string[]; ranked: boolean } | { kind: "rejoin"; matchId: string; token: string };
 let pvp:
   | { sock: MatchSocket; you: TeamId; over: boolean; started: boolean; token?: string; matchId?: string; reconnecting: boolean; attempts: number; intent: Intent; opponentName?: string }
   | null = null;
@@ -162,7 +162,7 @@ function showSetup(): void { setup = { picked: [], oppo: randomTeam([]), inspect
 /** A small fixed corner panel showing the guest identity (an editable name) and its win/loss record. */
 function profileBar(): string {
   const name = profile?.name ?? identity().name;
-  const rec = profile ? `${profile.wins}W · ${profile.losses}L${profile.draws ? ` · ${profile.draws}D` : ""}` : "offline";
+  const rec = profile ? `★ ${profile.rating} · ${profile.wins}W · ${profile.losses}L${profile.draws ? ` · ${profile.draws}D` : ""}` : "offline";
   return `<div style="position:fixed;top:8px;right:10px;z-index:40;background:rgba(18,18,26,.92);color:#eee;padding:6px 10px;font:13px system-ui;border:1px solid #333;border-radius:8px;display:flex;gap:8px;align-items:center${profile ? "" : ";opacity:.7"}">
     <span title="Your guest profile">👤</span>
     <input data-name-input maxlength="${MAX_NAME_LEN}" value="${escHtml(name)}" placeholder="Guest" title="Your display name — edit to rename" style="background:#22222c;border:1px solid #444;color:#fff;border-radius:4px;padding:3px 6px;width:110px;font:13px system-ui" />
@@ -261,7 +261,7 @@ app.addEventListener("click", (e) => {
     if (t.closest("[data-augfuse-close]") || t.classList.contains("overlay")) { setup.augfuse = false; renderSetupScreen(); }
     return;
   }
-  const el = (e.target as HTMLElement).closest<HTMLElement>("[data-owner],[data-skill],[data-target],[data-cancel],[data-resolve],[data-surrender],[data-pick],[data-inspect],[data-reroll],[data-start],[data-quick],[data-quick-cancel],[data-plus],[data-minus],[data-energy-confirm],[data-energy-cancel],[data-draft-inspect],[data-fuse-unit],[data-aug-unit],[data-draft-hold],[data-concede],[data-keep],[data-augfuse]");
+  const el = (e.target as HTMLElement).closest<HTMLElement>("[data-owner],[data-skill],[data-target],[data-cancel],[data-resolve],[data-surrender],[data-pick],[data-inspect],[data-reroll],[data-start],[data-quick],[data-ranked],[data-quick-cancel],[data-plus],[data-minus],[data-energy-confirm],[data-energy-cancel],[data-draft-inspect],[data-fuse-unit],[data-aug-unit],[data-draft-hold],[data-concede],[data-keep],[data-augfuse]");
   if (!el) return;
   const d = el.dataset;
 
@@ -307,6 +307,8 @@ app.addEventListener("click", (e) => {
       renderSetupScreen();
     } else if (d.quick && setup.picked.length === 3) {
       startQuickMatch([...setup.picked]); // networked PvP — matchmaking + an authoritative server
+    } else if (d.ranked && setup.picked.length === 3) {
+      startQuickMatch([...setup.picked], true); // ranked: Elo + rating-window matchmaking
     } else if (d.start && setup.picked.length === 3) {
       const draft: Draft = { A: [...setup.picked], B: [...setup.oppo], seed: Math.floor(Math.random() * 1e6) };
       setup = null;
@@ -522,13 +524,13 @@ function attemptReconnect(): void {
   wireSocket(sock);
 }
 
-/** Connect, join the queue with `team`, and let server messages drive the match from here on. */
-function startQuickMatch(team: string[]): void {
+/** Connect, join the (ranked or casual) queue with `team`, and let server messages drive the match. */
+function startQuickMatch(team: string[], ranked = false): void {
   const sock = new MatchSocket(serverUrl());
-  pvp = { sock, you: "A", over: false, started: false, reconnecting: false, attempts: 0, intent: { kind: "queue", team } };
+  pvp = { sock, you: "A", over: false, started: false, reconnecting: false, attempts: 0, intent: { kind: "queue", team, ranked } };
   setup = null;
   wireSocket(sock);
-  showSearching("Connecting…");
+  showSearching(ranked ? "Connecting to Ranked…" : "Connecting…");
 }
 
 /** On page load, silently try to rejoin an in-progress match (survives an accidental reload). */
@@ -590,14 +592,14 @@ function handleServerMsg(msg: ServerMsg): void {
   switch (msg.t) {
     case "authed":
       profile = msg.profile; // freshest name + record
-      if (pvp.intent.kind === "queue") pvp.sock.send({ t: "queue", team: pvp.intent.team, protocolVersion: PROTOCOL_VERSION });
+      if (pvp.intent.kind === "queue") pvp.sock.send({ t: "queue", team: pvp.intent.team, ranked: pvp.intent.ranked, protocolVersion: PROTOCOL_VERSION });
       else pvp.sock.send({ t: "rejoin", matchId: pvp.intent.matchId, token: pvp.intent.token, protocolVersion: PROTOCOL_VERSION });
       break;
     case "authError":
       pvp.over = true; pvp.sock.close(); pvp = null; clearStoredMatch();
       showModal(`<h2>Sign-in problem</h2><p>${escHtml(msg.message)}</p><button onclick="location.reload()">Back</button>`);
       break;
-    case "queued": showSearching("Searching for an opponent…"); break;
+    case "queued": showSearching(pvp.intent.kind === "queue" && pvp.intent.ranked ? "Searching for a ranked opponent…" : "Searching for an opponent…"); break;
     case "start":
       pvp.started = true; pvp.you = msg.you; ui.you = msg.you; state = msg.state; pvp.opponentName = msg.opponentName; ui.opponentName = msg.opponentName;
       pvp.token = msg.token; pvp.matchId = msg.matchId; storeMatch(msg.matchId, msg.token);
@@ -620,8 +622,12 @@ function handleServerMsg(msg: ServerMsg): void {
       const won = msg.outcome.winner === msg.you;
       const title = msg.outcome.winner === null ? "Stalemate" : won ? "Victory 🏆" : "Defeat";
       const why = msg.reason === "opponent-left" ? " Your opponent left the match." : msg.reason === "forfeit" ? " (by surrender)" : "";
+      const rating = msg.rating
+        ? `<p style="font-size:15px">Rating <b>${msg.rating.rating}</b> <span style="color:${msg.rating.delta >= 0 ? "#6c6" : "#e66"}">(${msg.rating.delta >= 0 ? "+" : ""}${msg.rating.delta})</span></p>`
+        : "";
       showModal(`<h2>${title}</h2>
         <p>Team ${msg.outcome.winner ?? "—"} wins ${msg.outcome.roundsWon.A}–${msg.outcome.roundsWon.B} over ${msg.outcome.rounds} round${msg.outcome.rounds === 1 ? "" : "s"}.${why}</p>
+        ${rating}
         <button onclick="location.reload()">Back to team select</button>`);
       pvp.sock.close();
       break;

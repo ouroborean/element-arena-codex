@@ -53,8 +53,8 @@ export const MAX_NAME_LEN = 20;
 //  Client → server
 // --------------------------------------------------------------------------- //
 export type ClientMsg =
-  /** Enter the Quick Match queue with a chosen 3-hero team. */
-  | { t: "queue"; team: string[]; protocolVersion: number }
+  /** Enter the queue with a chosen 3-hero team. `ranked` uses Elo + rating-window matchmaking. */
+  | { t: "queue"; team: string[]; ranked?: boolean; protocolVersion: number }
   /** The active player's committed turn: one action per acting hero (+ the optional generic-payment plan). */
   | { t: "turn"; actions: Action[]; genericPay?: EnergyPool }
   /** The drafting player's between-round upgrade choice (fuse / augment / skip). */
@@ -97,8 +97,8 @@ export type ServerMsg =
   | { t: "yourDraft"; state: MatchState; deadline: number }
   /** The opponent is drafting; render `state` and wait. */
   | { t: "opponentDraft"; state: MatchState }
-  /** The match is over. */
-  | { t: "matchEnd"; outcome: MatchOutcome; reason: EndReason; you: TeamId }
+  /** The match is over. `rating` is present for a ranked match: your new Elo and the change from it. */
+  | { t: "matchEnd"; outcome: MatchOutcome; reason: EndReason; you: TeamId; rating?: { rating: number; delta: number } }
   /** A recoverable problem (bad team, protocol mismatch, illegal message); usually terminal for this attempt. */
   | { t: "error"; message: string };
 

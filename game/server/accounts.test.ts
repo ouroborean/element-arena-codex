@@ -5,7 +5,7 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { AccountStore, cleanName, START_RATING } from "./accounts.ts";
+import { AccountStore, cleanName, elo, START_RATING } from "./accounts.ts";
 
 function store() {
   return new AccountStore(":memory:");
@@ -80,6 +80,18 @@ test("malformed identities are refused, not crashed", async () => {
   assert.equal(await s.authenticate("x".repeat(65), "sec", "X"), null, "over-long id");
   assert.equal(await s.authenticate("p", "x".repeat(513), "X"), null, "over-long secret");
   s.close();
+});
+
+test("elo: equal ratings move by ±K/2 on a decisive result, and not at all on a draw", () => {
+  assert.deepEqual(elo(1000, 1000, 1), [1016, 984], "winner +16, loser -16 (K=32, E=0.5)");
+  assert.deepEqual(elo(1000, 1000, 0), [984, 1016], "symmetric when B wins");
+  assert.deepEqual(elo(1000, 1000, 0.5), [1000, 1000], "a draw between equals is a no-op");
+});
+
+test("elo: beating a much higher-rated opponent gains more than an even win; it is zero-sum", () => {
+  const [low, high] = elo(1000, 1400, 1); // the underdog wins
+  assert.ok(low - 1000 > 16, "the upset gains more than an even win");
+  assert.equal(low - 1000, 1400 - high, "points won by one equal points lost by the other");
 });
 
 test("cleanName scrubs HTML-dangerous chars, clamps length, keeps spaces, defaults empty to Guest", () => {

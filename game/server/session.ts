@@ -40,6 +40,10 @@ export interface MatchClient {
 /** What a reconnecting player should be doing right now — used to resume them at the live state. */
 type Control = "turn" | "wait" | "draft" | "waitDraft";
 
+/** A player's new rating and the change from it (ranked matches only). */
+export type RatingChange = { rating: number; delta: number };
+export type RatingChanges = Partial<Record<TeamId, RatingChange>>;
+
 const other = (side: TeamId): TeamId => (side === "A" ? "B" : "A");
 const HOLD: TurnMsg = { t: "turn", actions: [] };
 const SKIP: DraftMsg = { t: "draftChoice", choice: { kind: "skip" } };
@@ -111,8 +115,9 @@ export class Match {
   /** Set by the owner (server) to detach client→match routing once the match ends. */
   onEnd?: () => void;
   /** Called once with the winning side (null = stalemate) when the match reaches a real result, so the
-   *  server can record win/loss/draw. NOT called for an internal error teardown. */
-  onResult?: (winner: TeamId | null) => void;
+   *  server can record win/loss/draw. Returns per-side rating changes (ranked only) to fold into matchEnd.
+   *  NOT called for an internal error teardown. */
+  onResult?: (winner: TeamId | null) => RatingChanges | void;
 
   constructor(a: MatchClient, b: MatchClient, seed: number, opts: { turnMs?: number; draftMs?: number; graceMs?: number } = {}) {
     this.a = a;
@@ -294,9 +299,12 @@ export class Match {
     if (this.over) return;
     this.over = true;
     this.clearGraceTimers();
-    this.a.send({ t: "matchEnd", outcome, reason, you: this.a.side! });
-    this.b.send({ t: "matchEnd", outcome, reason, you: this.b.side! });
-    this.onResult?.(outcome.winner); // a real result — record it (a stalemate is a draw for both)
+    // Record the result first (a stalemate is a draw for both); its rating changes ride out on matchEnd.
+    // Recording must never strand the players: if it throws (a DB fault), still send matchEnd + clean up.
+    let changes: RatingChanges | undefined;
+    try { changes = this.onResult?.(outcome.winner) || undefined; } catch { changes = undefined; }
+    this.a.send({ t: "matchEnd", outcome, reason, you: this.a.side!, rating: changes?.[this.a.side!] });
+    this.b.send({ t: "matchEnd", outcome, reason, you: this.b.side!, rating: changes?.[this.b.side!] });
     this.onEnd?.();
   }
 
