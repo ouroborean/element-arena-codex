@@ -93,17 +93,19 @@ function effectDesc(state: MatchState, u: Unit, s: Status, src?: string): { titl
 
 /**
  * The skill/passive id an effect should show the icon of, resolved most-precise first:
- *  1. a named status → the content-scanned map (status name → applying skill/passive), authoritative;
- *  2. an engine-stamped `sourceId` that is a real skill id (skill-cast provenance);
+ *  1. the engine-stamped runtime `sourceId` — the skill that ACTUALLY applied it, so it's form-correct
+ *     (base skill in base form, fusion skill when fused). Preferred over the static map, which is keyed by
+ *     name and can point at a fusion variant of a same-named status (e.g. base Fan the Flames vs Festering Burns).
+ *  2. a named status → the content-scanned name→skill map (fallback for statuses lacking runtime provenance);
  *  3. a skill-scoped cost/cooldown mod → the skill it discounts (its `skillId` field);
- *  4. last resort — the applying unit's passive, so it's always at least hero-correct (never a bare letter).
+ *  4. last resort — the applying unit's CURRENT passive (base or fusion form), so it's always hero-correct.
  */
 function statusSource(state: MatchState, s: Status): string | undefined {
-  if (s.name && STATUS_SOURCE[s.name]) return STATUS_SOURCE[s.name];
   if (s.sourceId && SKILL_TEXT[s.sourceId]) return s.sourceId;
+  if (s.name && STATUS_SOURCE[s.name]) return STATUS_SOURCE[s.name];
   if (s.skillId && SKILL_TEXT[s.skillId]) return s.skillId;
   const by = state.units[s.appliedBy];
-  return by?.heroId ? `${by.heroId}0` : undefined;
+  return by?.heroId ? `${by.heroId}${by.fused ?? ""}0` : undefined;
 }
 
 /** Status icons on a portrait: the source skill's art, each hover-describable. */
