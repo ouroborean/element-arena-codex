@@ -9126,6 +9126,32 @@
      ],
      "source": "maggie2",
      "note": "Grasping Vines is cancelled if Maggie is stunned; removing the mark disarms both the mark-guarded scheduled damage and the stun rider."
+    },
+    {
+     "on": "damageDealt",
+     "when": {
+      "has": "mark",
+      "name": "Bramblelash",
+      "of": "eventTarget"
+     },
+     "effect": [
+      {
+       "op": "applyStatus",
+       "to": "self",
+       "status": {
+        "kind": "elemental_essence",
+        "duration": null
+       }
+      },
+      {
+       "op": "removeStatus",
+       "kind": "mark",
+       "name": "Bramblelash",
+       "from": "eventTarget"
+      }
+     ],
+     "source": "maggie1",
+     "note": "Bramblelash: while the target bears the Bramblelash mark, the first new damage it receives (from any source) grants Maggie Elemental Essence. The mark is applied AFTER Bramblelash's own 15 so the strike itself does not self-trigger; consuming the mark makes it fire once per cast."
     }
    ],
    "skills": [

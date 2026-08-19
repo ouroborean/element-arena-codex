@@ -160,7 +160,7 @@ function eventUnits(sel: "eventSource" | "eventTarget" | "eventUnit", ctx: Ctx):
   let id: string | null = null;
   if (sel === "eventSource") {
     id = "source" in e ? e.source : "caster" in e ? e.caster : e.type === "unitDied" ? e.killer : null;
-  } else if (sel === "eventTarget" && "target" in e) id = e.target;
+  } else if (sel === "eventTarget") id = "target" in e ? e.target : "unit" in e ? e.unit : null;
   else if (sel === "eventUnit") id = "unit" in e ? e.unit : null;
   const u = id ? ctx.state.units[id] : undefined;
   return u ? [u] : [];
@@ -402,7 +402,7 @@ export function exec(effect: Effect, ctx: Ctx): void {
     case "addStack": {
       const amount = effect.amount ? applyRounding(evalValue(effect.amount, ctx)) : 1;
       const duration = effect.duration === undefined ? null : evalDuration(effect.duration, ctx);
-      for (const u of effectTargets(effect.to, ctx))
+      for (const u of effectTargets(effect.to, ctx)) {
         applyStatus(u, {
           kind: "stack",
           name: effect.name,
@@ -412,6 +412,9 @@ export function exec(effect: Effect, ctx: Ctx): void {
           appliedTurn: ctx.state.turn,
           sourceId: ctx.skillId,
         });
+        // A stack landing is a status application too, so "when this stack reaches N" triggers can watch it.
+        ctx.emit({ type: "statusApplied", unit: u.id, source: ctx.caster.id, kind: "stack", name: effect.name });
+      }
       return;
     }
     case "grantEnergy": {

@@ -10346,6 +10346,31 @@ export const ROSTER: HeroDef[] = [
      }
     ],
     "source": "maggie2"
+   },
+   {
+    "on": "damageDealt",
+    "when": {
+     "has": "mark",
+     "name": "Bramblelash",
+     "of": "eventTarget"
+    },
+    "effect": [
+     {
+      "op": "applyStatus",
+      "to": "self",
+      "status": {
+       "kind": "elemental_essence",
+       "duration": null
+      }
+     },
+     {
+      "op": "removeStatus",
+      "kind": "mark",
+      "name": "Bramblelash",
+      "from": "eventTarget"
+     }
+    ],
+    "source": "maggie1"
    }
   ]
  },
