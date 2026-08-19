@@ -187,18 +187,59 @@ function queuedBanner(state: MatchState, u: Unit, ui: UiState): string {
   return `<div class="queued">${ic ? `<img src="${ic}" ${IMG_FALLBACK} />` : ""}<span class="q-txt"><b>${esc(name)}</b> → ${esc(targets)}</span></div>`;
 }
 
-/** The ids of every unit some queued skill will hit (explicit single targets), for an "incoming" marker. */
-function queuedTargetIds(ui: UiState): Set<string> {
-  const ids = new Set<string>();
-  for (const a of ui.planned.values()) for (const t of a.targets ?? []) ids.add(t);
-  return ids;
+const livingOn = (state: MatchState, side: TeamId): Unit[] =>
+  state.teams[side].units.map((id) => state.units[id]).filter((u): u is Unit => !!u && u.alive);
+
+/** The units a queued action will actually hit: its explicit single target(s), else the whole set its
+ *  targeting implies — self/none → the caster, all-enemies/all-allies/all → that living group. */
+function actionTargets(state: MatchState, a: { unit: string; skillId: string; targets?: string[] }): string[] {
+  if (a.targets && a.targets.length) return a.targets;
+  const u = state.units[a.unit];
+  const skill = (u?.skills ?? []).find((s) => s.id === a.skillId);
+  if (!u || !skill) return [];
+  const enemy: TeamId = u.team === "A" ? "B" : "A";
+  switch (skill.targeting) {
+    case "all-enemies": return livingOn(state, enemy).map((x) => x.id);
+    case "all-allies": return livingOn(state, u.team).map((x) => x.id);
+    case "all": return [...livingOn(state, u.team), ...livingOn(state, enemy)].map((x) => x.id);
+    default: return [u.id]; // self / none → the caster
+  }
 }
 
-function heroCard(state: MatchState, u: Unit, ui: UiState, isYou: boolean, targetedBy: Set<string>): string {
+interface Incoming { caster: string; skillId: string; order: number; }
+/** For each targeted unit id, the queued skills aimed at it — with the caster and 1-based resolve order. */
+function incomingBy(state: MatchState, ui: UiState): Map<string, Incoming[]> {
+  const map = new Map<string, Incoming[]>();
+  let order = 0;
+  for (const a of ui.planned.values()) {
+    order++;
+    for (const t of actionTargets(state, a)) {
+      const list = map.get(t) ?? (map.set(t, []).get(t)!);
+      list.push({ caster: a.unit, skillId: a.skillId, order });
+    }
+  }
+  return map;
+}
+
+/** Skill icons hanging over the top edge of a targeted portrait — one per queued skill aimed here, in
+ *  resolve order. Each shows its skill on hover and dequeues that caster's action on click. */
+function targetingRow(state: MatchState, incoming: Incoming[]): string {
+  if (!incoming.length) return "";
+  const icons = incoming.map(({ caster, skillId, order }) => {
+    const cu = state.units[caster];
+    const ic = iconOf(skillId, cu?.heroId ?? undefined);
+    const t = SKILL_TEXT[skillId];
+    const body = `From ${esc(shortName(cu?.name ?? "?"))}, resolves #${order}. Click to remove.${t?.d ? ` — ${esc(t.d)}` : ""}`;
+    return `<button class="tgt" data-dequeue="${caster}" data-fxtitle="${esc(t?.n ?? skillId)}" data-fxbody="${body}">
+      ${ic ? `<img src="${ic}" ${IMG_FALLBACK} />` : `<span class="tgt-abbr">?</span>`}<span class="tgt-n">${order}</span></button>`;
+  }).join("");
+  return `<div class="tgtrow">${icons}</div>`;
+}
+
+function heroCard(state: MatchState, u: Unit, ui: UiState, isYou: boolean, incoming: Map<string, Incoming[]>): string {
   const targetable = ui.phase === "plan" && !!ui.targeting && ui.legalTargets.has(u.id);
-  const incoming = targetedBy.has(u.id);
   const essence = u.kind === "hero" && u.alive && hasEssenceIncome(u); // element glow — has an Essence charge, or is the middle hero
-  const cls = ["hero", u.alive ? "" : "dead", targetable ? "targetable" : "", incoming ? "incoming" : "", essence ? "essence" : "", ui.plannedSkill.has(u.id) ? "acted" : ""].filter(Boolean).join(" ");
+  const cls = ["hero", u.alive ? "" : "dead", targetable ? "targetable" : "", essence ? "essence" : "", ui.plannedSkill.has(u.id) ? "acted" : ""].filter(Boolean).join(" ");
   const mart = u.kind === "minion" ? minionPortrait(u.name) : null;
   const portrait = u.heroId
     ? `<img class="portrait" src="${heroPortrait(u.heroId, u.fused)}" alt="${esc(u.name)}" ${IMG_FALLBACK} />`
@@ -206,20 +247,21 @@ function heroCard(state: MatchState, u: Unit, ui: UiState, isYou: boolean, targe
     ? `<img class="portrait" src="${mart}" alt="${esc(u.name)}" ${IMG_FALLBACK} />`
     : `<div class="portrait minion-art">${esc(shortName(u.name))}</div>`;
   const pcol = `<div class="pcol">
-    <div class="frame" style="--el:${elColor(u.currentElement)}" ${targetable ? `data-target="${u.id}"` : ""}>${portrait}${effectIcons(state, u)}${incoming ? `<div class="incoming-tag">◎ targeted</div>` : ""}<div class="name">${esc(shortName(u.name))}</div></div>
+    ${targetingRow(state, incoming.get(u.id) ?? [])}
+    <div class="frame" style="--el:${elColor(u.currentElement)}" ${targetable ? `data-target="${u.id}"` : ""}>${portrait}${effectIcons(state, u)}<div class="name">${esc(shortName(u.name))}</div></div>
     ${hpBar(u)}
     ${isYou ? queuedBanner(state, u, ui) : ""}
   </div>`;
   return `<div class="${cls}">${pcol}${isYou && u.alive ? skillTiles(state, u, ui) : ""}</div>`;
 }
 
-function sideRow(state: MatchState, side: TeamId, ui: UiState, isYou: boolean, targetedBy: Set<string>): string {
+function sideRow(state: MatchState, side: TeamId, ui: UiState, isYou: boolean, incoming: Map<string, Incoming[]>): string {
   const units = state.teams[side].units.map((id) => state.units[id]).filter((u): u is Unit => !!u);
   const heroes = units.filter((u) => u.kind === "hero");
   const minions = units.filter((u) => u.kind === "minion");
   return `<div class="lane ${isYou ? "you" : "foe"}">
-    <div class="heroes">${heroes.map((u) => heroCard(state, u, ui, isYou, targetedBy)).join("")}</div>
-    ${minions.length ? `<div class="minions">${minions.map((u) => heroCard(state, u, ui, isYou, targetedBy)).join("")}</div>` : ""}
+    <div class="heroes">${heroes.map((u) => heroCard(state, u, ui, isYou, incoming)).join("")}</div>
+    ${minions.length ? `<div class="minions">${minions.map((u) => heroCard(state, u, ui, isYou, incoming)).join("")}</div>` : ""}
   </div>`;
 }
 
@@ -307,11 +349,11 @@ function energyPanel(ui: UiState): string {
 
 export function renderApp(state: MatchState, ui: UiState): string {
   const foe = ui.you === "A" ? "B" : "A";
-  const targetedBy = queuedTargetIds(ui);
+  const incoming = incomingBy(state, ui);
   return `<div class="arena">
-    ${sideRow(state, foe, ui, false, targetedBy)}
+    ${sideRow(state, foe, ui, false, incoming)}
     ${midbar(state, ui)}
-    ${sideRow(state, ui.you, ui, true, targetedBy)}
+    ${sideRow(state, ui.you, ui, true, incoming)}
   </div>${ui.energyPanel ? energyPanel(ui) : ""}${ui.overlay ?? ""}`;
 }
 

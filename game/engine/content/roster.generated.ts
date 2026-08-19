@@ -4749,7 +4749,7 @@ export const ROSTER: HeroDef[] = [
     "id": "saya2",
     "name": "Saya Coil",
     "element": "lightning",
-    "targeting": "single",
+    "targeting": "self",
     "klass": "basic",
     "tags": [
      "Harmful",
