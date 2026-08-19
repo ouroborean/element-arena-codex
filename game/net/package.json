@@ -1,0 +1,7 @@
+{
+  "name": "@arena/net",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Element Arena — shared Quick Match wire protocol (isomorphic, types-only + constants)."
+}

@@ -490,7 +490,7 @@ export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: 
       <div class="cs-roster left">${panelRows(LEFT_ROWS)}</div>
       <div class="cs-mid">
         <div class="cs-modes">
-          <button class="cs-mode" disabled>Quick Match</button>
+          <button class="cs-mode" data-quick="1" ${full ? "" : "disabled"}>Quick Match</button>
           <button class="cs-mode" disabled>Ranked Match</button>
           <button class="cs-mode wide" disabled>Hero Challenge Trials</button>
           <button class="cs-mode start" data-start="1" ${full ? "" : "disabled"}>Bot Match</button>

@@ -1,0 +1,12 @@
+{
+  "name": "@arena/server",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Element Arena — authoritative Quick Match server (dependency-free WebSocket, runs on bare node).",
+  "scripts": {
+    "start": "node index.ts",
+    "test": "node --test",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  }
+}

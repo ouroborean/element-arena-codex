@@ -1,0 +1,80 @@
+/**
+ * The Quick Match wire protocol — the single source of truth for the message shapes the browser client
+ * and the authoritative match server exchange. Types-only + constants, so it imports NOTHING at runtime
+ * (every engine import is `import type`, erased by the bundler / Node's type-stripping) and is safe to
+ * pull into both the Node server and the esbuild browser bundle.
+ *
+ * Model: the SERVER is authoritative. It owns the seed, runs the real engine, validates every action,
+ * and broadcasts the full MatchState after each phase. A client only ever sends its own committed turn /
+ * draft choice; it never simulates the match itself (it keeps the engine solely for read-only previews of
+ * the state the server sent). Turns strictly alternate — exactly one side is asked to act at a time.
+ */
+import type { Action } from "../engine/src/scheduler.ts";
+import type { MatchState, TeamId, EnergyPool } from "../engine/src/types.ts";
+import type { MatchOutcome } from "../engine/content/match.ts";
+import type { DraftChoice } from "../client/draft.ts";
+
+/** Bumped on any breaking change to the messages below; the server rejects a mismatched client. */
+export const PROTOCOL_VERSION = 1;
+
+/** Default port the match server listens on (overridable via ARENA_PORT / the client's ?server=). */
+export const DEFAULT_PORT = 8790;
+
+/** Best-of-N: first side to this many round wins takes the match (server-enforced, never client-set). */
+export const ROUNDS_TO_WIN = 2;
+
+/** Every drafted team is exactly this many heroes. */
+export const TEAM_SIZE = 3;
+
+/** How long a player has to submit a turn / a draft choice before the server fills it (auto-hold / autoDraft). */
+export const TURN_MS = 60_000;
+export const DRAFT_MS = 45_000;
+
+/** Why a match ended — a clean best-of-N decision, or one side dropping out. */
+export type EndReason = "decided" | "forfeit" | "opponent-left" | "stalemate";
+
+// --------------------------------------------------------------------------- //
+//  Client → server
+// --------------------------------------------------------------------------- //
+export type ClientMsg =
+  /** Enter the Quick Match queue with a chosen 3-hero team. */
+  | { t: "queue"; team: string[]; protocolVersion: number }
+  /** The active player's committed turn: one action per acting hero (+ the optional generic-payment plan). */
+  | { t: "turn"; actions: Action[]; genericPay?: EnergyPool }
+  /** The drafting player's between-round upgrade choice (fuse / augment / skip). */
+  | { t: "draftChoice"; choice: DraftChoice }
+  /** Concede the match immediately (the opponent wins by forfeit). */
+  | { t: "surrender" }
+  /** Leave the queue before being matched. */
+  | { t: "cancelQueue" };
+
+// --------------------------------------------------------------------------- //
+//  Server → client
+// --------------------------------------------------------------------------- //
+export type ServerMsg =
+  /** Acknowledged: you are waiting in the queue. */
+  | { t: "queued" }
+  /** Matched. `you` is your team id; `state` is the initial (pre-first-turn) board. */
+  | { t: "start"; you: TeamId; opponentTeam: string[]; state: MatchState }
+  /** It is YOUR turn — plan and reply with a `turn`. `deadline` is an epoch-ms timeout. */
+  | { t: "yourTurn"; state: MatchState; deadline: number }
+  /** The opponent is acting; just render `state` and wait. */
+  | { t: "opponentTurn"; state: MatchState }
+  /** It is YOUR between-round draft — reply with a `draftChoice`. */
+  | { t: "yourDraft"; state: MatchState; deadline: number }
+  /** The opponent is drafting; render `state` and wait. */
+  | { t: "opponentDraft"; state: MatchState }
+  /** The match is over. */
+  | { t: "matchEnd"; outcome: MatchOutcome; reason: EndReason; you: TeamId }
+  /** A recoverable problem (bad team, protocol mismatch, illegal message); usually terminal for this attempt. */
+  | { t: "error"; message: string };
+
+/** Narrowing parse of an inbound JSON string to a typed message, or null if it is not a well-formed object. */
+export function parseMessage<T extends { t: string }>(raw: string): T | null {
+  try {
+    const v = JSON.parse(raw);
+    return v && typeof v === "object" && typeof (v as { t?: unknown }).t === "string" ? (v as T) : null;
+  } catch {
+    return null;
+  }
+}
