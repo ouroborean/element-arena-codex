@@ -36,6 +36,14 @@ export function energyIcon(el: string): string {
   return `../../assets/energy_tooltips/${el}_energy.png`;
 }
 
+/** The angular roster-card art for a hero (character-select buttons). */
+export function characterButton(heroId: string): string {
+  return `../../assets/ui/character_buttons/${heroId}button.png`;
+}
+
+/** The character-select background scene. */
+export const CS_BACKGROUND = "../../assets/ui/backgrounds/background.png";
+
 // hero ids longest-first, so "sayaaurora1" prefix-matches "saya" (not a shorter accidental match).
 const HERO_IDS = ROSTER.map((h) => h.id).sort((a, b) => b.length - a.length);
 /** The hero that owns a skill id (its icon lives under that hero's folder) — for effect source icons. */
