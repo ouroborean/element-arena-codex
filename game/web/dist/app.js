@@ -81,10 +81,11 @@ ${c.d}`:""}`,f=["tile",r?"":"off",n===i.id?"chosen":""].filter(Boolean).join(" "
       </div>
       <div class="cs-art"><img src="${be(a)}" alt="${y(N(t.name))}" ${H} /></div>
       <div class="cs-skills">
-        <div class="cs-sk"><h4>Passive Skill</h4><div class="cs-icons">${i(`${t.id}0`)}</div></div>
-        <div class="cs-sk"><h4>Basic Skills</h4><div class="cs-icons">${r("basic")}</div></div>
-        <div class="cs-sk"><h4>Defensive Skill</h4><div class="cs-icons">${r("defensive")}</div></div>
-        <div class="cs-sk"><h4>Ultimate Skill</h4><div class="cs-icons">${r("ultimate")}</div></div>
+        <div class="cs-sk-title">Kit</div>
+        <div class="cs-sk passive"><h4>Passive</h4><div class="cs-icons">${i(`${t.id}0`)}</div></div>
+        <div class="cs-sk basic"><h4>Basic</h4><div class="cs-icons">${r("basic")}</div></div>
+        <div class="cs-sk defensive"><h4>Defensive</h4><div class="cs-icons">${r("defensive")}</div></div>
+        <div class="cs-sk ultimate"><h4>Ultimate</h4><div class="cs-icons">${r("ultimate")}</div></div>
       </div>
     </div>
 

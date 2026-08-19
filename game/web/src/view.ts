@@ -456,10 +456,11 @@ export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: 
       </div>
       <div class="cs-art"><img src="${heroPortrait(inspectId)}" alt="${esc(shortName(def.name))}" ${IMG_FALLBACK} /></div>
       <div class="cs-skills">
-        <div class="cs-sk"><h4>Passive Skill</h4><div class="cs-icons">${skTile(`${def.id}0`)}</div></div>
-        <div class="cs-sk"><h4>Basic Skills</h4><div class="cs-icons">${byClass("basic")}</div></div>
-        <div class="cs-sk"><h4>Defensive Skill</h4><div class="cs-icons">${byClass("defensive")}</div></div>
-        <div class="cs-sk"><h4>Ultimate Skill</h4><div class="cs-icons">${byClass("ultimate")}</div></div>
+        <div class="cs-sk-title">Kit</div>
+        <div class="cs-sk passive"><h4>Passive</h4><div class="cs-icons">${skTile(`${def.id}0`)}</div></div>
+        <div class="cs-sk basic"><h4>Basic</h4><div class="cs-icons">${byClass("basic")}</div></div>
+        <div class="cs-sk defensive"><h4>Defensive</h4><div class="cs-icons">${byClass("defensive")}</div></div>
+        <div class="cs-sk ultimate"><h4>Ultimate</h4><div class="cs-icons">${byClass("ultimate")}</div></div>
       </div>
     </div>
 
