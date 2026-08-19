@@ -486,8 +486,7 @@ export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: 
       </div>
       <div class="cs-roster right">${panelRows(RIGHT_ROWS)}</div>
     </div>
-    ${setup.augfuse ? augFuseModal(inspectId) : ""}
-  </div>`;
+  </div>${setup.augfuse ? augFuseModal(inspectId) : ""}`;
 }
 
 /** A read-only modal previewing every fusion form (by partner element) and every augment a base hero
@@ -496,18 +495,20 @@ function augFuseModal(heroId: string): string {
   const def = ROSTER.find((h) => h.id === heroId)!;
   const forms = fusionsFor(heroId);
   const augs = augmentsFor(heroId);
-  const block = (label: string, ic: string | null, name: string, desc: string) =>
+  const block = (label: string, ic: string | null, name: string, meta: string, desc: string) =>
     `<span class="fc-block"><span class="fc-label">${label}</span>
       <span class="fc-line">${ic ? `<img src="${ic}" ${IMG_FALLBACK} />` : ""}<b>${esc(name)}</b></span>
-      <span class="fc-desc">${esc(desc)}</span></span>`;
+      ${meta}<span class="fc-desc">${esc(desc)}</span></span>`;
   const fusion = forms.map((f) => {
     const sk = f.skill, skText = SKILL_TEXT[sk.id];
+    const cd = sk.cooldown > 0 ? `${sk.cooldown}-turn cooldown` : "no cooldown";
+    const skMeta = `<span class="fc-meta">${costIcons(sk.cost, sk.element)}<span class="fc-cd">${esc(cd)}</span></span>`;
     return `<div class="do-card fusion-card">
       <img class="fc-port" src="${heroPortrait(heroId, f.key)}" ${IMG_FALLBACK} />
       <span class="fc-body">
         <span class="fc-head">Fuse → <b style="color:${elColor(f.element)}">${esc(f.element)}</b></span>
-        ${block("New passive", iconOf(`${heroId}${f.key}0`, heroId), f.passive.name, f.passive.description)}
-        ${block("New skill", iconOf(sk.id, heroId), skText?.n ?? sk.name, skText?.d ?? "")}
+        ${block("New passive", iconOf(`${heroId}${f.key}0`, heroId), f.passive.name, "", f.passive.description)}
+        ${block("New skill", iconOf(sk.id, heroId), skText?.n ?? sk.name, skMeta, skText?.d ?? "")}
       </span></div>`;
   }).join("");
   const augment = augs.map((a) => `<div class="do-card"><span class="do-txt"><span class="do-name">★ ${esc(a.name)}</span><span class="do-desc">${esc(a.description)}</span></span></div>`).join("");

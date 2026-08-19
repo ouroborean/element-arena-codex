@@ -336,7 +336,12 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .cs-prompt { font-size: 15px; font-weight: 700; color: #fff; text-shadow: 0 1px 3px #000; }
 
 /* Fusions & Augments preview (character select) — display-only; fusions in two columns to fit all 10. */
+.augfuse-modal { width: 900px; }
 .augfuse-modal .do-card { cursor: default; margin-bottom: 0; }
 .augfuse-modal .do-sec { display: flex; flex-direction: column; gap: 8px; }
 .augfuse-modal .do-sec.fusion { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .augfuse-modal .do-sec.fusion h4 { grid-column: 1 / -1; }
+/* larger, more legible fusion portrait + the new skill's cost & cooldown */
+.augfuse-modal .fc-port { width: 116px; height: 155px; flex: 0 0 116px; }
+.fc-meta { display: flex; align-items: center; gap: 6px; margin: 3px 0; }
+.fc-cd { font-size: 11px; color: var(--mid); font-weight: 600; }
