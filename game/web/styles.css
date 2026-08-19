@@ -188,6 +188,29 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .ac-n { min-width: 16px; text-align: center; font-weight: 800; font-size: 13.5px; }
 .alloc-total { text-align: center; font-weight: 800; font-size: 13px; margin-bottom: 14px; }
 .alloc-total.ok { color: var(--you); } .alloc-total.short { color: var(--acc); }
+/* ── between-round fusion/augment draft ────────────────────────────────── */
+.draft-modal { text-align: left; width: 760px; max-width: 94vw; }
+.draft-modal h2 { text-align: center; }
+.draft-sub { text-align: center; font-size: 12.5px; }
+.draft-body { display: grid; grid-template-columns: 168px 1fr; gap: 16px; margin-bottom: 14px; }
+.draft-heroes { display: flex; flex-direction: column; gap: 7px; }
+.dh { display: grid; grid-template-columns: 38px 1fr; align-items: center; gap: 9px; padding: 6px 9px; background: var(--panel2); border: 1px solid var(--line); border-radius: 9px; color: var(--ink); cursor: pointer; text-align: left; }
+.dh.on { border-color: var(--acc); box-shadow: 0 0 0 1px var(--acc) inset; }
+.dh img { width: 38px; height: 38px; border-radius: 6px; object-fit: cover; object-position: top center; background: var(--panel); }
+.dh-name { font-weight: 700; font-size: 12.5px; }
+.dh-opts { grid-column: 2; color: var(--dim); font-size: 10.5px; }
+.draft-options { display: flex; flex-direction: column; gap: 12px; max-height: 56vh; overflow-y: auto; padding-right: 4px; }
+.do-sec h4 { margin: 0 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: .4px; color: var(--acc); }
+.do-sec h4 span { color: var(--dim); font-weight: 400; text-transform: none; letter-spacing: 0; font-size: 11px; }
+.do-card { display: flex; gap: 11px; align-items: flex-start; width: 100%; text-align: left; padding: 9px 11px; margin-bottom: 7px; background: var(--panel2); border: 1px solid var(--line); border-radius: 9px; color: var(--ink); cursor: pointer; }
+.do-card:hover { border-color: var(--acc); background: color-mix(in srgb, var(--acc) 8%, var(--panel2)); }
+.do-port { width: 46px; height: 60px; flex: 0 0 46px; border-radius: 6px; object-fit: cover; object-position: top center; background: var(--panel); }
+.do-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.do-name { font-weight: 800; font-size: 13px; }
+.do-sub { font-size: 11.5px; color: var(--acc); font-weight: 600; }
+.do-desc { font-size: 11.5px; color: var(--dim); line-height: 1.45; }
+.do-note { font-size: 11.5px; color: var(--dim); font-style: italic; padding: 4px 2px; }
 .modal-foot { display: flex; gap: 10px; justify-content: center; }
+.draft-modal .mini { background: var(--panel2); color: var(--dim); border: 1px solid var(--line); }
 .energy-modal .mini { background: var(--panel2); color: var(--dim); border: 1px solid var(--line); }
 .energy-modal .resolve:disabled { opacity: .4; cursor: default; }
