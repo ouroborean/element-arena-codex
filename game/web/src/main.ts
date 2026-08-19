@@ -139,13 +139,22 @@ function finishDraft(): void {
 }
 function logDraft(res: { ok: boolean; desc: string }): void { state.log.push(`draft — ${res.desc}`); }
 
+// In-app surrender confirmation (native confirm() is unreliable in embedded/sandboxed browser contexts).
+const SURRENDER_CONFIRM = `<div class="overlay"><div class="modal">
+  <h2>Surrender?</h2>
+  <p>You'll concede the match and return to team select.</p>
+  <div class="modal-foot">
+    <button class="mini" data-keep="1">Keep playing</button>
+    <button data-concede="1">Concede</button>
+  </div></div></div>`;
+
 // ── interaction (event delegation) ───────────────────────────────────────────────────────────────── //
 app.addEventListener("click", (e) => {
   const tgtEl = (e.target as HTMLElement).closest<HTMLElement>(".tgt");
   if (tgtEl) { const c = tgtEl.dataset.dequeue; if (c) { ui.planned.delete(c); ui.plannedSkill.delete(c); render(); } return; } // click a targeting icon → dequeue that skill
   const fxEl = (e.target as HTMLElement).closest<HTMLElement>(".fx");
   if (fxEl) { if (fxpop.hidden) showFx(fxEl); else hideFx(); return; } // tap an effect icon to toggle its description
-  const el = (e.target as HTMLElement).closest<HTMLElement>("[data-owner],[data-skill],[data-target],[data-cancel],[data-resolve],[data-surrender],[data-pick],[data-inspect],[data-reroll],[data-start],[data-plus],[data-minus],[data-energy-confirm],[data-energy-cancel],[data-draft-inspect],[data-fuse-unit],[data-aug-unit],[data-draft-hold]");
+  const el = (e.target as HTMLElement).closest<HTMLElement>("[data-owner],[data-skill],[data-target],[data-cancel],[data-resolve],[data-surrender],[data-pick],[data-inspect],[data-reroll],[data-start],[data-plus],[data-minus],[data-energy-confirm],[data-energy-cancel],[data-draft-inspect],[data-fuse-unit],[data-aug-unit],[data-draft-hold],[data-concede],[data-keep]");
   if (!el) return;
   const d = el.dataset;
 
@@ -185,7 +194,9 @@ app.addEventListener("click", (e) => {
     return;
   }
 
-  if (d.surrender) { if (confirm("Surrender this match?")) location.reload(); return; }
+  if (d.surrender) { ui.overlay = SURRENDER_CONFIRM; render(); return; }
+  if (d.concede) { location.reload(); return; }
+  if (d.keep) { ui.overlay = undefined; render(); return; }
   if (ui.phase !== "plan") return;
   if (d.cancel) { ui.targeting = undefined; ui.examine = undefined; ui.legalTargets = new Set(); render(); return; }
   if (d.resolve) { commitTurn(); return; }
