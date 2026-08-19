@@ -164,9 +164,12 @@ function eventUnits(sel: "eventSource" | "eventTarget" | "eventUnit", ctx: Ctx):
   if (!e) return [];
   let id: string | null = null;
   if (sel === "eventSource") {
-    id = "source" in e ? e.source : "caster" in e ? e.caster : e.type === "unitDied" ? e.killer : null;
-  } else if (sel === "eventTarget") id = "target" in e ? e.target : "unit" in e ? e.unit : null;
-  else if (sel === "eventUnit") id = "unit" in e ? e.unit : null;
+    // The actor behind the event. For a counter it is the counterer, not the countered skill's caster.
+    id = "counterer" in e ? e.counterer : "source" in e ? e.source : "caster" in e ? e.caster : e.type === "unitDied" ? e.killer : null;
+  } else if (sel === "eventTarget") {
+    // The patient of the event: a single `target`/`unit`, else the first of a skill's declared `targets`.
+    id = "target" in e ? e.target : "unit" in e ? e.unit : "targets" in e && e.targets.length > 0 ? e.targets[0] : null;
+  } else if (sel === "eventUnit") id = "unit" in e ? e.unit : null;
   const u = id ? ctx.state.units[id] : undefined;
   return u ? [u] : [];
 }
@@ -502,7 +505,19 @@ export function exec(effect: Effect, ctx: Ctx): void {
       const sk = (by?.skills ?? []).find((s) => s.id === effect.skillId);
       if (by && sk) {
         const targets = effect.on ? resolveSelector(effect.on, ctx) : ctx.targets;
-        runAll(sk.effects, { ...ctx, caster: by, self: by, targets, it: null, skillId: sk.id }); // inline, shares the bus
+        const deferred = sk.tags.includes("Channel") && sk.channelDeferred === true;
+        if (!deferred) runAll(sk.effects, { ...ctx, caster: by, self: by, targets, it: null, skillId: sk.id }); // inline, shares the bus
+        // A Channel skill used inline installs its channel too (mirrors performAction), so e.g. Repulse's
+        // useSkill of Call Tides actually begins the channel.
+        const instantCast = by.statuses.some((s) => s.kind === "instant_cast" && s.skillId === sk.id);
+        if (sk.tags.includes("Channel") && !instantCast) {
+          applyStatus(by, {
+            kind: "channeling", name: sk.id,
+            magnitude: sk.channelTurns ?? undefined,
+            channelTargets: targets.map((t) => t.id),
+            duration: null, appliedBy: by.id, appliedTurn: ctx.state.turn,
+          });
+        }
       }
       return;
     }
