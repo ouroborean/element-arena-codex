@@ -396,32 +396,22 @@ export function renderApp(state: MatchState, ui: UiState): string {
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 const titleOf = (fullName: string) => fullName.split(",").slice(1).join(",").trim();
 
-export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: string | null; skill?: string | null }): string {
+export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: string | null }): string {
   const sorted = ROSTER.slice().sort((a, b) => a.element.localeCompare(b.element) || shortName(a.name).localeCompare(shortName(b.name)));
   const inspectId = setup.inspect ?? sorted[0]!.id;
   const def = ROSTER.find((h) => h.id === inspectId)!;
   const on = setup.picked.includes(inspectId);
   const full = setup.picked.length >= 3;
 
-  // The skill whose details show in the panel — the last one clicked (for this hero), else the passive.
-  const validSkills = [`${def.id}0`, ...(def.skills ?? []).map((s) => s.id)];
-  const selSkill = setup.skill && validSkills.includes(setup.skill) ? setup.skill : `${def.id}0`;
+  // Each skill icon carries its info as data-* for a floating hover/tap popup (skpop in main.ts) — no
+  // inline detail panel, so switching skills never shoves the layout around.
   const skTile = (id: string) => {
-    const t = SKILL_TEXT[id];
-    return `<button class="cs-sicon ${selSkill === id ? "on" : ""}" data-skillinfo="${id}" title="${esc(t?.n ?? id)}"><img src="${iconOf(id, def.id) ?? ""}" ${IMG_FALLBACK} /></button>`;
-  };
-  const byClass = (k: string) => (def.skills ?? []).filter((s) => s.klass === k).map((s) => skTile(s.id)).join("");
-  const skillInfo = (id: string) => {
     const t = SKILL_TEXT[id], isPassive = id === `${def.id}0`;
     const sk = (def.skills ?? []).find((s) => s.id === id);
-    const klass = isPassive ? "passive" : sk?.klass ?? "";
-    const cd = isPassive || !sk ? "" : sk.cooldown > 0 ? `${sk.cooldown}-turn cooldown` : "no cooldown";
-    const cost = !isPassive && sk ? costIcons(sk.cost, sk.element) : "";
-    return `<div class="cs-skdetail"><img src="${iconOf(id, def.id) ?? ""}" ${IMG_FALLBACK} />
-      <div class="csd-body"><div class="csd-name">${esc(t?.n ?? id)}${cost ? ` <span class="csd-cost">${cost}</span>` : ""}</div>
-        <div class="csd-meta"><span class="mtag k">${esc(klass)}</span>${cd ? `<span class="mtag">${esc(cd)}</span>` : ""}</div>
-        <div class="csd-desc">${esc(t?.d ?? "No description.")}</div></div></div>`;
+    const meta = [isPassive ? "Passive" : cap(sk?.klass ?? ""), isPassive || !sk ? "" : sk.cooldown > 0 ? `${sk.cooldown}-turn cooldown` : "no cooldown"].filter(Boolean).join(" · ");
+    return `<button class="cs-sicon" data-skname="${esc(t?.n ?? id)}" data-skmeta="${esc(meta)}" data-skdesc="${esc(t?.d ?? "")}" data-skgen="${sk?.cost.generic ?? 0}" data-skspec="${sk?.cost.specific ?? 0}" data-skel="${esc(sk?.element ?? "")}" title="${esc(t?.n ?? id)}"><img src="${iconOf(id, def.id) ?? ""}" ${IMG_FALLBACK} /></button>`;
   };
+  const byClass = (k: string) => (def.skills ?? []).filter((s) => s.klass === k).map((s) => skTile(s.id)).join("");
 
   const heroCard = (h: (typeof sorted)[number]) => `<button class="cs-hero ${setup.picked.includes(h.id) ? "on" : ""} ${inspectId === h.id ? "sel" : ""}" data-inspect="${h.id}" style="--el:${elColor(h.element)}" title="${esc(shortName(h.name))}">
       <img src="${characterButton(h.id)}" alt="${esc(shortName(h.name))}" ${IMG_FALLBACK} />${setup.picked.includes(h.id) ? '<span class="cs-check">✓</span>' : ""}</button>`;
@@ -450,14 +440,11 @@ export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: 
         <button class="cs-abtn" disabled title="Fusions & augments are drafted between rounds">Fusions &amp; Augments</button>
       </div>
       <div class="cs-art"><img src="${heroPortrait(inspectId)}" alt="${esc(shortName(def.name))}" ${IMG_FALLBACK} /></div>
-      <div class="cs-right">
-        <div class="cs-skills">
-          <div class="cs-sk"><h4>Passive Skill</h4><div class="cs-icons">${skTile(`${def.id}0`)}</div></div>
-          <div class="cs-sk"><h4>Basic Skills</h4><div class="cs-icons">${byClass("basic")}</div></div>
-          <div class="cs-sk"><h4>Defensive Skill</h4><div class="cs-icons">${byClass("defensive")}</div></div>
-          <div class="cs-sk"><h4>Ultimate Skill</h4><div class="cs-icons">${byClass("ultimate")}</div></div>
-        </div>
-        ${skillInfo(selSkill)}
+      <div class="cs-skills">
+        <div class="cs-sk"><h4>Passive Skill</h4><div class="cs-icons">${skTile(`${def.id}0`)}</div></div>
+        <div class="cs-sk"><h4>Basic Skills</h4><div class="cs-icons">${byClass("basic")}</div></div>
+        <div class="cs-sk"><h4>Defensive Skill</h4><div class="cs-icons">${byClass("defensive")}</div></div>
+        <div class="cs-sk"><h4>Ultimate Skill</h4><div class="cs-icons">${byClass("ultimate")}</div></div>
       </div>
     </div>
 
