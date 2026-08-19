@@ -211,5 +211,5 @@ test("The Nightmare Rides — Oathbreaker Strike hits ALL enemies for 25 piercin
   const enemies = ["b1", "b2", "b3"].map((id) => unit(s, id));
   const before = enemies.map((u) => u.hp);
   performAction(s, { unit: "a1", skillId: "blackknight1", targets: ["b1"] });
-  enemies.forEach((u, i) => assert.equal(before[i] - u.hp, 25, `${u.id} takes 25 piercing (always enhanced, all enemies)`));
+  enemies.forEach((u, i) => assert.equal(before[i]! - u.hp, 25, `${u.id} takes 25 piercing (always enhanced, all enemies)`));
 });

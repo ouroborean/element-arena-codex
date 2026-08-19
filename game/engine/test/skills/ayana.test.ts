@@ -90,7 +90,7 @@ test("Chorus — Voice of Light then hits ALL enemies", () => {
   const enemies = ["b1", "b2", "b3"].map((id) => unit(s, id));
   const before = enemies.map((u) => u.hp);
   performAction(s, { unit: "a1", skillId: "ayana1", targets: ["b1"] });
-  enemies.forEach((u, i) => assert.equal(before[i] - u.hp, 15, `enemy ${u.id} takes 15 under Chorus`));
+  enemies.forEach((u, i) => assert.equal(before[i]! - u.hp, 15, `enemy ${u.id} takes 15 under Chorus`));
 });
 
 test("Chorus — Prayer then heals ALL allied heroes", () => {

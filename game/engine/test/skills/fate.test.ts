@@ -149,7 +149,7 @@ test("Will-o'-wisp — 5 Affliction self-damage, 10 Shield to the team for 2 tur
   performAction(s, { unit: "a1", skillId: "fate2" });
   assert.equal(f.hp, before - 5, "Fate takes 5 Affliction damage");
   for (const [i, id] of ["a1", "a2", "a3"].entries()) {
-    assert.equal(shieldTotal(unit(s, id)) - shBefore[i], 10, `${id} gains 10 Shield`);
+    assert.equal(shieldTotal(unit(s, id)) - shBefore[i]!, 10, `${id} gains 10 Shield`);
   }
   assert.ok(hasStatus(f, "mark", "Will-o'-wisp"), "the retaliation window is armed");
   assert.equal(skillOf(f, "fate2").currentCd, 2, "cooldown 2");

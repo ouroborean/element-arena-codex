@@ -95,9 +95,9 @@ test("sera2 — deals 15 Piercing to the whole enemy team and consumes 1 Eyes st
   addEyes(unit(s, "b2"), 1);
   const hp = [unit(s, "b1").hp, unit(s, "b2").hp, unit(s, "b3").hp];
   performAction(s, { unit: "a1", skillId: "sera2" });
-  assert.equal(hp[0] - unit(s, "b1").hp, 15, "b1 takes 15 Piercing");
-  assert.equal(hp[1] - unit(s, "b2").hp, 15, "b2 takes 15 Piercing");
-  assert.equal(hp[2] - unit(s, "b3").hp, 15, "b3 takes 15 Piercing");
+  assert.equal(hp[0]! - unit(s, "b1").hp, 15, "b1 takes 15 Piercing");
+  assert.equal(hp[1]! - unit(s, "b2").hp, 15, "b2 takes 15 Piercing");
+  assert.equal(hp[2]! - unit(s, "b3").hp, 15, "b3 takes 15 Piercing");
   assert.equal(stackMag(unit(s, "b1"), "Eyes of Vengeance"), 0, "b1's stack consumed");
   assert.equal(stackMag(unit(s, "b2"), "Eyes of Vengeance"), 0, "b2's stack consumed");
 });

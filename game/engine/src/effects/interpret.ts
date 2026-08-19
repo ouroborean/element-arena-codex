@@ -168,7 +168,7 @@ function eventUnits(sel: "eventSource" | "eventTarget" | "eventUnit", ctx: Ctx):
     id = "counterer" in e ? e.counterer : "source" in e ? e.source : "caster" in e ? e.caster : e.type === "unitDied" ? e.killer : null;
   } else if (sel === "eventTarget") {
     // The patient of the event: a single `target`/`unit`, else the first of a skill's declared `targets`.
-    id = "target" in e ? e.target : "unit" in e ? e.unit : "targets" in e && e.targets.length > 0 ? e.targets[0] : null;
+    id = "target" in e ? e.target : "unit" in e ? e.unit : "targets" in e && e.targets.length > 0 ? e.targets[0] ?? null : null;
   } else if (sel === "eventUnit") id = "unit" in e ? e.unit : null;
   const u = id ? ctx.state.units[id] : undefined;
   return u ? [u] : [];

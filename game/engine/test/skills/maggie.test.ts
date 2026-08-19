@@ -103,7 +103,7 @@ test("maggie2 Grasping Vines — if the target uses a skill during this time, th
   performAction(s, { unit: "a1", skillId: "maggie2", targets: ["b1"] });
   endTurn(s); // Maggie's team ends
   startTurn(s); // enemy team's turn
-  performAction(s, { unit: "b1", skillId: unit(s, "b1").skills[0].id, targets: ["a1"] });
+  performAction(s, { unit: "b1", skillId: unit(s, "b1").skills![0]!.id, targets: ["a1"] });
   assert.equal(hasStatus(unit(s, "b1"), "stun"), true, "acting while Grasping Vines is pending stuns the target");
 });
 
@@ -181,10 +181,10 @@ test("maggie5 The Thornborn Witch — deals damage equal to her Curse of Thorns 
   const alliesBefore = ["a2", "a3"].map((id) => unit(s, id).hp);
   performAction(s, { unit: "a1", skillId: "maggie5" });
   for (const [i, id] of ["b1", "b2", "b3"].entries()) {
-    assert.equal(unit(s, id).hp, enemiesBefore[i] - 10, `${id} (enemy) takes 10 = her Curse of Thorns damage`);
+    assert.equal(unit(s, id).hp, enemiesBefore[i]! - 10, `${id} (enemy) takes 10 = her Curse of Thorns damage`);
   }
   for (const [i, id] of ["a2", "a3"].entries()) {
-    assert.equal(unit(s, id).hp, alliesBefore[i] - 10, `${id} (ally) also takes 10 — hits enemies AND allies`);
+    assert.equal(unit(s, id).hp, alliesBefore[i]! - 10, `${id} (ally) also takes 10 — hits enemies AND allies`);
   }
 });
 

@@ -115,7 +115,7 @@ test("Chronicle Deeds — Tales to Tell gains 35 Shield if the marked enemy uses
   // Hand the turn to B and let the marked enemy act.
   endTurn(s);
   startTurn(s);
-  performAction(s, { unit: "b1", skillId: unit(s, "b1").skills[0]!.id, targets: ["a1"] });
+  performAction(s, { unit: "b1", skillId: unit(s, "b1").skills![0]!.id, targets: ["a1"] });
   assert.equal(shieldTotal(unit(s, "a1")), 35, "Tales to Tell gains 35 Shield when the marked enemy uses a skill");
 });
 
@@ -124,7 +124,7 @@ test("Chronicle Deeds — no Shield if a DIFFERENT (unmarked) enemy acts", () =>
   performAction(s, { unit: "a1", skillId: "keeper3", targets: ["b1"] }); // mark b1 only
   endTurn(s);
   startTurn(s);
-  performAction(s, { unit: "b2", skillId: unit(s, "b2").skills[0]!.id, targets: ["a1"] }); // b2 is unmarked
+  performAction(s, { unit: "b2", skillId: unit(s, "b2").skills![0]!.id, targets: ["a1"] }); // b2 is unmarked
   assert.equal(shieldTotal(unit(s, "a1")), 0, "an unmarked enemy acting grants nothing");
 });
 

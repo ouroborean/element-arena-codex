@@ -188,7 +188,7 @@ test("scratch5 — grants 10 Shield for 1 turn and marks any enemy who uses a sk
   const s = battle(A, B);
   performAction(s, { unit: "a1", skillId: "scratch5" });
   assert.equal(shieldTotal(unit(s, "a1")), 10, "10 Shield");
-  const sh = unit(s, "a1").shields[0];
+  const sh = unit(s, "a1").shields[0]!;
   assert.equal(sh.duration, 1, "for 1 turn");
   assert.ok(mark(unit(s, "a1"), "Disarming Pitch"), "the reactive self-window is open");
   endTurn(s); startTurn(s);

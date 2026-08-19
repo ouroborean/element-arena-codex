@@ -161,7 +161,7 @@ test("Shared Agony — 5 damage to every enemy, 5 Piercing back per enemy; coold
   const before = ["b1", "b2", "b3"].map((id) => unit(s, id).hp);
   performAction(s, { unit: "a1", skillId: "dennis4" });
   for (const [i, id] of ["b1", "b2", "b3"].entries()) {
-    assert.equal(before[i] - unit(s, id).hp, 5, `enemy ${id} takes 5 damage`);
+    assert.equal(before[i]! - unit(s, id).hp, 5, `enemy ${id} takes 5 damage`);
   }
   // Three enemies each deal 5 Piercing to Dennis. Piercing ignores DR, so all three land for 5 = 15.
   assert.equal(dh - d.hp, 15, "all three enemies deal 5 Piercing each (15 total) to Dennis");

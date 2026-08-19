@@ -119,7 +119,7 @@ test("Somnic Apparition — counters the target's next Harmful skill and creates
   assert.equal(unit(s, "a2").hp, 100, "the countered skill's effects do not land");
   const created = reflections();
   assert.equal(created.length, 1, "a Dream Reflection minion is created");
-  assert.equal(created[0].hp, 35, "the Dream Reflection has 35 HP");
+  assert.equal(created[0]!.hp, 35, "the Dream Reflection has 35 HP");
 });
 
 // --------------------------------------------------------------------------- //

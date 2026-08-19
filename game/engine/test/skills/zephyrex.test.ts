@@ -71,7 +71,7 @@ test("Elegant Sweep — on the following turn deals 25 piercing to all enemy Her
   endTurn(s); startTurn(s); // ...to Zephyrex's next turn, when the channel resolves
   const afterNext = enemyHeroHps(s);
   for (let i = 0; i < 3; i++) {
-    assert.equal(afterCast[i] - afterNext[i], 25, "each enemy Hero takes 25 on the following turn");
+    assert.equal(afterCast[i]! - afterNext[i]!, 25, "each enemy Hero takes 25 on the following turn");
   }
 });
 
