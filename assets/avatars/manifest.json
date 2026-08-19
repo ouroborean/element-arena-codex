@@ -1,0 +1,34 @@
+[
+ {
+  "file": "bolt.svg",
+  "name": "Bolt"
+ },
+ {
+  "file": "ember.svg",
+  "name": "Ember"
+ },
+ {
+  "file": "frost.svg",
+  "name": "Frost"
+ },
+ {
+  "file": "gale.svg",
+  "name": "Gale"
+ },
+ {
+  "file": "halo.svg",
+  "name": "Halo"
+ },
+ {
+  "file": "stone.svg",
+  "name": "Stone"
+ },
+ {
+  "file": "tide.svg",
+  "name": "Tide"
+ },
+ {
+  "file": "umbra.svg",
+  "name": "Umbra"
+ }
+]

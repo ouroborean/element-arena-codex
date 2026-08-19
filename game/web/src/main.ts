@@ -14,8 +14,8 @@ import { ROSTER } from "../../engine/content/roster.generated.ts";
 import { runMatch, type AsyncProvider } from "../../client/loop.ts";
 import { autoDraft, applyDraftChoice, hasDraftOptions, draftableHeroes, type DraftChoice } from "../../client/draft.ts";
 import { renderApp, renderSetup } from "./view.ts";
-import { energyIcon, elementRank } from "./assets.ts";
-import { MatchSocket, serverUrl, fetchProfile } from "./net.ts";
+import { energyIcon, elementRank, avatarUrl } from "./assets.ts";
+import { MatchSocket, serverUrl, fetchProfile, fetchAvatars, type AvatarInfo } from "./net.ts";
 import { PROTOCOL_VERSION, MAX_NAME_LEN, type ServerMsg, type Profile } from "../../net/protocol.ts";
 
 export interface UiState {
@@ -94,6 +94,26 @@ function identity(): Identity {
   return { ...cachedCreds, name };
 }
 function setStoredName(name: string): void { try { localStorage.setItem("arenaName", name.slice(0, MAX_NAME_LEN)); } catch { /* ignore */ } }
+
+// The pickable avatar set (from assets/avatars/manifest.json) and the player's chosen one.
+let avatars: AvatarInfo[] = [];
+let avatarPickerOpen = false;
+function playerAvatarFile(): string {
+  const stored = (() => { try { return localStorage.getItem("arenaAvatar"); } catch { return null; } })();
+  if (stored && (!avatars.length || avatars.some((a) => a.file === stored))) return stored;
+  return avatars[0]?.file ?? "";
+}
+function setAvatarFile(file: string): void { try { localStorage.setItem("arenaAvatar", file); } catch { /* ignore */ } }
+
+/** The player-profile panel's data: display name, an avatar image, and a rating + record subtitle. */
+function playerPanel(): { name: string; sub: string; avatar: string } {
+  const name = profile?.name ?? identity().name;
+  const sub = profile
+    ? `★ ${profile.rating} · ${profile.wins}W · ${profile.losses}L${profile.draws ? ` · ${profile.draws}D` : ""}`
+    : "offline";
+  const file = playerAvatarFile();
+  return { name, sub, avatar: file ? avatarUrl(file) : "" };
+}
 /** The `auth` message every match socket sends first, from the stored identity. */
 function authMsg() { const id = identity(); return { t: "auth" as const, playerId: id.playerId, secret: id.secret, name: id.name, protocolVersion: PROTOCOL_VERSION }; }
 const escHtml = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
@@ -155,19 +175,23 @@ function showSkpop(el: HTMLElement): void {
 function hideSkpop(): void { skpop.hidden = true; }
 
 function render(): void { hideFx(); app.innerHTML = renderApp(state, ui); }
-/** The team-select screen, with the guest-profile bar (name + record) pinned in the corner. */
-function renderSetupScreen(): void { app.innerHTML = renderSetup(setup!) + profileBar(); }
+/** The team-select screen (its player panel reads the profile) plus the avatar picker when open. */
+function renderSetupScreen(): void { app.innerHTML = renderSetup(setup!, playerPanel()) + avatarPickerHtml(); }
 function showSetup(): void { setup = { picked: [], oppo: randomTeam([]), inspect: null }; renderSetupScreen(); }
 
-/** A small fixed corner panel showing the guest identity (an editable name) and its win/loss record. */
-function profileBar(): string {
-  const name = profile?.name ?? identity().name;
-  const rec = profile ? `★ ${profile.rating} · ${profile.wins}W · ${profile.losses}L${profile.draws ? ` · ${profile.draws}D` : ""}` : "offline";
-  return `<div style="position:fixed;top:8px;right:10px;z-index:40;background:rgba(18,18,26,.92);color:#eee;padding:6px 10px;font:13px system-ui;border:1px solid #333;border-radius:8px;display:flex;gap:8px;align-items:center${profile ? "" : ";opacity:.7"}">
-    <span title="Your guest profile">👤</span>
-    <input data-name-input maxlength="${MAX_NAME_LEN}" value="${escHtml(name)}" placeholder="Guest" title="Your display name — edit to rename" style="background:#22222c;border:1px solid #444;color:#fff;border-radius:4px;padding:3px 6px;width:110px;font:13px system-ui" />
-    <span style="opacity:.85;white-space:nowrap">${escHtml(rec)}</span>
-  </div>`;
+/** The avatar chooser: a grid of every avatar in the manifest; clicking one sets it. Empty string when closed. */
+function avatarPickerHtml(): string {
+  if (!avatarPickerOpen) return "";
+  const current = playerAvatarFile();
+  const cells = avatars.length
+    ? avatars.map((a) => `<button class="av-cell ${a.file === current ? "on" : ""}" data-avatar-set="${escHtml(a.file)}" title="${escHtml(a.name)}">
+        <img src="${avatarUrl(a.file)}" alt="${escHtml(a.name)}" onerror="this.style.visibility='hidden'" /><span>${escHtml(a.name)}</span></button>`).join("")
+    : `<div class="do-note">No avatars found. Add images to <code>assets/avatars/</code> and run <code>build_avatars.py</code>.</div>`;
+  return `<div class="overlay" data-avatar-close="1"><div class="modal av-modal">
+    <h2>Choose your avatar</h2>
+    <div class="av-grid">${cells}</div>
+    <div class="modal-foot"><button class="mini" data-avatar-close="1">Close</button></div>
+  </div></div>`;
 }
 
 /** Fetch the guest profile from the server (create-or-verify); re-render the team-select if it's up. */
@@ -177,10 +201,13 @@ async function refreshProfile(): Promise<void> {
   if (setup) renderSetupScreen();
 }
 
-/** App entry: resume an in-progress match if one is stored, else fetch the profile and show team-select. */
+/** App entry: resume an in-progress match if one is stored, else load the profile + avatars and show team-select. */
 async function boot(): Promise<void> {
   if (tryResumeStoredMatch()) return; // an accidental reload rejoins the live match first
-  await refreshProfile();
+  const id = identity();
+  const [prof, avs] = await Promise.all([fetchProfile(id.playerId, id.secret, id.name), fetchAvatars()]);
+  profile = prof;
+  avatars = avs;
   showSetup();
 }
 
@@ -261,11 +288,16 @@ app.addEventListener("click", (e) => {
     if (t.closest("[data-augfuse-close]") || t.classList.contains("overlay")) { setup.augfuse = false; renderSetupScreen(); }
     return;
   }
-  const el = (e.target as HTMLElement).closest<HTMLElement>("[data-owner],[data-skill],[data-target],[data-cancel],[data-resolve],[data-surrender],[data-pick],[data-inspect],[data-reroll],[data-start],[data-quick],[data-ranked],[data-quick-cancel],[data-plus],[data-minus],[data-energy-confirm],[data-energy-cancel],[data-draft-inspect],[data-fuse-unit],[data-aug-unit],[data-draft-hold],[data-concede],[data-keep],[data-augfuse]");
+  const el = (e.target as HTMLElement).closest<HTMLElement>("[data-owner],[data-skill],[data-target],[data-cancel],[data-resolve],[data-surrender],[data-pick],[data-inspect],[data-reroll],[data-start],[data-quick],[data-ranked],[data-quick-cancel],[data-plus],[data-minus],[data-energy-confirm],[data-energy-cancel],[data-draft-inspect],[data-fuse-unit],[data-aug-unit],[data-draft-hold],[data-concede],[data-keep],[data-augfuse],[data-avatar-pick],[data-avatar-set],[data-avatar-close]");
   if (!el) return;
   const d = el.dataset;
 
   if (d.quickCancel) { cancelQuickMatch(); return; } // leave the Quick Match queue (searching screen)
+
+  // Avatar picker (team-select): open on the profile avatar, choose a cell, or close.
+  if (d.avatarSet) { setAvatarFile(d.avatarSet); avatarPickerOpen = false; renderSetupScreen(); return; }
+  if (d.avatarClose) { avatarPickerOpen = false; renderSetupScreen(); return; }
+  if (d.avatarPick !== undefined) { avatarPickerOpen = true; renderSetupScreen(); return; }
 
   if (ui.draft) { // the between-round draft modal is up — only its controls respond
     if (d.draftInspect) { ui.draft.inspect = d.draftInspect; render(); return; }

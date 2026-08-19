@@ -41,6 +41,11 @@ export function characterButton(heroId: string): string {
   return `../../assets/ui/character_buttons/${heroId}button.png`;
 }
 
+/** A player-avatar image by its manifest filename (see assets/avatars/, game/web/tools/build_avatars.py). */
+export function avatarUrl(file: string): string {
+  return `../../assets/avatars/${file}`;
+}
+
 /** The character-select background scene. */
 export const CS_BACKGROUND = "../../assets/ui/backgrounds/background.png";
 
