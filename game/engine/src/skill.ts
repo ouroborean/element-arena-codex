@@ -6,7 +6,7 @@
  * type-only import (no runtime cycle with the effect AST).
  */
 import type { Condition, SkillDef } from "./effects/ast.ts";
-import type { SkillClass } from "./types.ts";
+import type { SkillClass, UnitKind } from "./types.ts";
 
 /** GENERIC = any energy; SPECIFIC = energy of the skill's current element. */
 export interface EnergyCost {
@@ -24,6 +24,8 @@ export interface SkillInstance extends SkillDef {
   klass: SkillClass;
   /** Active class tags (Harmful, Instant, Strategic, Affliction, ...) — drives stun scoping. */
   tags: string[];
+  /** Restrict a single-target skill's legal targets to this unit kind (e.g. Syl's Feed → "minion" only). */
+  targetKind?: UnitKind;
   /** Channel skills (tag "Channel"): how many extra turns they re-run (null = until interrupted). */
   channelTurns?: number | null;
   /** Using this skill does NOT interrupt an active channel (per-skill opt-out). */

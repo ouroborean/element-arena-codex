@@ -47,7 +47,7 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .minions .hp { height: 13px; } .minions .hp-num { font-size: 9px; }
 
 /* Skills sit centred beneath the portrait, the grid spanning the portrait's width. */
-.tiles { display: grid; grid-template-columns: repeat(3, 36px); grid-auto-rows: 36px; gap: 5px; justify-content: center; margin-top: 8px; }
+.tiles { display: grid; grid-template-columns: repeat(3, 36px); grid-auto-rows: 36px; gap: 5px; justify-content: center; margin-top: 3px; }
 .tile { position: relative; width: 36px; height: 36px; padding: 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--panel2); cursor: pointer; }
 .tile img { width: 100%; height: 100%; object-fit: cover; }
 .tile:hover { border-color: var(--acc); }
@@ -162,11 +162,6 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .sp-warn { color: var(--acc); font-weight: 700; }
 
 /* ── queued-skill indicators (who queued what, on whom) ─────────────────── */
-.queued { display: flex; align-items: center; gap: 5px; margin-top: 5px; padding: 3px 5px; height: 28px; box-sizing: border-box; background: color-mix(in srgb, var(--you) 16%, transparent); border: 1px solid color-mix(in srgb, var(--you) 45%, transparent); border-radius: 6px; font-size: 10.5px; line-height: 1.2; }
-.queued.empty { visibility: hidden; } /* reserves the same height so queuing never shifts the tiles */
-.queued img { width: 18px; height: 18px; border-radius: 4px; object-fit: cover; flex: 0 0 18px; }
-.queued .q-txt { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.queued b { color: var(--you); font-weight: 700; }
 .hero.acted .frame { outline: 2px solid color-mix(in srgb, var(--you) 55%, transparent); outline-offset: 1px; }
 /* Targeting icons: the queued skills aimed at this character, straddling the top edge of the portrait,
    left-to-right in resolve order. Distinct from effect chips (top-right, inside the frame). Click to dequeue. */

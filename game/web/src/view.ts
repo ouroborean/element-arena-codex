@@ -166,30 +166,6 @@ function skillTiles(state: MatchState, u: Unit, ui: UiState): string {
   return `<div class="tiles">${tiles}</div>`;
 }
 
-/** A readable label for where a queued skill lands when it has no explicit single target (AoE/self). */
-function aoeLabel(skill: SkillInstance | undefined): string {
-  switch (skill?.targeting) {
-    case "all-enemies": return "all enemies";
-    case "all-allies": return "all allies";
-    case "all": return "everyone";
-    default: return "self";
-  }
-}
-
-/** The banner on a queued hero's card: which skill it will use, and on whom. The empty slot is always
- *  rendered (fixed height) so queuing a skill fills it in place instead of shoving the skill tiles down. */
-function queuedBanner(state: MatchState, u: Unit, ui: UiState): string {
-  const a = ui.planned.get(u.id);
-  if (!a) return `<div class="queued empty"></div>`;
-  const skill = (u.skills ?? []).find((s) => s.id === a.skillId);
-  const name = SKILL_TEXT[a.skillId]?.n ?? skill?.name ?? a.skillId;
-  const ic = iconOf(a.skillId, u.heroId ?? undefined);
-  const targets = a.targets && a.targets.length
-    ? a.targets.map((id) => shortName(state.units[id]?.name ?? "?")).join(", ")
-    : aoeLabel(skill);
-  return `<div class="queued">${ic ? `<img src="${ic}" ${IMG_FALLBACK} />` : ""}<span class="q-txt"><b>${esc(name)}</b> → ${esc(targets)}</span></div>`;
-}
-
 const livingOn = (state: MatchState, side: TeamId): Unit[] =>
   state.teams[side].units.map((id) => state.units[id]).filter((u): u is Unit => !!u && u.alive);
 
@@ -253,7 +229,6 @@ function heroCard(state: MatchState, u: Unit, ui: UiState, isYou: boolean, incom
     ${targetingRow(state, incoming.get(u.id) ?? [])}
     <div class="frame" style="--el:${elColor(u.currentElement)}" ${targetable ? `data-target="${u.id}"` : ""}>${portrait}${effectIcons(state, u)}<div class="name">${esc(shortName(u.name))}</div></div>
     ${hpBar(u)}
-    ${isYou ? queuedBanner(state, u, ui) : ""}
   </div>`;
   return `<div class="${cls}">${pcol}${isYou && u.alive ? skillTiles(state, u, ui) : ""}</div>`;
 }

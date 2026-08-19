@@ -428,6 +428,7 @@ export function legalTargets(state: MatchState, caster: Unit, skill: SkillInstan
   const isLegal = (u: Unit): boolean =>
     u.alive &&
     reanimatedOk(u) &&
+    (!skill.targetKind || u.kind === skill.targetKind) && // e.g. Feed may only target a minion (the Eagle)
     !(u.id !== caster.id && hasStatus(u, "untargetable")) && // others can't target it; self can
     !(harmful && !bypass && hasStatus(u, "invulnerable")) &&
     !(helpful && !bypass && hasStatus(u, "isolated"));
@@ -462,9 +463,14 @@ export function canUse(state: MatchState, caster: Unit, skill: SkillInstance): b
   if (isStunnedFor(caster, skill)) return false;
   if (skill.requires && !evalSkillCondition(state, caster, skill.requires)) return false;
   const rng = Rng.fromState(state.rngState); // a throwaway clone; we never write it back (read-only)
-  const targets = legalTargets(state, caster, skill, resolveTargets(state, caster, skill), rng);
   const needsTarget = skill.targeting === "single" && (skill.tags.includes("Harmful") || skill.tags.includes("Helpful"));
-  if (needsTarget && targets.length === 0) return false;
+  if (needsTarget) {
+    // Probe the proper side's FULL roster (heroes AND minions) so a kind-restricted skill (Feed → minion)
+    // finds its target — not resolveTargets' "first living enemy" default, which a targetKind filter rejects.
+    const side = skill.tags.includes("Harmful") ? otherTeam(caster.team) : caster.team;
+    const cands = unitsOf(state, side).filter((u) => u.alive);
+    if (legalTargets(state, caster, skill, cands, rng).length === 0) return false;
+  }
   return canPay(team(state, caster.team).energy, caster.currentElement, effectiveCost(caster, skill));
 }
 
