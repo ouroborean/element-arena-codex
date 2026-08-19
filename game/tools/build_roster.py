@@ -35,8 +35,9 @@ def strip_notes(obj):
     return obj
 
 
-SKILL_FIELDS = {"id", "name", "element", "targeting", "targetKind", "effects", "cost", "cooldown",
-                "klass", "tags", "channelTurns", "doesNotInterrupt", "requires", "uncounterableIf"}
+SKILL_FIELDS = {"id", "name", "element", "targeting", "targetKind", "targetsDead", "effects", "cost", "cooldown",
+                "klass", "tags", "channelTurns", "channelDeferred", "costPerStackDiscount", "doesNotInterrupt",
+                "requires", "uncounterableIf"}
 
 
 def clean_skill(s):

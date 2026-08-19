@@ -19,8 +19,8 @@ export interface ExpiredStatus {
 function sameSlot(a: Status, b: Status): boolean {
   if (a.kind !== b.kind) return false;
   if (a.kind === "mark" || a.kind === "stack" || a.kind === "dot" || a.kind === "stack_read_mod") return a.name === b.name;
-  // A skill-scoped cost/cooldown mod (or instant_cast) occupies its own slot per skill.
-  if (a.kind === "cost_mod" || a.kind === "cooldown_mod" || a.kind === "instant_cast") return a.skillId === b.skillId;
+  // A skill-scoped cost/cooldown mod (or instant_cast / cost_override) occupies its own slot per skill.
+  if (a.kind === "cost_mod" || a.kind === "cooldown_mod" || a.kind === "instant_cast" || a.kind === "cost_override") return a.skillId === b.skillId;
   return true;
 }
 
@@ -41,9 +41,12 @@ export function applyStatus(unit: Unit, status: Status): void {
     existing.appliedTurn = status.appliedTurn;
     return;
   }
-  // Refresh.
+  // Refresh: the new application's values win (DEFAULT_STACK_POLICY). `scope` is copied verbatim —
+  // including clearing it — so a full (unscoped) stun overrides an earlier scoped one on the same slot
+  // rather than inheriting its narrower scope (e.g. Gommar's Absolute Zero self-stun over its own AOE).
   existing.duration = status.duration;
   if (status.magnitude !== undefined) existing.magnitude = status.magnitude;
+  existing.scope = status.scope;
   existing.appliedBy = status.appliedBy;
   existing.appliedTurn = status.appliedTurn;
   existing.sourceId = status.sourceId;

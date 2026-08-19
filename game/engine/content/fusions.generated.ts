@@ -18279,7 +18279,7 @@ export const FUSIONS: FusionForm[] = [
     "when": {
      "and": [
       {
-       "eventHasTag": "invulnerable"
+       "eventStatusKind": "invulnerable"
       },
       {
        "isFaction": "eventTarget",
@@ -18349,7 +18349,7 @@ export const FUSIONS: FusionForm[] = [
     "when": {
      "and": [
       {
-       "eventHasTag": "invulnerable"
+       "eventStatusKind": "invulnerable"
       },
       {
        "isFaction": "eventTarget",
@@ -18542,7 +18542,7 @@ export const FUSIONS: FusionForm[] = [
     "when": {
      "and": [
       {
-       "eventHasTag": "invulnerable"
+       "eventStatusKind": "invulnerable"
       },
       {
        "isFaction": "eventTarget",

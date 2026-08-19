@@ -17,9 +17,9 @@
 import type { EnergyPool, MatchState, TeamId, Unit } from "./types.ts";
 import type { SkillInstance } from "./skill.ts";
 import { emit, evalSkillCondition, resolveDeclaration, runEffects } from "./effects/interpret.ts";
-import { applyDamage, applyHeal, outgoingDtypeOverride, tickShieldsForTeam } from "./damage.ts";
+import { applyDamage, applyHeal, bypassesAgainst, outgoingDtypeOverride, tickShieldsForTeam } from "./damage.ts";
 import { Rng } from "./rng.ts";
-import { applyStatus, clearRoundStatuses, removeStatus, tickDurationsForTeam } from "./status.ts";
+import { applyStatus, clearRoundStatuses, removeStatus, stackCount, tickDurationsForTeam } from "./status.ts";
 
 /** Provisional base income (ENERGY_INCOME, ruling open): +1 generic per living hero. */
 const GENERIC_PER_LIVING_HERO = 1;
@@ -199,7 +199,8 @@ export function tickDots(state: MatchState, id: TeamId): void {
       if (s.kind !== "dot" && s.kind !== "regen") continue;
       const owner = state.units[s.appliedBy];
       const byThisTeam = owner ? owner.team === id : false;
-      if (!(byThisTeam && s.duration !== null && s.appliedTurn < state.turn)) continue;
+      // A null duration is round-permanent (ticks every turn until end of round); a finite one ticks while > 0.
+      if (!(byThisTeam && s.appliedTurn < state.turn && (s.duration === null || s.duration > 0))) continue;
       if (s.kind === "regen") {
         applyHeal(u, s.magnitude ?? 0);
         continue;
@@ -321,11 +322,18 @@ function poolTotal(pool: EnergyPool): number {
   return t;
 }
 
-/** A skill's cost after the caster's cost_mod statuses (delta applied to generic, spilling to specific). */
+/** A skill's cost after the caster's cost_mod statuses (delta applied to generic, spilling to specific),
+ *  a dynamic per-stack discount, and any cost_override (an outright re-denomination that wins). */
 export function effectiveCost(caster: Unit, skill: SkillInstance): SkillInstance["cost"] {
+  // A cost_override replaces the cost wholesale (e.g. Dive re-denominates River Clone to 1 generic).
+  const override = caster.statuses.find((s) => s.kind === "cost_override" && s.skillId === skill.id);
+  if (override) return { generic: override.costGeneric ?? 0, specific: override.costSpecific ?? 0 };
+
   let delta = 0;
   // Global cost_mods (no skillId) apply to every skill; scoped ones only to their skill.
   for (const s of caster.statuses) if (s.kind === "cost_mod" && (!s.skillId || s.skillId === skill.id)) delta += s.magnitude ?? 0;
+  // Dynamic discount: a skill can shed cost per stack of a named resource (e.g. Tidal Wave per Call Tides).
+  if (skill.costPerStackDiscount) delta -= stackCount(caster, skill.costPerStackDiscount);
   if (delta === 0) return skill.cost;
   let generic = skill.cost.generic + delta;
   let specific = skill.cost.specific;
@@ -394,8 +402,11 @@ function resolveTargets(state: MatchState, caster: Unit, skill: SkillInstance, c
       return maybeNarrow([...unitsOf(state, "A"), ...unitsOf(state, "B")].filter((u) => u.alive));
     case "single": {
       const ids = chosen ?? [];
-      const picked = ids.map((id) => state.units[id]).filter((u): u is Unit => !!u && u.alive);
+      // A revive (targetsDead) keeps the dead and drops the living; every other skill is the reverse.
+      const wanted = (u: Unit) => (skill.targetsDead ? !u.alive : u.alive);
+      const picked = ids.map((id) => state.units[id]).filter((u): u is Unit => !!u && wanted(u));
       if (picked.length > 0) return picked;
+      if (skill.targetsDead) return []; // no default hunt for a revive target
       // default: first living enemy
       const enemy = unitsOf(state, otherTeam(caster.team)).find((u) => u.alive);
       return enemy ? [enemy] : [];
@@ -426,11 +437,11 @@ export function legalTargets(state: MatchState, caster: Unit, skill: SkillInstan
     (reanimated.appliedBy != null && u.id === reanimated.appliedBy) ||
     u.statuses.some((s) => s.kind === "mark" && s.name === "Bramblelash");
   const isLegal = (u: Unit): boolean =>
-    u.alive &&
+    (skill.targetsDead ? !u.alive : u.alive) && // a revive targets the dead; everything else the living
     reanimatedOk(u) &&
     (!skill.targetKind || u.kind === skill.targetKind) && // e.g. Feed may only target a minion (the Eagle)
     !(u.id !== caster.id && hasStatus(u, "untargetable")) && // others can't target it; self can
-    !(harmful && !bypass && hasStatus(u, "invulnerable")) &&
+    !(harmful && !bypass && !bypassesAgainst(caster, u) && hasStatus(u, "invulnerable")) && // conditional_bypass (Prisma Launch) also bypasses Invulnerable
     !(helpful && !bypass && hasStatus(u, "isolated"));
 
   if (skill.targeting !== "single") return chosen.filter(isLegal);
@@ -483,11 +494,16 @@ export function performAction(state: MatchState, action: Action): ActionResult {
   if (!skill) return { ok: false, reason: "skill-not-found" };
   if (skill.currentCd > 0) return { ok: false, reason: "on-cooldown" };
   if (isStunnedFor(caster, skill)) return { ok: false, reason: "stunned" };
-  if (skill.requires && !evalSkillCondition(state, caster, skill.requires)) return { ok: false, reason: "requirements-not-met" };
 
   // Targeting legality (before paying cost — an illegal action can't be declared).
   const rng = Rng.fromState(state.rngState);
-  const targets = legalTargets(state, caster, skill, resolveTargets(state, caster, skill, action.targets), rng);
+  const declared = resolveTargets(state, caster, skill, action.targets);
+  // `requires` is evaluated with the declared target bound, so a gate can veto a specific pick
+  // (e.g. Echoes of Desire "cannot target Xyris himself" = target != caster).
+  if (skill.requires && !evalSkillCondition(state, caster, skill.requires, declared)) {
+    return { ok: false, reason: "requirements-not-met" };
+  }
+  const targets = legalTargets(state, caster, skill, declared, rng);
   state.rngState = rng.state;
   const needsTarget = skill.targeting === "single" && (skill.tags.includes("Harmful") || skill.tags.includes("Helpful"));
   if (needsTarget && targets.length === 0) return { ok: false, reason: "no-legal-target" };
@@ -522,9 +538,17 @@ export function performAction(state: MatchState, action: Action): ActionResult {
   // Using a new skill cancels any active channel (unless this skill opts out).
   if (!skill.doesNotInterrupt) removeStatus(caster, "channeling");
 
-  const affected = runEffects(state, skill.effects, { caster, self: caster, targets: decl.finalTargets, skillId: skill.id });
+  // Put the skill on cooldown BEFORE running its effects, so a skill that modifies its OWN cooldown
+  // mid-cast (e.g. Sera's Energized Wingstorm reducing it per marked enemy consumed) adjusts from the
+  // real base rather than having its delta clobbered — or, for a reduction, clamped away against a 0.
   skill.currentCd = effectiveCooldown(caster, skill);
   skill.cdSetTurn = state.turn; // birth turn — advanceCooldowns skips it (see below), so cooldown N blocks N turns
+  // A deferred Channel (Elegant Sweep, "on the following turn…") runs no payload on the cast turn —
+  // it lands only when the channel resolves at runChannels. Sustained channels still fire on cast.
+  const deferred = isChannel(skill) && skill.channelDeferred === true;
+  const affected = deferred
+    ? []
+    : runEffects(state, skill.effects, { caster, self: caster, targets: decl.finalTargets, skillId: skill.id });
   caster.lastSkillId = skill.id; // the "used a skill" ledger (read by clone/last-skill mechanics)
 
   // A Channel skill installs a sustained channel that re-runs at the caster's turns — unless an

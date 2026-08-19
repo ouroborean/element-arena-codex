@@ -73,7 +73,9 @@ export type Condition =
   | { declaredTargetsSelf: true } // (skillDeclared) the trigger owner is among the declared targets
   | { eventHasTag: string } // (skillDeclared/skillUsed) the skill carries this class tag
   | { eventStatusKind: string; name?: string } // (statusApplied/statusExpired) the event's status kind (+name) matches
+  | { eventSkillId: string } // (skillUsed/skillDeclared/…) the event's skillId matches (e.g. exclude the granting skill)
   | { eventTeamIsSelf: true } // (turnStart/turnEnd) the event's team is the trigger owner's team ("my team's turn")
+  | { skillOnCooldown: string; of?: Selector } // the named skill on the selected unit (default self) has cooldown remaining
   | { and: Condition[] }
   | { or: Condition[] }
   | { not: Condition }
@@ -92,6 +94,8 @@ export interface StatusSpec {
   scope?: StunScope;
   /** For a taunt: the unit to force the bearer to target (resolved at apply time). */
   unitRef?: Selector;
+  /** For a conditional_bypass: the holder's damage/targeting bypasses against a target holding this status. */
+  bypassCond?: { kind: StatusKind; name?: string };
   /** Effects to run when this status expires naturally (duration lapse). */
   onExpire?: Effect[];
   /** Turns; null = round-permanent. May be a Value expression (computed at apply time). */

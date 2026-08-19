@@ -35,6 +35,11 @@ export interface Ctx {
   emit: (e: GameEvent) => void;
 }
 
+/** Harmful non-damage control/debuff effects — those a `non_damage_ignore` holder shrugs off when an
+ *  enemy applies them (Pyrrha's Wraith in White). Damage-over-time is damage, not a non-damage effect;
+ *  ambiguous marks/stacks are not blanket-blocked. */
+const HARMFUL_NON_DAMAGE = new Set<string>(["stun", "taunt", "blind", "isolated", "silence", "paralysis", "heal_lock"]);
+
 /** Native escape-hatch functions for the ~3% of skills that need bespoke code. */
 export type CustomFn = (ctx: Ctx, args: Record<string, unknown>) => void;
 const CUSTOM = new Map<string, CustomFn>();
@@ -159,9 +164,12 @@ function eventUnits(sel: "eventSource" | "eventTarget" | "eventUnit", ctx: Ctx):
   if (!e) return [];
   let id: string | null = null;
   if (sel === "eventSource") {
-    id = "source" in e ? e.source : "caster" in e ? e.caster : e.type === "unitDied" ? e.killer : null;
-  } else if (sel === "eventTarget" && "target" in e) id = e.target;
-  else if (sel === "eventUnit") id = "unit" in e ? e.unit : null;
+    // The actor behind the event. For a counter it is the counterer, not the countered skill's caster.
+    id = "counterer" in e ? e.counterer : "source" in e ? e.source : "caster" in e ? e.caster : e.type === "unitDied" ? e.killer : null;
+  } else if (sel === "eventTarget") {
+    // The patient of the event: a single `target`/`unit`, else the first of a skill's declared `targets`.
+    id = "target" in e ? e.target : "unit" in e ? e.unit : "targets" in e && e.targets.length > 0 ? e.targets[0] ?? null : null;
+  } else if (sel === "eventUnit") id = "unit" in e ? e.unit : null;
   const u = id ? ctx.state.units[id] : undefined;
   return u ? [u] : [];
 }
@@ -171,9 +179,22 @@ function resolveOne(sel: Selector | undefined, ctx: Ctx): Unit {
   return resolveSelector(sel, ctx)[0] ?? ctx.caster;
 }
 
-/** The units an effect applies to: its own `to`, else the skill's chosen targets. */
+/** The units an effect applies to: its own `to`, else the skill's chosen targets. An untargetable ENEMY is
+ *  dropped (AOE/faction selectors bypass legalTargets, so enforce it here too, mirroring the single-target
+ *  rule); same-team and self effects are unaffected, as are a hero's own linked-member mechanics. */
 function effectTargets(to: Selector | undefined, ctx: Ctx): Unit[] {
-  return to ? resolveSelector(to, ctx) : ctx.targets;
+  let units = to ? resolveSelector(to, ctx) : ctx.targets;
+  units = units.filter((u) => u.team === ctx.caster.team || !u.statuses.some((s) => s.kind === "untargetable"));
+  // Twisted Nightmares (xyris3): while the acting unit is marked, an AOE (faction) selector lands on
+  // only its first unit — "their AOE skills become single-target". Scoped to effect application, so
+  // count/condition reads (which call resolveSelector directly) are unaffected.
+  if (
+    units.length > 1 && to && typeof to === "object" && "faction" in to &&
+    ctx.caster.statuses.some((s) => s.kind === "mark" && s.name === "Twisted Nightmares")
+  ) {
+    units = units.slice(0, 1);
+  }
+  return units;
 }
 
 // --------------------------------------------------------------------------- //
@@ -281,9 +302,18 @@ export function evalCondition(c: Condition, ctx: Ctx): boolean {
     const e = ctx.event;
     return !!e && "kind" in e && e.kind === c.eventStatusKind && (c.name === undefined || ("name" in e && e.name === c.name));
   }
+  if ("eventSkillId" in c) {
+    const e = ctx.event;
+    return !!e && "skillId" in e && e.skillId === c.eventSkillId;
+  }
   if ("eventTeamIsSelf" in c) {
     const e = ctx.event;
     return !!e && "team" in e && e.team === ctx.self.team;
+  }
+  if ("skillOnCooldown" in c) {
+    const u = resolveOne(c.of, ctx);
+    const sk = (u.skills ?? []).find((k) => k.id === c.skillOnCooldown);
+    return !!sk && sk.currentCd > 0;
   }
   if ("and" in c) return c.and.every((x) => evalCondition(x, ctx));
   if ("or" in c) return c.or.some((x) => evalCondition(x, ctx));
@@ -306,6 +336,7 @@ function buildStatus(spec: StatusSpec, ctx: Ctx) {
     dtype: spec.dtype,
     scope: spec.scope,
     unitRef: spec.unitRef ? resolveSelector(spec.unitRef, ctx)[0]?.id : undefined,
+    bypassCond: spec.bypassCond,
     onExpire: spec.onExpire,
     duration: evalDuration(spec.duration, ctx),
     appliedBy: ctx.caster.id,
@@ -368,8 +399,11 @@ export function exec(effect: Effect, ctx: Ctx): void {
     }
     case "applyStatus": {
       for (const u of effectTargets(effect.to, ctx)) {
-        ctx.affected?.add(u.id);
         const st = buildStatus(effect.status, ctx);
+        // non_damage_ignore (Wraith in White): shrug off an incoming harmful non-damage effect from
+        // another unit. Self-inflicted effects (e.g. a self-stun) are not blocked.
+        if (u.id !== ctx.caster.id && HARMFUL_NON_DAMAGE.has(st.kind) && u.statuses.some((s) => s.kind === "non_damage_ignore")) continue;
+        ctx.affected?.add(u.id);
         applyStatus(u, st);
         ctx.emit({ type: "statusApplied", unit: u.id, source: ctx.caster.id, kind: st.kind, name: st.name });
       }
@@ -399,7 +433,7 @@ export function exec(effect: Effect, ctx: Ctx): void {
     case "addStack": {
       const amount = effect.amount ? applyRounding(evalValue(effect.amount, ctx)) : 1;
       const duration = effect.duration === undefined ? null : evalDuration(effect.duration, ctx);
-      for (const u of effectTargets(effect.to, ctx))
+      for (const u of effectTargets(effect.to, ctx)) {
         applyStatus(u, {
           kind: "stack",
           name: effect.name,
@@ -409,6 +443,9 @@ export function exec(effect: Effect, ctx: Ctx): void {
           appliedTurn: ctx.state.turn,
           sourceId: ctx.skillId,
         });
+        // A stack landing is a status application too, so "when this stack reaches N" triggers can watch it.
+        ctx.emit({ type: "statusApplied", unit: u.id, source: ctx.caster.id, kind: "stack", name: effect.name });
+      }
       return;
     }
     case "grantEnergy": {
@@ -469,7 +506,19 @@ export function exec(effect: Effect, ctx: Ctx): void {
       const sk = (by?.skills ?? []).find((s) => s.id === effect.skillId);
       if (by && sk) {
         const targets = effect.on ? resolveSelector(effect.on, ctx) : ctx.targets;
-        runAll(sk.effects, { ...ctx, caster: by, self: by, targets, it: null, skillId: sk.id }); // inline, shares the bus
+        const deferred = sk.tags.includes("Channel") && sk.channelDeferred === true;
+        if (!deferred) runAll(sk.effects, { ...ctx, caster: by, self: by, targets, it: null, skillId: sk.id }); // inline, shares the bus
+        // A Channel skill used inline installs its channel too (mirrors performAction), so e.g. Repulse's
+        // useSkill of Call Tides actually begins the channel.
+        const instantCast = by.statuses.some((s) => s.kind === "instant_cast" && s.skillId === sk.id);
+        if (sk.tags.includes("Channel") && !instantCast) {
+          applyStatus(by, {
+            kind: "channeling", name: sk.id,
+            magnitude: sk.channelTurns ?? undefined,
+            channelTargets: targets.map((t) => t.id),
+            duration: null, appliedBy: by.id, appliedTurn: ctx.state.turn,
+          });
+        }
       }
       return;
     }
@@ -617,11 +666,12 @@ export function createBus(state: MatchState, rng: Rng): Bus {
   return bus;
 }
 
-/** Evaluate a standalone condition against a caster (for skill `requires` gates). */
-export function evalSkillCondition(state: MatchState, caster: Unit, cond: Condition): boolean {
+/** Evaluate a standalone condition against a caster (for skill `requires` gates). The declared targets are
+ *  bound so a gate can reference the chosen `target` (e.g. "cannot target self"). */
+export function evalSkillCondition(state: MatchState, caster: Unit, cond: Condition, targets: Unit[] = []): boolean {
   const rng = Rng.fromState(state.rngState);
   const bus = createBus(state, rng);
-  const ctx: Ctx = { state, rng, caster, self: caster, targets: [], it: null, vars: {}, emit: bus.emit };
+  const ctx: Ctx = { state, rng, caster, self: caster, targets, it: null, vars: {}, emit: bus.emit };
   const result = evalCondition(cond, ctx);
   state.rngState = rng.state;
   return result;

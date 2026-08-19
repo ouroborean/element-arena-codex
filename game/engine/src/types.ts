@@ -42,6 +42,7 @@ export type StatusKind =
   | "untargetable" // cannot be targeted by ANY of another unit's skills (self-targeting still works)
   | "elemental_essence" // a one-shot charge: swaps the holder's next income from 1 generic to 1 of its element, then is consumed
   | "cost_mod" // magnitude: delta added to the holder's skill costs (+N pricier, -N cheaper)
+  | "cost_override" // skillId-scoped: replaces the named skill's cost with costGeneric/costSpecific (re-denomination)
   | "cooldown_mod" // magnitude: delta added to the cooldown the holder's skills go on when used
   | "silence" // suppresses Elemental Essence income
   | "paralysis" // cooldowns do not advance
@@ -90,8 +91,11 @@ export interface Status {
   appliedTurn: number;
   /** Skill / augment id that produced it, for provenance + dedupe. */
   sourceId?: string;
-  /** For a cost_mod / cooldown_mod that applies to ONE skill only (absent = all skills). */
+  /** For a cost_mod / cooldown_mod / cost_override that applies to ONE skill only (absent = all skills). */
   skillId?: string;
+  /** For a cost_override: the replacement generic / specific cost of the named skill. */
+  costGeneric?: number;
+  costSpecific?: number;
   /** For an incoming_damage_mult: apply only to NEW skill hits (isNew), not ongoing DoT ticks. */
   newDamageOnly?: boolean;
   /** For a conditional_bypass: the target must hold this status (kind + optional name) for the bypass to apply. */

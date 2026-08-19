@@ -1459,6 +1459,7 @@
      "name": "Hero's Return",
      "element": "ice",
      "targeting": "single",
+     "targetsDead": true,
      "klass": "ultimate",
      "tags": [
       "Helpful",
@@ -1916,9 +1917,21 @@
         "duration": 1
        },
        "to": "self"
+      },
+      {
+       "op": "custom",
+       "fn": "overrideSkillCost",
+       "args": {
+        "of": "self",
+        "skillId": "riverdaughter3",
+        "generic": 1,
+        "specific": 0,
+        "duration": 1
+       },
+       "note": "Dive re-denominates River Clone's cost to 1 generic for the empowerment window (cost_override, restores itself on expiry)."
       }
      ],
-     "note": "Invulnerable 1 turn. Applies three 1-turn empowerment marks read by next turn's skills: Dive Ripple (Ripple lasts two turns), Dive Undertow (Undertow hits all enemies), Dive River Clone (River Clone cost becomes 1 generic)."
+     "note": "Invulnerable 1 turn. Applies three 1-turn empowerment marks read by next turn's skills: Dive Ripple (Ripple lasts two turns), Dive Undertow (Undertow hits all enemies), Dive River Clone (River Clone cost becomes 1 generic via the cost_override)."
     }
    ],
    "minions": [
@@ -2448,6 +2461,7 @@
       "generic": 0,
       "specific": 5
      },
+     "costPerStackDiscount": "Call Tides",
      "cooldown": 1,
      "effects": [
       {
@@ -4062,7 +4076,8 @@
      },
      "cooldown": 1,
      "channelTurns": 1,
-     "note": "Channeled: the payload lands on the following turn (channelTurns:1). Interruptible - being stunned or using a new skill cancels it (Channel class; doesNotInterrupt intentionally absent).",
+     "channelDeferred": true,
+     "note": "Channeled and DEFERRED: no damage on the cast turn; the 25 piercing lands on the following turn (channelDeferred + channelTurns:1). Interruptible - being stunned or using a new skill cancels it (Channel class; doesNotInterrupt intentionally absent).",
      "effects": [
       {
        "op": "damage",
@@ -4091,7 +4106,10 @@
       "specific": 1
      },
      "cooldown": 2,
-     "note": "Bypasses Invulnerability (Bypassing tag): the 20 piercing lands even on an invulnerable target. Usable ONLY while Wind Step (zephyrex4) is on cooldown - the DSL Condition vocabulary has no primitive that references another skill's cooldown state, so this gate is documented here rather than in a requires clause.",
+     "requires": {
+      "skillOnCooldown": "zephyrex4"
+     },
+     "note": "Bypasses Invulnerability (Bypassing tag): the 20 piercing lands even on an invulnerable target. Usable ONLY while Wind Step (zephyrex4) is on cooldown - gated by the skillOnCooldown condition on the requires clause.",
      "effects": [
       {
        "op": "seq",
@@ -4239,7 +4257,7 @@
      "when": {
       "and": [
        {
-        "eventHasTag": "invulnerable"
+        "eventStatusKind": "invulnerable"
        },
        {
         "isFaction": "eventTarget",
@@ -9126,6 +9144,32 @@
      ],
      "source": "maggie2",
      "note": "Grasping Vines is cancelled if Maggie is stunned; removing the mark disarms both the mark-guarded scheduled damage and the stun rider."
+    },
+    {
+     "on": "damageDealt",
+     "when": {
+      "has": "mark",
+      "name": "Bramblelash",
+      "of": "eventTarget"
+     },
+     "effect": [
+      {
+       "op": "applyStatus",
+       "to": "self",
+       "status": {
+        "kind": "elemental_essence",
+        "duration": null
+       }
+      },
+      {
+       "op": "removeStatus",
+       "kind": "mark",
+       "name": "Bramblelash",
+       "from": "eventTarget"
+      }
+     ],
+     "source": "maggie1",
+     "note": "Bramblelash: while the target bears the Bramblelash mark, the first new damage it receives (from any source) grants Maggie Elemental Essence. The mark is applied AFTER Bramblelash's own 15 so the strike itself does not self-trigger; consuming the mark makes it fire once per cast."
     }
    ],
    "skills": [
@@ -9448,6 +9492,11 @@
          "eventSource",
          "self"
         ]
+       },
+       {
+        "not": {
+         "eventSkillId": "laria4"
+        }
        },
        {
         "has": "damage_reduction",
@@ -9882,10 +9931,7 @@
         "right": 1
        },
        {
-        "sameUnit": [
-         "eventTarget",
-         "self"
-        ]
+        "declaredTargetsSelf": true
        }
       ]
      },
@@ -12300,7 +12346,7 @@
       "generic": 0,
       "specific": 1
      },
-     "cooldown": 3,
+     "cooldown": 4,
      "effects": [
       {
        "op": "damage",
@@ -13605,6 +13651,18 @@
          }
         },
         {
+         "op": "applyStatus",
+         "to": "self",
+         "status": {
+          "kind": "conditional_bypass",
+          "duration": 1,
+          "bypassCond": {
+           "kind": "mark",
+           "name": "Prisma Launch: Bypass"
+          }
+         }
+        },
+        {
          "op": "if",
          "cond": {
           "and": [
@@ -13635,7 +13693,7 @@
          ]
         }
        ],
-       "note": "Oracle: 'Until the end of the next turn, Prisma Saffron's skills will Bypass against target enemy. If used on another Prisma Ranger that is using their Lens, their skills will also Bypass during this time and they become invulnerable for one turn.' The buddy branch grants Invulnerable. LIMITATION: the engine's Bypass is a STATIC skill tag ('Bypassing') read by targeting; there is no per-target dynamic-Bypass primitive, so the 'Prisma Launch: Bypass' mark documents the intended bypass window but is not enforced by legalTargets without an engine hook. 'Until the end of the next turn' modeled as duration 1."
+       "note": "Oracle: 'Until the end of the next turn, Prisma Saffron's skills will Bypass against target enemy. If used on another Prisma Ranger that is using their Lens, their skills will also Bypass during this time and they become invulnerable for one turn.' The buddy branch grants Invulnerable. The bypass is enforced via a conditional_bypass status on Saffron keyed to the target's 'Prisma Launch: Bypass' mark: legalTargets and the damage step both consult bypassesAgainst, so her skills land through the target's Invulnerable/DR/Shield. 'Until the end of the next turn' modeled as duration 1."
       },
       {
        "id": "trinitysaffron3",

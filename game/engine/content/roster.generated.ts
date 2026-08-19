@@ -2222,6 +2222,18 @@ export const MINIONS: MinionTemplate[] = [
       }
      },
      {
+      "op": "applyStatus",
+      "to": "self",
+      "status": {
+       "kind": "conditional_bypass",
+       "duration": 1,
+       "bypassCond": {
+        "kind": "mark",
+        "name": "Prisma Launch: Bypass"
+       }
+      }
+     },
+     {
       "op": "if",
       "cond": {
        "and": [
@@ -3677,6 +3689,7 @@ export const ROSTER: HeroDef[] = [
     "name": "Hero's Return",
     "element": "ice",
     "targeting": "single",
+    "targetsDead": true,
     "klass": "ultimate",
     "tags": [
      "Helpful",
@@ -4101,6 +4114,17 @@ export const ROSTER: HeroDef[] = [
        "duration": 1
       },
       "to": "self"
+     },
+     {
+      "op": "custom",
+      "fn": "overrideSkillCost",
+      "args": {
+       "of": "self",
+       "skillId": "riverdaughter3",
+       "generic": 1,
+       "specific": 0,
+       "duration": 1
+      }
      }
     ],
     "currentCd": 0
@@ -4520,6 +4544,7 @@ export const ROSTER: HeroDef[] = [
      "generic": 0,
      "specific": 5
     },
+    "costPerStackDiscount": "Call Tides",
     "cooldown": 1,
     "effects": [
      {
@@ -6110,6 +6135,7 @@ export const ROSTER: HeroDef[] = [
     },
     "cooldown": 1,
     "channelTurns": 1,
+    "channelDeferred": true,
     "effects": [
      {
       "op": "damage",
@@ -6139,6 +6165,9 @@ export const ROSTER: HeroDef[] = [
      "specific": 1
     },
     "cooldown": 2,
+    "requires": {
+     "skillOnCooldown": "zephyrex4"
+    },
     "effects": [
      {
       "op": "seq",
@@ -6285,7 +6314,7 @@ export const ROSTER: HeroDef[] = [
     "when": {
      "and": [
       {
-       "eventHasTag": "invulnerable"
+       "eventStatusKind": "invulnerable"
       },
       {
        "isFaction": "eventTarget",
@@ -10346,6 +10375,31 @@ export const ROSTER: HeroDef[] = [
      }
     ],
     "source": "maggie2"
+   },
+   {
+    "on": "damageDealt",
+    "when": {
+     "has": "mark",
+     "name": "Bramblelash",
+     "of": "eventTarget"
+    },
+    "effect": [
+     {
+      "op": "applyStatus",
+      "to": "self",
+      "status": {
+       "kind": "elemental_essence",
+       "duration": null
+      }
+     },
+     {
+      "op": "removeStatus",
+      "kind": "mark",
+      "name": "Bramblelash",
+      "from": "eventTarget"
+     }
+    ],
+    "source": "maggie1"
    }
   ]
  },
@@ -10735,6 +10789,11 @@ export const ROSTER: HeroDef[] = [
        ]
       },
       {
+       "not": {
+        "eventSkillId": "laria4"
+       }
+      },
+      {
        "has": "damage_reduction",
        "name": "Vanish",
        "of": "self"
@@ -10966,10 +11025,7 @@ export const ROSTER: HeroDef[] = [
        "right": 1
       },
       {
-       "sameUnit": [
-        "eventTarget",
-        "self"
-       ]
+       "declaredTargetsSelf": true
       }
      ]
     },
@@ -13052,7 +13108,7 @@ export const ROSTER: HeroDef[] = [
      "generic": 0,
      "specific": 1
     },
-    "cooldown": 3,
+    "cooldown": 4,
     "effects": [
      {
       "op": "damage",
