@@ -4102,6 +4102,17 @@ export const ROSTER: HeroDef[] = [
        "duration": 1
       },
       "to": "self"
+     },
+     {
+      "op": "custom",
+      "fn": "overrideSkillCost",
+      "args": {
+       "of": "self",
+       "skillId": "riverdaughter3",
+       "generic": 1,
+       "specific": 0,
+       "duration": 1
+      }
      }
     ],
     "currentCd": 0
@@ -4521,6 +4532,7 @@ export const ROSTER: HeroDef[] = [
      "generic": 0,
      "specific": 5
     },
+    "costPerStackDiscount": "Call Tides",
     "cooldown": 1,
     "effects": [
      {

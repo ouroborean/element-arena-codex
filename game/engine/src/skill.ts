@@ -29,6 +29,9 @@ export interface SkillInstance extends SkillDef {
   /** This skill targets a DEAD unit (a revive, e.g. Keeper's Hero's Return). Target resolution keeps the
    *  dead and excludes the living, inverting the usual alive-only filter. */
   targetsDead?: boolean;
+  /** A dynamic cost discount: shed 1 cost per caster stack of this named resource (spills onto specific,
+   *  like a negative cost_mod). E.g. Tidal Wave costs 1 less water per Call Tides stack. */
+  costPerStackDiscount?: string;
   /** Channel skills (tag "Channel"): how many extra turns they re-run (null = until interrupted). */
   channelTurns?: number | null;
   /** A deferred Channel (e.g. Elegant Sweep, "on the following turn…") runs NO payload on the cast turn;

@@ -19,7 +19,7 @@ import type { SkillInstance } from "./skill.ts";
 import { emit, evalSkillCondition, resolveDeclaration, runEffects } from "./effects/interpret.ts";
 import { applyDamage, applyHeal, outgoingDtypeOverride, tickShieldsForTeam } from "./damage.ts";
 import { Rng } from "./rng.ts";
-import { applyStatus, clearRoundStatuses, removeStatus, tickDurationsForTeam } from "./status.ts";
+import { applyStatus, clearRoundStatuses, removeStatus, stackCount, tickDurationsForTeam } from "./status.ts";
 
 /** Provisional base income (ENERGY_INCOME, ruling open): +1 generic per living hero. */
 const GENERIC_PER_LIVING_HERO = 1;
@@ -322,11 +322,18 @@ function poolTotal(pool: EnergyPool): number {
   return t;
 }
 
-/** A skill's cost after the caster's cost_mod statuses (delta applied to generic, spilling to specific). */
+/** A skill's cost after the caster's cost_mod statuses (delta applied to generic, spilling to specific),
+ *  a dynamic per-stack discount, and any cost_override (an outright re-denomination that wins). */
 export function effectiveCost(caster: Unit, skill: SkillInstance): SkillInstance["cost"] {
+  // A cost_override replaces the cost wholesale (e.g. Dive re-denominates River Clone to 1 generic).
+  const override = caster.statuses.find((s) => s.kind === "cost_override" && s.skillId === skill.id);
+  if (override) return { generic: override.costGeneric ?? 0, specific: override.costSpecific ?? 0 };
+
   let delta = 0;
   // Global cost_mods (no skillId) apply to every skill; scoped ones only to their skill.
   for (const s of caster.statuses) if (s.kind === "cost_mod" && (!s.skillId || s.skillId === skill.id)) delta += s.magnitude ?? 0;
+  // Dynamic discount: a skill can shed cost per stack of a named resource (e.g. Tidal Wave per Call Tides).
+  if (skill.costPerStackDiscount) delta -= stackCount(caster, skill.costPerStackDiscount);
   if (delta === 0) return skill.cost;
   let generic = skill.cost.generic + delta;
   let specific = skill.cost.specific;

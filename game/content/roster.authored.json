@@ -1917,9 +1917,21 @@
         "duration": 1
        },
        "to": "self"
+      },
+      {
+       "op": "custom",
+       "fn": "overrideSkillCost",
+       "args": {
+        "of": "self",
+        "skillId": "riverdaughter3",
+        "generic": 1,
+        "specific": 0,
+        "duration": 1
+       },
+       "note": "Dive re-denominates River Clone's cost to 1 generic for the empowerment window (cost_override, restores itself on expiry)."
       }
      ],
-     "note": "Invulnerable 1 turn. Applies three 1-turn empowerment marks read by next turn's skills: Dive Ripple (Ripple lasts two turns), Dive Undertow (Undertow hits all enemies), Dive River Clone (River Clone cost becomes 1 generic)."
+     "note": "Invulnerable 1 turn. Applies three 1-turn empowerment marks read by next turn's skills: Dive Ripple (Ripple lasts two turns), Dive Undertow (Undertow hits all enemies), Dive River Clone (River Clone cost becomes 1 generic via the cost_override)."
     }
    ],
    "minions": [
@@ -2449,6 +2461,7 @@
       "generic": 0,
       "specific": 5
      },
+     "costPerStackDiscount": "Call Tides",
      "cooldown": 1,
      "effects": [
       {

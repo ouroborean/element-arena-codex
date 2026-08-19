@@ -18,6 +18,24 @@ import type { SkillInstance } from "../src/skill.ts";
 // saya5 "Stroke of Genius" — sets the caster's OTHER skills to a flat 1-energy cost.
 // Faithful: per ENERGY_INCOME/cost model, a skill's SPECIFIC cost is paid in the caster's
 // CURRENT element, so {generic:0, specific:1} on Saya (element = lightning) IS "1 lightning".
+// riverdaughter5 "Dive" — re-denominate one skill's cost for a duration (River Clone becomes 1 generic).
+// A skillId-scoped cost_override status wins in effectiveCost; base cost is untouched, so it restores
+// itself when the override expires.
+registerCustom("overrideSkillCost", (ctx, args) => {
+  const dur = (args.duration as number | null | undefined);
+  for (const u of resolveSelector((args.of as Selector) ?? "self", ctx)) {
+    applyStatus(u, {
+      kind: "cost_override",
+      skillId: args.skillId as string,
+      costGeneric: (args.generic as number) ?? 0,
+      costSpecific: (args.specific as number) ?? 0,
+      duration: dur === undefined ? null : dur,
+      appliedBy: ctx.self.id,
+      appliedTurn: ctx.state.turn,
+    });
+  }
+});
+
 registerCustom("setSkillCosts", (ctx, args) => {
   const units = resolveSelector((args.of as Selector) ?? "caster", ctx);
   const except = args.exceptSkillId as string | undefined;
