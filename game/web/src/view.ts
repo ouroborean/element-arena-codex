@@ -334,7 +334,7 @@ function draftOptions(state: MatchState, u: Unit): string {
   const forms = availableFusions(state, u);
   const augs = availableAugments(u);
   const fusion = u.fused
-    ? `<div class="do-note">Already fused into <b>${esc(u.fused)}</b> — a hero fuses once per match.</div>`
+    ? `<div class="do-note">Already fused into <b>${esc(cap(u.fused))}</b> — a hero fuses once per match.</div>`
     : forms.length
     ? forms.map((f) => {
         const passIc = iconOf(`${hid}${f.key}0`, hid);
@@ -346,7 +346,7 @@ function draftOptions(state: MatchState, u: Unit): string {
         return `<button class="do-card fusion-card" data-fuse-unit="${u.id}" data-fuse-form="${esc(f.key)}">
           <img class="fc-port" src="${heroPortrait(hid, f.key)}" ${IMG_FALLBACK} />
           <span class="fc-body">
-            <span class="fc-head">Fuse → <b style="color:${elColor(f.element)}">${esc(f.element)}</b></span>
+            <span class="fc-head">Fuse → <b style="color:${elColor(f.element)}">${esc(cap(f.element))}</b></span>
             ${block("New passive", passIc, f.passive.name, f.passive.description)}
             ${block("New skill", skIc, skText?.n ?? sk.name, skText?.d ?? "")}
           </span></button>`;
@@ -371,7 +371,7 @@ function draftPanel(state: MatchState, ui: UiState): string {
     return `<button class="dh ${sel?.id === h.id ? "on" : ""}" data-draft-inspect="${h.id}">
       <img src="${heroPortrait(h.heroId ?? "", h.fused)}" ${IMG_FALLBACK} />
       <span class="dh-name">${esc(shortName(h.name))}</span>
-      <span class="dh-opts">${h.fused ? `fused:${esc(h.fused)}` : `${nf} ⚛`} · ${na} ★</span></button>`;
+      <span class="dh-opts">${h.fused ? `fused: ${esc(cap(h.fused))}` : `${nf} ⚛`} · ${na} ★</span></button>`;
   }).join("");
   return `<div class="overlay"><div class="modal draft-modal">
     <h2>Round ${state.round} — choose an upgrade</h2>
@@ -506,7 +506,7 @@ function augFuseModal(heroId: string): string {
     return `<div class="do-card fusion-card">
       <img class="fc-port" src="${heroPortrait(heroId, f.key)}" ${IMG_FALLBACK} />
       <span class="fc-body">
-        <span class="fc-head">Fuse → <b style="color:${elColor(f.element)}">${esc(f.element)}</b></span>
+        <span class="fc-head">Fuse → <b style="color:${elColor(f.element)}">${esc(cap(f.element))}</b></span>
         ${block("New passive", iconOf(`${heroId}${f.key}0`, heroId), f.passive.name, "", f.passive.description)}
         ${block("New skill", iconOf(sk.id, heroId), skText?.n ?? sk.name, skMeta, skText?.d ?? "")}
       </span></div>`;
