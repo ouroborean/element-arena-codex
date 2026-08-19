@@ -4323,7 +4323,7 @@
       "specific": 0
      },
      "cooldown": 1,
-     "note": "Heals the Eagle (only allied minion in the base kit) for 20. 'At maximum life after the heal' is tested as missingHp == 0 (no maxHp Value ref exists).",
+     "note": "Heals the Eagle (only allied minion in the base kit) for 20. 'At maximum life after the heal' is tested as missingHp == 0 (no maxHp Value ref exists). Feed may only target an allied minion (the Eagle) — targetKind restricts the pick.",
      "effects": [
       {
        "op": "seq",
@@ -4362,7 +4362,8 @@
         }
        ]
       }
-     ]
+     ],
+     "targetKind": "minion"
     },
     {
      "id": "syl2",

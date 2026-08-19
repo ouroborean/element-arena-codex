@@ -6407,6 +6407,7 @@ export const ROSTER: HeroDef[] = [
       ]
      }
     ],
+    "targetKind": "minion",
     "currentCd": 0
    },
    {
