@@ -400,8 +400,11 @@ function heroDetail(heroId: string, picked: string[]): string {
   const passive = SKILL_TEXT[`${heroId}0`];
   const skillRows = (def.skills ?? []).map((s) => {
     const t = SKILL_TEXT[s.id];
+    const meta = `<div class="sv-meta"><span class="mtag k">${esc(s.klass)}</span>` +
+      `<span class="mtag">${s.cooldown > 0 ? `${s.cooldown}-turn cooldown` : "no cooldown"}</span>` +
+      `${(s.tags ?? []).map((tg) => `<span class="mtag">${esc(tg)}</span>`).join("")}</div>`;
     return `<div class="sv-row"><img src="${iconOf(s.id, heroId) ?? ""}" ${IMG_FALLBACK} />
-      <div><div class="sv-name">${esc(t?.n ?? s.name)} <span class="sv-cost">${costIcons(s.cost, s.element)}</span></div><div class="sv-desc">${esc(t?.d ?? "")}</div></div></div>`;
+      <div><div class="sv-name">${esc(t?.n ?? s.name)} <span class="sv-cost">${costIcons(s.cost, s.element)}</span></div>${meta}<div class="sv-desc">${esc(t?.d ?? "")}</div></div></div>`;
   }).join("");
   return `<div class="detail-head">
       <img class="dp" src="${heroPortrait(heroId)}" ${IMG_FALLBACK} />
