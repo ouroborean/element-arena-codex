@@ -52,6 +52,7 @@ class Seat implements MatchClient {
   playerId?: string;
   name?: string;
   rating: number; // captured at match start; the Elo update reads these pre-match ratings
+  ranked = false; // set at pairing — decides how the result is recorded and cleans up rankedActive
   token = randomUUID();
   matchId: string;
   pendingTurn?: MatchClient["pendingTurn"];
@@ -101,6 +102,7 @@ class Conn {
 export class MatchServer {
   private queue: Conn[] = []; // casual (Quick Match), FIFO
   private rankedQueue: Conn[] = []; // ranked, rating-window matchmaking
+  private rankedActive = new Set<string>(); // playerIds currently in a ranked queue OR match — at most one each
   private conns = new Set<Conn>();
   private matches = new Map<string, Match>();
   private seats = new Map<string, Seat>(); // by rejoin token
@@ -168,20 +170,25 @@ export class MatchServer {
       conn.send({ t: "error", message: "invalid team — pick 3 distinct heroes" });
       return;
     }
+    const ranked = !!msg.ranked;
+    if (ranked && this.rankedActive.has(conn.playerId)) {
+      conn.send({ t: "error", message: "you already have a ranked match or queue in progress" });
+      return; // one live ranked context per identity — else two concurrent matches clobber the rating
+    }
     conn.team = [...msg.team];
     conn.phase = "queued";
-    conn.ranked = !!msg.ranked;
+    conn.ranked = ranked;
     conn.queuedAt = Date.now();
     conn.send({ t: "queued" });
-    if (conn.ranked) { this.rankedQueue.push(conn); this.matchmakeRanked(); }
+    if (ranked) { this.rankedActive.add(conn.playerId); this.rankedQueue.push(conn); this.matchmakeRanked(); }
     else { this.queue.push(conn); this.tryPair(); }
   }
 
   private dequeue(conn: Conn): void {
-    for (const q of [this.queue, this.rankedQueue]) {
-      const i = q.indexOf(conn);
-      if (i >= 0) q.splice(i, 1);
-    }
+    const ri = this.rankedQueue.indexOf(conn);
+    if (ri >= 0) { this.rankedQueue.splice(ri, 1); if (conn.playerId) this.rankedActive.delete(conn.playerId); }
+    const ci = this.queue.indexOf(conn);
+    if (ci >= 0) this.queue.splice(ci, 1);
     if (conn.phase === "queued") conn.phase = "idle";
   }
 
@@ -252,6 +259,7 @@ export class MatchServer {
     const matchId = randomUUID();
     const seatA = new Seat(ca.team, matchId, ca);
     const seatB = new Seat(cb.team, matchId, cb);
+    seatA.ranked = seatB.ranked = ranked;
     ca.phase = cb.phase = "playing";
     ca.seat = seatA;
     cb.seat = seatB;
@@ -263,7 +271,9 @@ export class MatchServer {
     this.matches.set(matchId, match);
     match.onResult = (winner) => this.recordResults(seatA, seatB, winner, ranked);
     match.onEnd = () => this.endMatch(matchId, [seatA, seatB]);
-    void match.run(); // fire-and-forget; the match drives itself via the provider callbacks and its own timers
+    // Fire-and-forget; the match drives itself. The .catch() is a backstop so an unexpected throw can't
+    // become an unhandled rejection that tears down the whole server.
+    match.run().catch(() => this.endMatch(matchId, [seatA, seatB]));
   }
 
   /**
@@ -272,18 +282,26 @@ export class MatchServer {
    */
   private recordResults(a: Seat, b: Seat, winner: TeamId | null, ranked: boolean): RatingChanges | void {
     const resultFor = (seat: Seat): ResultKind => (winner === null ? "draw" : seat.side === winner ? "win" : "loss");
-    if (!ranked) {
-      for (const seat of [a, b]) if (seat.playerId) this.store.recordResult(seat.playerId, resultFor(seat));
-      return;
+    try {
+      if (!ranked) {
+        for (const seat of [a, b]) if (seat.playerId) this.store.recordResult(seat.playerId, resultFor(seat));
+        return;
+      }
+      const sa = winner === null ? 0.5 : a.side === winner ? 1 : 0;
+      const [na, nb] = elo(a.rating, b.rating, sa);
+      if (a.playerId && b.playerId) {
+        this.store.recordRankedMatch({ playerId: a.playerId, result: resultFor(a), rating: na }, { playerId: b.playerId, result: resultFor(b), rating: nb });
+      } else { // a rare bot/anonymous side — record whoever we have
+        if (a.playerId) this.store.recordRankedResult(a.playerId, resultFor(a), na);
+        if (b.playerId) this.store.recordRankedResult(b.playerId, resultFor(b), nb);
+      }
+      const changes: RatingChanges = {};
+      changes[a.side!] = { rating: na, delta: na - a.rating };
+      changes[b.side!] = { rating: nb, delta: nb - b.rating };
+      return changes;
+    } catch {
+      return; // a DB fault: the match still ends (end() sends matchEnd); no rating change is reported
     }
-    const sa = winner === null ? 0.5 : a.side === winner ? 1 : 0;
-    const [na, nb] = elo(a.rating, b.rating, sa);
-    if (a.playerId) this.store.recordRankedResult(a.playerId, resultFor(a), na);
-    if (b.playerId) this.store.recordRankedResult(b.playerId, resultFor(b), nb);
-    const changes: RatingChanges = {};
-    changes[a.side!] = { rating: na, delta: na - a.rating };
-    changes[b.side!] = { rating: nb, delta: nb - b.rating };
-    return changes;
   }
 
   /** Tear down a finished match: forget its seats and free both connections to requeue. */
@@ -291,6 +309,7 @@ export class MatchServer {
     this.matches.delete(matchId);
     for (const seat of seats) {
       this.seats.delete(seat.token);
+      if (seat.ranked && seat.playerId) this.rankedActive.delete(seat.playerId); // free the identity to queue ranked again
       const owner = seat.owner;
       if (owner && owner.seat === seat) {
         owner.seat = undefined;

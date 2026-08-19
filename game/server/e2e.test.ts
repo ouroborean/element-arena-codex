@@ -91,6 +91,28 @@ test("two real WebSocket clients are matched and driven to a result over TCP", a
   }
 });
 
+test("one identity can't hold two concurrent ranked queue entries (rating-clobber guard)", async () => {
+  const { stop, http } = startServer(0);
+  await once(http, "listening");
+  const port = (http.address() as AddressInfo).port;
+  const url = `ws://127.0.0.1:${port}`;
+  let a: Client | undefined;
+  let b: Client | undefined;
+  try {
+    [a, b] = await Promise.all([connect(url), connect(url)]);
+    // The SAME identity authenticates on two sockets and tries to queue ranked on both.
+    await authQueue(a, ["pyrrha", "jarrik", "gommar"], "dup-id", "dup-sec", "Dup", true);
+    await a.wait("queued");
+    await authQueue(b, ["ando", "syl", "riverdaughter"], "dup-id", "dup-sec", "Dup", true);
+    const err = (await b.wait("error")) as Extract<ServerMsg, { t: "error" }>;
+    assert.match(err.message, /ranked/i, "the second ranked queue for the same id is refused");
+  } finally {
+    a?.ws.close();
+    b?.ws.close();
+    stop();
+  }
+});
+
 test("the server rejects a malformed team", async () => {
   const { stop, http } = startServer(0);
   await once(http, "listening");

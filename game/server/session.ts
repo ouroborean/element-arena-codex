@@ -300,7 +300,9 @@ export class Match {
     this.over = true;
     this.clearGraceTimers();
     // Record the result first (a stalemate is a draw for both); its rating changes ride out on matchEnd.
-    const changes = this.onResult?.(outcome.winner) || undefined;
+    // Recording must never strand the players: if it throws (a DB fault), still send matchEnd + clean up.
+    let changes: RatingChanges | undefined;
+    try { changes = this.onResult?.(outcome.winner) || undefined; } catch { changes = undefined; }
     this.a.send({ t: "matchEnd", outcome, reason, you: this.a.side!, rating: changes?.[this.a.side!] });
     this.b.send({ t: "matchEnd", outcome, reason, you: this.b.side!, rating: changes?.[this.b.side!] });
     this.onEnd?.();
