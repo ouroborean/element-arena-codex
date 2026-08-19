@@ -26,6 +26,9 @@ export interface SkillInstance extends SkillDef {
   tags: string[];
   /** Restrict a single-target skill's legal targets to this unit kind (e.g. Syl's Feed → "minion" only). */
   targetKind?: UnitKind;
+  /** This skill targets a DEAD unit (a revive, e.g. Keeper's Hero's Return). Target resolution keeps the
+   *  dead and excludes the living, inverting the usual alive-only filter. */
+  targetsDead?: boolean;
   /** Channel skills (tag "Channel"): how many extra turns they re-run (null = until interrupted). */
   channelTurns?: number | null;
   /** A deferred Channel (e.g. Elegant Sweep, "on the following turn…") runs NO payload on the cast turn;

@@ -395,8 +395,11 @@ function resolveTargets(state: MatchState, caster: Unit, skill: SkillInstance, c
       return maybeNarrow([...unitsOf(state, "A"), ...unitsOf(state, "B")].filter((u) => u.alive));
     case "single": {
       const ids = chosen ?? [];
-      const picked = ids.map((id) => state.units[id]).filter((u): u is Unit => !!u && u.alive);
+      // A revive (targetsDead) keeps the dead and drops the living; every other skill is the reverse.
+      const wanted = (u: Unit) => (skill.targetsDead ? !u.alive : u.alive);
+      const picked = ids.map((id) => state.units[id]).filter((u): u is Unit => !!u && wanted(u));
       if (picked.length > 0) return picked;
+      if (skill.targetsDead) return []; // no default hunt for a revive target
       // default: first living enemy
       const enemy = unitsOf(state, otherTeam(caster.team)).find((u) => u.alive);
       return enemy ? [enemy] : [];
@@ -427,7 +430,7 @@ export function legalTargets(state: MatchState, caster: Unit, skill: SkillInstan
     (reanimated.appliedBy != null && u.id === reanimated.appliedBy) ||
     u.statuses.some((s) => s.kind === "mark" && s.name === "Bramblelash");
   const isLegal = (u: Unit): boolean =>
-    u.alive &&
+    (skill.targetsDead ? !u.alive : u.alive) && // a revive targets the dead; everything else the living
     reanimatedOk(u) &&
     (!skill.targetKind || u.kind === skill.targetKind) && // e.g. Feed may only target a minion (the Eagle)
     !(u.id !== caster.id && hasStatus(u, "untargetable")) && // others can't target it; self can

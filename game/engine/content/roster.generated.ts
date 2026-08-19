@@ -3677,6 +3677,7 @@ export const ROSTER: HeroDef[] = [
     "name": "Hero's Return",
     "element": "ice",
     "targeting": "single",
+    "targetsDead": true,
     "klass": "ultimate",
     "tags": [
      "Helpful",
