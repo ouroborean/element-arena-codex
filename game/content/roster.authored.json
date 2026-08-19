@@ -13651,6 +13651,18 @@
          }
         },
         {
+         "op": "applyStatus",
+         "to": "self",
+         "status": {
+          "kind": "conditional_bypass",
+          "duration": 1,
+          "bypassCond": {
+           "kind": "mark",
+           "name": "Prisma Launch: Bypass"
+          }
+         }
+        },
+        {
          "op": "if",
          "cond": {
           "and": [
@@ -13681,7 +13693,7 @@
          ]
         }
        ],
-       "note": "Oracle: 'Until the end of the next turn, Prisma Saffron's skills will Bypass against target enemy. If used on another Prisma Ranger that is using their Lens, their skills will also Bypass during this time and they become invulnerable for one turn.' The buddy branch grants Invulnerable. LIMITATION: the engine's Bypass is a STATIC skill tag ('Bypassing') read by targeting; there is no per-target dynamic-Bypass primitive, so the 'Prisma Launch: Bypass' mark documents the intended bypass window but is not enforced by legalTargets without an engine hook. 'Until the end of the next turn' modeled as duration 1."
+       "note": "Oracle: 'Until the end of the next turn, Prisma Saffron's skills will Bypass against target enemy. If used on another Prisma Ranger that is using their Lens, their skills will also Bypass during this time and they become invulnerable for one turn.' The buddy branch grants Invulnerable. The bypass is enforced via a conditional_bypass status on Saffron keyed to the target's 'Prisma Launch: Bypass' mark: legalTargets and the damage step both consult bypassesAgainst, so her skills land through the target's Invulnerable/DR/Shield. 'Until the end of the next turn' modeled as duration 1."
       },
       {
        "id": "trinitysaffron3",

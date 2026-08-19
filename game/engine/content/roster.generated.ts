@@ -2222,6 +2222,18 @@ export const MINIONS: MinionTemplate[] = [
       }
      },
      {
+      "op": "applyStatus",
+      "to": "self",
+      "status": {
+       "kind": "conditional_bypass",
+       "duration": 1,
+       "bypassCond": {
+        "kind": "mark",
+        "name": "Prisma Launch: Bypass"
+       }
+      }
+     },
+     {
       "op": "if",
       "cond": {
        "and": [

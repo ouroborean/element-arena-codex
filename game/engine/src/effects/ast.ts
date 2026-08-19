@@ -94,6 +94,8 @@ export interface StatusSpec {
   scope?: StunScope;
   /** For a taunt: the unit to force the bearer to target (resolved at apply time). */
   unitRef?: Selector;
+  /** For a conditional_bypass: the holder's damage/targeting bypasses against a target holding this status. */
+  bypassCond?: { kind: StatusKind; name?: string };
   /** Effects to run when this status expires naturally (duration lapse). */
   onExpire?: Effect[];
   /** Turns; null = round-permanent. May be a Value expression (computed at apply time). */

@@ -17,7 +17,7 @@
 import type { EnergyPool, MatchState, TeamId, Unit } from "./types.ts";
 import type { SkillInstance } from "./skill.ts";
 import { emit, evalSkillCondition, resolveDeclaration, runEffects } from "./effects/interpret.ts";
-import { applyDamage, applyHeal, outgoingDtypeOverride, tickShieldsForTeam } from "./damage.ts";
+import { applyDamage, applyHeal, bypassesAgainst, outgoingDtypeOverride, tickShieldsForTeam } from "./damage.ts";
 import { Rng } from "./rng.ts";
 import { applyStatus, clearRoundStatuses, removeStatus, stackCount, tickDurationsForTeam } from "./status.ts";
 
@@ -441,7 +441,7 @@ export function legalTargets(state: MatchState, caster: Unit, skill: SkillInstan
     reanimatedOk(u) &&
     (!skill.targetKind || u.kind === skill.targetKind) && // e.g. Feed may only target a minion (the Eagle)
     !(u.id !== caster.id && hasStatus(u, "untargetable")) && // others can't target it; self can
-    !(harmful && !bypass && hasStatus(u, "invulnerable")) &&
+    !(harmful && !bypass && !bypassesAgainst(caster, u) && hasStatus(u, "invulnerable")) && // conditional_bypass (Prisma Launch) also bypasses Invulnerable
     !(helpful && !bypass && hasStatus(u, "isolated"));
 
   if (skill.targeting !== "single") return chosen.filter(isLegal);

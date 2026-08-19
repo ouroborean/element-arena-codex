@@ -336,6 +336,7 @@ function buildStatus(spec: StatusSpec, ctx: Ctx) {
     dtype: spec.dtype,
     scope: spec.scope,
     unitRef: spec.unitRef ? resolveSelector(spec.unitRef, ctx)[0]?.id : undefined,
+    bypassCond: spec.bypassCond,
     onExpire: spec.onExpire,
     duration: evalDuration(spec.duration, ctx),
     appliedBy: ctx.caster.id,
