@@ -28,6 +28,10 @@ export interface SkillInstance extends SkillDef {
   targetKind?: UnitKind;
   /** Channel skills (tag "Channel"): how many extra turns they re-run (null = until interrupted). */
   channelTurns?: number | null;
+  /** A deferred Channel (e.g. Elegant Sweep, "on the following turn…") runs NO payload on the cast turn;
+   *  its effects land only when the channel resolves. Default (absent/false) is a sustained channel that
+   *  also fires on cast. */
+  channelDeferred?: boolean;
   /** Using this skill does NOT interrupt an active channel (per-skill opt-out). */
   doesNotInterrupt?: boolean;
   /** A hard castability precondition (unselectable if false) — distinct from in-effect if/else. */

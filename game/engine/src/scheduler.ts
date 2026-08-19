@@ -533,7 +533,12 @@ export function performAction(state: MatchState, action: Action): ActionResult {
   // real base rather than having its delta clobbered — or, for a reduction, clamped away against a 0.
   skill.currentCd = effectiveCooldown(caster, skill);
   skill.cdSetTurn = state.turn; // birth turn — advanceCooldowns skips it (see below), so cooldown N blocks N turns
-  const affected = runEffects(state, skill.effects, { caster, self: caster, targets: decl.finalTargets, skillId: skill.id });
+  // A deferred Channel (Elegant Sweep, "on the following turn…") runs no payload on the cast turn —
+  // it lands only when the channel resolves at runChannels. Sustained channels still fire on cast.
+  const deferred = isChannel(skill) && skill.channelDeferred === true;
+  const affected = deferred
+    ? []
+    : runEffects(state, skill.effects, { caster, self: caster, targets: decl.finalTargets, skillId: skill.id });
   caster.lastSkillId = skill.id; // the "used a skill" ledger (read by clone/last-skill mechanics)
 
   // A Channel skill installs a sustained channel that re-runs at the caster's turns — unless an

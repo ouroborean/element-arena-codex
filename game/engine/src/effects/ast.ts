@@ -73,6 +73,7 @@ export type Condition =
   | { declaredTargetsSelf: true } // (skillDeclared) the trigger owner is among the declared targets
   | { eventHasTag: string } // (skillDeclared/skillUsed) the skill carries this class tag
   | { eventStatusKind: string; name?: string } // (statusApplied/statusExpired) the event's status kind (+name) matches
+  | { eventSkillId: string } // (skillUsed/skillDeclared/…) the event's skillId matches (e.g. exclude the granting skill)
   | { eventTeamIsSelf: true } // (turnStart/turnEnd) the event's team is the trigger owner's team ("my team's turn")
   | { skillOnCooldown: string; of?: Selector } // the named skill on the selected unit (default self) has cooldown remaining
   | { and: Condition[] }

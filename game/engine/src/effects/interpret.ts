@@ -294,6 +294,10 @@ export function evalCondition(c: Condition, ctx: Ctx): boolean {
     const e = ctx.event;
     return !!e && "kind" in e && e.kind === c.eventStatusKind && (c.name === undefined || ("name" in e && e.name === c.name));
   }
+  if ("eventSkillId" in c) {
+    const e = ctx.event;
+    return !!e && "skillId" in e && e.skillId === c.eventSkillId;
+  }
   if ("eventTeamIsSelf" in c) {
     const e = ctx.event;
     return !!e && "team" in e && e.team === ctx.self.team;

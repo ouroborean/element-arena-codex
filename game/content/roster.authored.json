@@ -4062,7 +4062,8 @@
      },
      "cooldown": 1,
      "channelTurns": 1,
-     "note": "Channeled: the payload lands on the following turn (channelTurns:1). Interruptible - being stunned or using a new skill cancels it (Channel class; doesNotInterrupt intentionally absent).",
+     "channelDeferred": true,
+     "note": "Channeled and DEFERRED: no damage on the cast turn; the 25 piercing lands on the following turn (channelDeferred + channelTurns:1). Interruptible - being stunned or using a new skill cancels it (Channel class; doesNotInterrupt intentionally absent).",
      "effects": [
       {
        "op": "damage",
@@ -9477,6 +9478,11 @@
          "eventSource",
          "self"
         ]
+       },
+       {
+        "not": {
+         "eventSkillId": "laria4"
+        }
        },
        {
         "has": "damage_reduction",

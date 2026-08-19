@@ -6110,6 +6110,7 @@ export const ROSTER: HeroDef[] = [
     },
     "cooldown": 1,
     "channelTurns": 1,
+    "channelDeferred": true,
     "effects": [
      {
       "op": "damage",
@@ -10761,6 +10762,11 @@ export const ROSTER: HeroDef[] = [
         "eventSource",
         "self"
        ]
+      },
+      {
+       "not": {
+        "eventSkillId": "laria4"
+       }
       },
       {
        "has": "damage_reduction",
