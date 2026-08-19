@@ -71,7 +71,7 @@ export class Match {
   private state: MatchState;
   private bySide: Record<TeamId, MatchClient>;
   private over = false;
-  private aborted: { winner: TeamId } | null = null;
+  private aborted: { winner: TeamId; reason: EndReason } | null = null;
   private turnMs: number;
   private draftMs: number;
   /** Set by the owner (server) to detach client→match routing once the match ends. */
@@ -102,20 +102,20 @@ export class Match {
       from.pendingDraft = undefined;
       resolve(msg);
     } else if (msg.t === "surrender") {
-      this.abort(from === this.a ? this.b : this.a);
+      this.abort(from === this.a ? this.b : this.a, "forfeit");
     }
     // Anything else (a stray/out-of-turn message) is ignored.
   }
 
   /** A player dropped (socket closed) — the opponent wins by forfeit. */
   onDisconnect(who: MatchClient): void {
-    this.abort(who === this.a ? this.b : this.a);
+    this.abort(who === this.a ? this.b : this.a, "opponent-left");
   }
 
   /** Mark the match aborted in `survivor`'s favour and unblock any awaited input so the loop unwinds. */
-  private abort(survivor: MatchClient): void {
+  private abort(survivor: MatchClient, reason: EndReason): void {
     if (this.over || this.aborted) return;
-    this.aborted = { winner: survivor.side! };
+    this.aborted = { winner: survivor.side!, reason };
     for (const c of [this.a, this.b]) {
       c.pendingTurn?.(HOLD);
       c.pendingTurn = undefined;
@@ -142,7 +142,7 @@ export class Match {
       /* aborted, or an unexpected engine error — disambiguated by `this.aborted` below */
     }
 
-    if (this.aborted) return this.end(this.forfeitOutcome(this.aborted.winner), "opponent-left");
+    if (this.aborted) return this.end(this.forfeitOutcome(this.aborted.winner), this.aborted.reason);
     if (!outcome) {
       for (const c of [this.a, this.b]) c.send({ t: "error", message: "the match ended unexpectedly" });
       this.finish();

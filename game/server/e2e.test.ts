@@ -37,9 +37,11 @@ test("two real WebSocket clients are matched and driven to a result over TCP", a
   await once(http, "listening");
   const port = (http.address() as AddressInfo).port;
   const url = `ws://127.0.0.1:${port}`;
+  let p1: Awaited<ReturnType<typeof connect>> | undefined;
+  let p2: Awaited<ReturnType<typeof connect>> | undefined;
 
   try {
-    const [p1, p2] = await Promise.all([connect(url), connect(url)]);
+    [p1, p2] = await Promise.all([connect(url), connect(url)]);
 
     // Both queue with valid teams; the second one triggers the pairing.
     p1.ws.send(JSON.stringify({ t: "queue", team: ["pyrrha", "jarrik", "gommar"], protocolVersion: PROTOCOL_VERSION }));
@@ -50,19 +52,19 @@ test("two real WebSocket clients are matched and driven to a result over TCP", a
     assert.notEqual(s1.you, s2.you, "the two clients are on opposite sides");
     assert.ok(s1.state && s1.state.units, "the start message carries a full MatchState (round-tripped over the wire)");
 
-    // Whoever is asked to act first surrenders — the match must resolve and both get matchEnd.
-    const firstMover = s1.you === "A" ? p1 : p2; // Team A takes the first turn
+    // Team A always takes the first turn; that player surrenders, so Team B must win by forfeit.
+    const firstMover = s1.you === "A" ? p1 : p2;
     await firstMover.wait("yourTurn");
     firstMover.ws.send(JSON.stringify({ t: "surrender" }));
 
     const e1 = (await p1.wait("matchEnd")) as Extract<ServerMsg, { t: "matchEnd" }>;
     const e2 = (await p2.wait("matchEnd")) as Extract<ServerMsg, { t: "matchEnd" }>;
     assert.equal(e1.outcome.winner, e2.outcome.winner, "both clients agree on the winner");
-    assert.notEqual(e1.outcome.winner, s1.you === "A" ? "A" : "B", "the surrendering first-mover did not win");
-
-    p1.ws.close();
-    p2.ws.close();
+    assert.equal(e1.outcome.winner, "B", "the surrendering first-mover (Team A) loses to Team B");
+    assert.equal(e1.reason, "forfeit", "a surrender is a forfeit");
   } finally {
+    p1?.ws.close();
+    p2?.ws.close();
     stop();
   }
 });
@@ -71,13 +73,14 @@ test("the server rejects a malformed team", async () => {
   const { stop, http } = startServer(0);
   await once(http, "listening");
   const port = (http.address() as AddressInfo).port;
+  let p: Awaited<ReturnType<typeof connect>> | undefined;
   try {
-    const p = await connect(`ws://127.0.0.1:${port}`);
+    p = await connect(`ws://127.0.0.1:${port}`);
     p.ws.send(JSON.stringify({ t: "queue", team: ["pyrrha", "pyrrha", "pyrrha"], protocolVersion: PROTOCOL_VERSION })); // duplicates
     const err = (await p.wait("error")) as Extract<ServerMsg, { t: "error" }>;
     assert.match(err.message, /invalid team/i);
-    p.ws.close();
   } finally {
+    p?.ws.close();
     stop();
   }
 });

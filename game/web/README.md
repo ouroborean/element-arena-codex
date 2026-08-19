@@ -25,8 +25,11 @@ lives between the lanes so it never covers a target. **Every skill requires clic
 (even self/auto ones highlight and confirm on click). Active **effects** appear as small
 skill-art icons on a portrait — the art of the skill/passive that applied them — hover (or tap)
 one for a description of what it's doing.
-The left panel is your shared **energy pool**; **Surrender** concedes. The AI uses
-`defaultPolicy`. First to 2 rounds wins; between rounds each team auto-drafts (draft UI TBD).
+The left panel is your shared **energy pool**; **Surrender** concedes. First to 2 rounds wins.
+
+**Bot Match** plays the local `defaultPolicy` AI. **Quick Match** plays a real opponent over the network —
+start the match server first (`node game/server/index.ts`, see `game/server/README.md`), then press Quick
+Match with a full team; the client dials `ws://<page-host>:8790` (override with `?server=wss://host`).
 
 ## Build
 

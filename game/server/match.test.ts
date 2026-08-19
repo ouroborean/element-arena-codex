@@ -124,5 +124,6 @@ test("a surrender hands the win to the opponent", async () => {
   assert.ok(aEnd && bEnd, "both are notified of the surrender outcome");
   const bSide = (b.messages.find((m) => m.t === "start") as Extract<ServerMsg, { t: "start" }>).you;
   assert.equal(bEnd!.outcome.winner, bSide, "the opponent of the surrendering player wins");
+  assert.equal(bEnd!.reason, "forfeit", "a surrender is reported as a forfeit, not an opponent-left");
   assert.equal(aEnd!.you !== bEnd!.you, true, "each side is told its own perspective");
 });

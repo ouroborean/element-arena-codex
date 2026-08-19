@@ -12,9 +12,11 @@ import { Rng } from "../../engine/src/rng.ts";
 import { buildMatch, defaultPolicy, type Draft } from "../../engine/content/match.ts";
 import { ROSTER } from "../../engine/content/roster.generated.ts";
 import { runMatch, type AsyncProvider } from "../../client/loop.ts";
-import { autoDraft, applyDraftChoice, hasDraftOptions, draftableHeroes } from "../../client/draft.ts";
+import { autoDraft, applyDraftChoice, hasDraftOptions, draftableHeroes, type DraftChoice } from "../../client/draft.ts";
 import { renderApp, renderSetup } from "./view.ts";
 import { energyIcon, elementRank } from "./assets.ts";
+import { MatchSocket, serverUrl } from "./net.ts";
+import { PROTOCOL_VERSION, type ServerMsg } from "../../net/protocol.ts";
 
 export interface UiState {
   you: TeamId;
@@ -49,6 +51,11 @@ const living = (s: MatchState, side: TeamId): Unit[] =>
 const app = document.getElementById("app")!;
 let state: MatchState;
 let setup: { picked: string[]; oppo: string[]; inspect: string | null; augfuse?: boolean } | null = null;
+// A live Quick Match (PvP) session. Non-null only in networked play; in bot mode it stays null and the
+// local runMatch loop drives everything. When set, the turn/draft/concede commit points send to the server
+// instead of resolving locally, and the server's state broadcasts drive the board.
+let pvp: { sock: MatchSocket; you: TeamId; over: boolean } | null = null;
+const escHtml = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
 const ui: UiState = {
   you: "A", phase: "busy", phaseLabel: "starting…", hint: "",
   legalTargets: new Set(), planned: new Map(), plannedSkill: new Map(),
@@ -186,15 +193,26 @@ app.addEventListener("click", (e) => {
     if (t.closest("[data-augfuse-close]") || t.classList.contains("overlay")) { setup.augfuse = false; app.innerHTML = renderSetup(setup); }
     return;
   }
-  const el = (e.target as HTMLElement).closest<HTMLElement>("[data-owner],[data-skill],[data-target],[data-cancel],[data-resolve],[data-surrender],[data-pick],[data-inspect],[data-reroll],[data-start],[data-plus],[data-minus],[data-energy-confirm],[data-energy-cancel],[data-draft-inspect],[data-fuse-unit],[data-aug-unit],[data-draft-hold],[data-concede],[data-keep],[data-augfuse]");
+  const el = (e.target as HTMLElement).closest<HTMLElement>("[data-owner],[data-skill],[data-target],[data-cancel],[data-resolve],[data-surrender],[data-pick],[data-inspect],[data-reroll],[data-start],[data-quick],[data-quick-cancel],[data-plus],[data-minus],[data-energy-confirm],[data-energy-cancel],[data-draft-inspect],[data-fuse-unit],[data-aug-unit],[data-draft-hold],[data-concede],[data-keep],[data-augfuse]");
   if (!el) return;
   const d = el.dataset;
 
+  if (d.quickCancel) { cancelQuickMatch(); return; } // leave the Quick Match queue (searching screen)
+
   if (ui.draft) { // the between-round draft modal is up — only its controls respond
-    if (d.draftInspect) { ui.draft.inspect = d.draftInspect; render(); }
-    else if (d.fuseUnit && d.fuseForm) { logDraft(applyDraftChoice(state, { kind: "fuse", unitId: d.fuseUnit, formKey: d.fuseForm })); finishDraft(); }
-    else if (d.augUnit && d.augId) { logDraft(applyDraftChoice(state, { kind: "augment", unitId: d.augUnit, augmentId: d.augId })); finishDraft(); }
-    else if (d.draftHold) { finishDraft(); }
+    if (d.draftInspect) { ui.draft.inspect = d.draftInspect; render(); return; }
+    let choice: DraftChoice | null = null;
+    if (d.fuseUnit && d.fuseForm) choice = { kind: "fuse", unitId: d.fuseUnit, formKey: d.fuseForm };
+    else if (d.augUnit && d.augId) choice = { kind: "augment", unitId: d.augUnit, augmentId: d.augId };
+    else if (d.draftHold) choice = { kind: "skip" };
+    if (!choice) return;
+    if (pvp) { // networked: the server applies the choice authoritatively and broadcasts the new state
+      pvp.sock.send({ t: "draftChoice", choice });
+      pvpBusy("Applying your upgrade…");
+    } else {
+      if (choice.kind !== "skip") logDraft(applyDraftChoice(state, choice));
+      finishDraft();
+    }
     return;
   }
 
@@ -219,6 +237,8 @@ app.addEventListener("click", (e) => {
     } else if (d.reroll) {
       setup.oppo = randomTeam(setup.picked);
       app.innerHTML = renderSetup(setup);
+    } else if (d.quick && setup.picked.length === 3) {
+      startQuickMatch([...setup.picked]); // networked PvP — matchmaking + an authoritative server
     } else if (d.start && setup.picked.length === 3) {
       const draft: Draft = { A: [...setup.picked], B: [...setup.oppo], seed: Math.floor(Math.random() * 1e6) };
       setup = null;
@@ -228,7 +248,11 @@ app.addEventListener("click", (e) => {
   }
 
   if (d.surrender) { ui.overlay = SURRENDER_CONFIRM; render(); return; }
-  if (d.concede) { location.reload(); return; }
+  if (d.concede) { // networked: tell the server (it decides the forfeit); bot mode just restarts
+    if (pvp) { pvp.sock.send({ t: "surrender" }); pvpBusy("Conceding…"); }
+    else location.reload();
+    return;
+  }
   if (d.keep) { ui.overlay = undefined; render(); return; }
   if (ui.phase !== "plan") return;
   if (d.cancel) { ui.targeting = undefined; ui.examine = undefined; ui.legalTargets = new Set(); render(); return; }
@@ -310,6 +334,11 @@ function commitTurn(): void {
 }
 
 function finalizeTurn(actions: Action[], alloc: Record<string, number> | undefined): void {
+  if (pvp) { // networked: hand the committed turn to the authoritative server, then wait for its next state
+    pvp.sock.send({ t: "turn", actions, genericPay: alloc });
+    pvpBusy("Waiting for opponent…");
+    return;
+  }
   if (alloc) state.genericPay = { ...alloc }; // the engine drains generic from these colors first
   const resolve = ui.resolveTurn;
   ui.resolveTurn = undefined;
@@ -375,6 +404,88 @@ async function startMatch(draft: Draft): Promise<void> {
   </div></div>`;
   ui.phaseLabel = "match over";
   render();
+}
+
+// ── Quick Match (PvP, server-authoritative) ─────────────────────────────────────────────────────────── //
+/** A standalone centred modal that works before any board exists (searching / errors / connection loss). */
+function showModal(html: string): void { app.innerHTML = `<div class="overlay"><div class="modal">${html}</div></div>`; }
+function showSearching(text: string): void {
+  showModal(`<h2>Quick Match</h2><p>${escHtml(text)}</p>
+    <div class="modal-foot"><button data-quick-cancel="1">Cancel</button></div>`);
+}
+
+/** Connect, join the queue with `team`, and let server messages drive the match from here on. */
+function startQuickMatch(team: string[]): void {
+  const sock = new MatchSocket(serverUrl());
+  pvp = { sock, you: "A", over: false };
+  setup = null;
+  sock.onOpen = () => sock.send({ t: "queue", team, protocolVersion: PROTOCOL_VERSION });
+  sock.onMessage = handleServerMsg;
+  sock.onError = () => { if (pvp && !pvp.over) { pvp = null; showModal(`<h2>Can't reach the server</h2><p>No match server at <code>${escHtml(serverUrl())}</code>. Start it with <code>node game/server/index.ts</code>.</p><button onclick="location.reload()">Back</button>`); } };
+  sock.onClose = () => { if (pvp && !pvp.over) { pvp = null; showModal(`<h2>Connection lost</h2><p>The match connection closed.</p><button onclick="location.reload()">Back to team select</button>`); } };
+  showSearching("Connecting…");
+}
+
+function cancelQuickMatch(): void {
+  pvp?.sock.send({ t: "cancelQueue" });
+  pvp?.sock.close();
+  pvp = null;
+  showSetup();
+}
+
+/** Enter local planning for a networked turn — mirrors the bot-mode human provider, minus the local promise. */
+function enterPvpPlanning(): void {
+  ui.phase = "plan";
+  ui.phaseLabel = "your move";
+  ui.hint = "Pick a skill on each hero, then a target. Skip a hero to hold it.";
+  ui.planned.clear(); ui.plannedSkill.clear();
+  ui.targeting = undefined; ui.examine = undefined; ui.legalTargets = new Set();
+  ui.energyPanel = undefined; ui.overlay = undefined; ui.draft = undefined;
+  render();
+}
+
+function pvpBusy(label: string): void {
+  ui.phase = "busy"; ui.phaseLabel = label;
+  ui.targeting = undefined; ui.examine = undefined; ui.energyPanel = undefined; ui.legalTargets = new Set();
+  ui.planned.clear(); ui.plannedSkill.clear(); ui.draft = undefined; ui.overlay = undefined;
+  render();
+}
+
+function handleServerMsg(msg: ServerMsg): void {
+  if (!pvp) return;
+  switch (msg.t) {
+    case "queued": showSearching("Searching for an opponent…"); break;
+    case "start":
+      pvp.you = msg.you; ui.you = msg.you; state = msg.state;
+      pvpBusy("Match found — get ready…");
+      break;
+    case "opponentTurn": state = msg.state; pvpBusy("Opponent is acting…"); break;
+    case "yourTurn": state = msg.state; enterPvpPlanning(); break;
+    case "opponentDraft": state = msg.state; pvpBusy("Opponent is choosing an upgrade…"); break;
+    case "yourDraft": {
+      state = msg.state;
+      const side = pvp.you; // a player always drafts for its own team
+      ui.phase = "busy"; ui.phaseLabel = "choose your upgrade"; ui.overlay = undefined; ui.energyPanel = undefined;
+      ui.draft = { side, inspect: draftableHeroes(state, side)[0]?.id ?? null, resolve: () => {} };
+      render();
+      break;
+    }
+    case "matchEnd": {
+      pvp.over = true;
+      const won = msg.outcome.winner === msg.you;
+      const title = msg.outcome.winner === null ? "Stalemate" : won ? "Victory 🏆" : "Defeat";
+      const why = msg.reason === "opponent-left" ? " Your opponent left the match." : msg.reason === "forfeit" ? " (by surrender)" : "";
+      showModal(`<h2>${title}</h2>
+        <p>Team ${msg.outcome.winner ?? "—"} wins ${msg.outcome.roundsWon.A}–${msg.outcome.roundsWon.B} over ${msg.outcome.rounds} round${msg.outcome.rounds === 1 ? "" : "s"}.${why}</p>
+        <button onclick="location.reload()">Back to team select</button>`);
+      pvp.sock.close();
+      break;
+    }
+    case "error":
+      pvp.over = true; pvp.sock.close();
+      showModal(`<h2>Quick Match</h2><p>${escHtml(msg.message)}</p><button onclick="location.reload()">Back</button>`);
+      break;
+  }
 }
 
 showSetup(); // start at the team-select screen; "New team" reloads back here
