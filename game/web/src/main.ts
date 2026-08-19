@@ -122,6 +122,8 @@ function unusableReason(u: Unit, skill: SkillInstance): string {
 
 // ── interaction (event delegation) ───────────────────────────────────────────────────────────────── //
 app.addEventListener("click", (e) => {
+  const tgtEl = (e.target as HTMLElement).closest<HTMLElement>(".tgt");
+  if (tgtEl) { const c = tgtEl.dataset.dequeue; if (c) { ui.planned.delete(c); ui.plannedSkill.delete(c); render(); } return; } // click a targeting icon → dequeue that skill
   const fxEl = (e.target as HTMLElement).closest<HTMLElement>(".fx");
   if (fxEl) { if (fxpop.hidden) showFx(fxEl); else hideFx(); return; } // tap an effect icon to toggle its description
   const el = (e.target as HTMLElement).closest<HTMLElement>("[data-owner],[data-skill],[data-target],[data-cancel],[data-resolve],[data-surrender],[data-pick],[data-inspect],[data-reroll],[data-start],[data-plus],[data-minus],[data-energy-confirm],[data-energy-cancel]");
@@ -177,9 +179,9 @@ app.addEventListener("click", (e) => {
   }
 });
 
-// desktop hover: show an effect's description popup
-app.addEventListener("mouseover", (e) => { const fx = (e.target as HTMLElement).closest<HTMLElement>(".fx"); if (fx) showFx(fx); });
-app.addEventListener("mouseout", (e) => { if ((e.target as HTMLElement).closest(".fx")) hideFx(); });
+// desktop hover: show the effect/targeting-skill description popup
+app.addEventListener("mouseover", (e) => { const el = (e.target as HTMLElement).closest<HTMLElement>(".fx, .tgt"); if (el) showFx(el); });
+app.addEventListener("mouseout", (e) => { if ((e.target as HTMLElement).closest(".fx, .tgt")) hideFx(); });
 
 /** The turn's total generic cost, and how much of each color is free to pay it (pool minus the specific
  *  each element must reserve). Generic energy is fully available; it can only ever pay generic. */
