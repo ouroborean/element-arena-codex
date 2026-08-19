@@ -13080,7 +13080,7 @@ export const ROSTER: HeroDef[] = [
      "generic": 0,
      "specific": 1
     },
-    "cooldown": 3,
+    "cooldown": 4,
     "effects": [
      {
       "op": "damage",

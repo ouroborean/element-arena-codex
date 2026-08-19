@@ -523,9 +523,12 @@ export function performAction(state: MatchState, action: Action): ActionResult {
   // Using a new skill cancels any active channel (unless this skill opts out).
   if (!skill.doesNotInterrupt) removeStatus(caster, "channeling");
 
-  const affected = runEffects(state, skill.effects, { caster, self: caster, targets: decl.finalTargets, skillId: skill.id });
+  // Put the skill on cooldown BEFORE running its effects, so a skill that modifies its OWN cooldown
+  // mid-cast (e.g. Sera's Energized Wingstorm reducing it per marked enemy consumed) adjusts from the
+  // real base rather than having its delta clobbered — or, for a reduction, clamped away against a 0.
   skill.currentCd = effectiveCooldown(caster, skill);
   skill.cdSetTurn = state.turn; // birth turn — advanceCooldowns skips it (see below), so cooldown N blocks N turns
+  const affected = runEffects(state, skill.effects, { caster, self: caster, targets: decl.finalTargets, skillId: skill.id });
   caster.lastSkillId = skill.id; // the "used a skill" ledger (read by clone/last-skill mechanics)
 
   // A Channel skill installs a sustained channel that re-runs at the caster's turns — unless an
