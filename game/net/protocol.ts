@@ -30,6 +30,9 @@ export const TEAM_SIZE = 3;
 export const TURN_MS = 60_000;
 export const DRAFT_MS = 45_000;
 
+/** After a player's socket drops, how long the match is held open for them to reconnect before it forfeits. */
+export const RECONNECT_GRACE_MS = 45_000;
+
 /** Why a match ended — a clean best-of-N decision, or one side dropping out. */
 export type EndReason = "decided" | "forfeit" | "opponent-left" | "stalemate";
 
@@ -46,7 +49,9 @@ export type ClientMsg =
   /** Concede the match immediately (the opponent wins by forfeit). */
   | { t: "surrender" }
   /** Leave the queue before being matched. */
-  | { t: "cancelQueue" };
+  | { t: "cancelQueue" }
+  /** Rejoin an in-progress match after a disconnect (a new socket presenting the seat's rejoin token). */
+  | { t: "rejoin"; matchId: string; token: string; protocolVersion: number };
 
 // --------------------------------------------------------------------------- //
 //  Server → client
@@ -54,8 +59,17 @@ export type ClientMsg =
 export type ServerMsg =
   /** Acknowledged: you are waiting in the queue. */
   | { t: "queued" }
-  /** Matched. `you` is your team id; `state` is the initial (pre-first-turn) board. */
-  | { t: "start"; you: TeamId; opponentTeam: string[]; state: MatchState }
+  /** Matched. `you` is your team id; `state` is the initial board; `matchId`/`token` let you rejoin on a drop. */
+  | { t: "start"; you: TeamId; opponentTeam: string[]; state: MatchState; matchId: string; token: string }
+  /** A successful rejoin: here is where the match stands, what you should be doing, and whether the
+   *  opponent is currently disconnected (so a double-disconnect resumes with an accurate banner). */
+  | { t: "resumed"; you: TeamId; state: MatchState; control: "turn" | "wait" | "draft" | "waitDraft"; deadline?: number; opponentDisconnected: boolean }
+  /** Your opponent's connection dropped; the match is held open `graceMs` for them to return. */
+  | { t: "opponentDisconnected"; graceMs: number }
+  /** Your opponent reconnected — carry on. */
+  | { t: "opponentReconnected" }
+  /** A rejoin attempt failed (the match ended, or the token/match id did not match). */
+  | { t: "rejoinFailed"; message: string }
   /** It is YOUR turn — plan and reply with a `turn`. `deadline` is an epoch-ms timeout. */
   | { t: "yourTurn"; state: MatchState; deadline: number }
   /** The opponent is acting; just render `state` and wait. */

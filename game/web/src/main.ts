@@ -34,6 +34,8 @@ export interface UiState {
   // settle once you commit a choice (or hold).
   draft?: { side: TeamId; inspect: string | null; resolve: () => void };
   overlay?: string;
+  /** A thin fixed banner over the board (e.g. "opponent disconnected — waiting…"). */
+  notice?: string;
   resolveTurn?: (actions: Action[]) => void;
 }
 
@@ -54,7 +56,12 @@ let setup: { picked: string[]; oppo: string[]; inspect: string | null; augfuse?:
 // A live Quick Match (PvP) session. Non-null only in networked play; in bot mode it stays null and the
 // local runMatch loop drives everything. When set, the turn/draft/concede commit points send to the server
 // instead of resolving locally, and the server's state broadcasts drive the board.
-let pvp: { sock: MatchSocket; you: TeamId; over: boolean; started: boolean } | null = null;
+let pvp:
+  | { sock: MatchSocket; you: TeamId; over: boolean; started: boolean; token?: string; matchId?: string; reconnecting: boolean; attempts: number }
+  | null = null;
+const MAX_RECONNECT_ATTEMPTS = 6;
+const RECONNECT_DELAY_MS = 2500;
+const STORED_MATCH_KEY = "arenaMatch"; // sessionStorage: lets a page reload rejoin an in-progress match
 const escHtml = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
 const ui: UiState = {
   you: "A", phase: "busy", phaseLabel: "starting…", hint: "",
@@ -414,26 +421,67 @@ function showSearching(text: string): void {
     <div class="modal-foot"><button data-quick-cancel="1">Cancel</button></div>`);
 }
 
+function storeMatch(matchId: string, token: string): void {
+  try { sessionStorage.setItem(STORED_MATCH_KEY, JSON.stringify({ matchId, token })); } catch { /* private mode */ }
+}
+function clearStoredMatch(): void {
+  try { sessionStorage.removeItem(STORED_MATCH_KEY); } catch { /* ignore */ }
+}
+
+/** A dropped socket. A reconnect/resume attempt retries; a first in-match drop starts reconnecting; only a
+ *  fresh (never-started, no token) connect failure is a flat "can't reach the server". */
+function onDrop(): void {
+  if (!pvp || pvp.over) return;
+  if (pvp.reconnecting) { setTimeout(attemptReconnect, RECONNECT_DELAY_MS); return; } // a reconnect/resume attempt itself dropped → retry
+  if (!pvp.started) { pvp.over = true; pvp = null; showModal(`<h2>Can't reach the server</h2><p>No match server at <code>${escHtml(serverUrl())}</code>. Start it with <code>node game/server/index.ts</code>.</p><button onclick="location.reload()">Back</button>`); return; }
+  pvp.reconnecting = true; pvp.attempts = 0;
+  attemptReconnect();
+}
+
+/** Open a fresh socket and present the rejoin token to resume the in-progress match. */
+function attemptReconnect(): void {
+  if (!pvp || pvp.over || !pvp.reconnecting) return;
+  if (++pvp.attempts > MAX_RECONNECT_ATTEMPTS || !pvp.token || !pvp.matchId) {
+    pvp.over = true; pvp = null; clearStoredMatch();
+    showModal(`<h2>Connection lost</h2><p>Couldn't reconnect to the match.</p><button onclick="location.reload()">Back to team select</button>`);
+    return;
+  }
+  showModal(`<h2>Reconnecting…</h2><p>Attempt ${pvp.attempts} of ${MAX_RECONNECT_ATTEMPTS}…</p>`);
+  const sock = new MatchSocket(serverUrl());
+  pvp.sock = sock;
+  const { token, matchId } = pvp;
+  sock.onOpen = () => sock.send({ t: "rejoin", matchId: matchId!, token: token!, protocolVersion: PROTOCOL_VERSION });
+  sock.onMessage = handleServerMsg;
+  sock.onError = () => { /* wait for close */ };
+  sock.onClose = onDrop;
+}
+
 /** Connect, join the queue with `team`, and let server messages drive the match from here on. */
 function startQuickMatch(team: string[]): void {
   const sock = new MatchSocket(serverUrl());
-  pvp = { sock, you: "A", over: false, started: false };
+  pvp = { sock, you: "A", over: false, started: false, reconnecting: false, attempts: 0 };
   setup = null;
   sock.onOpen = () => sock.send({ t: "queue", team, protocolVersion: PROTOCOL_VERSION });
   sock.onMessage = handleServerMsg;
-  // 'error' then 'close' both fire on an abnormal drop — run once, and tailor the message to whether the
-  // match had actually started (a dropped in-match connection vs. never reaching the server at all).
-  const onDrop = () => {
-    if (!pvp || pvp.over) return;
-    const started = pvp.started;
-    pvp.over = true; pvp.sock.close(); pvp = null;
-    showModal(started
-      ? `<h2>Connection lost</h2><p>The match connection closed.</p><button onclick="location.reload()">Back to team select</button>`
-      : `<h2>Can't reach the server</h2><p>No match server at <code>${escHtml(serverUrl())}</code>. Start it with <code>node game/server/index.ts</code>.</p><button onclick="location.reload()">Back</button>`);
-  };
-  sock.onError = onDrop;
+  sock.onError = () => { /* wait for close */ };
   sock.onClose = onDrop;
   showSearching("Connecting…");
+}
+
+/** On page load, silently try to rejoin an in-progress match (survives an accidental reload). */
+function tryResumeStoredMatch(): boolean {
+  let stored: { matchId?: unknown; token?: unknown };
+  try { stored = JSON.parse(sessionStorage.getItem(STORED_MATCH_KEY) ?? "null") ?? {}; } catch { clearStoredMatch(); return false; }
+  if (typeof stored.matchId !== "string" || typeof stored.token !== "string") return false;
+  const matchId = stored.matchId, token = stored.token;
+  const sock = new MatchSocket(serverUrl());
+  pvp = { sock, you: "A", over: false, started: false, token, matchId, reconnecting: true, attempts: 0 };
+  sock.onOpen = () => sock.send({ t: "rejoin", matchId, token, protocolVersion: PROTOCOL_VERSION });
+  sock.onMessage = handleServerMsg;
+  sock.onError = () => { /* wait for close */ };
+  sock.onClose = onDrop;
+  showModal(`<h2>Reconnecting…</h2><p>Rejoining your match…</p>`);
+  return true;
 }
 
 function cancelQuickMatch(): void {
@@ -441,6 +489,13 @@ function cancelQuickMatch(): void {
   pvp?.sock.close();
   pvp = null;
   showSetup();
+}
+
+/** Open the between-round draft modal for a side (shared by yourDraft and a reconnect resumed at draft). */
+function openPvpDraft(side: TeamId): void {
+  ui.phase = "busy"; ui.phaseLabel = "choose your upgrade"; ui.overlay = undefined; ui.energyPanel = undefined;
+  ui.draft = { side, inspect: draftableHeroes(state, side)[0]?.id ?? null, resolve: () => {} };
+  render();
 }
 
 /** Enter local planning for a networked turn — mirrors the bot-mode human provider, minus the local promise. */
@@ -461,27 +516,37 @@ function pvpBusy(label: string): void {
   render();
 }
 
+/** Resume the board at the given control state — shared by yourTurn/opponentTurn/… and a reconnect. */
+function applyControl(control: "turn" | "wait" | "draft" | "waitDraft"): void {
+  if (control === "turn") enterPvpPlanning();
+  else if (control === "draft") openPvpDraft(pvp!.you);
+  else if (control === "waitDraft") pvpBusy("Opponent is choosing an upgrade…");
+  else pvpBusy("Opponent is acting…");
+}
+
 function handleServerMsg(msg: ServerMsg): void {
   if (!pvp) return;
   switch (msg.t) {
     case "queued": showSearching("Searching for an opponent…"); break;
     case "start":
       pvp.started = true; pvp.you = msg.you; ui.you = msg.you; state = msg.state;
+      pvp.token = msg.token; pvp.matchId = msg.matchId; storeMatch(msg.matchId, msg.token);
       pvpBusy("Match found — get ready…");
+      break;
+    case "resumed":
+      pvp.started = true; pvp.reconnecting = false; pvp.attempts = 0;
+      pvp.you = msg.you; ui.you = msg.you; state = msg.state;
+      ui.notice = msg.opponentDisconnected ? "Opponent disconnected — waiting for them to reconnect…" : undefined;
+      applyControl(msg.control);
       break;
     case "opponentTurn": state = msg.state; pvpBusy("Opponent is acting…"); break;
     case "yourTurn": state = msg.state; enterPvpPlanning(); break;
     case "opponentDraft": state = msg.state; pvpBusy("Opponent is choosing an upgrade…"); break;
-    case "yourDraft": {
-      state = msg.state;
-      const side = pvp.you; // a player always drafts for its own team
-      ui.phase = "busy"; ui.phaseLabel = "choose your upgrade"; ui.overlay = undefined; ui.energyPanel = undefined;
-      ui.draft = { side, inspect: draftableHeroes(state, side)[0]?.id ?? null, resolve: () => {} };
-      render();
-      break;
-    }
+    case "yourDraft": state = msg.state; openPvpDraft(pvp.you); break; // a player always drafts for its own team
+    case "opponentDisconnected": ui.notice = "Opponent disconnected — waiting for them to reconnect…"; render(); break;
+    case "opponentReconnected": ui.notice = undefined; render(); break;
     case "matchEnd": {
-      pvp.over = true;
+      pvp.over = true; clearStoredMatch(); ui.notice = undefined;
       const won = msg.outcome.winner === msg.you;
       const title = msg.outcome.winner === null ? "Stalemate" : won ? "Victory 🏆" : "Defeat";
       const why = msg.reason === "opponent-left" ? " Your opponent left the match." : msg.reason === "forfeit" ? " (by surrender)" : "";
@@ -491,11 +556,19 @@ function handleServerMsg(msg: ServerMsg): void {
       pvp.sock.close();
       break;
     }
+    case "rejoinFailed": {
+      const wasStarted = pvp.started;
+      pvp.over = true; pvp.sock.close(); pvp = null; clearStoredMatch();
+      if (wasStarted) showModal(`<h2>Match ended</h2><p>${escHtml(msg.message)}</p><button onclick="location.reload()">Back to team select</button>`);
+      else showSetup(); // a stale stored match on page load — just return to team select
+      break;
+    }
     case "error":
-      pvp.over = true; pvp.sock.close();
+      pvp.over = true; pvp.sock.close(); clearStoredMatch();
       showModal(`<h2>Quick Match</h2><p>${escHtml(msg.message)}</p><button onclick="location.reload()">Back</button>`);
       break;
   }
 }
 
-showSetup(); // start at the team-select screen; "New team" reloads back here
+// Start at team select — unless a match from this tab is still in progress (an accidental reload), which we rejoin.
+if (!tryResumeStoredMatch()) showSetup();

@@ -403,11 +403,14 @@ function draftPanel(state: MatchState, ui: UiState): string {
 export function renderApp(state: MatchState, ui: UiState): string {
   const foe = ui.you === "A" ? "B" : "A";
   const incoming = incomingBy(state, ui);
+  const notice = ui.notice
+    ? `<div style="position:fixed;top:0;left:0;right:0;z-index:60;background:#6b2b3a;color:#fff;text-align:center;padding:6px 10px;font-size:14px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.4)">${esc(ui.notice)}</div>`
+    : "";
   return `<div class="arena">
     ${sideRow(state, foe, ui, false, incoming)}
     ${midbar(state, ui)}
     ${sideRow(state, ui.you, ui, true, incoming)}
-  </div>${ui.energyPanel ? energyPanel(ui) : ""}${ui.draft ? draftPanel(state, ui) : ""}${ui.overlay ?? ""}`;
+  </div>${notice}${ui.energyPanel ? energyPanel(ui) : ""}${ui.draft ? draftPanel(state, ui) : ""}${ui.overlay ?? ""}`;
 }
 
 // ── team select (redesigned scene) ────────────────────────────────────────────────────────────────── //
