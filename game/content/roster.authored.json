@@ -4091,7 +4091,10 @@
       "specific": 1
      },
      "cooldown": 2,
-     "note": "Bypasses Invulnerability (Bypassing tag): the 20 piercing lands even on an invulnerable target. Usable ONLY while Wind Step (zephyrex4) is on cooldown - the DSL Condition vocabulary has no primitive that references another skill's cooldown state, so this gate is documented here rather than in a requires clause.",
+     "requires": {
+      "skillOnCooldown": "zephyrex4"
+     },
+     "note": "Bypasses Invulnerability (Bypassing tag): the 20 piercing lands even on an invulnerable target. Usable ONLY while Wind Step (zephyrex4) is on cooldown - gated by the skillOnCooldown condition on the requires clause.",
      "effects": [
       {
        "op": "seq",
@@ -4239,7 +4242,7 @@
      "when": {
       "and": [
        {
-        "eventHasTag": "invulnerable"
+        "eventStatusKind": "invulnerable"
        },
        {
         "isFaction": "eventTarget",

@@ -288,6 +288,11 @@ export function evalCondition(c: Condition, ctx: Ctx): boolean {
     const e = ctx.event;
     return !!e && "team" in e && e.team === ctx.self.team;
   }
+  if ("skillOnCooldown" in c) {
+    const u = resolveOne(c.of, ctx);
+    const sk = (u.skills ?? []).find((k) => k.id === c.skillOnCooldown);
+    return !!sk && sk.currentCd > 0;
+  }
   if ("and" in c) return c.and.every((x) => evalCondition(x, ctx));
   if ("or" in c) return c.or.some((x) => evalCondition(x, ctx));
   if ("not" in c) return !evalCondition(c.not, ctx);

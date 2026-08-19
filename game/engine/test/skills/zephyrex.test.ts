@@ -101,6 +101,8 @@ test("Sonic Thrust — can only be used while Wind Step is on cooldown", () => {
 test("Sonic Thrust — 20 Piercing that Bypasses Invulnerability, and stuns non-Strategic skills for 1 turn", () => {
   const s = battle(["zephyrex", "gommar", "syl"], ["gommar", "ando", "riverdaughter"]);
   const b1 = unit(s, "b1");
+  // Sonic Thrust is gated on Wind Step being on cooldown; put it there so we can isolate the strike.
+  skillOf(unit(s, "a1"), "zephyrex4").currentCd = 2;
   // Invulnerability must NOT stop it (Bypassing). Apply the status directly (no event) to isolate the bypass.
   b1.statuses.push({ kind: "invulnerable", duration: 2, appliedBy: "b1", appliedTurn: 0 });
   performAction(s, { unit: "a1", skillId: "zephyrex3", targets: ["b1"] });

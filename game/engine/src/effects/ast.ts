@@ -74,6 +74,7 @@ export type Condition =
   | { eventHasTag: string } // (skillDeclared/skillUsed) the skill carries this class tag
   | { eventStatusKind: string; name?: string } // (statusApplied/statusExpired) the event's status kind (+name) matches
   | { eventTeamIsSelf: true } // (turnStart/turnEnd) the event's team is the trigger owner's team ("my team's turn")
+  | { skillOnCooldown: string; of?: Selector } // the named skill on the selected unit (default self) has cooldown remaining
   | { and: Condition[] }
   | { or: Condition[] }
   | { not: Condition }

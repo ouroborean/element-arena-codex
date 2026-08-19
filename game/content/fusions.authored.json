@@ -18633,7 +18633,7 @@
      "when": {
       "and": [
        {
-        "eventHasTag": "invulnerable"
+        "eventStatusKind": "invulnerable"
        },
        {
         "isFaction": "eventTarget",
@@ -18704,7 +18704,7 @@
      "when": {
       "and": [
        {
-        "eventHasTag": "invulnerable"
+        "eventStatusKind": "invulnerable"
        },
        {
         "isFaction": "eventTarget",
@@ -18901,7 +18901,7 @@
      "when": {
       "and": [
        {
-        "eventHasTag": "invulnerable"
+        "eventStatusKind": "invulnerable"
        },
        {
         "isFaction": "eventTarget",
