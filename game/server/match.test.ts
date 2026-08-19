@@ -12,10 +12,13 @@ import "../engine/content/fusion_effects.ts";
 import "../engine/content/augment_effects.ts";
 import { defaultPolicy } from "../engine/content/match.ts";
 import type { TeamId } from "../engine/src/types.ts";
-import { Match, type MatchClient } from "./session.ts";
+import { Match, filterTurnActions, type MatchClient } from "./session.ts";
 import type { ServerMsg } from "../net/protocol.ts";
 
 const tick = (ms = 5) => new Promise((r) => setTimeout(r, ms));
+
+/** Ordered record of which side was prompted to draft first (shared across a pair's two doubles). */
+interface DraftEvent { side: TeamId; myRoundsWon: number; oppRoundsWon: number; }
 
 /** A scripted player: auto-attacks on its turn and skips drafts, unless `silent`. Records every message. */
 class Double implements MatchClient {
@@ -26,6 +29,7 @@ class Double implements MatchClient {
   match!: Match;
   messages: ServerMsg[] = [];
   silent = false; // when true, never replies (to exercise timeouts/forfeits)
+  draftLog: DraftEvent[] = []; // shared array (set by pair()) recording yourDraft order across both doubles
 
   constructor(team: string[]) {
     this.team = team;
@@ -33,6 +37,10 @@ class Double implements MatchClient {
 
   send(msg: ServerMsg): void {
     this.messages.push(msg);
+    if (msg.t === "yourDraft") {
+      const rw = msg.state.teams;
+      this.draftLog.push({ side: this.side!, myRoundsWon: rw[this.side!].roundsWon, oppRoundsWon: rw[this.side! === "A" ? "B" : "A"].roundsWon });
+    }
     if (this.silent) return;
     // Reply on a microtask: the match sets pendingTurn AFTER this synchronous send returns.
     if (msg.t === "yourTurn") {
@@ -54,10 +62,12 @@ class Double implements MatchClient {
 function pair(aTeam: string[], bTeam: string[], opts?: { turnMs?: number; draftMs?: number }) {
   const a = new Double(aTeam);
   const b = new Double(bTeam);
+  const draftLog: DraftEvent[] = [];
+  a.draftLog = b.draftLog = draftLog; // shared, so first-to-draft ordering is observable across both
   const match = new Match(a, b, 12345, { turnMs: 40, draftMs: 40, ...opts });
   a.match = match;
   b.match = match;
-  return { a, b, match };
+  return { a, b, match, draftLog };
 }
 
 test("a full Quick Match plays to a decisive winner and both players are told the same outcome", async () => {
@@ -126,4 +136,27 @@ test("a surrender hands the win to the opponent", async () => {
   assert.equal(bEnd!.outcome.winner, bSide, "the opponent of the surrendering player wins");
   assert.equal(bEnd!.reason, "forfeit", "a surrender is reported as a forfeit, not an opponent-left");
   assert.equal(aEnd!.you !== bEnd!.you, true, "each side is told its own perspective");
+});
+
+test("filterTurnActions keeps only the active side's own units, one action each", () => {
+  const units = { a1: { team: "A" }, a2: { team: "A" }, b1: { team: "B" } } as const;
+  const submitted = [
+    { unit: "b1", skillId: "x" }, // an OPPONENT unit — must be dropped
+    { unit: "a1", skillId: "s1", targets: ["b1"] },
+    { unit: "a1", skillId: "s2" }, // a SECOND action for a1 — must be dropped (one per unit)
+    { unit: "ghost", skillId: "z" }, // an unknown unit — dropped
+    { unit: "a2", skillId: "s3" },
+  ];
+  const kept = filterTurnActions(submitted, "A", units);
+  assert.deepEqual(kept.map((a) => a.unit), ["a1", "a2"], "opponent, duplicate, and unknown units are filtered out");
+  assert.equal(kept[0]!.skillId, "s1", "the FIRST action for a unit is the one kept");
+});
+
+test("the round LOSER drafts first between rounds", async () => {
+  // Two aggressive teams that both have fusion options at round 2, so a real draft phase occurs.
+  const { match, draftLog } = pair(["pyrrha", "jarrik", "gommar"], ["ando", "syl", "riverdaughter"]);
+  await match.run();
+  assert.ok(draftLog.length >= 2, "a between-round draft happened (both sides prompted)");
+  const first = draftLog[0]!;
+  assert.ok(first.myRoundsWon < first.oppRoundsWon, "the side prompted first has fewer round wins — i.e. the loser drafts first");
 });

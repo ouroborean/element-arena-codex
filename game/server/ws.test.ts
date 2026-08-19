@@ -110,3 +110,19 @@ test("decoder fails a stray continuation frame", () => {
   dec.push(maskFrame(0x0, Buffer.from("orphan", "utf8"), true));
   assert.ok(events.some((e) => e.startsWith("error:")), "continuation with no message in progress errors");
 });
+
+test("decoder caps a fragmented message's TOTAL size, not just each frame", () => {
+  const { dec, texts, events } = collect(200);
+  // Each 80-byte frame is under the 200-byte per-frame limit, but the running total exceeds it.
+  dec.push(maskFrame(0x1, Buffer.from("x".repeat(80)), false)); // start (fin=0)
+  dec.push(maskFrame(0x0, Buffer.from("y".repeat(80)), false)); // continuation (total 160, ok)
+  dec.push(maskFrame(0x0, Buffer.from("z".repeat(80)), false)); // continuation (total 240 > 200 -> fail)
+  assert.equal(texts.length, 0, "the oversized fragmented message is never delivered");
+  assert.ok(events.some((e) => e.startsWith("error:")), "the connection is failed");
+});
+
+test("decoder rejects an illegal fragmented control frame (ping with fin=0)", () => {
+  const { dec, events } = collect();
+  dec.push(maskFrame(0x9, Buffer.alloc(0), false)); // ping with fin=0 — a §5.5 violation
+  assert.ok(events.some((e) => e.startsWith("error:")), "a fragmented control frame fails the connection");
+});

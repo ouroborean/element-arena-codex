@@ -14,6 +14,7 @@ import type { Duplex } from "node:stream";
 
 const GUID = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"; // RFC 6455 magic for the accept-key hash
 const OP_CONT = 0x0, OP_TEXT = 0x1, OP_BIN = 0x2, OP_CLOSE = 0x8, OP_PING = 0x9, OP_PONG = 0xa;
+const MAX_OUTBOUND_BYTES = 8 * 1024 * 1024; // drop a peer whose unsent write buffer grows past this (dead reader)
 
 /** The Sec-WebSocket-Accept value for a client's Sec-WebSocket-Key (SHA-1 of key+GUID, base64). */
 export function acceptKey(key: string): string {
@@ -56,6 +57,7 @@ export class FrameDecoder {
   private buf: Buffer = Buffer.alloc(0);
   private fragments: Buffer[] = [];
   private fragOpcode = -1;
+  private fragBytes = 0; // running total of a fragmented message's payload, capped at maxBytes
   private failed = false;
   private hooks: DecoderHooks;
   private maxBytes: number;
@@ -111,6 +113,10 @@ export class FrameDecoder {
   }
 
   private dispatch(fin: boolean, opcode: number, payload: Buffer): void {
+    // Control frames (RFC 6455 §5.5) must not be fragmented and carry at most 125 bytes.
+    if ((opcode === OP_CLOSE || opcode === OP_PING || opcode === OP_PONG) && (!fin || payload.length > 125)) {
+      return void this.fail("invalid control frame");
+    }
     switch (opcode) {
       case OP_CLOSE: this.hooks.onClose(); return;
       case OP_PING: this.hooks.onPing(payload); return;
@@ -121,15 +127,20 @@ export class FrameDecoder {
         if (fin) return this.deliver(opcode, payload); // the common case: a whole message in one frame
         this.fragOpcode = opcode;
         this.fragments = [payload];
+        this.fragBytes = payload.length;
         return;
       case OP_CONT:
         if (this.fragOpcode === -1) return void this.fail("continuation with no message in progress");
+        this.fragBytes += payload.length;
+        // Bound the REASSEMBLED size too: a stream of small non-final fragments must not buffer unboundedly.
+        if (this.fragBytes > this.maxBytes) return void this.fail("fragmented message too large");
         this.fragments.push(payload);
         if (fin) {
           const whole = Buffer.concat(this.fragments);
           const op = this.fragOpcode;
           this.fragments = [];
           this.fragOpcode = -1;
+          this.fragBytes = 0;
           this.deliver(op, whole);
         }
         return;
@@ -193,6 +204,9 @@ export class WsConn {
   private rawSend(opcode: number, payload: Buffer): void {
     try {
       this.socket.write(encodeFrame(opcode, payload));
+      // Backpressure: a peer that can't keep up with authoritative broadcasts must not inflate our write
+      // buffer without bound. If the queued bytes blow past the cap, treat it as a dead reader and drop it.
+      if ((this.socket.writableLength ?? 0) > MAX_OUTBOUND_BYTES) this.destroy();
     } catch {
       this.markClosed();
     }
@@ -229,7 +243,15 @@ export class WsConn {
 export function attachWebSocketServer(server: Server, onConnection: (conn: WsConn) => void): void {
   server.on("upgrade", (req: IncomingMessage, socket: Duplex, head: Buffer) => {
     const key = req.headers["sec-websocket-key"];
-    if ((req.headers.upgrade ?? "").toLowerCase() !== "websocket" || typeof key !== "string") {
+    // A conformant WebSocket upgrade is a GET with Upgrade: websocket, Sec-WebSocket-Version: 13, and a
+    // non-empty Sec-WebSocket-Key. Reject anything else with a 400 rather than a bogus 101.
+    if (
+      req.method !== "GET" ||
+      (req.headers.upgrade ?? "").toLowerCase() !== "websocket" ||
+      req.headers["sec-websocket-version"] !== "13" ||
+      typeof key !== "string" || key.length === 0
+    ) {
+      try { socket.write("HTTP/1.1 400 Bad Request\r\nConnection: close\r\n\r\n"); } catch { /* gone */ }
       socket.destroy();
       return;
     }

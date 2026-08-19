@@ -56,6 +56,23 @@ function sanitizeGenericPay(g: unknown): Record<string, number> | undefined {
   return out;
 }
 
+/**
+ * Authoritative turn gate: keep only actions for `side`'s OWN units, at most one per unit. Without this a
+ * client could name the opponent's units on its turn (spending their energy, cooldown-locking their kit,
+ * wiping their team) or act twice with one unit — the engine's performAction takes no side and won't stop it.
+ */
+export function filterTurnActions(actions: Action[], side: TeamId, units: Record<string, { team: TeamId } | undefined>): Action[] {
+  const seen = new Set<string>();
+  const out: Action[] = [];
+  for (const a of actions) {
+    const u = units[a.unit];
+    if (!u || u.team !== side || seen.has(a.unit)) continue;
+    seen.add(a.unit);
+    out.push(a);
+  }
+  return out;
+}
+
 function sanitizeChoice(c: unknown): DraftChoice {
   if (c && typeof c === "object") {
     const o = c as Record<string, unknown>;
@@ -124,9 +141,15 @@ export class Match {
     }
   }
 
+  /** State for the wire: the full board (clients preview moves from it) but with the unbounded match log
+   *  trimmed to its tail, so re-broadcasting every phase doesn't grow O(turns^2) in bandwidth. */
+  private wireState(): MatchState {
+    return this.state.log.length > 8 ? { ...this.state, log: this.state.log.slice(-8) } : this.state;
+  }
+
   async run(): Promise<void> {
-    this.a.send({ t: "start", you: this.a.side!, opponentTeam: this.b.team, state: this.state });
-    this.b.send({ t: "start", you: this.b.side!, opponentTeam: this.a.team, state: this.state });
+    this.a.send({ t: "start", you: this.a.side!, opponentTeam: this.b.team, state: this.wireState() });
+    this.b.send({ t: "start", you: this.b.side!, opponentTeam: this.a.team, state: this.wireState() });
 
     let outcome: MatchOutcome | null = null;
     try {
@@ -136,7 +159,7 @@ export class Match {
           onResults: () => this.broadcastState(), // both sides see the just-resolved turn before the next one
           onRoundEnd: () => this.broadcastState(),
         },
-        onBetweenRounds: (_st, loser) => this.runDraftPhase(loser),
+        onBetweenRounds: (_st, winner) => this.runDraftPhase(other(winner)), // runMatch passes the WINNER; the loser drafts first
       });
     } catch {
       /* aborted, or an unexpected engine error — disambiguated by `this.aborted` below */
@@ -157,8 +180,8 @@ export class Match {
     const waiting = this.bySide[other(side)];
     return new Promise<Action[]>((resolve) => {
       const deadline = Date.now() + this.turnMs;
-      active.send({ t: "yourTurn", state: this.state, deadline });
-      waiting.send({ t: "opponentTurn", state: this.state });
+      active.send({ t: "yourTurn", state: this.wireState(), deadline });
+      waiting.send({ t: "opponentTurn", state: this.wireState() });
       const timer = setTimeout(() => {
         active.pendingTurn = undefined;
         resolve([]); // auto-hold: a timed-out player does nothing this turn
@@ -166,7 +189,7 @@ export class Match {
       active.pendingTurn = (msg) => {
         clearTimeout(timer);
         this.state.genericPay = sanitizeGenericPay(msg.genericPay);
-        resolve(sanitizeActions(msg.actions));
+        resolve(filterTurnActions(sanitizeActions(msg.actions), side, this.state.units));
       };
     });
   }
@@ -177,10 +200,10 @@ export class Match {
       if (!hasDraftOptions(this.state, side)) continue; // nothing to pick — skip the prompt
       const drafter = this.bySide[side];
       const waiting = this.bySide[other(side)];
-      const choice = await new Promise<DraftChoice>((resolve) => {
+      let choice = await new Promise<DraftChoice>((resolve) => {
         const deadline = Date.now() + this.draftMs;
-        drafter.send({ t: "yourDraft", state: this.state, deadline });
-        waiting.send({ t: "opponentDraft", state: this.state });
+        drafter.send({ t: "yourDraft", state: this.wireState(), deadline });
+        waiting.send({ t: "opponentDraft", state: this.wireState() });
         const timer = setTimeout(() => {
           drafter.pendingDraft = undefined;
           resolve(autoDraft(this.state, side));
@@ -190,6 +213,9 @@ export class Match {
           resolve(sanitizeChoice(msg.choice));
         };
       });
+      // Authoritative gate: you may only fuse/augment your OWN hero (else a client could consume the
+      // opponent's once-per-match fusion during its own draft window).
+      if (choice.kind !== "skip" && this.state.units[choice.unitId]?.team !== side) choice = { kind: "skip" };
       const res = applyDraftChoice(this.state, choice); // validates availability; an illegal pick is a no-op
       if (res.ok && choice.kind !== "skip") this.state.log.push(`draft — Team ${side}: ${res.desc}`);
       this.broadcastState();
@@ -202,7 +228,7 @@ export class Match {
 
   /** Push the current authoritative state to both players as a neutral "render + wait" update. */
   private broadcastState(): void {
-    for (const c of [this.a, this.b]) c.send({ t: "opponentTurn", state: this.state });
+    for (const c of [this.a, this.b]) c.send({ t: "opponentTurn", state: this.wireState() });
   }
 
   private end(outcome: MatchOutcome, reason: EndReason): void {

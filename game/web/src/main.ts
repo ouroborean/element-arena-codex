@@ -54,7 +54,7 @@ let setup: { picked: string[]; oppo: string[]; inspect: string | null; augfuse?:
 // A live Quick Match (PvP) session. Non-null only in networked play; in bot mode it stays null and the
 // local runMatch loop drives everything. When set, the turn/draft/concede commit points send to the server
 // instead of resolving locally, and the server's state broadcasts drive the board.
-let pvp: { sock: MatchSocket; you: TeamId; over: boolean } | null = null;
+let pvp: { sock: MatchSocket; you: TeamId; over: boolean; started: boolean } | null = null;
 const escHtml = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
 const ui: UiState = {
   you: "A", phase: "busy", phaseLabel: "starting…", hint: "",
@@ -417,12 +417,22 @@ function showSearching(text: string): void {
 /** Connect, join the queue with `team`, and let server messages drive the match from here on. */
 function startQuickMatch(team: string[]): void {
   const sock = new MatchSocket(serverUrl());
-  pvp = { sock, you: "A", over: false };
+  pvp = { sock, you: "A", over: false, started: false };
   setup = null;
   sock.onOpen = () => sock.send({ t: "queue", team, protocolVersion: PROTOCOL_VERSION });
   sock.onMessage = handleServerMsg;
-  sock.onError = () => { if (pvp && !pvp.over) { pvp = null; showModal(`<h2>Can't reach the server</h2><p>No match server at <code>${escHtml(serverUrl())}</code>. Start it with <code>node game/server/index.ts</code>.</p><button onclick="location.reload()">Back</button>`); } };
-  sock.onClose = () => { if (pvp && !pvp.over) { pvp = null; showModal(`<h2>Connection lost</h2><p>The match connection closed.</p><button onclick="location.reload()">Back to team select</button>`); } };
+  // 'error' then 'close' both fire on an abnormal drop — run once, and tailor the message to whether the
+  // match had actually started (a dropped in-match connection vs. never reaching the server at all).
+  const onDrop = () => {
+    if (!pvp || pvp.over) return;
+    const started = pvp.started;
+    pvp.over = true; pvp.sock.close(); pvp = null;
+    showModal(started
+      ? `<h2>Connection lost</h2><p>The match connection closed.</p><button onclick="location.reload()">Back to team select</button>`
+      : `<h2>Can't reach the server</h2><p>No match server at <code>${escHtml(serverUrl())}</code>. Start it with <code>node game/server/index.ts</code>.</p><button onclick="location.reload()">Back</button>`);
+  };
+  sock.onError = onDrop;
+  sock.onClose = onDrop;
   showSearching("Connecting…");
 }
 
@@ -456,7 +466,7 @@ function handleServerMsg(msg: ServerMsg): void {
   switch (msg.t) {
     case "queued": showSearching("Searching for an opponent…"); break;
     case "start":
-      pvp.you = msg.you; ui.you = msg.you; state = msg.state;
+      pvp.started = true; pvp.you = msg.you; ui.you = msg.you; state = msg.state;
       pvpBusy("Match found — get ready…");
       break;
     case "opponentTurn": state = msg.state; pvpBusy("Opponent is acting…"); break;
