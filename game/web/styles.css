@@ -68,7 +68,9 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .cost-ic { width: 16px; height: 16px; border-radius: 3px; object-fit: cover; }
 .cost-free { color: var(--dim); font-size: 11px; font-weight: 600; }
 
-.mid-center { text-align: center; }
+/* Reserve the skill-panel's height so entering/leaving targeting never resizes the midbar. */
+.mid-center { text-align: center; min-height: 112px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; }
+.mid-center .skillpanel, .mid-center .bar { align-self: stretch; }
 .turn { font-size: 22px; font-weight: 800; letter-spacing: .3px; }
 .turn.you { color: var(--you); } .turn.foe { color: var(--dim); }
 .mid-center .hint { color: var(--dim); font-size: 12px; margin: 4px 0 8px; }
@@ -100,7 +102,8 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .port-name { position: absolute; left: 0; right: 0; bottom: 0; padding: 10px 3px 3px; font-size: 10px; font-weight: 700; text-align: center; background: linear-gradient(transparent, #000d); }
 .port-check { position: absolute; top: 3px; right: 4px; color: var(--you); font-weight: 800; text-shadow: 0 1px 2px #000; }
 
-.detail { grid-column: 2; grid-row: 1; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; max-height: 78vh; overflow-y: auto; }
+/* Fixed height so selecting a hero (hint → full detail) never grows the panel and shoves the team tray. */
+.detail { grid-column: 2; grid-row: 1; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; height: 78vh; overflow-y: auto; }
 .detail .hint { color: var(--dim); }
 .detail-head { display: grid; grid-template-columns: 64px 1fr; gap: 10px; align-items: center; margin-bottom: 12px; }
 .detail-head .dp { grid-row: 1 / 3; width: 64px; aspect-ratio: 3/4; object-fit: cover; object-position: top; border-radius: 8px; }
@@ -159,9 +162,10 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .sp-warn { color: var(--acc); font-weight: 700; }
 
 /* ── queued-skill indicators (who queued what, on whom) ─────────────────── */
-.queued { display: flex; align-items: center; gap: 5px; margin-top: 5px; padding: 3px 5px; background: color-mix(in srgb, var(--you) 16%, transparent); border: 1px solid color-mix(in srgb, var(--you) 45%, transparent); border-radius: 6px; font-size: 10.5px; line-height: 1.2; }
+.queued { display: flex; align-items: center; gap: 5px; margin-top: 5px; padding: 3px 5px; height: 28px; box-sizing: border-box; background: color-mix(in srgb, var(--you) 16%, transparent); border: 1px solid color-mix(in srgb, var(--you) 45%, transparent); border-radius: 6px; font-size: 10.5px; line-height: 1.2; }
+.queued.empty { visibility: hidden; } /* reserves the same height so queuing never shifts the tiles */
 .queued img { width: 18px; height: 18px; border-radius: 4px; object-fit: cover; flex: 0 0 18px; }
-.queued .q-txt { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.queued .q-txt { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .queued b { color: var(--you); font-weight: 700; }
 .hero.acted .frame { outline: 2px solid color-mix(in srgb, var(--you) 55%, transparent); outline-offset: 1px; }
 /* Targeting icons: the queued skills aimed at this character, straddling the top edge of the portrait,
@@ -199,7 +203,8 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .dh img { width: 38px; height: 38px; border-radius: 6px; object-fit: cover; object-position: top center; background: var(--panel); }
 .dh-name { font-weight: 700; font-size: 12.5px; }
 .dh-opts { grid-column: 2; color: var(--dim); font-size: 10.5px; }
-.draft-options { display: flex; flex-direction: column; gap: 12px; max-height: 56vh; overflow-y: auto; padding-right: 4px; }
+/* Fixed height so switching heroes (different option counts) never resizes / re-centers the modal. */
+.draft-options { display: flex; flex-direction: column; gap: 12px; height: 56vh; overflow-y: auto; padding-right: 4px; }
 .do-sec h4 { margin: 0 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: .4px; color: var(--acc); }
 .do-sec h4 span { color: var(--dim); font-weight: 400; text-transform: none; letter-spacing: 0; font-size: 11px; }
 .do-card { display: flex; gap: 11px; align-items: flex-start; width: 100%; text-align: left; padding: 9px 11px; margin-bottom: 7px; background: var(--panel2); border: 1px solid var(--line); border-radius: 9px; color: var(--ink); cursor: pointer; }

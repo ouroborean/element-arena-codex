@@ -176,10 +176,11 @@ function aoeLabel(skill: SkillInstance | undefined): string {
   }
 }
 
-/** The banner on a queued hero's card: which skill it will use, and on whom. */
+/** The banner on a queued hero's card: which skill it will use, and on whom. The empty slot is always
+ *  rendered (fixed height) so queuing a skill fills it in place instead of shoving the skill tiles down. */
 function queuedBanner(state: MatchState, u: Unit, ui: UiState): string {
   const a = ui.planned.get(u.id);
-  if (!a) return "";
+  if (!a) return `<div class="queued empty"></div>`;
   const skill = (u.skills ?? []).find((s) => s.id === a.skillId);
   const name = SKILL_TEXT[a.skillId]?.n ?? skill?.name ?? a.skillId;
   const ic = iconOf(a.skillId, u.heroId ?? undefined);
