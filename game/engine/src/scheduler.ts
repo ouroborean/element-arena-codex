@@ -199,7 +199,8 @@ export function tickDots(state: MatchState, id: TeamId): void {
       if (s.kind !== "dot" && s.kind !== "regen") continue;
       const owner = state.units[s.appliedBy];
       const byThisTeam = owner ? owner.team === id : false;
-      if (!(byThisTeam && s.duration !== null && s.appliedTurn < state.turn)) continue;
+      // A null duration is round-permanent (ticks every turn until end of round); a finite one ticks while > 0.
+      if (!(byThisTeam && s.appliedTurn < state.turn && (s.duration === null || s.duration > 0))) continue;
       if (s.kind === "regen") {
         applyHeal(u, s.magnitude ?? 0);
         continue;

@@ -56,10 +56,10 @@ test("maggie0 Curse of Thorns — using a skill accrues the curse (a Curse of Th
 test("maggie0 Curse of Thorns — after using a skill, Maggie takes 5 Affliction damage each turn", () => {
   const s = battle(A, B);
   performAction(s, { unit: "a1", skillId: "maggie1", targets: ["b1"] });
-  assert.equal(unit(s, "a1").hp, 85, "the Bramblelash cast itself does not self-damage yet");
+  assert.equal(unit(s, "a1").hp, 100, "the Bramblelash cast itself does not self-damage yet");
   // Advance to Maggie's next turn; the curse should tick for 5.
   toNextMaggieTurnEnd(s);
-  assert.equal(unit(s, "a1").hp, 80, "Curse of Thorns deals 5 Affliction damage on her next turn");
+  assert.equal(unit(s, "a1").hp, 95, "Curse of Thorns deals 5 Affliction damage on her next turn");
 });
 
 // --------------------------------------------------------------------------- //

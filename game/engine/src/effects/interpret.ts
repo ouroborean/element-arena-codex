@@ -171,9 +171,12 @@ function resolveOne(sel: Selector | undefined, ctx: Ctx): Unit {
   return resolveSelector(sel, ctx)[0] ?? ctx.caster;
 }
 
-/** The units an effect applies to: its own `to`, else the skill's chosen targets. */
+/** The units an effect applies to: its own `to`, else the skill's chosen targets. An untargetable ENEMY is
+ *  dropped (AOE/faction selectors bypass legalTargets, so enforce it here too, mirroring the single-target
+ *  rule); same-team and self effects are unaffected, as are a hero's own linked-member mechanics. */
 function effectTargets(to: Selector | undefined, ctx: Ctx): Unit[] {
-  return to ? resolveSelector(to, ctx) : ctx.targets;
+  const units = to ? resolveSelector(to, ctx) : ctx.targets;
+  return units.filter((u) => u.team === ctx.caster.team || !u.statuses.some((s) => s.kind === "untargetable"));
 }
 
 // --------------------------------------------------------------------------- //
