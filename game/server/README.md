@@ -39,10 +39,18 @@ npm test          # node --test — codec, Match integration, and a real-TCP end
 npm run typecheck # tsc --noEmit
 ```
 
+## Reconnection
+
+A player's **seat** in a match outlives any single socket. When a socket drops, the match isn't forfeited
+immediately — it opens a **grace window** (`RECONNECT_GRACE_MS`, 45s) and tells the opponent. A new socket
+that presents the seat's `rejoin` token (`{matchId, token}`, both handed to the client in `start`) rebinds
+the seat and is `resumed` at the live state; only if nobody returns before the window closes does it forfeit.
+The web client stores the token in `sessionStorage`, so even a full page reload rejoins automatically.
+
 ## Scope (MVP)
 
 Quick Match only: queue → team reveal → alternating turns → between-round draft → win/forfeit, plus turn
-timeout and disconnect handling. No accounts, MMR, reconnection, or ranked yet. Anti-cheat covers the two
-things a client controls — the seed is server-held (RNG can't be precomputed) and every action is validated
-by the same engine the UI uses (illegal moves are rejected). Hidden-info redaction is a no-op today because
-the engine has no visibility primitive (invisible statuses are display-only) — revisit if one is added.
+timeout, disconnect handling, and **reconnection** (above). No accounts, MMR, or ranked yet. Anti-cheat
+covers the two things a client controls — the seed is server-held (RNG can't be precomputed) and every
+action is validated by the same engine the UI uses (illegal moves are rejected). Hidden-info redaction is a
+no-op today because the engine has no visibility primitive (invisible statuses are display-only).

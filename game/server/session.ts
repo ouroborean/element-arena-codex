@@ -4,7 +4,8 @@
  * full state after each phase. Players only ever submit their own committed turn / draft choice.
  *
  * The class talks to an abstract `MatchClient` (not a socket) so it can be driven by scripted doubles in
- * tests. Timeouts fill a silent turn (auto-hold) or an auto-draft; a disconnect forfeits the match.
+ * tests. Turn/draft timeouts auto-fill; a surrender forfeits immediately; a dropped socket starts a grace
+ * window (onSeatDisconnect) so the player can reconnect (onSeatReconnect) instead of losing outright.
  */
 import type { Action } from "../engine/src/scheduler.ts";
 import type { MatchState, TeamId } from "../engine/src/types.ts";
@@ -12,22 +13,29 @@ import type { MatchOutcome } from "../engine/content/match.ts";
 import { buildMatch } from "../engine/content/match.ts";
 import { runMatch } from "../client/loop.ts";
 import { applyDraftChoice, autoDraft, hasDraftOptions, type DraftChoice } from "../client/draft.ts";
-import { ROUNDS_TO_WIN, TURN_MS, DRAFT_MS, type ClientMsg, type ServerMsg, type EndReason } from "../net/protocol.ts";
+import { ROUNDS_TO_WIN, TURN_MS, DRAFT_MS, RECONNECT_GRACE_MS, type ClientMsg, type ServerMsg, type EndReason } from "../net/protocol.ts";
 
 type TurnMsg = Extract<ClientMsg, { t: "turn" }>;
 type DraftMsg = Extract<ClientMsg, { t: "draftChoice" }>;
 
-/** What a match needs of a connected player — a real WsConn wrapper in production, a double in tests. */
+/** What a match needs of a connected player — a real seat (with a swappable socket) in production, a double
+ *  in tests. A seat outlives any single connection so a reconnect can rebind it. */
 export interface MatchClient {
   team: string[];
   /** Assigned by the match at start (the coin-flip who-goes-first). */
   side?: TeamId;
+  /** Rejoin credentials, set by the server before run(); echoed to the client in `start` so it can reconnect. */
+  token?: string;
+  matchId?: string;
   /** Set by the match while it awaits this player's turn; the router resolves it on an inbound `turn`. */
   pendingTurn?: (msg: TurnMsg) => void;
   /** Set while awaiting this player's between-round draft choice. */
   pendingDraft?: (msg: DraftMsg) => void;
   send(msg: ServerMsg): void;
 }
+
+/** What a reconnecting player should be doing right now — used to resume them at the live state. */
+type Control = "turn" | "wait" | "draft" | "waitDraft";
 
 const other = (side: TeamId): TeamId => (side === "A" ? "B" : "A");
 const HOLD: TurnMsg = { t: "turn", actions: [] };
@@ -91,14 +99,21 @@ export class Match {
   private aborted: { winner: TeamId; reason: EndReason } | null = null;
   private turnMs: number;
   private draftMs: number;
+  private graceMs: number;
+  /** Sides whose socket is currently dropped (grace timer running). */
+  private disconnected = new Set<TeamId>();
+  private graceTimers: Partial<Record<TeamId, ReturnType<typeof setTimeout>>> = {};
+  /** What each side is currently owed — so a reconnecting player can be resumed at the live state. */
+  private pending: Record<TeamId, { control: Control; deadline?: number }> = { A: { control: "wait" }, B: { control: "wait" } };
   /** Set by the owner (server) to detach client→match routing once the match ends. */
   onEnd?: () => void;
 
-  constructor(a: MatchClient, b: MatchClient, seed: number, opts: { turnMs?: number; draftMs?: number } = {}) {
+  constructor(a: MatchClient, b: MatchClient, seed: number, opts: { turnMs?: number; draftMs?: number; graceMs?: number } = {}) {
     this.a = a;
     this.b = b;
     this.turnMs = opts.turnMs ?? TURN_MS;
     this.draftMs = opts.draftMs ?? DRAFT_MS;
+    this.graceMs = opts.graceMs ?? RECONNECT_GRACE_MS;
     // Random side assignment IS the first-move coin flip (Team A always takes a round's first turn).
     const aIsA = Math.random() < 0.5;
     a.side = aIsA ? "A" : "B";
@@ -124,9 +139,34 @@ export class Match {
     // Anything else (a stray/out-of-turn message) is ignored.
   }
 
-  /** A player dropped (socket closed) — the opponent wins by forfeit. */
-  onDisconnect(who: MatchClient): void {
-    this.abort(who === this.a ? this.b : this.a, "opponent-left");
+  /**
+   * A player's socket dropped. Instead of forfeiting immediately, hold the match open for `graceMs` while
+   * the opponent is told; if the player hasn't reconnected by then, they forfeit. The match loop keeps
+   * running meanwhile (their turns auto-hold), so a returning player resumes at the live state.
+   */
+  onSeatDisconnect(seat: MatchClient): void {
+    if (this.over || this.aborted) return;
+    const side = seat.side!;
+    if (this.disconnected.has(side)) return;
+    this.disconnected.add(side);
+    this.bySide[other(side)].send({ t: "opponentDisconnected", graceMs: this.graceMs });
+    const timer = setTimeout(() => {
+      if (!this.over && !this.aborted && this.disconnected.has(side)) this.abort(this.bySide[other(side)], "opponent-left");
+    }, this.graceMs);
+    timer.unref?.();
+    this.graceTimers[side] = timer;
+  }
+
+  /** A player reconnected within the grace window: cancel the forfeit, resume them at the live state. */
+  onSeatReconnect(seat: MatchClient): void {
+    if (this.over) return;
+    const side = seat.side!;
+    const timer = this.graceTimers[side];
+    if (timer) { clearTimeout(timer); delete this.graceTimers[side]; }
+    this.disconnected.delete(side);
+    const p = this.pending[side];
+    seat.send({ t: "resumed", you: side, state: this.wireState(), control: p.control, deadline: p.deadline });
+    this.bySide[other(side)].send({ t: "opponentReconnected" });
   }
 
   /** Mark the match aborted in `survivor`'s favour and unblock any awaited input so the loop unwinds. */
@@ -141,6 +181,13 @@ export class Match {
     }
   }
 
+  private clearGraceTimers(): void {
+    for (const side of ["A", "B"] as TeamId[]) {
+      const t = this.graceTimers[side];
+      if (t) { clearTimeout(t); delete this.graceTimers[side]; }
+    }
+  }
+
   /** State for the wire: the full board (clients preview moves from it) but with the unbounded match log
    *  trimmed to its tail, so re-broadcasting every phase doesn't grow O(turns^2) in bandwidth. */
   private wireState(): MatchState {
@@ -148,8 +195,8 @@ export class Match {
   }
 
   async run(): Promise<void> {
-    this.a.send({ t: "start", you: this.a.side!, opponentTeam: this.b.team, state: this.wireState() });
-    this.b.send({ t: "start", you: this.b.side!, opponentTeam: this.a.team, state: this.wireState() });
+    this.a.send({ t: "start", you: this.a.side!, opponentTeam: this.b.team, state: this.wireState(), matchId: this.a.matchId ?? "", token: this.a.token ?? "" });
+    this.b.send({ t: "start", you: this.b.side!, opponentTeam: this.a.team, state: this.wireState(), matchId: this.b.matchId ?? "", token: this.b.token ?? "" });
 
     let outcome: MatchOutcome | null = null;
     try {
@@ -180,6 +227,8 @@ export class Match {
     const waiting = this.bySide[other(side)];
     return new Promise<Action[]>((resolve) => {
       const deadline = Date.now() + this.turnMs;
+      this.pending[side] = { control: "turn", deadline };
+      this.pending[other(side)] = { control: "wait" };
       active.send({ t: "yourTurn", state: this.wireState(), deadline });
       waiting.send({ t: "opponentTurn", state: this.wireState() });
       const timer = setTimeout(() => {
@@ -202,6 +251,8 @@ export class Match {
       const waiting = this.bySide[other(side)];
       let choice = await new Promise<DraftChoice>((resolve) => {
         const deadline = Date.now() + this.draftMs;
+        this.pending[side] = { control: "draft", deadline };
+        this.pending[other(side)] = { control: "waitDraft" };
         drafter.send({ t: "yourDraft", state: this.wireState(), deadline });
         waiting.send({ t: "opponentDraft", state: this.wireState() });
         const timer = setTimeout(() => {
@@ -234,6 +285,7 @@ export class Match {
   private end(outcome: MatchOutcome, reason: EndReason): void {
     if (this.over) return;
     this.over = true;
+    this.clearGraceTimers();
     this.a.send({ t: "matchEnd", outcome, reason, you: this.a.side! });
     this.b.send({ t: "matchEnd", outcome, reason, you: this.b.side! });
     this.onEnd?.();
@@ -242,6 +294,7 @@ export class Match {
   private finish(): void {
     if (this.over) return;
     this.over = true;
+    this.clearGraceTimers();
     this.onEnd?.();
   }
 }
