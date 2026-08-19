@@ -1,6 +1,7 @@
 /**
  * Tests for the guest-identity SQLite account store: create-on-first-use, secret verification (impostor
- * rejection), name update + scrubbing, and result tallying. Uses an in-memory database.
+ * rejection), name update + scrubbing, result tallying, and a concurrent-create race. Uses an in-memory db.
+ * `authenticate` is async (scrypt is offloaded off the event loop), so every call is awaited.
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -10,9 +11,9 @@ function store() {
   return new AccountStore(":memory:");
 }
 
-test("first authenticate creates a fresh profile at the starting rating", () => {
+test("first authenticate creates a fresh profile at the starting rating", async () => {
   const s = store();
-  const p = s.authenticate("player-1", "secret-abc", "Ada");
+  const p = await s.authenticate("player-1", "secret-abc", "Ada");
   assert.ok(p, "a new identity is accepted");
   assert.equal(p!.playerId, "player-1");
   assert.equal(p!.name, "Ada");
@@ -21,37 +22,48 @@ test("first authenticate creates a fresh profile at the starting rating", () => 
   s.close();
 });
 
-test("re-authenticating with the correct secret returns the same profile", () => {
+test("re-authenticating with the correct secret returns the same profile", async () => {
   const s = store();
-  s.authenticate("p", "right-secret", "Grace");
-  const again = s.authenticate("p", "right-secret", "Grace");
+  await s.authenticate("p", "right-secret", "Grace");
+  const again = await s.authenticate("p", "right-secret", "Grace");
   assert.ok(again, "the matching secret verifies");
   assert.equal(again!.name, "Grace");
   s.close();
 });
 
-test("a wrong secret for an existing id is rejected (impostor)", () => {
+test("a wrong secret for an existing id is rejected (impostor)", async () => {
   const s = store();
-  s.authenticate("p", "the-real-secret", "Real");
-  const impostor = s.authenticate("p", "guessed-secret", "Fake");
+  await s.authenticate("p", "the-real-secret", "Real");
+  const impostor = await s.authenticate("p", "guessed-secret", "Fake");
   assert.equal(impostor, null, "the mismatched secret is refused");
-  // The real owner still gets in, and the impostor's name change did NOT take.
-  assert.equal(s.authenticate("p", "the-real-secret", "Real")!.name, "Real");
+  assert.equal((await s.authenticate("p", "the-real-secret", "Real"))!.name, "Real", "the real owner still gets in, name unchanged");
   s.close();
 });
 
-test("a changed name updates on the next matching auth", () => {
+test("a changed name updates on the next matching auth", async () => {
   const s = store();
-  s.authenticate("p", "sec", "OldName");
-  const p = s.authenticate("p", "sec", "NewName");
+  await s.authenticate("p", "sec", "OldName");
+  const p = await s.authenticate("p", "sec", "NewName");
   assert.equal(p!.name, "NewName");
   assert.equal(s.getProfile("p")!.name, "NewName", "persisted");
   s.close();
 });
 
-test("recordResult tallies wins / losses / draws and persists", () => {
+test("concurrent first-auths for the same id both succeed (create race handled)", async () => {
   const s = store();
-  s.authenticate("p", "sec", "Rec");
+  const [a, b] = await Promise.all([
+    s.authenticate("race", "same-secret", "One"),
+    s.authenticate("race", "same-secret", "Two"),
+  ]);
+  assert.ok(a && b, "neither concurrent create fails");
+  assert.equal(a!.playerId, "race");
+  assert.equal(b!.playerId, "race");
+  s.close();
+});
+
+test("recordResult tallies wins / losses / draws and persists", async () => {
+  const s = store();
+  await s.authenticate("p", "sec", "Rec");
   s.recordResult("p", "win");
   s.recordResult("p", "win");
   s.recordResult("p", "loss");
@@ -61,16 +73,17 @@ test("recordResult tallies wins / losses / draws and persists", () => {
   s.close();
 });
 
-test("malformed identities are refused, not crashed", () => {
+test("malformed identities are refused, not crashed", async () => {
   const s = store();
-  assert.equal(s.authenticate("", "sec", "X"), null, "empty id");
-  assert.equal(s.authenticate("p", "", "X"), null, "empty secret");
-  assert.equal(s.authenticate("x".repeat(65), "sec", "X"), null, "over-long id");
+  assert.equal(await s.authenticate("", "sec", "X"), null, "empty id");
+  assert.equal(await s.authenticate("p", "", "X"), null, "empty secret");
+  assert.equal(await s.authenticate("x".repeat(65), "sec", "X"), null, "over-long id");
+  assert.equal(await s.authenticate("p", "x".repeat(513), "X"), null, "over-long secret");
   s.close();
 });
 
 test("cleanName scrubs HTML-dangerous chars, clamps length, keeps spaces, defaults empty to Guest", () => {
-  assert.equal(cleanName('<script>bad</script>'), "scriptbad/script"); // angle brackets gone; the slash is harmless
+  assert.equal(cleanName("<script>bad</script>"), "scriptbad/script"); // angle brackets gone; the slash is harmless
   assert.equal(cleanName("Ada Lovelace"), "Ada Lovelace", "internal spaces are kept");
   assert.equal(cleanName("   "), "Guest", "blank becomes Guest");
   assert.equal(cleanName(42 as unknown), "Guest", "non-strings become Guest");

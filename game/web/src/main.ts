@@ -70,15 +70,28 @@ const STORED_MATCH_KEY = "arenaMatch"; // sessionStorage: lets a page reload rej
 // ── guest identity (persistent, client-held) ────────────────────────────────────────────────────────── //
 let profile: Profile | null = null; // the authoritative profile from the server (name + record), when reachable
 interface Identity { playerId: string; secret: string; name: string; }
+let cachedCreds: { playerId: string; secret: string } | null = null; // memoized so a session keeps ONE identity even if storage is blocked
+
+/** A random token that works even outside a secure context (crypto.randomUUID is undefined over LAN http). */
+function uuid(): string {
+  const c = globalThis.crypto as Crypto | undefined;
+  if (c?.randomUUID) return c.randomUUID();
+  const b = new Uint8Array(16);
+  if (c?.getRandomValues) c.getRandomValues(b);
+  else for (let i = 0; i < 16; i++) b[i] = Math.floor(Math.random() * 256);
+  return "g-" + Array.from(b, (x) => x.toString(16).padStart(2, "0")).join("");
+}
+
 function identity(): Identity {
-  let creds: { playerId: string; secret: string };
-  try { creds = JSON.parse(localStorage.getItem("arenaIdentity") ?? "null"); } catch { creds = null as never; }
-  if (!creds?.playerId || !creds?.secret) {
-    creds = { playerId: crypto.randomUUID(), secret: crypto.randomUUID() };
-    try { localStorage.setItem("arenaIdentity", JSON.stringify(creds)); } catch { /* private mode */ }
+  if (!cachedCreds) {
+    try { const c = JSON.parse(localStorage.getItem("arenaIdentity") ?? "null"); if (c?.playerId && c?.secret) cachedCreds = c; } catch { /* blocked */ }
+    if (!cachedCreds) {
+      cachedCreds = { playerId: uuid(), secret: uuid() };
+      try { localStorage.setItem("arenaIdentity", JSON.stringify(cachedCreds)); } catch { /* private mode — the memo keeps it stable this session */ }
+    }
   }
   const name = (() => { try { return localStorage.getItem("arenaName") || "Guest"; } catch { return "Guest"; } })();
-  return { ...creds, name };
+  return { ...cachedCreds, name };
 }
 function setStoredName(name: string): void { try { localStorage.setItem("arenaName", name.slice(0, MAX_NAME_LEN)); } catch { /* ignore */ } }
 /** The `auth` message every match socket sends first, from the stored identity. */

@@ -4,14 +4,20 @@
  * profile bound to a scrypt hash of its secret; later calls VERIFY the secret before returning the profile.
  * The secret is a high-entropy random token, never a human password, and only its hash is stored.
  *
+ * Hashing uses the ASYNC scrypt (threadpool-offloaded) so it never blocks the server's single event loop.
  * Persists a display name, a win/loss/draw record, and a `rating` (seeded at 1000) that anchors future Ranked.
  */
 import { DatabaseSync } from "node:sqlite";
-import { randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
+import { randomBytes, scrypt, timingSafeEqual } from "node:crypto";
+import { promisify } from "node:util";
 import { MAX_NAME_LEN, type Profile } from "../net/protocol.ts";
 
 export const START_RATING = 1000;
+const MAX_SECRET_LEN = 512; // a legitimate secret is a ~36-char UUID; bound it so a huge input can't inflate hashing
+const MAX_PROFILES = 200_000; // coarse cap so unauthenticated create-on-first-use can't fill the disk without bound
 export type ResultKind = "win" | "loss" | "draw";
+
+const scryptAsync = promisify(scrypt) as (secret: string, salt: Buffer, keylen: number) => Promise<Buffer>;
 
 // Characters scrubbed from a display name: HTML-dangerous quotes/angles/ampersand, backtick (\x60), and
 // ASCII control chars (\x00-\x1f). Spaces are kept (collapsed + trimmed below). Built from a string so the
@@ -26,10 +32,6 @@ export function cleanName(name: unknown): string {
     .trim()
     .slice(0, MAX_NAME_LEN);
   return s.length ? s : "Guest";
-}
-
-function hashSecret(secret: string, salt: Buffer): Buffer {
-  return scryptSync(secret, salt, 32);
 }
 
 interface Row {
@@ -60,34 +62,51 @@ export class AccountStore {
     return this.db.prepare("SELECT * FROM profiles WHERE playerId = ?").get(playerId) as Row | undefined;
   }
 
+  private count(): number {
+    return (this.db.prepare("SELECT COUNT(*) AS n FROM profiles").get() as { n: number }).n;
+  }
+
   private toProfile(r: Row): Profile {
     return { playerId: r.playerId, name: r.name, wins: r.wins, losses: r.losses, draws: r.draws, rating: r.rating };
   }
 
-  /**
-   * Create-or-verify a guest identity. Returns the profile on success, or null if the id already exists with
-   * a DIFFERENT secret (an impostor). A matching call also updates the display name if it changed.
-   */
-  authenticate(playerId: string, secret: string, name: string): Profile | null {
-    if (typeof playerId !== "string" || playerId.length === 0 || playerId.length > 64 || typeof secret !== "string" || secret.length === 0) return null;
-    const now = Date.now();
-    const nm = cleanName(name);
-    const existing = this.row(playerId);
-    if (!existing) {
-      const salt = randomBytes(16);
-      const hash = hashSecret(secret, salt);
-      this.db.prepare("INSERT INTO profiles (playerId, name, salt, secretHash, created, updated) VALUES (?, ?, ?, ?, ?, ?)")
-        .run(playerId, nm, salt, hash, now, now);
-      return { playerId, name: nm, wins: 0, losses: 0, draws: 0, rating: START_RATING };
-    }
+  /** Verify a secret against an existing row (async hash), updating the display name if it changed. */
+  private async verify(existing: Row, secret: string, name: string): Promise<Profile | null> {
+    const actual = await scryptAsync(secret, Buffer.from(existing.salt), 32);
     const expected = Buffer.from(existing.secretHash);
-    const actual = hashSecret(secret, Buffer.from(existing.salt));
     if (expected.length !== actual.length || !timingSafeEqual(expected, actual)) return null; // wrong secret
+    const nm = cleanName(name);
     if (nm !== existing.name) {
-      this.db.prepare("UPDATE profiles SET name = ?, updated = ? WHERE playerId = ?").run(nm, now, playerId);
+      this.db.prepare("UPDATE profiles SET name = ?, updated = ? WHERE playerId = ?").run(nm, Date.now(), existing.playerId);
       existing.name = nm;
     }
     return this.toProfile(existing);
+  }
+
+  /**
+   * Create-or-verify a guest identity. Returns the profile on success, null if the id already exists with a
+   * DIFFERENT secret, if inputs are malformed, or if the profile cap is reached for a brand-new id.
+   */
+  async authenticate(playerId: string, secret: string, name: string): Promise<Profile | null> {
+    if (typeof playerId !== "string" || playerId.length === 0 || playerId.length > 64) return null;
+    if (typeof secret !== "string" || secret.length === 0 || secret.length > MAX_SECRET_LEN) return null;
+
+    const existing = this.row(playerId);
+    if (existing) return this.verify(existing, secret, name);
+
+    if (this.count() >= MAX_PROFILES) return null; // refuse to grow the store without bound
+    const salt = randomBytes(16);
+    const hash = await scryptAsync(secret, salt, 32);
+    const now = Date.now();
+    try {
+      this.db.prepare("INSERT INTO profiles (playerId, name, salt, secretHash, created, updated) VALUES (?, ?, ?, ?, ?, ?)")
+        .run(playerId, cleanName(name), salt, hash, now, now);
+      return { playerId, name: cleanName(name), wins: 0, losses: 0, draws: 0, rating: START_RATING };
+    } catch {
+      // A concurrent auth created this id during the await — fall back to verifying against that row.
+      const r = this.row(playerId);
+      return r ? this.verify(r, secret, name) : null;
+    }
   }
 
   /** Tally a match result for a player (identity must already exist). No-op for an unknown id. */

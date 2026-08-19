@@ -110,27 +110,35 @@ export class MatchServer {
   private route(conn: Conn, raw: string): void {
     const msg = parseMessage<ClientMsg>(raw);
     if (!msg) return;
-    switch (msg.t) {
-      case "auth": this.authenticate(conn, msg); return;
-      case "queue": this.enqueue(conn, msg); return;
-      case "cancelQueue": this.dequeue(conn); return;
-      case "rejoin": this.rejoin(conn, msg); return;
-      case "turn":
-      case "draftChoice":
-      case "surrender":
-        conn.seat?.match.handleMessage(conn.seat, msg);
-        return;
+    try {
+      switch (msg.t) {
+        case "auth": void this.authenticate(conn, msg); return;
+        case "queue": this.enqueue(conn, msg); return;
+        case "cancelQueue": this.dequeue(conn); return;
+        case "rejoin": this.rejoin(conn, msg); return;
+        case "turn":
+        case "draftChoice":
+        case "surrender":
+          conn.seat?.match.handleMessage(conn.seat, msg);
+          return;
+      }
+    } catch {
+      /* a malformed message must never crash the server; drop it */
     }
   }
 
   /** Verify (or create) the connection's guest identity and bind it for this session. */
-  private authenticate(conn: Conn, msg: Extract<ClientMsg, { t: "auth" }>): void {
+  private async authenticate(conn: Conn, msg: Extract<ClientMsg, { t: "auth" }>): Promise<void> {
     if (msg.protocolVersion !== PROTOCOL_VERSION) { conn.send({ t: "authError", message: "protocol mismatch" }); return; }
-    const profile = this.store.authenticate(msg.playerId, msg.secret, msg.name);
-    if (!profile) { conn.send({ t: "authError", message: "that player id is taken by someone else" }); return; }
-    conn.playerId = profile.playerId;
-    conn.name = profile.name;
-    conn.send({ t: "authed", profile });
+    try {
+      const profile = await this.store.authenticate(msg.playerId, msg.secret, msg.name);
+      if (!profile) { conn.send({ t: "authError", message: "that player id is taken by someone else" }); return; }
+      conn.playerId = profile.playerId;
+      conn.name = profile.name;
+      conn.send({ t: "authed", profile });
+    } catch {
+      conn.send({ t: "authError", message: "sign-in failed, please retry" }); // a DB fault must not crash the server
+    }
   }
 
   private enqueue(conn: Conn, msg: Extract<ClientMsg, { t: "queue" }>): void {
@@ -181,11 +189,15 @@ export class MatchServer {
     seat.match.onSeatReconnect(seat);
   }
 
-  /** Pair waiting players FIFO and start their matches. */
+  /** Pair waiting players FIFO — but never pair two connections that share one identity (self-collusion). */
   private tryPair(): void {
     while (this.queue.length >= 2) {
-      const ca = this.queue.shift()!;
-      const cb = this.queue.shift()!;
+      const ca = this.queue[0]!;
+      const bi = this.queue.findIndex((c, i) => i > 0 && c.playerId !== ca.playerId);
+      if (bi === -1) break; // only same-identity connections are waiting — hold until a distinct player arrives
+      const cb = this.queue[bi]!;
+      this.queue.splice(bi, 1); // remove cb (higher index) first…
+      this.queue.shift(); // …then ca at the front
       const matchId = randomUUID();
       const seatA = new Seat(ca.team, matchId, ca);
       const seatB = new Seat(cb.team, matchId, cb);
@@ -274,10 +286,10 @@ export function startServer(port = Number(process.env.ARENA_PORT) || DEFAULT_POR
     if (req.method === "POST" && req.url === "/profile") {
       let body = "";
       req.on("data", (c) => { body += c; if (body.length > 4096) req.destroy(); });
-      req.on("end", () => {
+      req.on("end", async () => {
         try {
           const { playerId, secret, name } = JSON.parse(body) as { playerId?: string; secret?: string; name?: string };
-          const profile = store.authenticate(playerId ?? "", secret ?? "", name ?? "");
+          const profile = await store.authenticate(playerId ?? "", secret ?? "", name ?? "");
           res.writeHead(profile ? 200 : 401, { ...CORS, "content-type": "application/json" });
           res.end(JSON.stringify(profile ? { profile } : { error: "authentication failed" }));
         } catch {

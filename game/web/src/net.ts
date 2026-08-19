@@ -46,7 +46,8 @@ export function serverUrl(): string {
   const stored = localStorage.getItem("arenaServer");
   if (stored) return stored;
   const host = location.hostname || "localhost";
-  return `ws://${host}:${DEFAULT_PORT}`;
+  const scheme = location.protocol === "https:" ? "wss" : "ws"; // match the page so an https client isn't mixed-content-blocked
+  return `${scheme}://${host}:${DEFAULT_PORT}`;
 }
 
 /** The http(s) origin matching serverUrl (ws→http, wss→https) — for the /profile endpoint. */
