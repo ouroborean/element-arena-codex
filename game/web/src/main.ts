@@ -14,7 +14,7 @@ import { ROSTER } from "../../engine/content/roster.generated.ts";
 import { runMatch, type AsyncProvider } from "../../client/loop.ts";
 import { autoDraft, applyDraftChoice, hasDraftOptions, draftableHeroes } from "../../client/draft.ts";
 import { renderApp, renderSetup } from "./view.ts";
-import { energyIcon } from "./assets.ts";
+import { energyIcon, elementRank } from "./assets.ts";
 
 export interface UiState {
   you: TeamId;
@@ -288,7 +288,7 @@ function planGeneric(actions: Action[]): { generic: number; avail: Record<string
 function defaultAlloc(generic: number, avail: Record<string, number>): Record<string, number> {
   const alloc: Record<string, number> = {};
   let rem = generic;
-  for (const c of ["generic", ...Object.keys(avail).filter((k) => k !== "generic").sort()]) {
+  for (const c of ["generic", ...Object.keys(avail).filter((k) => k !== "generic").sort((a, b) => elementRank(a) - elementRank(b) || a.localeCompare(b))]) {
     if (rem <= 0) break;
     const take = Math.min(rem, avail[c] ?? 0);
     if (take > 0) { alloc[c] = take; rem -= take; }

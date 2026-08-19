@@ -62,3 +62,12 @@ export const ELEMENT_COLOR: Record<string, string> = {
   unholy: "#8a5ad0", vengeance: "#d05a6a",
 };
 export const elColor = (el: string): string => ELEMENT_COLOR[el] ?? "#8a8fa8";
+
+/** Canonical element iteration order (never alphabetical). Fusion/other elements fall after these ten. */
+export const ELEMENT_ORDER = ["fire", "ice", "wind", "lightning", "water", "earth", "poison", "shadow", "holy", "unholy"];
+/** Sort rank for an element: generic first, then the fixed base-element order, then anything else. */
+export function elementRank(el: string): number {
+  if (el === "generic") return -1;
+  const i = ELEMENT_ORDER.indexOf(el);
+  return i >= 0 ? i : ELEMENT_ORDER.length;
+}
