@@ -187,14 +187,33 @@ function queuedBanner(state: MatchState, u: Unit, ui: UiState): string {
   return `<div class="queued">${ic ? `<img src="${ic}" ${IMG_FALLBACK} />` : ""}<span class="q-txt"><b>${esc(name)}</b> → ${esc(targets)}</span></div>`;
 }
 
+const livingOn = (state: MatchState, side: TeamId): Unit[] =>
+  state.teams[side].units.map((id) => state.units[id]).filter((u): u is Unit => !!u && u.alive);
+
+/** The units a queued action will actually hit: its explicit single target(s), else the whole set its
+ *  targeting implies — self/none → the caster, all-enemies/all-allies/all → that living group. */
+function actionTargets(state: MatchState, a: { unit: string; skillId: string; targets?: string[] }): string[] {
+  if (a.targets && a.targets.length) return a.targets;
+  const u = state.units[a.unit];
+  const skill = (u?.skills ?? []).find((s) => s.id === a.skillId);
+  if (!u || !skill) return [];
+  const enemy: TeamId = u.team === "A" ? "B" : "A";
+  switch (skill.targeting) {
+    case "all-enemies": return livingOn(state, enemy).map((x) => x.id);
+    case "all-allies": return livingOn(state, u.team).map((x) => x.id);
+    case "all": return [...livingOn(state, u.team), ...livingOn(state, enemy)].map((x) => x.id);
+    default: return [u.id]; // self / none → the caster
+  }
+}
+
 interface Incoming { caster: string; skillId: string; order: number; }
 /** For each targeted unit id, the queued skills aimed at it — with the caster and 1-based resolve order. */
-function incomingBy(ui: UiState): Map<string, Incoming[]> {
+function incomingBy(state: MatchState, ui: UiState): Map<string, Incoming[]> {
   const map = new Map<string, Incoming[]>();
   let order = 0;
   for (const a of ui.planned.values()) {
     order++;
-    for (const t of a.targets ?? []) {
+    for (const t of actionTargets(state, a)) {
       const list = map.get(t) ?? (map.set(t, []).get(t)!);
       list.push({ caster: a.unit, skillId: a.skillId, order });
     }
@@ -330,7 +349,7 @@ function energyPanel(ui: UiState): string {
 
 export function renderApp(state: MatchState, ui: UiState): string {
   const foe = ui.you === "A" ? "B" : "A";
-  const incoming = incomingBy(ui);
+  const incoming = incomingBy(state, ui);
   return `<div class="arena">
     ${sideRow(state, foe, ui, false, incoming)}
     ${midbar(state, ui)}
