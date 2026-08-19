@@ -157,16 +157,18 @@ export class Match {
     this.graceTimers[side] = timer;
   }
 
-  /** A player reconnected within the grace window: cancel the forfeit, resume them at the live state. */
+  /** A socket (re)bound to a seat: resume it at the live state. Only a seat that was actually disconnected
+   *  cancels a forfeit and notifies the opponent — so a redundant/abusive rejoin on a live seat is a cheap
+   *  state refresh, not an amplifier that spams the opponent. */
   onSeatReconnect(seat: MatchClient): void {
-    if (this.over) return;
+    if (this.over || this.aborted) return;
     const side = seat.side!;
     const timer = this.graceTimers[side];
     if (timer) { clearTimeout(timer); delete this.graceTimers[side]; }
-    this.disconnected.delete(side);
+    const wasDisconnected = this.disconnected.delete(side);
     const p = this.pending[side];
-    seat.send({ t: "resumed", you: side, state: this.wireState(), control: p.control, deadline: p.deadline });
-    this.bySide[other(side)].send({ t: "opponentReconnected" });
+    seat.send({ t: "resumed", you: side, state: this.wireState(), control: p.control, deadline: p.deadline, opponentDisconnected: this.disconnected.has(other(side)) });
+    if (wasDisconnected) this.bySide[other(side)].send({ t: "opponentReconnected" });
   }
 
   /** Mark the match aborted in `survivor`'s favour and unblock any awaited input so the loop unwinds. */

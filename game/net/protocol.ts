@@ -61,8 +61,9 @@ export type ServerMsg =
   | { t: "queued" }
   /** Matched. `you` is your team id; `state` is the initial board; `matchId`/`token` let you rejoin on a drop. */
   | { t: "start"; you: TeamId; opponentTeam: string[]; state: MatchState; matchId: string; token: string }
-  /** A successful rejoin: here is where the match stands and what you should be doing right now. */
-  | { t: "resumed"; you: TeamId; state: MatchState; control: "turn" | "wait" | "draft" | "waitDraft"; deadline?: number }
+  /** A successful rejoin: here is where the match stands, what you should be doing, and whether the
+   *  opponent is currently disconnected (so a double-disconnect resumes with an accurate banner). */
+  | { t: "resumed"; you: TeamId; state: MatchState; control: "turn" | "wait" | "draft" | "waitDraft"; deadline?: number; opponentDisconnected: boolean }
   /** Your opponent's connection dropped; the match is held open `graceMs` for them to return. */
   | { t: "opponentDisconnected"; graceMs: number }
   /** Your opponent reconnected — carry on. */

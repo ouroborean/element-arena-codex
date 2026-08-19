@@ -428,11 +428,12 @@ function clearStoredMatch(): void {
   try { sessionStorage.removeItem(STORED_MATCH_KEY); } catch { /* ignore */ }
 }
 
-/** A dropped socket. Before a match starts it's just "can't reach the server"; mid-match we try to reconnect. */
+/** A dropped socket. A reconnect/resume attempt retries; a first in-match drop starts reconnecting; only a
+ *  fresh (never-started, no token) connect failure is a flat "can't reach the server". */
 function onDrop(): void {
   if (!pvp || pvp.over) return;
+  if (pvp.reconnecting) { setTimeout(attemptReconnect, RECONNECT_DELAY_MS); return; } // a reconnect/resume attempt itself dropped → retry
   if (!pvp.started) { pvp.over = true; pvp = null; showModal(`<h2>Can't reach the server</h2><p>No match server at <code>${escHtml(serverUrl())}</code>. Start it with <code>node game/server/index.ts</code>.</p><button onclick="location.reload()">Back</button>`); return; }
-  if (pvp.reconnecting) { setTimeout(attemptReconnect, RECONNECT_DELAY_MS); return; } // a reconnect attempt itself dropped → retry
   pvp.reconnecting = true; pvp.attempts = 0;
   attemptReconnect();
 }
@@ -534,7 +535,8 @@ function handleServerMsg(msg: ServerMsg): void {
       break;
     case "resumed":
       pvp.started = true; pvp.reconnecting = false; pvp.attempts = 0;
-      pvp.you = msg.you; ui.you = msg.you; state = msg.state; ui.notice = undefined;
+      pvp.you = msg.you; ui.you = msg.you; state = msg.state;
+      ui.notice = msg.opponentDisconnected ? "Opponent disconnected — waiting for them to reconnect…" : undefined;
       applyControl(msg.control);
       break;
     case "opponentTurn": state = msg.state; pvpBusy("Opponent is acting…"); break;

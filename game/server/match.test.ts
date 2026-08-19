@@ -141,11 +141,43 @@ test("a disconnected player can reconnect within the grace window and resume —
   const resumed = a.messages.slice(beforeResume).find((m) => m.t === "resumed") as Extract<ServerMsg, { t: "resumed" }> | undefined;
   assert.ok(resumed, "A is resumed at the live state");
   assert.equal(resumed!.control, "turn", "and told it is A's turn to act");
+  assert.equal(resumed!.opponentDisconnected, false, "and told the opponent is present");
   assert.ok(b.messages.some((m) => m.t === "opponentReconnected"), "B is told A is back");
   await running;
   const aEnd = a.end();
   assert.ok(aEnd, "the match still concludes");
   assert.equal(aEnd!.reason, "decided", "it finished by a normal decision, not a forfeit");
+});
+
+test("a redundant rejoin on a still-connected seat refreshes state without spamming the opponent", async () => {
+  const { a, b, match } = pair(["pyrrha", "jarrik", "gommar"], ["ando", "syl", "riverdaughter"], { graceMs: 5000 });
+  a.silent = true; // park the match at A's turn
+  const running = match.run();
+  await tick();
+  const bReconnectsBefore = b.messages.filter((m) => m.t === "opponentReconnected").length;
+  const aResumedBefore = a.messages.filter((m) => m.t === "resumed").length;
+  match.onSeatReconnect(a); // A never disconnected — a redundant/abusive rejoin
+  assert.equal(a.messages.filter((m) => m.t === "resumed").length, aResumedBefore + 1, "A still gets a state refresh");
+  assert.equal(b.messages.filter((m) => m.t === "opponentReconnected").length, bReconnectsBefore, "the opponent is NOT notified (nobody actually reconnected)");
+  match.handleMessage(b, { t: "surrender" }); // end the match cleanly
+  await running;
+});
+
+test("reconnecting while the opponent is also offline resumes with the opponent-disconnected flag set", async () => {
+  const { a, b, match } = pair(["pyrrha", "jarrik", "gommar"], ["ando", "syl", "riverdaughter"], { graceMs: 30 });
+  a.silent = true; // park at A's turn (A stays silent so it won't auto-play on resume)
+  const running = match.run();
+  await tick();
+  a.disconnected = true; match.onSeatDisconnect(a);
+  b.disconnected = true; match.onSeatDisconnect(b); // both offline
+  const before = a.messages.length;
+  a.disconnected = false; match.onSeatReconnect(a); // A returns while B is still gone
+  const resumed = a.messages.slice(before).find((m) => m.t === "resumed") as Extract<ServerMsg, { t: "resumed" }> | undefined;
+  assert.ok(resumed, "A is resumed");
+  assert.equal(resumed!.opponentDisconnected, true, "and told the opponent is still offline");
+  await tick(60); // B's 30ms grace expires with no reconnect → forfeit to A
+  await running;
+  assert.equal(a.end()!.reason, "opponent-left", "B not returning forfeits to A");
 });
 
 test("a surrender hands the win to the opponent", async () => {

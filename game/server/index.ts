@@ -21,6 +21,7 @@ import "../engine/content/fusion_effects.ts";
 import "../engine/content/augment_effects.ts";
 
 const HEARTBEAT_MS = 30_000;
+const MAX_CONNS = 4096; // a coarse global cap so a client can't farm unbounded sockets
 const HERO_IDS = new Set(ROSTER.map((h) => h.id));
 
 /** A valid Quick Match team: exactly TEAM_SIZE distinct heroes that exist in the roster. */
@@ -87,6 +88,7 @@ export class MatchServer {
 
   /** Register a fresh connection and wire its message/close handling. */
   accept(ws: WsConn): void {
+    if (this.conns.size >= MAX_CONNS) { ws.destroy(); return; } // refuse past the global cap
     const conn = new Conn(ws);
     this.conns.add(conn);
     ws.onMessage = (raw) => this.route(conn, raw);
@@ -137,8 +139,14 @@ export class MatchServer {
     if (msg.protocolVersion !== PROTOCOL_VERSION) { conn.send({ t: "rejoinFailed", message: "protocol mismatch" }); return; }
     const seat = this.seats.get(msg.token);
     if (!seat || seat.matchId !== msg.matchId) { conn.send({ t: "rejoinFailed", message: "that match has ended or was not found" }); return; }
-    // Rebind: orphan any previous owner (a stale/duplicate socket), then adopt this connection.
-    if (seat.owner && seat.owner !== conn) seat.owner.seat = undefined;
+    // Rebind. Reap any previous owner (a stale/duplicate socket): reset it to idle and close it so it isn't
+    // left as a pinned zombie in `conns`, then adopt this connection.
+    if (seat.owner && seat.owner !== conn) {
+      const prev = seat.owner;
+      prev.seat = undefined;
+      prev.phase = "idle";
+      prev.ws.close();
+    }
     seat.owner = conn;
     seat.conn = conn.ws;
     conn.seat = seat;
