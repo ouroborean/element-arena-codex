@@ -396,9 +396,22 @@ export function renderApp(state: MatchState, ui: UiState): string {
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 const titleOf = (fullName: string) => fullName.split(",").slice(1).join(",").trim();
 
+// Hand-authored roster layout, split into the left & right panels around the centre controls. Each single-
+// element pair sits together (both heroes of that element); the fusion-element heroes stand alone by name.
+const LEFT_ROWS = [
+  ["sera", "gommar", "keeper", "jarrik", "pyrrha"], //  SERA · [ice] · [fire]
+  ["hector", "titania", "syl", "zephyrex"], //           [poison] · [wind]
+  ["fate", "dennis", "maggie", "blackknight"], //        Fate · Dennis · [unholy]
+];
+const RIGHT_ROWS = [
+  ["riverdaughter", "zevkir", "ando", "saya", "scratch"], // [water] · [lightning] · Scratch
+  ["gaia", "roland", "ayana", "taryn", "trinity"], //        [earth] · [holy] · Trinity
+  ["laria", "xyris", "galazax", "aramao"], //               [shadow] · Galazax · Aramao
+];
+const ROSTER_ORDER = [...LEFT_ROWS.flat(), ...RIGHT_ROWS.flat()];
+
 export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: string | null }): string {
-  const sorted = ROSTER.slice().sort((a, b) => a.element.localeCompare(b.element) || shortName(a.name).localeCompare(shortName(b.name)));
-  const inspectId = setup.inspect ?? sorted[0]!.id;
+  const inspectId = setup.inspect ?? ROSTER_ORDER[0]!;
   const def = ROSTER.find((h) => h.id === inspectId)!;
   const on = setup.picked.includes(inspectId);
   const full = setup.picked.length >= 3;
@@ -413,10 +426,12 @@ export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: 
   };
   const byClass = (k: string) => (def.skills ?? []).filter((s) => s.klass === k).map((s) => skTile(s.id)).join("");
 
-  const heroCard = (h: (typeof sorted)[number]) => `<button class="cs-hero ${setup.picked.includes(h.id) ? "on" : ""} ${inspectId === h.id ? "sel" : ""}" data-inspect="${h.id}" style="--el:${elColor(h.element)}" title="${esc(shortName(h.name))}">
-      <img src="${characterButton(h.id)}" alt="${esc(shortName(h.name))}" ${IMG_FALLBACK} />${setup.picked.includes(h.id) ? '<span class="cs-check">✓</span>' : ""}</button>`;
-  const half = Math.ceil(sorted.length / 2);
-  const rosterHalf = (list: typeof sorted) => list.map(heroCard).join("");
+  const heroCard = (id: string) => {
+    const h = ROSTER.find((x) => x.id === id)!;
+    return `<button class="cs-hero ${setup.picked.includes(id) ? "on" : ""} ${inspectId === id ? "sel" : ""}" data-inspect="${id}" style="--el:${elColor(h.element)}" title="${esc(shortName(h.name))}">
+      <img src="${characterButton(id)}" alt="${esc(shortName(h.name))}" ${IMG_FALLBACK} />${setup.picked.includes(id) ? '<span class="cs-check">✓</span>' : ""}</button>`;
+  };
+  const panelRows = (rows: string[][]) => rows.map((row) => `<div class="cs-rrow">${row.map(heroCard).join("")}</div>`).join("");
 
   const slots = [0, 1, 2].map((i) => {
     const id = setup.picked[i];
@@ -449,7 +464,7 @@ export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: 
     </div>
 
     <div class="cs-bottom">
-      <div class="cs-roster left">${rosterHalf(sorted.slice(0, half))}</div>
+      <div class="cs-roster left">${panelRows(LEFT_ROWS)}</div>
       <div class="cs-mid">
         <div class="cs-modes">
           <button class="cs-mode" disabled>Quick Match</button>
@@ -462,7 +477,7 @@ export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: 
         <div class="cs-team">${slots}</div>
         <div class="cs-prompt">${full ? "Ready — press Bot Match ▶" : `Select ${3 - setup.picked.length} more — 3 Heroes to begin!`}</div>
       </div>
-      <div class="cs-roster right">${rosterHalf(sorted.slice(half))}</div>
+      <div class="cs-roster right">${panelRows(RIGHT_ROWS)}</div>
     </div>
   </div>`;
 }

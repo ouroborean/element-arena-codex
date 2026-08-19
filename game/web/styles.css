@@ -289,12 +289,16 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 
 /* bottom band: angled roster panels flanking the match controls */
 .cs-bottom { display: grid; grid-template-columns: 1fr minmax(320px, auto) 1fr; align-items: end; gap: 14px; margin-top: auto; }
-.cs-roster { display: grid; grid-template-columns: repeat(5, 90px); gap: 5px; padding: 8px; align-content: end; }
-.cs-roster.left { justify-content: end; transform: perspective(1500px) rotateY(13deg); transform-origin: right bottom; }
-.cs-roster.right { justify-content: start; transform: perspective(1500px) rotateY(-13deg); transform-origin: left bottom; }
+.cs-roster { display: flex; flex-direction: column; justify-content: flex-end; gap: 5px; padding: 8px; }
+.cs-roster.left { transform: perspective(1500px) rotateY(13deg); transform-origin: right bottom; }
+.cs-roster.right { transform: perspective(1500px) rotateY(-13deg); transform-origin: left bottom; }
+/* explicit rows (varying length) hug toward the centre controls */
+.cs-rrow { display: flex; gap: 5px; }
+.cs-roster.left .cs-rrow { justify-content: flex-end; }
+.cs-roster.right .cs-rrow { justify-content: flex-start; }
 /* Left-panel cards are mirrored so both panels angle toward the centre (opposite orientations). */
 .cs-roster.left .cs-hero img { transform: scaleX(-1); }
-.cs-hero { position: relative; padding: 0; border: 0; background: none; cursor: pointer; transition: transform .08s; }
+.cs-hero { position: relative; width: 88px; flex: 0 0 88px; padding: 0; border: 0; background: none; cursor: pointer; transition: transform .08s; }
 /* Element-coloured edge that follows the card's angular silhouette (double drop-shadow over the alpha). */
 .cs-hero img { width: 100%; aspect-ratio: 3/4; object-fit: cover; object-position: top center; display: block;
   filter: drop-shadow(1px 0 0 var(--el)) drop-shadow(-1px 0 0 var(--el)) drop-shadow(0 1px 0 var(--el)) drop-shadow(0 -1px 0 var(--el)) drop-shadow(0 2px 3px #000a); }
