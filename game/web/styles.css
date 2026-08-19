@@ -257,8 +257,9 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .cs-mini-txt span { font-size: 11px; color: var(--dim); }
 
 /* hero showcase: info | big art | skills */
-.cs-show { display: grid; grid-template-columns: 230px 1fr 320px; align-items: center; gap: 18px; padding: 8px 30px 0; margin-top: 30px; min-height: 44vh; }
-.cs-info { display: flex; flex-direction: column; align-items: flex-start; gap: 9px; }
+/* Snug, centred group — info, art and skills sit next to each other, not spread to the edges. */
+.cs-show { display: flex; justify-content: center; align-items: center; gap: 20px; padding: 8px 20px 0; margin-top: 30px; min-height: 44vh; }
+.cs-info { width: 210px; display: flex; flex-direction: column; align-items: flex-start; gap: 9px; }
 .cs-hname { font-size: 34px; font-weight: 800; color: #fff; line-height: 1; text-shadow: 0 2px 6px #000, 0 0 3px #000; }
 .cs-hel { font-size: 15px; font-weight: 600; color: var(--acc); text-shadow: 0 1px 3px #000; margin-bottom: 6px; }
 .cs-abtn { min-width: 210px; padding: 12px 20px; font: inherit; font-weight: 700; font-size: 15px; color: #fff; cursor: pointer; text-align: center;
@@ -271,20 +272,35 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
   border: 3px solid #ffffff55; box-shadow: 0 10px 44px #000b, inset 0 0 0 6px #10131f66; background: #10131f; }
 .cs-art img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
 
-.cs-skills { display: flex; flex-direction: column; gap: 11px; }
+.cs-right { width: 300px; display: flex; flex-direction: column; gap: 12px; }
+.cs-skills { display: flex; flex-direction: column; gap: 10px; }
+/* click-to-view skill info panel */
+.cs-skdetail { display: flex; gap: 10px; background: #10131fdd; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+.cs-skdetail > img { width: 44px; height: 44px; flex: 0 0 44px; border-radius: 7px; object-fit: cover; border: 1px solid #ffffff33; background: #10131f; }
+.csd-body { min-width: 0; }
+.csd-name { display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 13.5px; color: #fff; }
+.csd-cost { display: inline-flex; gap: 3px; }
+.csd-meta { display: flex; flex-wrap: wrap; gap: 4px; margin: 4px 0; }
+.csd-desc { font-size: 11.5px; color: var(--dim); line-height: 1.42; }
 .cs-sk h4 { margin: 0 0 5px; font-size: 14px; font-style: italic; font-weight: 800; color: #fff; text-shadow: 0 1px 3px #000; }
 .cs-icons { display: flex; gap: 6px; }
-.cs-sicon { width: 52px; height: 52px; border-radius: 8px; overflow: hidden; border: 1px solid #ffffff45; background: #10131f; box-shadow: 0 2px 8px #0008; cursor: help; }
-.cs-sicon img { width: 100%; height: 100%; object-fit: cover; }
+.cs-sicon { width: 48px; height: 48px; padding: 0; border-radius: 8px; overflow: hidden; border: 1px solid #ffffff45; background: #10131f; box-shadow: 0 2px 8px #0008; cursor: pointer; }
+.cs-sicon img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cs-sicon:hover { border-color: var(--acc); }
+.cs-sicon.on { border-color: var(--acc); box-shadow: 0 0 0 2px var(--acc); }
 
 /* bottom band: angled roster panels flanking the match controls */
 .cs-bottom { display: grid; grid-template-columns: 1fr minmax(320px, auto) 1fr; align-items: end; gap: 14px; margin-top: auto; }
-.cs-roster { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 8px; align-content: end; }
-.cs-roster.left { transform: perspective(1500px) rotateY(13deg); transform-origin: right bottom; }
-.cs-roster.right { transform: perspective(1500px) rotateY(-13deg); transform-origin: left bottom; }
+.cs-roster { display: grid; grid-template-columns: repeat(5, 90px); gap: 5px; padding: 8px; align-content: end; }
+.cs-roster.left { justify-content: end; transform: perspective(1500px) rotateY(13deg); transform-origin: right bottom; }
+.cs-roster.right { justify-content: start; transform: perspective(1500px) rotateY(-13deg); transform-origin: left bottom; }
+/* Left-panel cards are mirrored so both panels angle toward the centre (opposite orientations). */
+.cs-roster.left .cs-hero img { transform: scaleX(-1); }
 .cs-hero { position: relative; padding: 0; border: 0; background: none; cursor: pointer; transition: transform .08s; }
-.cs-hero img { width: 100%; aspect-ratio: 3/4; object-fit: cover; object-position: top center; display: block; filter: drop-shadow(0 2px 4px #000b); }
-.cs-hero:hover { transform: translateY(-3px) scale(1.05); z-index: 3; }
+/* Element-coloured edge that follows the card's angular silhouette (double drop-shadow over the alpha). */
+.cs-hero img { width: 100%; aspect-ratio: 3/4; object-fit: cover; object-position: top center; display: block;
+  filter: drop-shadow(1px 0 0 var(--el)) drop-shadow(-1px 0 0 var(--el)) drop-shadow(0 1px 0 var(--el)) drop-shadow(0 -1px 0 var(--el)) drop-shadow(0 2px 3px #000a); }
+.cs-hero:hover { transform: translateY(-3px) scale(1.06); z-index: 3; }
 .cs-hero.sel { outline: 2px solid var(--acc); outline-offset: -1px; }
 .cs-hero.on::after { content: ""; position: absolute; inset: 0; box-shadow: inset 0 0 0 2px var(--you); }
 .cs-check { position: absolute; top: 2px; right: 5px; color: var(--you); font-weight: 800; font-size: 13px; text-shadow: 0 1px 2px #000; }

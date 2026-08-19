@@ -48,7 +48,7 @@ const living = (s: MatchState, side: TeamId): Unit[] =>
 
 const app = document.getElementById("app")!;
 let state: MatchState;
-let setup: { picked: string[]; oppo: string[]; inspect: string | null } | null = null;
+let setup: { picked: string[]; oppo: string[]; inspect: string | null; skill: string | null } | null = null;
 const ui: UiState = {
   you: "A", phase: "busy", phaseLabel: "starting…", hint: "",
   legalTargets: new Set(), planned: new Map(), plannedSkill: new Map(),
@@ -84,7 +84,7 @@ function showFx(el: HTMLElement): void {
 function hideFx(): void { fxpop.hidden = true; }
 
 function render(): void { hideFx(); app.innerHTML = renderApp(state, ui); }
-function showSetup(): void { setup = { picked: [], oppo: randomTeam([]), inspect: null }; app.innerHTML = renderSetup(setup); }
+function showSetup(): void { setup = { picked: [], oppo: randomTeam([]), inspect: null, skill: null }; app.innerHTML = renderSetup(setup); }
 
 /** Legal single-target set (Harmful→enemies, Helpful→allies, else either), run through targeting rules. */
 function targetsFor(u: Unit, skillId: string): Set<string> {
@@ -154,7 +154,7 @@ app.addEventListener("click", (e) => {
   if (tgtEl) { const c = tgtEl.dataset.dequeue; if (c) { ui.planned.delete(c); ui.plannedSkill.delete(c); render(); } return; } // click a targeting icon → dequeue that skill
   const fxEl = (e.target as HTMLElement).closest<HTMLElement>(".fx");
   if (fxEl) { if (fxpop.hidden) showFx(fxEl); else hideFx(); return; } // tap an effect icon to toggle its description
-  const el = (e.target as HTMLElement).closest<HTMLElement>("[data-owner],[data-skill],[data-target],[data-cancel],[data-resolve],[data-surrender],[data-pick],[data-inspect],[data-reroll],[data-start],[data-plus],[data-minus],[data-energy-confirm],[data-energy-cancel],[data-draft-inspect],[data-fuse-unit],[data-aug-unit],[data-draft-hold],[data-concede],[data-keep]");
+  const el = (e.target as HTMLElement).closest<HTMLElement>("[data-owner],[data-skill],[data-target],[data-cancel],[data-resolve],[data-surrender],[data-pick],[data-inspect],[data-reroll],[data-start],[data-plus],[data-minus],[data-energy-confirm],[data-energy-cancel],[data-draft-inspect],[data-fuse-unit],[data-aug-unit],[data-draft-hold],[data-concede],[data-keep],[data-skillinfo]");
   if (!el) return;
   const d = el.dataset;
 
@@ -177,7 +177,8 @@ app.addEventListener("click", (e) => {
   }
 
   if (setup) { // team-select screen
-    if (d.inspect) { setup.inspect = d.inspect; app.innerHTML = renderSetup(setup); }
+    if (d.skillinfo) { setup.skill = d.skillinfo; app.innerHTML = renderSetup(setup); }
+    else if (d.inspect) { setup.inspect = d.inspect; app.innerHTML = renderSetup(setup); }
     else if (d.pick) { // add / remove (detail button or a tray slot)
       const i = setup.picked.indexOf(d.pick);
       if (i >= 0) setup.picked.splice(i, 1);
