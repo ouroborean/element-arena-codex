@@ -83,6 +83,29 @@ function showFx(el: HTMLElement): void {
 }
 function hideFx(): void { fxpop.hidden = true; }
 
+// A floating skill-info popup for character select — pops off a skill icon on hover/tap (no layout shift).
+const skpop = document.createElement("div");
+skpop.className = "skpop"; skpop.hidden = true;
+document.body.appendChild(skpop);
+function showSkpop(el: HTMLElement): void {
+  const d = el.dataset;
+  skpop.textContent = "";
+  const name = document.createElement("b"); name.textContent = d.skname ?? "";
+  const meta = document.createElement("div"); meta.className = "skpop-meta"; meta.textContent = d.skmeta ?? "";
+  const spec = +(d.skspec ?? 0), gen = +(d.skgen ?? 0), cel = d.skel || "generic";
+  const pip = (elm: string) => { const im = document.createElement("img"); im.className = "skpop-cost"; im.src = energyIcon(elm); meta.append(im); };
+  for (let i = 0; i < spec; i++) pip(cel);
+  for (let i = 0; i < gen; i++) pip("generic");
+  const desc = document.createElement("div"); desc.className = "skpop-desc"; desc.textContent = d.skdesc || "No description.";
+  skpop.append(name, meta, desc);
+  skpop.hidden = false;
+  const r = el.getBoundingClientRect(), pw = skpop.offsetWidth, ph = skpop.offsetHeight;
+  const top = r.top - ph - 8 >= 6 ? r.top - ph - 8 : r.bottom + 8; // above the icon, flipping below if no room
+  skpop.style.left = `${Math.max(6, Math.min(window.innerWidth - pw - 6, r.left + r.width / 2 - pw / 2))}px`;
+  skpop.style.top = `${top}px`;
+}
+function hideSkpop(): void { skpop.hidden = true; }
+
 function render(): void { hideFx(); app.innerHTML = renderApp(state, ui); }
 function showSetup(): void { setup = { picked: [], oppo: randomTeam([]), inspect: null }; app.innerHTML = renderSetup(setup); }
 
@@ -154,6 +177,9 @@ app.addEventListener("click", (e) => {
   if (tgtEl) { const c = tgtEl.dataset.dequeue; if (c) { ui.planned.delete(c); ui.plannedSkill.delete(c); render(); } return; } // click a targeting icon → dequeue that skill
   const fxEl = (e.target as HTMLElement).closest<HTMLElement>(".fx");
   if (fxEl) { if (fxpop.hidden) showFx(fxEl); else hideFx(); return; } // tap an effect icon to toggle its description
+  const skEl = (e.target as HTMLElement).closest<HTMLElement>(".cs-sicon");
+  if (skEl) { showSkpop(skEl); return; } // tap a skill icon → pop off its info
+  hideSkpop(); // any other click dismisses the skill popup
   const el = (e.target as HTMLElement).closest<HTMLElement>("[data-owner],[data-skill],[data-target],[data-cancel],[data-resolve],[data-surrender],[data-pick],[data-inspect],[data-reroll],[data-start],[data-plus],[data-minus],[data-energy-confirm],[data-energy-cancel],[data-draft-inspect],[data-fuse-unit],[data-aug-unit],[data-draft-hold],[data-concede],[data-keep]");
   if (!el) return;
   const d = el.dataset;
@@ -218,8 +244,16 @@ app.addEventListener("click", (e) => {
 });
 
 // desktop hover: show the effect/targeting-skill description popup
-app.addEventListener("mouseover", (e) => { const el = (e.target as HTMLElement).closest<HTMLElement>(".fx, .tgt"); if (el) showFx(el); });
-app.addEventListener("mouseout", (e) => { if ((e.target as HTMLElement).closest(".fx, .tgt")) hideFx(); });
+app.addEventListener("mouseover", (e) => {
+  const t = e.target as HTMLElement;
+  const el = t.closest<HTMLElement>(".fx, .tgt"); if (el) showFx(el);
+  const sk = t.closest<HTMLElement>(".cs-sicon"); if (sk) showSkpop(sk);
+});
+app.addEventListener("mouseout", (e) => {
+  const t = e.target as HTMLElement;
+  if (t.closest(".fx, .tgt")) hideFx();
+  if (t.closest(".cs-sicon")) hideSkpop();
+});
 
 /** The turn's total generic cost, and how much of each color is free to pay it (pool minus the specific
  *  each element must reserve). Generic energy is fully available; it can only ever pay generic. */

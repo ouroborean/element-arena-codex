@@ -9,7 +9,7 @@ import { canUse, effectiveCost, hasEssenceIncome } from "../../engine/src/schedu
 import { availableFusions, availableAugments } from "../../engine/content/metagame.ts";
 import { draftableHeroes } from "../../client/draft.ts";
 import { ROSTER } from "../../engine/content/roster.generated.ts";
-import { heroPortrait, iconOf, minionPortrait, energyIcon, elColor } from "./assets.ts";
+import { heroPortrait, iconOf, minionPortrait, energyIcon, characterButton, elColor } from "./assets.ts";
 import { SKILL_TEXT } from "./skilltext.generated.ts";
 import { STATUS_SOURCE } from "./statussource.generated.ts";
 import { EFFECT_DESC, EFFECT_VARIANT, EFFECT_HIDE } from "./effectdesc.generated.ts";
@@ -392,47 +392,92 @@ export function renderApp(state: MatchState, ui: UiState): string {
   </div>${ui.energyPanel ? energyPanel(ui) : ""}${ui.draft ? draftPanel(state, ui) : ""}${ui.overlay ?? ""}`;
 }
 
-// ── team select (with a skill viewer) ─────────────────────────────────────────────────────────────── //
-function heroDetail(heroId: string, picked: string[]): string {
-  const def = ROSTER.find((h) => h.id === heroId);
-  if (!def) return "";
-  const on = picked.includes(heroId);
-  const passive = SKILL_TEXT[`${heroId}0`];
-  const skillRows = (def.skills ?? []).map((s) => {
-    const t = SKILL_TEXT[s.id];
-    return `<div class="sv-row"><img src="${iconOf(s.id, heroId) ?? ""}" ${IMG_FALLBACK} />
-      <div><div class="sv-name">${esc(t?.n ?? s.name)} <span class="sv-cost">${costIcons(s.cost, s.element)}</span></div><div class="sv-desc">${esc(t?.d ?? "")}</div></div></div>`;
-  }).join("");
-  return `<div class="detail-head">
-      <img class="dp" src="${heroPortrait(heroId)}" ${IMG_FALLBACK} />
-      <div><h3>${esc(def.name)}</h3><span class="dp-el">${esc(def.element)}</span></div>
-      <button class="addbtn ${on ? "rem" : ""}" data-pick="${heroId}" ${!on && picked.length >= 3 ? "disabled" : ""}>${on ? "− Remove" : "+ Add to team"}</button>
-    </div>
-    ${passive ? `<div class="sv-row passive"><img src="${iconOf(`${heroId}0`, heroId) ?? ""}" ${IMG_FALLBACK} /><div><div class="sv-name">${esc(passive.n)} <i>passive</i></div><div class="sv-desc">${esc(passive.d)}</div></div></div>` : ""}
-    <div class="skillview">${skillRows}</div>`;
-}
+// ── team select (redesigned scene) ────────────────────────────────────────────────────────────────── //
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+const titleOf = (fullName: string) => fullName.split(",").slice(1).join(",").trim();
+
+// Hand-authored roster layout, split into the left & right panels around the centre controls. Each single-
+// element pair sits together (both heroes of that element); the fusion-element heroes stand alone by name.
+const LEFT_ROWS = [
+  ["sera", "gommar", "keeper", "jarrik", "pyrrha"], //  SERA · [ice] · [fire]
+  ["hector", "titania", "syl", "zephyrex"], //           [poison] · [wind]
+  ["fate", "dennis", "maggie", "blackknight"], //        Fate · Dennis · [unholy]
+];
+const RIGHT_ROWS = [
+  ["riverdaughter", "zevkir", "ando", "saya", "scratch"], // [water] · [lightning] · Scratch
+  ["gaia", "roland", "ayana", "taryn", "trinity"], //        [earth] · [holy] · Trinity
+  ["laria", "xyris", "galazax", "aramao"], //               [shadow] · Galazax · Aramao
+];
+const ROSTER_ORDER = [...LEFT_ROWS.flat(), ...RIGHT_ROWS.flat()];
 
 export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: string | null }): string {
-  const grid = ROSTER.map((h) => ({ id: h.id, name: shortName(h.name), element: h.element }))
-    .sort((a, b) => a.element.localeCompare(b.element) || a.name.localeCompare(b.name))
-    .map((h) => {
-      const on = setup.picked.includes(h.id);
-      return `<button class="port ${on ? "on" : ""} ${setup.inspect === h.id ? "sel" : ""}" data-inspect="${h.id}" style="--el:${elColor(h.element)}">
-        <img src="${heroPortrait(h.id)}" alt="${esc(h.name)}" ${IMG_FALLBACK} />
-        <span class="port-name">${esc(h.name)}</span>${on ? '<span class="port-check">✓</span>' : ""}</button>`;
-    }).join("");
+  const inspectId = setup.inspect ?? ROSTER_ORDER[0]!;
+  const def = ROSTER.find((h) => h.id === inspectId)!;
+  const on = setup.picked.includes(inspectId);
+  const full = setup.picked.length >= 3;
+
+  // Each skill icon carries its info as data-* for a floating hover/tap popup (skpop in main.ts) — no
+  // inline detail panel, so switching skills never shoves the layout around.
+  const skTile = (id: string) => {
+    const t = SKILL_TEXT[id], isPassive = id === `${def.id}0`;
+    const sk = (def.skills ?? []).find((s) => s.id === id);
+    const meta = [isPassive ? "Passive" : cap(sk?.klass ?? ""), isPassive || !sk ? "" : sk.cooldown > 0 ? `${sk.cooldown}-turn cooldown` : "no cooldown"].filter(Boolean).join(" · ");
+    return `<button class="cs-sicon" data-skname="${esc(t?.n ?? id)}" data-skmeta="${esc(meta)}" data-skdesc="${esc(t?.d ?? "")}" data-skgen="${sk?.cost.generic ?? 0}" data-skspec="${sk?.cost.specific ?? 0}" data-skel="${esc(sk?.element ?? "")}" title="${esc(t?.n ?? id)}"><img src="${iconOf(id, def.id) ?? ""}" ${IMG_FALLBACK} /></button>`;
+  };
+  const byClass = (k: string) => (def.skills ?? []).filter((s) => s.klass === k).map((s) => skTile(s.id)).join("");
+
+  const heroCard = (id: string) => {
+    const h = ROSTER.find((x) => x.id === id)!;
+    return `<button class="cs-hero ${setup.picked.includes(id) ? "on" : ""} ${inspectId === id ? "sel" : ""}" data-inspect="${id}" style="--el:${elColor(h.element)}" title="${esc(shortName(h.name))}">
+      <img src="${characterButton(id)}" alt="${esc(shortName(h.name))}" ${IMG_FALLBACK} />${setup.picked.includes(id) ? '<span class="cs-check">✓</span>' : ""}</button>`;
+  };
+  const panelRows = (rows: string[][]) => rows.map((row) => `<div class="cs-rrow">${row.map(heroCard).join("")}</div>`).join("");
+
   const slots = [0, 1, 2].map((i) => {
     const id = setup.picked[i];
-    return id ? `<button class="slot on" data-pick="${id}" title="remove">${esc(nameOf(id))} ✕</button>` : `<span class="slot empty">—</span>`;
+    return id
+      ? `<button class="cs-slot on" data-pick="${id}" title="remove ${esc(nameOf(id))}"><img src="${characterButton(id)}" ${IMG_FALLBACK} /></button>`
+      : `<span class="cs-slot empty"></span>`;
   }).join("");
-  return `<header><div class="brand">◆ Element Arena</div><div class="status">team select</div></header>
-    <div class="select">
-      <div class="roster-grid">${grid}</div>
-      <aside class="detail">${setup.inspect ? heroDetail(setup.inspect, setup.picked) : `<div class="hint">Click a hero to view its skills, then add it to your team.</div>`}</aside>
-      <div class="teambar">
-        <div class="tray"><b>Your team <span class="count">${setup.picked.length}/3</span></b><div class="slots">${slots}</div></div>
-        <div class="tray"><b>Opponent (AI)</b><div class="oppo">${setup.oppo.map((id) => `<span>${esc(nameOf(id))}</span>`).join("")}</div><button class="mini" data-reroll="1">🎲 re-roll</button></div>
-        <button class="start" data-start="1" ${setup.picked.length === 3 ? "" : "disabled"}>Start battle ▶</button>
+
+  return `<div class="cs">
+    <div class="cs-mini">
+      <img src="${characterButton(inspectId)}" ${IMG_FALLBACK} />
+      <div class="cs-mini-txt"><b>${esc(shortName(def.name))}</b><span>${esc(titleOf(def.name) || `${cap(def.element)} Element`)}</span></div>
+    </div>
+
+    <div class="cs-show">
+      <div class="cs-info">
+        <div class="cs-hname">${esc(shortName(def.name))}</div>
+        <div class="cs-hel">${esc(cap(def.element))} Element</div>
+        <button class="cs-abtn ${on ? "rem" : ""}" data-pick="${inspectId}" ${!on && full ? "disabled" : ""}>${on ? "Remove Hero" : "Add to Team"}</button>
+        <button class="cs-abtn" disabled title="Not available yet">Mastery</button>
+        <button class="cs-abtn" disabled title="Fusions & augments are drafted between rounds">Fusions &amp; Augments</button>
       </div>
-    </div>`;
+      <div class="cs-art"><img src="${heroPortrait(inspectId)}" alt="${esc(shortName(def.name))}" ${IMG_FALLBACK} /></div>
+      <div class="cs-skills">
+        <div class="cs-sk"><h4>Passive Skill</h4><div class="cs-icons">${skTile(`${def.id}0`)}</div></div>
+        <div class="cs-sk"><h4>Basic Skills</h4><div class="cs-icons">${byClass("basic")}</div></div>
+        <div class="cs-sk"><h4>Defensive Skill</h4><div class="cs-icons">${byClass("defensive")}</div></div>
+        <div class="cs-sk"><h4>Ultimate Skill</h4><div class="cs-icons">${byClass("ultimate")}</div></div>
+      </div>
+    </div>
+
+    <div class="cs-bottom">
+      <div class="cs-roster left">${panelRows(LEFT_ROWS)}</div>
+      <div class="cs-mid">
+        <div class="cs-modes">
+          <button class="cs-mode" disabled>Quick Match</button>
+          <button class="cs-mode" disabled>Ranked Match</button>
+          <button class="cs-mode wide" disabled>Hero Challenge Trials</button>
+          <button class="cs-mode start" data-start="1" ${full ? "" : "disabled"}>Bot Match</button>
+          <button class="cs-mode" disabled>Private Match</button>
+        </div>
+        <div class="cs-team-title">Your Team</div>
+        <div class="cs-team">${slots}</div>
+        <div class="cs-prompt">${full ? "Ready — press Bot Match ▶" : `Select ${3 - setup.picked.length} more — 3 Heroes to begin!`}</div>
+      </div>
+      <div class="cs-roster right">${panelRows(RIGHT_ROWS)}</div>
+    </div>
+  </div>`;
 }

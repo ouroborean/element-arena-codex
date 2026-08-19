@@ -36,6 +36,14 @@ export function energyIcon(el: string): string {
   return `../../assets/energy_tooltips/${el}_energy.png`;
 }
 
+/** The angular roster-card art for a hero (character-select buttons). */
+export function characterButton(heroId: string): string {
+  return `../../assets/ui/character_buttons/${heroId}button.png`;
+}
+
+/** The character-select background scene. */
+export const CS_BACKGROUND = "../../assets/ui/backgrounds/background.png";
+
 // hero ids longest-first, so "sayaaurora1" prefix-matches "saya" (not a shorter accidental match).
 const HERO_IDS = ROSTER.map((h) => h.id).sort((a, b) => b.length - a.length);
 /** The hero that owns a skill id (its icon lives under that hero's folder) — for effect source icons. */
@@ -50,5 +58,7 @@ export const ELEMENT_COLOR: Record<string, string> = {
   slime: "#7fc86a", nomad: "#c9a26a", myth: "#e0b84a", moon: "#b8c0e8", spore: "#9ad86a",
   battery: "#e8d24a", stasis: "#8fd0e8", reanimation: "#c86a8a", faerie: "#e89ad0", ninja: "#8a8a9a",
   angel: "#f0e6c0", prism: "#d86ad0", aurora: "#6ad8c0", generic: "#8a8fa8",
+  apocalypse: "#c0392b", devil: "#b0304a", holy: "#f0e0a0", serum: "#6ac8a0", storm: "#6a9fd8",
+  unholy: "#8a5ad0", vengeance: "#d05a6a",
 };
 export const elColor = (el: string): string => ELEMENT_COLOR[el] ?? "#8a8fa8";
