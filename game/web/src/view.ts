@@ -17,6 +17,7 @@ import { heroPortrait, iconOf, minionPortrait, energyIcon, characterButton, elCo
 import { SKILL_TEXT } from "./skilltext.generated.ts";
 import { STATUS_SOURCE } from "./statussource.generated.ts";
 import { EFFECT_DESC, EFFECT_VARIANT, EFFECT_HIDE } from "./effectdesc.generated.ts";
+import { MAX_NAME_LEN } from "../../net/protocol.ts";
 import type { UiState } from "./main.ts";
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
@@ -415,7 +416,6 @@ export function renderApp(state: MatchState, ui: UiState): string {
 
 // ── team select (redesigned scene) ────────────────────────────────────────────────────────────────── //
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
-const titleOf = (fullName: string) => fullName.split(",").slice(1).join(",").trim();
 
 // Hand-authored roster layout, split into the left & right panels around the centre controls. Each single-
 // element pair sits together (both heroes of that element); the fusion-element heroes stand alone by name.
@@ -431,7 +431,7 @@ const RIGHT_ROWS = [
 ];
 const ROSTER_ORDER = [...LEFT_ROWS.flat(), ...RIGHT_ROWS.flat()];
 
-export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: string | null; augfuse?: boolean }): string {
+export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: string | null; augfuse?: boolean }, player: { name: string; sub: string; avatar: string }): string {
   const inspectId = setup.inspect ?? ROSTER_ORDER[0]!;
   const def = ROSTER.find((h) => h.id === inspectId)!;
   const on = setup.picked.includes(inspectId);
@@ -465,9 +465,12 @@ export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: 
   }).join("");
 
   return `<div class="cs">
-    <div class="cs-mini">
-      <img src="${characterButton(inspectId)}" ${IMG_FALLBACK} />
-      <div class="cs-mini-txt"><b>${esc(shortName(def.name))}</b><span>${esc(titleOf(def.name) || `${cap(def.element)} Element`)}</span></div>
+    <div class="cs-mini" title="Your profile">
+      <button class="cs-avatar" data-avatar-pick title="Change avatar">${player.avatar ? `<img src="${player.avatar}" alt="avatar" ${IMG_FALLBACK} />` : `<span class="cs-avatar-ph">👤</span>`}</button>
+      <div class="cs-mini-txt">
+        <input class="cs-uname" data-name-input maxlength="${MAX_NAME_LEN}" value="${esc(player.name)}" placeholder="Guest" title="Your display name — edit to rename" />
+        <span>${esc(player.sub)}</span>
+      </div>
     </div>
 
     <div class="cs-show">
