@@ -359,11 +359,21 @@ function draftOptions(state: MatchState, u: Unit): string {
   const fusion = u.fused
     ? `<div class="do-note">Already fused into <b>${esc(u.fused)}</b> — a hero fuses once per match.</div>`
     : forms.length
-    ? forms.map((f) => `<button class="do-card" data-fuse-unit="${u.id}" data-fuse-form="${esc(f.key)}">
-        <img class="do-port" src="${heroPortrait(hid, f.key)}" ${IMG_FALLBACK} />
-        <span class="do-txt"><span class="do-name">Fuse → <b style="color:${elColor(f.element)}">${esc(f.element)}</b></span>
-          <span class="do-sub">${esc(f.passive.name)}</span>
-          <span class="do-desc">${esc(f.passive.description)}</span></span></button>`).join("")
+    ? forms.map((f) => {
+        const passIc = iconOf(`${hid}${f.key}0`, hid);
+        const sk = f.skill, skText = SKILL_TEXT[sk.id], skIc = iconOf(sk.id, hid);
+        const block = (label: string, ic: string | null, name: string, desc: string) =>
+          `<span class="fc-block"><span class="fc-label">${label}</span>
+            <span class="fc-line">${ic ? `<img src="${ic}" ${IMG_FALLBACK} />` : ""}<b>${esc(name)}</b></span>
+            <span class="fc-desc">${esc(desc)}</span></span>`;
+        return `<button class="do-card fusion-card" data-fuse-unit="${u.id}" data-fuse-form="${esc(f.key)}">
+          <img class="fc-port" src="${heroPortrait(hid, f.key)}" ${IMG_FALLBACK} />
+          <span class="fc-body">
+            <span class="fc-head">Fuse → <b style="color:${elColor(f.element)}">${esc(f.element)}</b></span>
+            ${block("New passive", passIc, f.passive.name, f.passive.description)}
+            ${block("New skill", skIc, skText?.n ?? sk.name, skText?.d ?? "")}
+          </span></button>`;
+      }).join("")
     : `<div class="do-note">No fusion available — needs a teammate whose element forms a recipe.</div>`;
   const augment = augs.length
     ? augs.map((a) => `<button class="do-card" data-aug-unit="${u.id}" data-aug-id="${esc(a.id)}">
