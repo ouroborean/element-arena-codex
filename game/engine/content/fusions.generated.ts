@@ -7762,9 +7762,7 @@ export const FUSIONS: FusionForm[] = [
     "on": "skillUsed",
     "source": "Reading in the Dark",
     "when": {
-     "has": "mark",
-     "name": "Endless Night",
-     "of": "eventSource"
+     "eventHidden": true
     },
     "effect": [
      {
@@ -7799,7 +7797,7 @@ export const FUSIONS: FusionForm[] = [
       "includeSelf": true
      },
      "status": {
-      "kind": "mark",
+      "kind": "cloak",
       "name": "Endless Night",
       "duration": 2
      }
