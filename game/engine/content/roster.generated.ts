@@ -7362,7 +7362,7 @@ export const ROSTER: HeroDef[] = [
   "passive": {
    "name": "Pain Tolerance",
    "description": "If Hector the Injector is on this Hero's team, Hector's passive won't create a minion at the start of the round, and all of Hector's skills that refer to Dennis will refer to this Hero instead. If Dennis is damaged, he will gain Elemental Essence and 5 Damage Reduction until the end of his next turn. This effect stacks, but does not refresh. Dennis can only gain Elemental Essence from this effect once per turn.",
-   "pending": "Part A (Hector-teammate rewrite: suppress Hector's summon, retarget every 'Dennis' reference from the minion to this hero) is now ENCODED via Unit.understudyFor: buildMatch sets it to 'Dennis the Apprentice' when Dennis shares Hector's team, and resolveSelector admits this hero for any selector naming that exact template - so Hector's count-guarded roundStart summon sees count>=1 (suppressed) and his Protect Me! redirect + Serum targets resolve onto hero-Dennis. The understudy is a REFERENCE stand-in only: targeting/status/count/redirect selectors naming the template resolve to hero-Dennis, but structural minion-lifecycle ops (defeat/revive/transform/useSkill-by) do NOT admit it, so Hector's Perfect Form fusion cannot consume the hero, Serum Overload cannot revive him as a minion, and a Dennis-cast reference (Dennisyphus) no-ops since the hero lacks the minion's skills. Part B is the damageDealt trigger: a 'Pain Tolerance' stack drives cumulative 5xN Damage Reduction, duration 1 = 'until end of his next turn'. The stack magnitude accumulates ('stacks'); the merging status model shares one duration-1 timer across stacks rather than giving each stack an independent expiry, so 'does not refresh' (each stack keeping its own original end) is still approximated here - a follow-up gives each hit an independent scheduled -1 expiry. Elemental Essence is gated to once per turn by a self-expiring duration-1 guard mark."
+   "pending": "Part A (Hector-teammate rewrite: suppress Hector's summon, retarget every 'Dennis' reference from the minion to this hero) is now ENCODED via Unit.understudyFor: buildMatch sets it to 'Dennis the Apprentice' when Dennis shares Hector's team, and resolveSelector admits this hero for any selector naming that exact template - so Hector's count-guarded roundStart summon sees count>=1 (suppressed) and his Protect Me! redirect + Serum targets resolve onto hero-Dennis. The understudy is a REFERENCE stand-in only: targeting/status/count/redirect selectors naming the template resolve to hero-Dennis, but structural minion-lifecycle ops (defeat/revive/transform/useSkill-by) do NOT admit it, so Hector's Perfect Form fusion cannot consume the hero, Serum Overload cannot revive him as a minion, and a Dennis-cast reference (Dennisyphus) no-ops since the hero lacks the minion's skills. Part B is the damageDealt trigger: a 'Pain Tolerance' stack drives cumulative 5xN Damage Reduction, duration 1 = 'until end of his next turn'. 'Stacks but does not refresh' is encoded exactly: each hit adds a PERMANENT (dur null) Pain Tolerance stack and schedules its OWN -1 at Dennis's next turn-end (delayTurns 1), so every stack expires on its own clock rather than sharing one refreshed duration-1 timer; DR is recomputed = 5 x live stackCount after each change. Elemental Essence is gated to once per turn by a self-expiring duration-1 guard mark."
   },
   "skills": [
    {
@@ -7657,7 +7657,7 @@ export const ROSTER: HeroDef[] = [
       "op": "addStack",
       "name": "Pain Tolerance",
       "amount": 1,
-      "duration": 1,
+      "duration": null,
       "to": "self"
      },
      {
@@ -7677,8 +7677,56 @@ export const ROSTER: HeroDef[] = [
          }
         ]
        },
-       "duration": 1
+       "duration": null
       }
+     },
+     {
+      "op": "schedule",
+      "delayTurns": 1,
+      "to": "self",
+      "effect": [
+       {
+        "op": "if",
+        "cond": {
+         "cmp": ">=",
+         "left": {
+          "ref": "stackCount",
+          "name": "Pain Tolerance",
+          "of": "self"
+         },
+         "right": 1
+        },
+        "then": [
+         {
+          "op": "addStack",
+          "name": "Pain Tolerance",
+          "amount": -1,
+          "duration": null,
+          "to": "self"
+         }
+        ]
+       },
+       {
+        "op": "applyStatus",
+        "to": "self",
+        "status": {
+         "kind": "damage_reduction",
+         "name": "Pain Tolerance",
+         "magnitude": {
+          "op": "mul",
+          "args": [
+           5,
+           {
+            "ref": "stackCount",
+            "name": "Pain Tolerance",
+            "of": "self"
+           }
+          ]
+         },
+         "duration": null
+        }
+       }
+      ]
      },
      {
       "op": "if",
