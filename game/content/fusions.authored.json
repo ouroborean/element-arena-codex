@@ -5344,7 +5344,7 @@
         }
        ]
       },
-      "note": "CUSTOM: for 2 turns, if the target uses a skill they take 15 Affliction damage and are stunned 1 turn, and the 'To Your Health!' mark is removed so its heal does not fire. A target-side skillUsed trap that also cancels the pending onExpire heal cannot be expressed with the effect primitives."
+      "note": "Implemented by armSkillUseTrap: marks the target 'Skill Trap' for 2 turns; if the target uses a skill, the onUse payload fires (15 Affliction + stun 1) and `cancels` removes the 'To Your Health!' mark, so its onExpire heal never fires."
      }
     ]
    }
@@ -5898,7 +5898,7 @@
           }
          ]
         },
-        "note": "CUSTOM: if the ally uses a new skill within 1 turn, they gain Elemental Essence; needs a target-side skillUsed trap not expressible with the effect primitives."
+        "note": "Implemented by armSkillUseReward: marks the ally 'Skill Reward' for 1 turn; if they use a skill within the window they gain Elemental Essence."
        }
       ],
       "else": [
@@ -5930,7 +5930,7 @@
           }
          ]
         },
-        "note": "onExpire stun is the 'if they do not use a new skill they are stunned' branch; the 'unless they use a skill' cancellation would require a target-side skillUsed trap and is not modeled."
+        "note": "onExpire stun is the 'if they do not use a new skill they are stunned' branch; the 'unless they use a skill' cancellation is the removeMarkOnSkillUse custom below, which strips the 'A Sprinkle of Recklessness' mark if the enemy uses a skill (so its onExpire stun never fires)."
        },
        {
         "op": "custom",
