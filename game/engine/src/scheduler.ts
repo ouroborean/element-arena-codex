@@ -67,6 +67,8 @@ export function removeDeadMinions(state: MatchState): void {
 export function startRound(state: MatchState, firstTeam: TeamId = "A"): void {
   state.round += 1;
   clearRoundStatuses(state);
+  state.scheduled = []; // scheduled effects are round-scoped (like statuses/dynamic triggers): they target
+  // this round's HP/stacks/statuses, so an unfired one must not carry into the next fresh battle.
   for (const u of Object.values(state.units)) {
     u.hp = u.maxHp;
     u.shields = [];
