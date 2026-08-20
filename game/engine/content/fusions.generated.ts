@@ -8808,7 +8808,7 @@ export const FUSIONS: FusionForm[] = [
   },
   "passiveTriggers": [
    {
-    "on": "roundStart",
+    "on": "turnStart",
     "source": "Deep, Dark Night",
     "effect": [
      {
@@ -8816,24 +8816,32 @@ export const FUSIONS: FusionForm[] = [
       "cond": {
        "cmp": ">=",
        "left": {
-        "ref": "count",
+        "ref": "stackSum",
+        "name": "Deepening Shadows",
         "of": {
-         "filter": {
-          "faction": "enemies",
-          "kind": "hero"
-         },
-         "with": {
-          "kind": "stack",
-          "name": "Deepening Shadows"
-         }
+         "faction": "enemies",
+         "kind": "hero"
         }
        },
        "right": 10
       },
       "then": [
        {
-        "op": "custom",
-        "fn": "revealEnemyInvisibleEffects"
+        "op": "applyStatus",
+        "to": "self",
+        "status": {
+         "kind": "reveal",
+         "name": "Deep, Dark Night",
+         "duration": null
+        }
+       }
+      ],
+      "else": [
+       {
+        "op": "removeStatus",
+        "kind": "reveal",
+        "name": "Deep, Dark Night",
+        "from": "self"
        }
       ]
      },
@@ -8842,17 +8850,12 @@ export const FUSIONS: FusionForm[] = [
       "cond": {
        "cmp": ">=",
        "left": {
-        "ref": "count",
+        "ref": "stackSum",
+        "name": "Deepening Shadows",
         "of": {
-         "filter": {
-          "faction": "allies",
-          "includeSelf": true,
-          "kind": "hero"
-         },
-         "with": {
-          "kind": "stack",
-          "name": "Deepening Shadows"
-         }
+         "faction": "allies",
+         "includeSelf": true,
+         "kind": "hero"
         }
        },
        "right": 10

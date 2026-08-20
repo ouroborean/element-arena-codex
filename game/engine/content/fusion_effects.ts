@@ -988,9 +988,9 @@ registerCustom("untargetableByBlindedSkills", (ctx, a) => {
   }
 });
 
-// laria:night (Reveal): the "see invisible effects" clause is cosmetic — the isHidden/invisible flag is a
-// deferred, unmodelled presentation concept, so there is nothing mechanical to reveal (faithful no-op).
-registerCustom("revealEnemyInvisibleEffects", () => { /* cosmetic: no hidden-effect system to reveal */ });
+// laria:night "Deep, Dark Night" no longer needs a custom reveal fn: its passive now applies the real
+// `reveal` status directly (True Sight) when enemies hold 10+ total Deepening Shadows — see the fusion's
+// turnStart trigger in fusions.authored.json.
 
 // gaia:nomad (gaianomad1 "Sandstorm") — the two "during this time" auras riding the 4-turn Sandstorm window.
 // Aura 1: "Rampart costs [65]" (= 1 generic): a duration-bounded cost_currency_remap moves Rampart's single

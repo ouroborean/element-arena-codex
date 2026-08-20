@@ -8945,7 +8945,7 @@
    },
    "passiveTriggers": [
     {
-     "on": "roundStart",
+     "on": "turnStart",
      "source": "Deep, Dark Night",
      "effect": [
       {
@@ -8953,25 +8953,32 @@
        "cond": {
         "cmp": ">=",
         "left": {
-         "ref": "count",
+         "ref": "stackSum",
+         "name": "Deepening Shadows",
          "of": {
-          "filter": {
-           "faction": "enemies",
-           "kind": "hero"
-          },
-          "with": {
-           "kind": "stack",
-           "name": "Deepening Shadows"
-          }
+          "faction": "enemies",
+          "kind": "hero"
          }
         },
         "right": 10
        },
        "then": [
         {
-         "op": "custom",
-         "fn": "revealEnemyInvisibleEffects",
-         "note": "Reveal all invisible (veiled/hidden) effects created by the opponent."
+         "op": "applyStatus",
+         "to": "self",
+         "status": {
+          "kind": "reveal",
+          "name": "Deep, Dark Night",
+          "duration": null
+         }
+        }
+       ],
+       "else": [
+        {
+         "op": "removeStatus",
+         "kind": "reveal",
+         "name": "Deep, Dark Night",
+         "from": "self"
         }
        ]
       },
@@ -8980,17 +8987,12 @@
        "cond": {
         "cmp": ">=",
         "left": {
-         "ref": "count",
+         "ref": "stackSum",
+         "name": "Deepening Shadows",
          "of": {
-          "filter": {
-           "faction": "allies",
-           "includeSelf": true,
-           "kind": "hero"
-          },
-          "with": {
-           "kind": "stack",
-           "name": "Deepening Shadows"
-          }
+          "faction": "allies",
+          "includeSelf": true,
+          "kind": "hero"
          }
         },
         "right": 10
@@ -9024,7 +9026,7 @@
        ]
       }
      ],
-     "note": "sum ref shape {ref:sum,metric:stackCount,name:'Deepening Shadows',of:<selector>} = total Deepening Shadows across those heroes."
+     "note": "Recomputed each turnStart (NOT roundStart: clearRoundStatuses wipes the Deepening Shadows stacks before a roundStart trigger could read them). Enemy branch: while enemy heroes hold 10+ TOTAL Deepening Shadows (stackSum), Laria's team holds `reveal` (True Sight — redactState stops hiding the opponent's Invisible effects). Ally branch: while allied heroes hold 10+ total, all allied heroes are `veiled`, so their effects are Invisible to the enemy. Both toggle off via the else-branch when the total drops below 10, and reset with the stacks at round start."
     }
    ],
    "skill": {
