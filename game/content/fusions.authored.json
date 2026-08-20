@@ -5037,17 +5037,9 @@
       "count": 1
      },
      {
-      "op": "applyStatus",
-      "to": {
-       "faction": "allies",
-       "kind": "minion",
-       "template": "Frozen Beast"
-      },
-      "status": {
-       "kind": "stun",
-       "duration": null
-      },
-      "note": "'permanently stunned until Gommar loses Frost-Covered': applied as a permanent stun on the new minion. The 'until Gommar loses Frost-Covered' release has no clean primitive (no auto-remove on his mark loss) and is left as documentation."
+      "op": "custom",
+      "fn": "stunFrostBeastUntilFrostLost",
+      "note": "'permanently stunned until Gommar loses Frost-Covered': the custom stuns the new Frozen Beast (dur null) AND arms a round-permanent one-shot watch that removes that stun on statusLost(mark 'Frost-Covered') of Gommar (self) — emitted by the removeStatus op when one of his actives consumes the charge. One-way release."
      }
     ]
    }

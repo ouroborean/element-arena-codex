@@ -591,12 +591,12 @@
    "owner": "gommar",
    "name": "Flashfreeze",
    "description": "After Gommar consumes Frost-Covered, he regains it at the end of his next turn.",
-   "note": "Reactive on the Frost-Covered mark leaving Gommar (statusExpired), which re-grants it via schedule at the end of his next turn (delayTurns 1). The name gate lives in the custom effect (statusExpired carries no name-matching Condition). CAVEAT: the shipped base kit never consumes/removes Frost-Covered — it is a round-permanent mark the enhanced skills only READ — so no statusExpired for it fires today and this augment is dormant against the current kit; when a consume/removal path exists, regainFrostCoveredNextTurn schedules the re-grant.",
+   "note": "Reactive on Gommar CONSUMING Frost-Covered: keys on statusLost (the explicit-removal event emitted by the removeStatus op), since Frost-Covered is a dur-null mark that never naturally expires (statusExpired would never fire). regainFrostCoveredNextTurn gates on eventUnit==self + kind/name, then schedules applyStatus Frost-Covered to self at the end of his next turn (delayTurns 1). Gommar's base actives gommar1/2/3/5 consume the charge via removeStatus, so this now fires.",
    "patches": [
     {
      "op": "addTrigger",
      "trigger": {
-      "on": "statusExpired",
+      "on": "statusLost",
       "source": "Flashfreeze",
       "effect": [
        {
@@ -608,7 +608,7 @@
          "to": "self",
          "delayTurns": 1
         },
-        "note": "If the expired status is the Frost-Covered mark on Gommar, schedule applyStatus Frost-Covered to self at the end of his next turn."
+        "note": "If Gommar lost the Frost-Covered mark, schedule applyStatus Frost-Covered to self at the end of his next turn."
        }
       ]
      }

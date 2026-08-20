@@ -37,7 +37,7 @@ STATUS_KINDS = {"damage_reduction", "incoming_damage_mod", "outgoing_damage_mod"
                 "heal_lock", "uncounterable", "coil_damage_bonus", "mark", "stack"}
 EVENTS = {"damageDealt", "shieldDamaged", "shieldBroken", "unitDied", "skillUsed", "skillDeclared",
           "skillGranted", "minionSummoned", "healReceived", "statusApplied", "statusExpired", "skillRedirected",
-          "counterFired", "energyFromEssence", "turnStart", "turnEnd", "roundStart"}
+          "counterFired", "energyFromEssence", "turnStart", "turnEnd", "roundStart", "statusLost"}
 TARGETING = {"single", "self", "all-enemies", "all-allies", "all", "none"}
 KLASS = {"basic", "defensive", "ultimate", "fusion", "passive"}
 DTYPES = {"normal", "piercing", "affliction", "true"}

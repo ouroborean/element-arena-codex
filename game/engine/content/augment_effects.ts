@@ -116,10 +116,12 @@ registerCustom("jumpStatusOnExpire", (ctx, a) => {
   if (pick) applyStatus(pick, { kind: spec.kind, name: spec.name, magnitude: typeof spec.magnitude === "number" ? spec.magnitude : undefined, dtype: spec.dtype, duration: (spec.duration as number | null) ?? null, appliedBy: ctx.self.id, appliedTurn: ctx.state.turn });
 });
 
-// regainFrostCoveredNextTurn — when a named status lapses, schedule re-applying it after a delay.
+// regainFrostCoveredNextTurn — when the holder LOSES a named status (Flashfreeze: Gommar consuming
+// Frost-Covered), schedule re-applying it after a delay. Keys on statusLost (the explicit-removal event) —
+// Frost-Covered is a dur-null mark that never naturally expires, so statusExpired would never fire.
 registerCustom("regainFrostCoveredNextTurn", (ctx, a) => {
   const e = ctx.event;
-  if (!e || e.type !== "statusExpired" || e.kind !== (a.kind as string) || e.name !== (a.name as string)) return;
+  if (!e || e.type !== "statusLost" || e.unit !== ctx.self.id || e.kind !== (a.kind as string) || e.name !== (a.name as string)) return;
   ctx.state.scheduled.push({
     effect: [{ op: "applyStatus", to: "self", status: { kind: a.kind as Status["kind"], name: a.name as string, duration: null } }],
     caster: ctx.self.id, targets: [ctx.self.id], turns: num(a.delayTurns, 1), appliedTurn: ctx.state.turn,
