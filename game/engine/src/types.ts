@@ -55,6 +55,7 @@ export type StatusKind =
   | "stealth" // does not trigger enemy effects
   | "veiled" // concealed until the veiled unit uses a Harmful skill (removed then, unless doesNotBreakVeil); the concealment itself is server-side redaction
   | "cloak" // a timed, NON-breaking concealment window (keeper "Endless Night"): the holder's effects + skill-uses are Invisible to the enemy for its duration, and — unlike veiled — a Harmful action does NOT strip it
+  | "reveal" // True Sight: while any unit on a team holds this, that team sees THROUGH the opponent's invisibility (redactState stops hiding the enemy's Invisible effects from it) — ayana:prism "Illumination", laria:night reveal branch
   | "taunt" // forced to target a specific unit
   | "blind" // single-target skills retarget at random
   | "stun" // cannot use skills (optionally tag-scoped)

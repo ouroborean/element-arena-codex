@@ -39,10 +39,13 @@ export function skillIsInvisible(caster: Unit, skill: { isHidden?: boolean }): b
   return !!skill.isHidden || isConcealed(caster);
 }
 
-/** Does `viewer`'s team currently see through the opponent's invisibility (a reveal / True Sight)? Wired in a
- *  later PR (Ayana's Prism Sentence, Laria's Deepening Shadows); until then no team has reveal. */
-export function viewerHasReveal(_state: MatchState, _viewer: TeamId): boolean {
-  return false;
+/** Does `viewer`'s team currently see through the opponent's invisibility (a reveal / True Sight)? True while
+ *  any unit on the team holds a `reveal` status — Ayana's "Illumination" (while Prism Sentence is active) or
+ *  Laria's Deepening Shadows reveal branch. When true, redactState stops hiding the enemy's Invisible effects
+ *  from this viewer. */
+export function viewerHasReveal(state: MatchState, viewer: TeamId): boolean {
+  const t = state.teams[viewer];
+  return t.units.some((id) => state.units[id]?.statuses.some((s) => s.kind === "reveal"));
 }
 
 /** Should this status be hidden from `viewer`? You always see your own team's effects; otherwise an effect
