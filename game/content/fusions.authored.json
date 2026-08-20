@@ -7498,7 +7498,7 @@
    "passive": {
     "name": "Licherature",
     "description": "Keeper of Fables may no longer receive healing from any source. Tales to Tell now grants 10 additional Shield whenever it activates.",
-    "note": "First clause = permanent heal_lock (re-established each round; statuses are round-scoped). Second clause ('Tales to Tell grants 10 additional Shield whenever it activates') raises the magnitude of Keeper's Shield gains by 10; there is no shieldGranted event and no primitive to amend a grant amount reactively, so it is documented, not transcribed."
+    "note": "First clause = permanent heal_lock (re-established each round; statuses are round-scoped). Second clause ('Tales to Tell grants 10 additional Shield whenever it activates') = a permanent shield_grant_bonus:10 on Keeper (re-applied each round), which addShield adds to every Shield grant he receives. The engine models Keeper's Shield as one pool, so all his grants count as Tales to Tell; a rare ally-sourced grant is also boosted, accepted under that one-pool model (shields aren't source-tagged, same limitation as keeper4's absorb cap)."
    },
    "passiveTriggers": [
     {
@@ -7512,9 +7512,18 @@
         "kind": "heal_lock",
         "duration": null
        }
+      },
+      {
+       "op": "applyStatus",
+       "to": "self",
+       "status": {
+        "kind": "shield_grant_bonus",
+        "magnitude": 10,
+        "duration": null
+       }
       }
      ],
-     "note": "'may no longer receive healing from any source' = permanent self heal_lock, re-applied at each round start."
+     "note": "'may no longer receive healing from any source' = permanent self heal_lock, re-applied at each round start. 'Tales to Tell grants 10 additional Shield whenever it activates' = a permanent shield_grant_bonus:10 on Keeper (all his Shield lands in the one pool), which addShield adds to every grant."
     }
    ],
    "skill": {
@@ -7591,9 +7600,23 @@
    "passive": {
     "name": "Wise Old Man",
     "description": "The Shield from Tales to Tell no longer prevents damage to Keeper of Fables. When Keeper of Fables dies, his allies gain Shield equal to the Shield on Tales to Tell, divided evenly and rounded up to the nearest increment of 5.",
-    "note": "First clause ('Shield no longer prevents damage to Keeper') turns Tales to Tell into a pure resource pool that stops absorbing incoming damage for Keeper; there is no primitive to make a Shield non-absorbing, so it is documented, not transcribed. Second clause is the on-death distribution below."
+    "note": "First clause ('Shield no longer prevents damage to Keeper') = a permanent shield_non_absorbing on Keeper (re-applied each round): applyDamage skips his Shield absorption so damage falls through to HP, while the pool stays intact as a resource (consumeShield still spends it; the on-death read below still sees it). Second clause is the on-death distribution below."
    },
    "passiveTriggers": [
+    {
+     "on": "roundStart",
+     "source": "Wise Old Man",
+     "effect": [
+      {
+       "op": "applyStatus",
+       "to": "self",
+       "status": {
+        "kind": "shield_non_absorbing",
+        "duration": null
+       }
+      }
+     ]
+    },
     {
      "on": "unitDied",
      "source": "Wise Old Man",

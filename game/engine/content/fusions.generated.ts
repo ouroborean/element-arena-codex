@@ -7411,6 +7411,15 @@ export const FUSIONS: FusionForm[] = [
        "kind": "heal_lock",
        "duration": null
       }
+     },
+     {
+      "op": "applyStatus",
+      "to": "self",
+      "status": {
+       "kind": "shield_grant_bonus",
+       "magnitude": 10,
+       "duration": null
+      }
      }
     ]
    }
@@ -7490,6 +7499,20 @@ export const FUSIONS: FusionForm[] = [
    "description": "The Shield from Tales to Tell no longer prevents damage to Keeper of Fables. When Keeper of Fables dies, his allies gain Shield equal to the Shield on Tales to Tell, divided evenly and rounded up to the nearest increment of 5."
   },
   "passiveTriggers": [
+   {
+    "on": "roundStart",
+    "source": "Wise Old Man",
+    "effect": [
+     {
+      "op": "applyStatus",
+      "to": "self",
+      "status": {
+       "kind": "shield_non_absorbing",
+       "duration": null
+      }
+     }
+    ]
+   },
    {
     "on": "unitDied",
     "source": "Wise Old Man",

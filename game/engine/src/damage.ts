@@ -37,7 +37,10 @@ export function addShield(
   id?: string,
 ): void {
   if (amount <= 0) return;
-  u.shields.push({ amount, duration, appliedBy, appliedTurn, id });
+  // "Tales to Tell grants N additional Shield whenever it activates": every grant to a holder of
+  // shield_grant_bonus is boosted (Keeper's Shield all lands in his one pool).
+  const bonus = sumMagnitude(u, "shield_grant_bonus");
+  u.shields.push({ amount: amount + bonus, duration, appliedBy, appliedTurn, id });
 }
 
 /**
@@ -233,7 +236,9 @@ export function applyDamage(target: Unit, dmg: DamageInstance): DamageResult {
   //    up to the per-hit shield-absorb cap (shield_absorb_cap) — overflow above the cap falls through to HP.
   const shieldBefore = totalShield(target);
   let shieldAbsorbed = 0;
-  if (!cap.shield && !shattered && !dmg.bypass && shieldBefore > 0) {
+  // shield_non_absorbing (Wise Old Man): the pool no longer prevents damage — it stays intact as a pure
+  // resource (still spendable / readable), and this hit falls straight through to HP.
+  if (!cap.shield && !shattered && !dmg.bypass && !has(target, "shield_non_absorbing") && shieldBefore > 0) {
     let absorbable = Math.min(amount, shieldAbsorbCap(target));
     for (const sh of target.shields) {
       if (absorbable <= 0) break;
