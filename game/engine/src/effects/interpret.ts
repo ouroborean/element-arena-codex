@@ -38,6 +38,9 @@ export interface Ctx {
    *  effect's later re-run does NOT inherit it (a deferred effect re-runs with a fresh context) — an
    *  "invisible until triggered" trap is handled by the temporal-reveal work, not this flag. */
   invisible?: boolean;
+  /** Display-disguise context: statuses applied here are stamped to display as skill `disguiseAs` in the
+   *  opponent's view (redactState). Seeded from the casting skill's disguiseAs. */
+  disguiseAs?: string;
   /** Set of unit ids this skill's effects touched (damaged/statused) — for "affected N targets" reads. */
   affected?: Set<string>;
   /** Present inside a trigger: the event that fired it. */
@@ -349,6 +352,13 @@ function evalDuration(d: Value | null, ctx: Ctx): number | null {
   return d === null ? null : applyRounding(evalValue(d, ctx));
 }
 
+/** The label to show a disguised status in the opponent's view: the disguise skill's display name (resolved
+ *  from the caster's own kit), falling back to the raw id. Returns the disguise fields, or empty when none. */
+export function disguiseFieldsOf(ctx: Ctx): { disguiseAs?: string; disguiseName?: string } {
+  if (!ctx.disguiseAs) return {};
+  return { disguiseAs: ctx.disguiseAs, disguiseName: ctx.caster.skills?.find((s) => s.id === ctx.disguiseAs)?.name ?? ctx.disguiseAs };
+}
+
 function buildStatus(spec: StatusSpec, ctx: Ctx) {
   return {
     kind: spec.kind,
@@ -365,6 +375,8 @@ function buildStatus(spec: StatusSpec, ctx: Ctx) {
     // Frozen invisibility: an isHidden skill's context (ctx.invisible) hides ALL its effects; a status-spec
     // `invisible:true` hides just this one. Either makes the opponent's wire-state omit this status.
     invisible: ctx.invisible || spec.invisible || undefined,
+    // Display disguise (if the casting skill wears one): shown as the disguise skill in the opponent's view.
+    ...disguiseFieldsOf(ctx),
   };
 }
 
@@ -851,7 +863,7 @@ export function resolveDeclaration(state: MatchState, caster: Unit, skill: Skill
 export function runEffects(
   state: MatchState,
   effects: Effect[],
-  opts: { caster: Unit; self?: Unit; targets?: Unit[]; skillId?: string; targeting?: string; invisible?: boolean },
+  opts: { caster: Unit; self?: Unit; targets?: Unit[]; skillId?: string; targeting?: string; invisible?: boolean; disguiseAs?: string },
 ): string[] {
   const rng = Rng.fromState(state.rngState);
   const bus = createBus(state, rng);
@@ -866,6 +878,7 @@ export function runEffects(
     skillId: opts.skillId,
     targeting: opts.targeting,
     invisible: opts.invisible,
+    disguiseAs: opts.disguiseAs,
     affected,
     emit: bus.emit,
   };

@@ -18923,6 +18923,7 @@
      "specific": 1
     },
     "cooldown": 1,
+    "disguiseAs": "zephyrex2",
     "effects": [
      {
       "op": "custom",
@@ -18932,10 +18933,9 @@
        "amount": 45,
        "dtype": "piercing",
        "target": "target",
-       "disguiseAs": "zephyrex2",
        "cancelOnHarmfulSkillReceived": true
       },
-      "note": "Channeled strike: Zephyrex marks one enemy; at the end of his next turn he deals 45 Piercing to it UNLESS he received a new harmful skill during the channel (no skillReceived/harmful-grant event exists to gate a plain schedule). Enemy players see the effect displayed as Elegant Sweep (no display-disguise primitive). The delayed, conditional, disguised resolution is bundled into one escape hatch."
+      "note": "Channeled strike: Zephyrex marks one enemy; at the end of his next turn he deals 45 Piercing to it UNLESS he received a new harmful skill during the channel (no skillReceived/harmful-grant event exists to gate a plain schedule). 'Enemy players see the effect displayed as Elegant Sweep' is real: the skill-level disguiseAs (zephyrex2) telegraphs the cast under Elegant Sweep's name and stamps its Cleave marks so redactState re-skins them to Elegant Sweep in the opponent's view (cosmetic; the real 45-Piercing mechanic is unchanged)."
      }
     ]
    }

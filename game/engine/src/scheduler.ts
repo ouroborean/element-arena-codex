@@ -522,6 +522,9 @@ export function performAction(state: MatchState, action: Action): ActionResult {
   // caster's veiled), so a skill struck from stealth is reported Invisible for its OWN cast even though the
   // cloak drops afterwards. Feeds the `hidden` flag on this cast's events + the log-telegraph suppression.
   const invisibleCast = skill.isHidden || isConcealed(caster);
+  // Display disguise (zephyrex:mist Cleave the Veil → Elegant Sweep): the cover-name to telegraph under and
+  // to stamp onto every status this cast leaves, so the opponent's view is re-skinned by redactState.
+  const disguiseName = skill.disguiseAs ? ((caster.skills ?? []).find((s) => s.id === skill.disguiseAs)?.name ?? skill.disguiseAs) : undefined;
 
   // Targeting legality (before paying cost — an illegal action can't be declared).
   const rng = Rng.fromState(state.rngState);
@@ -564,7 +567,7 @@ export function performAction(state: MatchState, action: Action): ActionResult {
     else removeStatus(caster, "channeling");
   }
 
-  const affected = runEffects(state, skill.effects, { caster, self: caster, targets: decl.finalTargets, skillId: skill.id, targeting: effectiveTargeting(caster, skill), invisible: skill.isHidden });
+  const affected = runEffects(state, skill.effects, { caster, self: caster, targets: decl.finalTargets, skillId: skill.id, targeting: effectiveTargeting(caster, skill), invisible: skill.isHidden, disguiseAs: skill.disguiseAs });
   skill.currentCd = effectiveCooldown(caster, skill);
   skill.cdSetTurn = state.turn; // birth turn — advanceCooldowns skips it (see below), so cooldown N blocks N turns
   caster.lastSkillId = skill.id; // the "used a skill" ledger (read by clone/last-skill mechanics)
@@ -586,6 +589,9 @@ export function performAction(state: MatchState, action: Action): ActionResult {
       instanceId,
       duration: null, appliedBy: caster.id, appliedTurn: state.turn,
       invisible: skill.isHidden || undefined, // an Invisible Channel skill hides its own channeling marker
+      // A disguised Channel skill re-skins its channeling marker too (the name stays the real skill id for the
+      // channel machinery; redactState swaps only the displayed name for the opponent).
+      disguiseAs: skill.disguiseAs, disguiseName,
     });
   }
 
@@ -593,8 +599,9 @@ export function performAction(state: MatchState, action: Action): ActionResult {
   // opts out (aramao1/aramao2 "does not break Veiled"). Concealment while veiled is a separate redaction concern.
   if (skill.tags.includes("Harmful") && !skill.doesNotBreakVeil) removeStatus(caster, "veiled");
 
-  // An Invisible skill (inherently, or cast from a cloak) leaves no telegraph in the shared log.
-  if (!invisibleCast) state.log.push(`${caster.name} used ${skill.name}`);
+  // An Invisible skill (inherently, or cast from a cloak) leaves no telegraph in the shared log; a disguised
+  // skill telegraphs under its cover name (Cleave the Veil → "Elegant Sweep") so the log doesn't out it.
+  if (!invisibleCast) state.log.push(`${caster.name} used ${disguiseName ?? skill.name}`);
   emit(state, { type: "skillUsed", caster: caster.id, skillId: skill.id, targets: decl.finalTargets.map((t) => t.id), tags: skill.tags, affected, hidden: invisibleCast });
   removeDeadMinions(state);
   return { ok: true };

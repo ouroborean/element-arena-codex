@@ -18579,6 +18579,7 @@ export const FUSIONS: FusionForm[] = [
     "specific": 1
    },
    "cooldown": 1,
+   "disguiseAs": "zephyrex2",
    "effects": [
     {
      "op": "custom",
@@ -18588,7 +18589,6 @@ export const FUSIONS: FusionForm[] = [
       "amount": 45,
       "dtype": "piercing",
       "target": "target",
-      "disguiseAs": "zephyrex2",
       "cancelOnHarmfulSkillReceived": true
      }
     }

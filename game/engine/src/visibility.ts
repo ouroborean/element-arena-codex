@@ -63,6 +63,16 @@ function hiddenFrom(state: MatchState, status: Status, bearer: Unit, viewer: Tea
   return status.invisible === true || isConcealed(state.units[status.appliedBy]);
 }
 
+/** In the OPPONENT's view a disguised status is re-labelled + re-sourced to its cover skill (and the disguise
+ *  fields stripped so nothing leaks). The owner and a True-Sight viewer see the real status unchanged. */
+function disguiseFor(state: MatchState, s: Status, bearer: Unit, viewer: TeamId, reveal: boolean): Status {
+  if (!s.disguiseAs || reveal || statusOwnerTeam(state, s, bearer) === viewer) return s;
+  // A channeling marker's `name` is the skill ID (the client resolves it via skillName), so swap it to the
+  // disguise's ID; every other status shows its `name` directly, so swap that to the disguise's label.
+  const name = s.kind === "channeling" ? s.disguiseAs : (s.disguiseName ?? s.name);
+  return { ...s, name, sourceId: s.disguiseAs, disguiseAs: undefined, disguiseName: undefined };
+}
+
 /** An Invisible cast fingerprints the caster OUTSIDE its statuses: the skill it used ticks a cooldown, and
  *  the last-skill ledger names it. Neither is drawn in the UI, but both ride the wire — so from a FOE's view
  *  scrub the cooldown of any Invisible skill and blank a last-skill ledger that names one. Only isHidden
@@ -92,8 +102,11 @@ export function redactState(state: MatchState, viewer: TeamId): MatchState {
   const units: Record<string, Unit> = {};
   for (const [id, u] of Object.entries(state.units)) {
     let out = u;
-    const visible = u.statuses.filter((s) => !hiddenFrom(state, s, u, viewer, reveal));
-    if (visible.length !== u.statuses.length) out = { ...out, statuses: visible };
+    // Statuses: drop the ones hidden from this viewer, then re-skin any that remain but wear a disguise.
+    const kept = u.statuses.filter((s) => !hiddenFrom(state, s, u, viewer, reveal));
+    let sChanged = kept.length !== u.statuses.length;
+    const projected = kept.map((s) => { const d = disguiseFor(state, s, u, viewer, reveal); if (d !== s) sChanged = true; return d; });
+    if (sChanged) out = { ...out, statuses: projected };
     // A dynamic watch armed by an Invisible cast (a reflect/trap installed via installWatch under an isHidden
     // skill) is broadcast by name in `triggers` — on whichever unit it sits, incl. an enemy target. Drop it
     // from anyone who is not on the INSTALLING team (derived from appliedBy), so an armed trap isn't readable.

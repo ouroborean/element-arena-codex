@@ -111,6 +111,12 @@ export interface Status {
    *  Invisible skill is minion-owned, so this is a known forward-looking limitation, not a live leak.
    *  Dynamic team cloak (veiled/Endless Night) is layered on at redaction time, not frozen here. */
   invisible?: boolean;
+  /** Display disguise: in the OPPONENT's view this status is shown as if it came from skill `disguiseAs`
+   *  (its source icon) and re-labelled `disguiseName` — zephyrex:mist "Cleave the Veil" displayed as Elegant
+   *  Sweep. redactState performs the swap and strips these fields; the owner (and a True-Sight viewer) see
+   *  the real effect. Cosmetic only — the mechanic is unchanged. */
+  disguiseAs?: string;
+  disguiseName?: string;
   /** For a cost_mod / cooldown_mod that applies to ONE skill only (absent = all skills). */
   skillId?: string;
   /** For an incoming_damage_mult: apply only to NEW skill hits (isNew), not ongoing DoT ticks. */
