@@ -294,6 +294,11 @@ export function evalCondition(c: Condition, ctx: Ctx): boolean {
     const e = ctx.event;
     return !!e && "team" in e && e.team === ctx.self.team;
   }
+  if ("eventRedirectedToSelf" in c) {
+    // On skillRedirected (a reflect): did the skill get redirected ONTO this unit? (reads the destination `to`.)
+    const e = ctx.event;
+    return !!e && e.type === "skillRedirected" && e.to === ctx.self.id;
+  }
   if ("and" in c) return c.and.every((x) => evalCondition(x, ctx));
   if ("or" in c) return c.or.some((x) => evalCondition(x, ctx));
   if ("not" in c) return !evalCondition(c.not, ctx);

@@ -135,7 +135,7 @@ def v_condition(c, path):
         v_selector(c["isKind"], path + ".isKind")
         if c.get("kind") not in {"hero", "minion"}:
             err(path, f"invalid isKind '{c.get('kind')}'")
-    elif "declaredTargetsSelf" in c or "eventHasTag" in c or "eventStatusKind" in c or "eventTeamIsSelf" in c or "chance" in c:
+    elif "declaredTargetsSelf" in c or "eventHasTag" in c or "eventStatusKind" in c or "eventTeamIsSelf" in c or "eventRedirectedToSelf" in c or "chance" in c:
         pass
     elif "and" in c:
         for i, x in enumerate(c["and"]):
