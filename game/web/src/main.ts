@@ -8,6 +8,7 @@ import type { MatchState, TeamId, Unit } from "../../engine/src/types.ts";
 import type { Action } from "../../engine/src/scheduler.ts";
 import type { SkillInstance } from "../../engine/src/skill.ts";
 import { legalTargets, canUse, canPay, effectiveCost } from "../../engine/src/scheduler.ts";
+import { redactState } from "../../engine/src/visibility.ts";
 import { Rng } from "../../engine/src/rng.ts";
 import { buildMatch, defaultPolicy, type Draft } from "../../engine/content/match.ts";
 import { ROSTER } from "../../engine/content/roster.generated.ts";
@@ -174,7 +175,11 @@ function showSkpop(el: HTMLElement): void {
 }
 function hideSkpop(): void { skpop.hidden = true; }
 
-function render(): void { hideFx(); app.innerHTML = renderApp(state, ui); }
+// Render the board from the LOCAL seat's perspective: an opponent's Invisible effects are stripped here.
+// In PvP the server already redacted `state`, so this is idempotent; in local vs-bot play (where `state` is
+// the full authoritative board the engine loop runs on) this is what actually hides the bot's Invisible
+// effects from the human. We redact only the render copy — the live `state` the loop mutates stays whole.
+function render(): void { hideFx(); app.innerHTML = renderApp(redactState(state, ui.you), ui); }
 /** The team-select screen (its player panel reads the profile) plus the avatar picker when open. */
 function renderSetupScreen(): void { app.innerHTML = renderSetup(setup!, playerPanel()) + avatarPickerHtml(); }
 function showSetup(): void { setup = { picked: [], oppo: randomTeam([]), inspect: null }; renderSetupScreen(); }

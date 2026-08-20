@@ -14,6 +14,7 @@ import { buildMatch } from "../engine/content/match.ts";
 import { runMatch } from "../client/loop.ts";
 import { applyDraftChoice, autoDraft, hasDraftOptions, type DraftChoice } from "../client/draft.ts";
 import { ROUNDS_TO_WIN, TURN_MS, DRAFT_MS, RECONNECT_GRACE_MS, type ClientMsg, type ServerMsg, type EndReason } from "../net/protocol.ts";
+import { redactState } from "../engine/src/visibility.ts";
 
 type TurnMsg = Extract<ClientMsg, { t: "turn" }>;
 type DraftMsg = Extract<ClientMsg, { t: "draftChoice" }>;
@@ -178,7 +179,7 @@ export class Match {
     if (timer) { clearTimeout(timer); delete this.graceTimers[side]; }
     const wasDisconnected = this.disconnected.delete(side);
     const p = this.pending[side];
-    seat.send({ t: "resumed", you: side, state: this.wireState(), control: p.control, deadline: p.deadline, opponentDisconnected: this.disconnected.has(other(side)), opponentName: this.bySide[other(side)].name ?? "Opponent" });
+    seat.send({ t: "resumed", you: side, state: this.wireState(side), control: p.control, deadline: p.deadline, opponentDisconnected: this.disconnected.has(other(side)), opponentName: this.bySide[other(side)].name ?? "Opponent" });
     if (wasDisconnected) this.bySide[other(side)].send({ t: "opponentReconnected" });
   }
 
@@ -201,15 +202,17 @@ export class Match {
     }
   }
 
-  /** State for the wire: the full board (clients preview moves from it) but with the unbounded match log
-   *  trimmed to its tail, so re-broadcasting every phase doesn't grow O(turns^2) in bandwidth. */
-  private wireState(): MatchState {
-    return this.state.log.length > 8 ? { ...this.state, log: this.state.log.slice(-8) } : this.state;
+  /** State for the wire, projected for ONE seat: the opponent's Invisible effects are stripped (redactState)
+   *  so a client can never see — or preview against — what it is not meant to know, THEN the unbounded match
+   *  log is trimmed to its tail so re-broadcasting every phase doesn't grow O(turns^2) in bandwidth. */
+  private wireState(viewer: TeamId): MatchState {
+    const seen = redactState(this.state, viewer);
+    return seen.log.length > 8 ? { ...seen, log: seen.log.slice(-8) } : seen;
   }
 
   async run(): Promise<void> {
-    this.a.send({ t: "start", you: this.a.side!, opponentTeam: this.b.team, opponentName: this.b.name ?? "Opponent", state: this.wireState(), matchId: this.a.matchId ?? "", token: this.a.token ?? "" });
-    this.b.send({ t: "start", you: this.b.side!, opponentTeam: this.a.team, opponentName: this.a.name ?? "Opponent", state: this.wireState(), matchId: this.b.matchId ?? "", token: this.b.token ?? "" });
+    this.a.send({ t: "start", you: this.a.side!, opponentTeam: this.b.team, opponentName: this.b.name ?? "Opponent", state: this.wireState(this.a.side!), matchId: this.a.matchId ?? "", token: this.a.token ?? "" });
+    this.b.send({ t: "start", you: this.b.side!, opponentTeam: this.a.team, opponentName: this.a.name ?? "Opponent", state: this.wireState(this.b.side!), matchId: this.b.matchId ?? "", token: this.b.token ?? "" });
 
     let outcome: MatchOutcome | null = null;
     try {
@@ -242,8 +245,8 @@ export class Match {
       const deadline = Date.now() + this.turnMs;
       this.pending[side] = { control: "turn", deadline };
       this.pending[other(side)] = { control: "wait" };
-      active.send({ t: "yourTurn", state: this.wireState(), deadline });
-      waiting.send({ t: "opponentTurn", state: this.wireState() });
+      active.send({ t: "yourTurn", state: this.wireState(side), deadline });
+      waiting.send({ t: "opponentTurn", state: this.wireState(other(side)) });
       const timer = setTimeout(() => {
         active.pendingTurn = undefined;
         resolve([]); // auto-hold: a timed-out player does nothing this turn
@@ -266,8 +269,8 @@ export class Match {
         const deadline = Date.now() + this.draftMs;
         this.pending[side] = { control: "draft", deadline };
         this.pending[other(side)] = { control: "waitDraft" };
-        drafter.send({ t: "yourDraft", state: this.wireState(), deadline });
-        waiting.send({ t: "opponentDraft", state: this.wireState() });
+        drafter.send({ t: "yourDraft", state: this.wireState(side), deadline });
+        waiting.send({ t: "opponentDraft", state: this.wireState(other(side)) });
         const timer = setTimeout(() => {
           drafter.pendingDraft = undefined;
           resolve(autoDraft(this.state, side));
@@ -292,7 +295,7 @@ export class Match {
 
   /** Push the current authoritative state to both players as a neutral "render + wait" update. */
   private broadcastState(): void {
-    for (const c of [this.a, this.b]) c.send({ t: "opponentTurn", state: this.wireState() });
+    for (const c of [this.a, this.b]) c.send({ t: "opponentTurn", state: this.wireState(c.side!) });
   }
 
   private end(outcome: MatchOutcome, reason: EndReason): void {
