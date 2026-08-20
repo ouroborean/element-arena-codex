@@ -39,7 +39,7 @@ function dealAndEmit(ctx: Ctx, u: Unit, amount: number, dtype: DamageType = "nor
 function installWatch(ctx: Ctx, spec: Omit<TriggeredEffect, "owner">, turns: number | null, owner: Unit = ctx.self): void {
   // sourceSkillId = the skill/passive that installed this watch (ctx.skillId), so a status the watch
   // later applies can show that skill's icon even though it fires in a fresh, deferred context.
-  owner.triggers = [...(owner.triggers ?? []), { sourceSkillId: ctx.skillId, ...spec, owner: owner.id, duration: turns, appliedBy: ctx.self.id, appliedTurn: ctx.state.turn }];
+  owner.triggers = [...(owner.triggers ?? []), { sourceSkillId: ctx.skillId, ...spec, owner: owner.id, duration: turns, appliedBy: ctx.self.id, appliedTurn: ctx.state.turn, invisible: ctx.invisible || undefined }];
 }
 /** Tag units with a marker so a later-firing dynamic trigger can name "the target(s)" by mark. */
 function markUnits(ctx: Ctx, sel: Selector, name: string, duration: number | null): void {

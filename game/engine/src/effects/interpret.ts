@@ -598,6 +598,7 @@ export function exec(effect: Effect, ctx: Ctx): void {
       ctx.state.scheduled.push({
         effect: effect.effect, caster: ctx.caster.id, targets,
         turns: effect.delayTurns, appliedTurn: ctx.state.turn, skillId: ctx.skillId,
+        invisible: ctx.invisible || undefined,
       });
       return;
     }

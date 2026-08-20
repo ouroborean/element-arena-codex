@@ -217,4 +217,7 @@ export interface ScheduledEntry {
   appliedTurn: number;
   /** The skill/passive that scheduled it — carried across the delay so applied statuses keep their source. */
   skillId?: string;
+  /** Redaction: scheduled by an Invisible cast (the schedule op under ctx.invisible) — redactState omits it
+   *  from the opponent's wire so a pending Invisible payload isn't laid bare before it fires. */
+  invisible?: boolean;
 }
