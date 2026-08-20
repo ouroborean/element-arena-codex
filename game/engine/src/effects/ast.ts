@@ -72,6 +72,7 @@ export type Condition =
   | { sameUnit: [Selector, Selector] } // identity equality of the first unit each resolves to
   | { isFaction: Selector; faction: "ally" | "enemy" } // relative to the acting unit's team
   | { isKind: Selector; kind: "hero" | "minion" } // is the selected unit a hero or a minion?
+  | { skillOnCooldown: string } // the caster's own skill (by id) is currently on cooldown (zephyrex3 requires Wind Step down)
   | { declaredTargetsSelf: true } // (skillDeclared) the trigger owner is among the declared targets
   | { eventHasTag: string } // (skillDeclared/skillUsed) the skill carries this class tag
   | { eventStatusKind: string; name?: string } // (statusApplied/statusExpired) the event's status kind (+name) matches

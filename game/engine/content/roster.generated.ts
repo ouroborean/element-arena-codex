@@ -6219,6 +6219,9 @@ export const ROSTER: HeroDef[] = [
      "specific": 1
     },
     "cooldown": 2,
+    "requires": {
+     "skillOnCooldown": "zephyrex4"
+    },
     "effects": [
      {
       "op": "seq",

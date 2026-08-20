@@ -311,6 +311,11 @@ export function evalCondition(c: Condition, ctx: Ctx): boolean {
     const e = ctx.event;
     return !!e && "hidden" in e && !!(e as { hidden?: boolean }).hidden === c.eventHidden;
   }
+  if ("skillOnCooldown" in c) {
+    // The caster's own skill (by id) is on cooldown right now — a castability gate (zephyrex3 Sonic Thrust).
+    const sk = (ctx.self.skills ?? []).find((s) => s.id === c.skillOnCooldown);
+    return !!sk && sk.currentCd > 0;
+  }
   if ("and" in c) return c.and.every((x) => evalCondition(x, ctx));
   if ("or" in c) return c.or.some((x) => evalCondition(x, ctx));
   if ("not" in c) return !evalCondition(c.not, ctx);
