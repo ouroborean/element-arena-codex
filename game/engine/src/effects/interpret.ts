@@ -27,6 +27,9 @@ export interface Ctx {
   vars: Record<string, number>;
   /** The skill / passive id currently executing — stamped onto any status it applies (provenance). */
   skillId?: string;
+  /** The declared targeting of the skill currently executing ("single" vs an AOE category) — the true
+   *  signal for "single-target damage" (a resolved defender count of 1 can also be an AOE hitting one enemy). */
+  targeting?: string;
   /** Set of unit ids this skill's effects touched (damaged/statused) — for "affected N targets" reads. */
   affected?: Set<string>;
   /** Present inside a trigger: the event that fired it. */
@@ -321,14 +324,38 @@ export function exec(effect: Effect, ctx: Ctx): void {
       const dtype = outgoingDtypeOverride(ctx.caster) ?? effect.dtype ?? "normal";
       // Attacker-side empower/weaken: additive mod, then multiplicative mult (e.g. triple damage).
       const amount = Math.max(0, (evalValue(effect.amount, ctx) + outgoingDamageMod(ctx.caster, dtype)) * outgoingDamageMult(ctx.caster));
-      for (const u of effectTargets(effect.to, ctx)) {
+      // Land one share of this damage on one defender (`src` = the credited dealer), running its full
+      // mitigation and emitting its events. The damage's own character (type + bypass) stays the attacker's.
+      const land = (u: Unit, amt: number, src: string): void => {
         ctx.affected?.add(u.id);
         const wasAlive = u.alive;
-        const r = applyDamage(u, { amount, type: dtype, isNew: true, sourceId: effect.id, bypass: bypassesAgainst(ctx.caster, u) });
-        if (r.shieldAbsorbed > 0) ctx.emit({ type: "shieldDamaged", unit: u.id, source: ctx.caster.id, amount: r.shieldAbsorbed });
-        if (r.shieldBroke) ctx.emit({ type: "shieldBroken", unit: u.id, source: ctx.caster.id });
-        ctx.emit({ type: "damageDealt", source: ctx.caster.id, target: u.id, amount: r.hpLost, dtype, sourceId: effect.id, isNew: true });
-        if (wasAlive && r.lethal) ctx.emit({ type: "unitDied", unit: u.id, killer: ctx.caster.id });
+        const r = applyDamage(u, { amount: amt, type: dtype, isNew: true, sourceId: effect.id, bypass: bypassesAgainst(ctx.caster, u) });
+        if (r.shieldAbsorbed > 0) ctx.emit({ type: "shieldDamaged", unit: u.id, source: src, amount: r.shieldAbsorbed });
+        if (r.shieldBroke) ctx.emit({ type: "shieldBroken", unit: u.id, source: src });
+        ctx.emit({ type: "damageDealt", source: src, target: u.id, amount: r.hpLost, dtype, sourceId: effect.id, isNew: true });
+        if (wasAlive && r.lethal) ctx.emit({ type: "unitDied", unit: u.id, killer: src });
+      };
+      // "single-target damage" is the CASTING SKILL's declared targeting, not the resolved defender count:
+      // an all-enemies AOE can resolve to a single living enemy, and a forEach fans single-defender ops.
+      const splittable = ctx.targeting === "single";
+      for (const u of effectTargets(effect.to, ctx)) {
+        // Blackened Soul (split_incoming): a single-target hit on the holder is divided evenly among the
+        // holder + living opposing-team bearers of the named mark. The holder's share is credited to the
+        // attacker (they legitimately hit the holder); the redistributed shares are credited to the split
+        // holder (Jarrik) — matching the DoT/thorns precedent (scheduler.ts sources redirected damage to the
+        // effect owner), so the attacker's on-deal reactions don't fire on friendly-fire shares. Shares land
+        // via `land`, NOT by re-entering the damage op, so a co-bearer holding split_incoming doesn't re-split.
+        const split = splittable && u.alive ? u.statuses.find((s) => s.kind === "split_incoming") : undefined;
+        if (split) {
+          const co = teamUnits(ctx.state, otherTeam(u.team)).filter(
+            (x) => x.alive && x.id !== u.id && x.statuses.some((s) => s.kind === "mark" && s.name === split.name),
+          );
+          const per = applyRounding(amount / (1 + co.length));
+          land(u, per, ctx.caster.id);
+          for (const d of co) land(d, per, u.id);
+        } else {
+          land(u, amount, ctx.caster.id);
+        }
       }
       return;
     }
@@ -738,7 +765,7 @@ export function resolveDeclaration(state: MatchState, caster: Unit, skill: Skill
 export function runEffects(
   state: MatchState,
   effects: Effect[],
-  opts: { caster: Unit; self?: Unit; targets?: Unit[]; skillId?: string },
+  opts: { caster: Unit; self?: Unit; targets?: Unit[]; skillId?: string; targeting?: string },
 ): string[] {
   const rng = Rng.fromState(state.rngState);
   const bus = createBus(state, rng);
@@ -751,6 +778,7 @@ export function runEffects(
     it: null,
     vars: {},
     skillId: opts.skillId,
+    targeting: opts.targeting,
     affected,
     emit: bus.emit,
   };

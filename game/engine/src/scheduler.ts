@@ -522,7 +522,7 @@ export function performAction(state: MatchState, action: Action): ActionResult {
   // Using a new skill cancels any active channel (unless this skill opts out).
   if (!skill.doesNotInterrupt) removeStatus(caster, "channeling");
 
-  const affected = runEffects(state, skill.effects, { caster, self: caster, targets: decl.finalTargets, skillId: skill.id });
+  const affected = runEffects(state, skill.effects, { caster, self: caster, targets: decl.finalTargets, skillId: skill.id, targeting: skill.targeting });
   skill.currentCd = effectiveCooldown(caster, skill);
   skill.cdSetTurn = state.turn; // birth turn — advanceCooldowns skips it (see below), so cooldown N blocks N turns
   caster.lastSkillId = skill.id; // the "used a skill" ledger (read by clone/last-skill mechanics)
