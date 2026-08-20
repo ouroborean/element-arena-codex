@@ -597,7 +597,8 @@ function summonMinion(ctx: Ctx, templateName: string, hpOverride: number | null)
     id, kind: "minion", name: tmpl?.name ?? templateName, team: ctx.caster.team,
     hp: maxHp, maxHp, shields: [],
     baseElement: element, currentElement: element,
-    statuses: [], alive: true, summoner: ctx.caster.id,
+    statuses: (tmpl?.statuses ?? []).map((s) => ({ ...s, appliedBy: ctx.caster.id, appliedTurn: ctx.state.turn })),
+    alive: true, summoner: ctx.caster.id,
     skills: (tmpl?.skills ?? []).map((s) => ({ ...s, currentCd: 0 })),
     triggers: (tmpl?.triggers ?? []).map((t) => ({ ...t, owner: id })),
   };

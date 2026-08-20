@@ -3515,7 +3515,7 @@
    "passive": {
     "name": "Rising Indignation",
     "description": "Whenever Gaia receives new damage, the cost of Gaia's Fury is reduced by [65], stacking. At 3 stacks, Gaia's Fury is automatically cast. During this time, Moonspike may not be used, and the Gaia's Fury minion deals and receives 10 additional damage.",
-    "note": "Each time Gaia takes damage (damageDealt with eventTarget self) she gains a Rising Indignation stack; at 3 stacks Gaia's Fury (gaiamoon1) auto-casts (useSkill) and the stack resets. The load-bearing outcome (auto-cast at 3) is realized. NOT expressed: the per-stack '[65]' (1 generic) cost discount needs a stack-scaled, skill-id-scoped cost_mod (scopedCostMod takes a flat number, not a Value); 'Moonspike may not be used' has no corresponding base skill on Gaia; and the summoned minion's +10 dealt/received belongs to the minion template, not the fusion form."
+    "note": "Each time Gaia takes damage (damageDealt with eventTarget self) she gains a Rising Indignation stack; at 3 stacks Gaia's Fury (gaiamoon1) auto-casts (useSkill) and the stack resets. The load-bearing outcome (auto-cast at 3) is realized. All three 'during this time' clauses are now expressed (Reading A: every Gaia's Fury minion is enraged): (a) the per-stack [65] discount = costMods:{mul(stackCount('Rising Indignation'),-1)} on gaiamoon1 (1 stack -> 2 generic, 2 -> 1, 3 -> 0+auto-cast); (b) 'Moonspike may not be used' = gaiafury2.requires:{not has 'Enraged'} on the minion (which carries the Enraged mark); (c) the minion's +10 dealt/received = intrinsic outgoing_damage_mod/incoming_damage_mod +10 in the 'Gaia's Fury' template's new statuses[]."
    },
    "passiveTriggers": [
     {
@@ -3577,6 +3577,17 @@
      "generic": 3,
      "specific": 0
     },
+    "costMods": [
+     {
+      "magnitude": {
+       "op": "mul",
+       "args": [
+        { "ref": "stackCount", "name": "Rising Indignation", "of": "self" },
+        -1
+       ]
+      }
+     }
+    ],
     "cooldown": 3,
     "effects": [
      {

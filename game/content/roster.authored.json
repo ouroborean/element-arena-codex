@@ -7041,6 +7041,24 @@
      "name": "Gaia's Fury",
      "maxHp": 100,
      "element": "moon",
+     "statuses": [
+      {
+       "kind": "mark",
+       "name": "Enraged",
+       "duration": null
+      },
+      {
+       "kind": "outgoing_damage_mod",
+       "magnitude": 10,
+       "duration": null
+      },
+      {
+       "kind": "incoming_damage_mod",
+       "magnitude": 10,
+       "duration": null
+      }
+     ],
+     "note": "The minion is 'Gaia, Enraged' (Rising Indignation, Reading A: every Gaia's Fury minion is enraged): +10 dealt (outgoing_damage_mod) and +10 received (incoming_damage_mod), and Moon Spike (gaiafury2) is locked via requires:{not has 'Enraged'} — so it may not be used, per prose.",
      "skills": [
       {
        "id": "gaiafury1",
@@ -7083,6 +7101,13 @@
         "specific": 1
        },
        "cooldown": 0,
+       "requires": {
+        "not": {
+         "has": "mark",
+         "name": "Enraged",
+         "of": "self"
+        }
+       },
        "effects": [
         {
          "op": "damage",

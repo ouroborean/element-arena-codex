@@ -1173,6 +1173,13 @@ export const MINIONS: MinionTemplate[] = [
      "specific": 1
     },
     "cooldown": 0,
+    "requires": {
+     "not": {
+      "has": "mark",
+      "name": "Enraged",
+      "of": "self"
+     }
+    },
     "effects": [
      {
       "op": "damage",
@@ -1203,7 +1210,24 @@ export const MINIONS: MinionTemplate[] = [
     "currentCd": 0
    }
   ],
-  "triggers": []
+  "triggers": [],
+  "statuses": [
+   {
+    "kind": "mark",
+    "name": "Enraged",
+    "duration": null
+   },
+   {
+    "kind": "outgoing_damage_mod",
+    "magnitude": 10,
+    "duration": null
+   },
+   {
+    "kind": "incoming_damage_mod",
+    "magnitude": 10,
+    "duration": null
+   }
+  ]
  },
  {
   "name": "Boulder",
