@@ -7242,7 +7242,7 @@
    "passive": {
     "name": "Chronicle Fragments",
     "description": "Whenever the Shield from Tales to Tell is broken by damage, Keeper of Fables receives a stack of Chronicle Fragments. These Fragments are consumed by his abilities, counting as 10 Shield each.",
-    "note": "Second sentence ('Fragments are consumed by his abilities, counting as 10 Shield each') changes how consumeShield draws currency -- Fragments substitute for 10 Shield apiece when a skill's Shield cost is paid. That is a modification of the spend primitive, not a reactive event, so it is documented here and not transcribed as a HeroTrigger."
+    "note": "Second sentence ('Fragments are consumed by his abilities, counting as 10 Shield each') is now modeled: Keeper's Shield-cost checks read spendableShield (= totalShield + 10*stackCount('Chronicle Fragments')), and consumeShield spends real Shield first, then whole Fragments for the shortfall. Non-Keeper callers hold 0 Fragments, so both are backward-compatible."
    },
    "passiveTriggers": [
     {

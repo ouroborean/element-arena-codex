@@ -204,6 +204,11 @@ export function evalValue(v: Value, ctx: Ctx): number {
         return resolveOne(v.of, ctx).hp;
       case "shield":
         return totalShield(resolveOne(v.of, ctx));
+      case "spendableShield": {
+        // Shield spendable toward a Shield cost, counting each Chronicle Fragments stack as 10 Shield.
+        const u = resolveOne(v.of, ctx);
+        return totalShield(u) + 10 * stackCount(u, "Chronicle Fragments");
+      }
       case "count":
         return resolveSelector(v.of, ctx).length;
       case "statusDuration": {
