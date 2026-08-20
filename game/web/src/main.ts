@@ -244,7 +244,7 @@ function queue(unitId: string, skillId: string, targets: string[] | undefined): 
 /** Why a skill can't be used right now — shown in the examine panel for an unusable tile. */
 function unusableReason(u: Unit, skill: SkillInstance): string {
   if (skill.currentCd > 0) return `On cooldown — ${skill.currentCd} turn${skill.currentCd > 1 ? "s" : ""} remaining.`;
-  if (!canPay(state.teams[u.team].energy, u.currentElement, effectiveCost(u, skill))) return "Not enough energy in the pool.";
+  if (!canPay(state.teams[u.team].energy, u.currentElement, effectiveCost(u, skill, state))) return "Not enough energy in the pool.";
   return "Can't be used right now (stunned, silenced, or no valid target).";
 }
 
@@ -398,7 +398,7 @@ function planGeneric(actions: Action[]): { generic: number; avail: Record<string
     const u = state.units[a.unit];
     const sk = (u?.skills ?? []).find((s) => s.id === a.skillId);
     if (!u || !sk) continue;
-    const c = effectiveCost(u, sk);
+    const c = effectiveCost(u, sk, state);
     generic += c.generic;
     if (c.specific > 0) reservedSpecific[u.currentElement] = (reservedSpecific[u.currentElement] ?? 0) + c.specific;
   }

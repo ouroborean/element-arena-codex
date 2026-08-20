@@ -90,8 +90,8 @@ export function renderBoard(state: MatchState, youSide: TeamId): string {
 }
 
 /** "Fan the Flames  1⚡ · cd0 · Harmful" — a one-line skill descriptor. */
-export function describeSkill(u: Unit, skill: SkillInstance): string {
-  const cost = effectiveCost(u, skill);
+export function describeSkill(state: MatchState, u: Unit, skill: SkillInstance): string {
+  const cost = effectiveCost(u, skill, state);
   const costStr = [cost.generic ? `${cost.generic} gen` : "", cost.specific ? `${cost.specific} ${skill.element}` : ""].filter(Boolean).join("+") || "free";
   const cd = skill.currentCd > 0 ? red(`cd${skill.currentCd}`) : dim("ready");
   const kind = skill.tags.find((t) => ["Harmful", "Helpful", "Strategic"].includes(t)) ?? skill.klass;
@@ -107,7 +107,7 @@ export function renderSkillMenu(state: MatchState, u: Unit): { text: string; usa
     const ok = canUse(state, u, s);
     if (ok) usable.push(s.id);
     const n = ok ? bold(`${i + 1})`) : dim(`${i + 1})`);
-    const body = describeSkill(u, s);
+    const body = describeSkill(state, u, s);
     lines.push(`   ${n} ${ok ? body : dim(body) + dim(" — unusable")}`);
   });
   lines.push(`   ${bold("0)")} ${dim("skip / hold")}`);

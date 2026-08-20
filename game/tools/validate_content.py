@@ -32,7 +32,7 @@ STATUS_KINDS = {"damage_reduction", "incoming_damage_mod", "outgoing_damage_mod"
                 "shield_absorb_cap", "split_incoming",
                 "damage_becomes_heal", "heal_becomes_damage", "dies_at_max", "shatter",
                 "damage_ignore", "non_damage_ignore", "immortal", "revive_ward", "invulnerable",
-                "isolated", "untargetable", "elemental_essence", "cost_mod", "silence", "paralysis",
+                "isolated", "untargetable", "elemental_essence", "cost_mod", "cost_currency_remap", "silence", "paralysis",
                 "stealth", "veiled", "taunt", "blind", "stun", "channeling", "dot", "regen",
                 "heal_lock", "uncounterable", "mark", "stack"}
 EVENTS = {"damageDealt", "shieldDamaged", "shieldBroken", "unitDied", "skillUsed", "skillDeclared",

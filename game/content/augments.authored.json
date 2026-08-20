@@ -929,11 +929,10 @@
      "fn": "conditionalCostReduction",
      "args": {
       "skillId": "keeper5",
-      "condition": "soloLivingHero",
-      "element": "generic",
-      "amount": 1
+      "amount": 1,
+      "when": { "cmp": "==", "left": { "ref": "count", "of": { "faction": "allies", "kind": "hero", "includeSelf": true } }, "right": 1 }
      },
-     "note": "'costs one less [65]' (Generic) while Keeper is the only living allied hero. Not expressible via setSkillMeta (unconditional) or a cost Value (no cast-time solo check), so a custom is used. See augment note re: base cost having no Generic component."
+     "note": "'costs one less [65]' (Generic) while Keeper is the only living allied hero — a per-cast conditional costMod on keeper5 (see conditionalCostReduction). The `when` matches keeper5's own solo gate (count of living ally heroes == 1). effectiveCost re-evaluates it live each cast. RULING: keeper5's base cost has no Generic component, so the -1 Generic spills onto the Specific cost (the engine's universal cost_mod convention) — i.e. solo Hero's Return costs one Specific less. This preserves the discount (the intended 'cheaper when solo' effect) rather than making it a no-op; kept intentionally over a literal 'floor Generic at 0' reading."
     }
    ]
   },

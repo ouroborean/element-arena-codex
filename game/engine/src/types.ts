@@ -44,6 +44,7 @@ export type StatusKind =
   | "untargetable" // cannot be targeted by ANY of another unit's skills (self-targeting still works)
   | "elemental_essence" // a one-shot charge: swaps the holder's next income from 1 generic to 1 of its element, then is consumed
   | "cost_mod" // magnitude: delta added to the holder's skill costs (+N pricier, -N cheaper)
+  | "cost_currency_remap" // skillId-scoped: the named skill's remaining Specific cost is payable as Generic (any color)
   | "cooldown_mod" // magnitude: delta added to the cooldown the holder's skills go on when used
   | "silence" // suppresses Elemental Essence income
   | "paralysis" // cooldowns do not advance
