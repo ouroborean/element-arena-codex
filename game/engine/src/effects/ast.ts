@@ -33,7 +33,8 @@ export type Value =
   | { ref: "statusDuration"; kind: StatusKind; name?: string; of?: Selector } // remaining turns (0 if absent/permanent)
   | { ref: "statusMag"; kind: StatusKind; name?: string; of?: Selector } // a status's magnitude (0 if absent)
   | { ref: "statusCount"; kind: StatusKind; name?: string; of?: Selector } // how many status instances of this kind (+name) the unit holds
-  | { ref: "sum"; metric: "missingHp" | "currentHp" | "shield"; of: Selector } // aggregate across a selector
+  | { ref: "sum"; metric: "missingHp" | "currentHp" | "shield"; of: Selector } // aggregate a metric across a selector
+  | { ref: "stackSum"; name: string; of: Selector } // total stacks of a named resource summed across a selector (laria:night "10+ total Deepening Shadows")
   | { ref: "var"; name: string }
   | { op: "add" | "sub" | "mul" | "min" | "max"; args: Value[] }
   | { op: "div"; num: Value; by: number; floor?: boolean };

@@ -238,6 +238,13 @@ export function evalValue(v: Value, ctx: Ctx): number {
         }
         return total;
       }
+      case "stackSum": {
+        // Total stacks of a named resource summed across a selector — distinct from `count` (how many units
+        // hold it) and `stackCount` (one unit's stacks). Powers laria:night's "10+ TOTAL Deepening Shadows".
+        let total = 0;
+        for (const u of resolveSelector(v.of, ctx)) total += stackCount(u, v.name);
+        return total;
+      }
       case "var":
         return ctx.vars[v.name] ?? 0;
     }
