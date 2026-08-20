@@ -996,6 +996,21 @@ registerCustom("revealEnemyInvisibleEffects", () => { /* cosmetic: no hidden-eff
 // [earth] specific onto generic (any color pays it), auto-reverting at the window's end. Aura 2: "enemies
 // damaged by Worldfist are Blinded for 1 turn": a self-owned watch over the window on Gaia's damageDealt — the
 // Sandstorm dot ticks carry source=Gaia (tickDots), so they blind too, as does any other Worldfist hit.
+// gommar:stasis (gommarstasis1 "Keeper of Beasts") — "the Frozen Beast is permanently stunned until Gommar
+// loses Frost-Covered." Stuns the freshly-summoned Beast(s), then arms a round-permanent one-shot watch that
+// thaws them the moment Gommar loses his Frost-Covered mark (statusLost, emitted by the removeStatus op when
+// one of his actives consumes the charge). The release is one-way — once he loses it, the beast stays freed.
+registerCustom("stunFrostBeastUntilFrostLost", (ctx) => {
+  for (const beast of resolveSelector({ faction: "allies", kind: "minion", template: "Frozen Beast" }, ctx))
+    applyStatus(beast, { kind: "stun", duration: null, appliedBy: ctx.self.id, appliedTurn: ctx.state.turn });
+  installWatch(ctx, {
+    on: "statusLost", source: "Keeper of Beasts",
+    when: { and: [{ sameUnit: ["eventUnit", "self"] }, { eventStatusKind: "mark", name: "Frost-Covered" }] },
+    effect: [{ op: "removeStatus", kind: "stun", from: { faction: "allies", kind: "minion", template: "Frozen Beast" } }],
+    once: true,
+  }, null); // round-permanent: it waits however long until Gommar loses the mark this round
+});
+
 registerCustom("worldfistAuras", (ctx, a) => {
   const turns = num(a.turns, 4);
   applyStatus(ctx.self, { kind: "cost_currency_remap", skillId: (a.rampartId as string) ?? "gaia4", duration: turns, appliedBy: ctx.self.id, appliedTurn: ctx.state.turn });

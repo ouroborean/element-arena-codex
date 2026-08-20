@@ -4987,16 +4987,8 @@ export const FUSIONS: FusionForm[] = [
      "count": 1
     },
     {
-     "op": "applyStatus",
-     "to": {
-      "faction": "allies",
-      "kind": "minion",
-      "template": "Frozen Beast"
-     },
-     "status": {
-      "kind": "stun",
-      "duration": null
-     }
+     "op": "custom",
+     "fn": "stunFrostBeastUntilFrostLost"
     }
    ],
    "currentCd": 0

@@ -421,7 +421,13 @@ export function exec(effect: Effect, ctx: Ctx): void {
       return;
     }
     case "removeStatus": {
-      for (const u of effectTargets(effect.from, ctx)) removeStatus(u, effect.kind, effect.name);
+      for (const u of effectTargets(effect.from, ctx)) {
+        // Emit statusLost only when a matching status was actually present (an EXPLICIT loss, distinct from
+        // natural expiry which emits statusExpired). Lets "until <unit> loses <mark>" mechanics react.
+        const had = u.statuses.some((s) => s.kind === effect.kind && (effect.name === undefined || s.name === effect.name));
+        removeStatus(u, effect.kind, effect.name);
+        if (had) ctx.emit({ type: "statusLost", unit: u.id, kind: effect.kind, name: effect.name });
+      }
       return;
     }
     case "modifyStatus": {

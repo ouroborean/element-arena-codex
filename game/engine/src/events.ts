@@ -27,6 +27,7 @@ export type GameEvent =
   | { type: "healReceived"; unit: UnitId; source: UnitId | null; amount: number; overheal?: number }
   | { type: "statusApplied"; unit: UnitId; source: UnitId | null; kind: string; name?: string }
   | { type: "statusExpired"; unit: UnitId; kind: string; name?: string }
+  | { type: "statusLost"; unit: UnitId; kind: string; name?: string } // a status EXPLICITLY removed (removeStatus op), distinct from natural expiry
   | { type: "skillRedirected"; caster: UnitId; skillId: string; from: UnitId; to: UnitId }
   | { type: "counterFired"; counterer: UnitId; caster: UnitId; skillId: string }
   // A hero converted Elemental Essence into a unit of specific energy this income step (the essence

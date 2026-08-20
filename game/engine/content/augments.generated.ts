@@ -586,7 +586,7 @@ export const AUGMENTS: Augment[] = [
    {
     "op": "addTrigger",
     "trigger": {
-     "on": "statusExpired",
+     "on": "statusLost",
      "source": "Flashfreeze",
      "effect": [
       {
