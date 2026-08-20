@@ -3546,6 +3546,21 @@ export const FUSIONS: FusionForm[] = [
     "generic": 3,
     "specific": 0
    },
+   "costMods": [
+    {
+     "magnitude": {
+      "op": "mul",
+      "args": [
+       {
+        "ref": "stackCount",
+        "name": "Rising Indignation",
+        "of": "self"
+       },
+       -1
+      ]
+     }
+    }
+   ],
    "cooldown": 3,
    "effects": [
     {

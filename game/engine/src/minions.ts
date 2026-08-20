@@ -8,6 +8,7 @@
  */
 import type { SkillInstance } from "./skill.ts";
 import type { TriggeredEffect } from "./events.ts";
+import type { Status } from "./types.ts";
 
 export interface MinionTemplate {
   name: string;
@@ -17,6 +18,9 @@ export interface MinionTemplate {
   skills?: SkillInstance[];
   /** Triggers, minus `owner` (bound to the minion's id when summoned). */
   triggers?: Omit<TriggeredEffect, "owner">[];
+  /** Statuses the minion is summoned WITH (intrinsic properties — e.g. Gaia, Enraged's +10 mods + Enraged
+   *  mark). `appliedBy`/`appliedTurn` are filled at summon; use duration null for round-permanent. */
+  statuses?: Array<Omit<Status, "appliedBy" | "appliedTurn">>;
 }
 
 const REGISTRY = new Map<string, MinionTemplate>();

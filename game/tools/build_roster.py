@@ -89,6 +89,8 @@ def main():
                 entry["element"] = m["element"]
             entry["skills"] = with_cd(m.get("skills"))
             entry["triggers"] = norm_triggers(m.get("triggers"), m["name"])
+            if m.get("statuses"):
+                entry["statuses"] = strip_notes(m["statuses"])
             minions[m["name"]] = entry
 
     parts = [
