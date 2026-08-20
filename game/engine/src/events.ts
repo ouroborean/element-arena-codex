@@ -17,13 +17,13 @@ export type GameEvent =
   | { type: "shieldDamaged"; unit: UnitId; source: UnitId | null; amount: number }
   | { type: "shieldBroken"; unit: UnitId; source: UnitId | null }
   | { type: "unitDied"; unit: UnitId; killer: UnitId | null }
-  | { type: "skillUsed"; caster: UnitId; skillId: string; targets: UnitId[]; tags?: string[]; affected?: UnitId[] }
+  | { type: "skillUsed"; caster: UnitId; skillId: string; targets: UnitId[]; tags?: string[]; affected?: UnitId[]; hidden?: boolean }
   // A unit was granted a new skill (a fusion/augment-era mechanic; no base-kit emitter yet).
   | { type: "skillGranted"; unit: UnitId; skillId: string; source: UnitId | null }
   // A minion was just summoned from a template (so "minions of template X gain Y" can hook creation).
   | { type: "minionSummoned"; unit: UnitId; template: string; summoner: UnitId }
   // Emitted before a skill's effects resolve; counter/reflect triggers may interrupt it.
-  | { type: "skillDeclared"; caster: UnitId; skillId: string; tags: string[]; targets: UnitId[] }
+  | { type: "skillDeclared"; caster: UnitId; skillId: string; tags: string[]; targets: UnitId[]; hidden?: boolean }
   | { type: "healReceived"; unit: UnitId; source: UnitId | null; amount: number; overheal?: number }
   | { type: "statusApplied"; unit: UnitId; source: UnitId | null; kind: string; name?: string }
   | { type: "statusExpired"; unit: UnitId; kind: string; name?: string }

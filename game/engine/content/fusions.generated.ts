@@ -474,6 +474,7 @@ export const FUSIONS: FusionForm[] = [
   ],
   "skill": {
    "id": "andomagnet1",
+   "isHidden": true,
    "name": "Opposites Attract",
    "element": "magnet",
    "klass": "fusion",
@@ -8562,6 +8563,7 @@ export const FUSIONS: FusionForm[] = [
   ],
   "skill": {
    "id": "lariamirror1",
+   "isHidden": true,
    "name": "Shadow Rebound",
    "element": "mirror",
    "targeting": "single",
@@ -10575,6 +10577,7 @@ export const FUSIONS: FusionForm[] = [
   ],
   "skill": {
    "id": "pyrrhabrimstone1",
+   "isHidden": true,
    "name": "Sulphur Vent",
    "element": "brimstone",
    "targeting": "self",
@@ -13767,6 +13770,7 @@ export const FUSIONS: FusionForm[] = [
   ],
   "skill": {
    "id": "sayamagnet1",
+   "isHidden": true,
    "name": "Personal Magnetism",
    "element": "magnet",
    "klass": "fusion",
@@ -15194,6 +15198,7 @@ export const FUSIONS: FusionForm[] = [
   ],
   "skill": {
    "id": "tarynangel1",
+   "isHidden": true,
    "name": "Hand of Michael",
    "element": "angel",
    "klass": "fusion",
@@ -15813,6 +15818,7 @@ export const FUSIONS: FusionForm[] = [
   ],
   "skill": {
    "id": "tarynvengeance1",
+   "isHidden": true,
    "name": "Not Today",
    "element": "vengeance",
    "klass": "fusion",
@@ -16220,6 +16226,7 @@ export const FUSIONS: FusionForm[] = [
   ],
   "skill": {
    "id": "titaniaassassin1",
+   "isHidden": true,
    "name": "Drop of Moonglove",
    "element": "assassin",
    "klass": "fusion",
