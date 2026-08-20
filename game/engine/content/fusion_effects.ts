@@ -436,21 +436,22 @@ registerCustom("solarFlareRewrite", (ctx, a) => {
   s.element = a.element as string;
 });
 
-// taryn:zealot — Banner of Harmony affects all enemies. (The "for 1 turn" window is not auto-reverted:
-// DEBT — a temporary targeting widen has no revert hook; it holds for the round.)
+// taryn:zealot — "Until the end of his next turn, Banner of Harmony will affect all enemies." A duration-bounded
+// skill_targeting_override the target resolver reads live (effectiveTargeting), so both Banner's damage and its
+// mark hit all enemies for the window, then it auto-reverts at Taryn's turn-end (no skill mutation to undo).
 registerCustom("bannerAffectsAllEnemies", (ctx, a) => {
-  const s = mutableSkill(ctx, a.skillId as string);
-  if (s) s.targeting = "all-enemies";
+  applyStatus(ctx.self, { kind: "skill_targeting_override", skillId: a.skillId as string, name: "all-enemies", duration: num(a.turns, 1), appliedBy: ctx.self.id, appliedTurn: ctx.state.turn });
 });
 
-// titania:brimstone — Thorn Prick is free for `turns` (scoped cost_mod). The +5 initial-damage half is
-// DEBT (a temporary per-skill damage buff has no revert hook), tracked with an observable mark.
+// titania:brimstone — "For 4 turns, Thorn Prick costs nothing and its INITIAL damage is +5 (its DoT is unchanged)."
+// A scoped free-cost cost_mod plus a duration-bounded skill_damage_bonus the damage op reads live for that skill id
+// (the DoT is applied via applyStatus, not a damage op, so it is untouched). Both auto-revert at Titania's turn-end.
 registerCustom("empowerThornPrick", (ctx, a) => {
-  const s = mutableSkill(ctx, a.skillId as string);
+  const s = (ctx.self.skills ?? []).find((k) => k.id === (a.skillId as string));
   if (!s) return;
   const turns = num(a.turns, 4);
   if (a.freeCost) applyStatus(ctx.self, { kind: "cost_mod", skillId: s.id, magnitude: -(s.cost.generic + s.cost.specific), duration: turns, appliedBy: ctx.self.id, appliedTurn: ctx.state.turn });
-  applyStatus(ctx.self, { kind: "mark", name: `Thorn Prick +${num(a.bonusInitialDamage, 5)}`, duration: turns, appliedBy: ctx.self.id, appliedTurn: ctx.state.turn });
+  applyStatus(ctx.self, { kind: "skill_damage_bonus", skillId: s.id, magnitude: num(a.bonusInitialDamage, 5), duration: turns, appliedBy: ctx.self.id, appliedTurn: ctx.state.turn });
 });
 
 // ── Cluster 4 — HP manipulation (implemented to exact prose) ─────────────────── //

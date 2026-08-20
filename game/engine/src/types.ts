@@ -31,6 +31,8 @@ export type StatusKind =
   | "conditional_bypass" // the holder's damage ignores DR+Shield against targets that satisfy bypassCond
   | "shield_absorb_cap" // magnitude: max Shield the holder may spend absorbing a single hit (overflow falls through to HP)
   | "split_incoming" // the holder's single-target hits are split evenly among the holder + opposing-team bearers of mark `name`
+  | "skill_damage_bonus" // skillId-scoped: flat bonus added to the named skill's damage-op hits while it holds (empowerThornPrick)
+  | "skill_targeting_override" // skillId-scoped: overrides the named skill's targeting; name = the new category (bannerAffectsAllEnemies)
   | "damage_becomes_heal" // inverted HP: incoming damage heals the holder instead
   | "heal_becomes_damage" // inverted HP: incoming healing damages the holder instead
   | "dies_at_max" // inverted HP: the holder dies at MAX hp, and does not die at 0

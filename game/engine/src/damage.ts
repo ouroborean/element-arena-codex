@@ -114,6 +114,14 @@ export function incomingDamageMod(u: Unit): number {
   return sumMagnitude(u, "incoming_damage_mod");
 }
 
+/** Flat damage bonus the caster's active skill_damage_bonus statuses add to the NAMED skill's hits (empowerThornPrick). */
+export function skillDamageBonus(u: Unit, skillId: string | undefined): number {
+  if (!skillId) return 0;
+  let total = 0;
+  for (const s of u.statuses) if (s.kind === "skill_damage_bonus" && s.skillId === skillId) total += s.magnitude ?? 0;
+  return total;
+}
+
 /** Per-hit cap on how much Shield the unit may spend absorbing one hit (Infinity = uncapped; most restrictive wins). */
 export function shieldAbsorbCap(u: Unit): number {
   let m = Infinity;

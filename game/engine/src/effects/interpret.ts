@@ -8,7 +8,7 @@
  */
 import type { MatchState, TeamId, Unit } from "../types.ts";
 import { Rng } from "../rng.ts";
-import { addShield, applyDamage, applyHeal, applyHealthLoss, bypassesAgainst, outgoingDamageMod, outgoingDamageMult, outgoingDtypeOverride, totalShield } from "../damage.ts";
+import { addShield, applyDamage, applyHeal, applyHealthLoss, bypassesAgainst, outgoingDamageMod, outgoingDamageMult, outgoingDtypeOverride, skillDamageBonus, totalShield } from "../damage.ts";
 import { applyStatus, removeStatus, stackCount } from "../status.ts";
 import { applyRounding } from "../rulings.ts";
 import type { GameEvent, TriggeredEffect } from "../events.ts";
@@ -328,8 +328,8 @@ export function exec(effect: Effect, ctx: Ctx): void {
     case "damage": {
       // The dealer's outgoing type may be forced (e.g. Piercing), which also changes what mods apply.
       const dtype = outgoingDtypeOverride(ctx.caster) ?? effect.dtype ?? "normal";
-      // Attacker-side empower/weaken: additive mod, then multiplicative mult (e.g. triple damage).
-      const amount = Math.max(0, (evalValue(effect.amount, ctx) + outgoingDamageMod(ctx.caster, dtype)) * outgoingDamageMult(ctx.caster));
+      // Attacker-side empower/weaken: additive mods (global + this-skill-scoped), then multiplicative mult.
+      const amount = Math.max(0, (evalValue(effect.amount, ctx) + outgoingDamageMod(ctx.caster, dtype) + skillDamageBonus(ctx.caster, ctx.skillId)) * outgoingDamageMult(ctx.caster));
       // Land one share of this damage on one defender (`src` = the credited dealer), running its full
       // mitigation and emitting its events. The damage's own character (type + bypass) stays the attacker's.
       const land = (u: Unit, amt: number, src: string): void => {
