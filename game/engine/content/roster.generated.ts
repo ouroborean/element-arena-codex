@@ -6299,7 +6299,8 @@ export const ROSTER: HeroDef[] = [
       "status": {
        "kind": "damage_reduction",
        "magnitude": 15,
-       "duration": 1
+       "duration": 1,
+       "invisible": true
       },
       "to": "self"
      },

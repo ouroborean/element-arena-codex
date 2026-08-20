@@ -101,6 +101,14 @@ export interface Status {
   appliedTurn: number;
   /** Skill / augment id that produced it, for provenance + dedupe. */
   sourceId?: string;
+  /** Redaction: this effect is Invisible — the opponent's wire-state omits it (see redactState in
+   *  visibility.ts). Set FROZEN at apply time, either from an isHidden skill's execution context or from a
+   *  status-spec `invisible:true` (e.g. Zephyrex Wind Step's hidden DR). The owning team is derived from
+   *  `appliedBy`, so a status applied by a HERO stays scoped correctly for the match (dead heroes persist);
+   *  a status applied by a MINION reverts to the bearer's team once the minion is swept — no current
+   *  Invisible skill is minion-owned, so this is a known forward-looking limitation, not a live leak.
+   *  Dynamic team cloak (veiled/Endless Night) is layered on at redaction time, not frozen here. */
+  invisible?: boolean;
   /** For a cost_mod / cooldown_mod that applies to ONE skill only (absent = all skills). */
   skillId?: string;
   /** For an incoming_damage_mult: apply only to NEW skill hits (isNew), not ongoing DoT ticks. */
