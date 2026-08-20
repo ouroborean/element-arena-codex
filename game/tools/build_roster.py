@@ -23,12 +23,12 @@ OUT = os.path.join(HERE, "..", "engine", "content", "roster.generated.ts")
 
 
 # Authoring-only / deferred-cosmetic keys that are not valid engine fields.
-COSMETIC_KEYS = {"note", "invisible", "hidden", "hidden_targets"}  # isHidden is now a real per-skill flag (kept)
+COSMETIC_KEYS = {"note", "hidden", "hidden_targets"}  # isHidden + status-level `invisible` are now real (kept)
 
 
 def strip_notes(obj):
-    """Recursively drop authoring-only / cosmetic keys (documentation notes, status-level `invisible`
-    redaction flags, frozen `hidden`/`hidden_targets` leakage). The per-skill `isHidden` flag is REAL and kept."""
+    """Recursively drop authoring-only / cosmetic keys (documentation notes, frozen `hidden`/`hidden_targets`
+    leakage). The per-skill `isHidden` flag and status-spec `invisible` redaction flag are REAL and kept."""
     if isinstance(obj, dict):
         return {k: strip_notes(v) for k, v in obj.items() if k not in COSMETIC_KEYS}
     if isinstance(obj, list):

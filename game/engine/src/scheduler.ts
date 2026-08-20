@@ -558,7 +558,7 @@ export function performAction(state: MatchState, action: Action): ActionResult {
     else removeStatus(caster, "channeling");
   }
 
-  const affected = runEffects(state, skill.effects, { caster, self: caster, targets: decl.finalTargets, skillId: skill.id, targeting: effectiveTargeting(caster, skill) });
+  const affected = runEffects(state, skill.effects, { caster, self: caster, targets: decl.finalTargets, skillId: skill.id, targeting: effectiveTargeting(caster, skill), invisible: skill.isHidden });
   skill.currentCd = effectiveCooldown(caster, skill);
   skill.cdSetTurn = state.turn; // birth turn — advanceCooldowns skips it (see below), so cooldown N blocks N turns
   caster.lastSkillId = skill.id; // the "used a skill" ledger (read by clone/last-skill mechanics)
@@ -579,6 +579,7 @@ export function performAction(state: MatchState, action: Action): ActionResult {
       channelTargets: decl.finalTargets.map((t) => t.id),
       instanceId,
       duration: null, appliedBy: caster.id, appliedTurn: state.turn,
+      invisible: skill.isHidden || undefined, // an Invisible Channel skill hides its own channeling marker
     });
   }
 
@@ -586,7 +587,8 @@ export function performAction(state: MatchState, action: Action): ActionResult {
   // opts out (aramao1/aramao2 "does not break Veiled"). Concealment while veiled is a separate redaction concern.
   if (skill.tags.includes("Harmful") && !skill.doesNotBreakVeil) removeStatus(caster, "veiled");
 
-  state.log.push(`${caster.name} used ${skill.name}`);
+  // An Invisible skill leaves no telegraph in the shared log (the opponent must not learn it was used).
+  if (!skill.isHidden) state.log.push(`${caster.name} used ${skill.name}`);
   emit(state, { type: "skillUsed", caster: caster.id, skillId: skill.id, targets: decl.finalTargets.map((t) => t.id), tags: skill.tags, affected, hidden: skill.isHidden });
   removeDeadMinions(state);
   return { ok: true };

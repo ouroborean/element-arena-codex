@@ -50,6 +50,8 @@ export function applyStatus(unit: Unit, status: Status): void {
   existing.appliedBy = status.appliedBy;
   existing.appliedTurn = status.appliedTurn;
   existing.sourceId = status.sourceId;
+  existing.invisible = status.invisible; // a re-application under a (non-)invisible context updates concealment
+
 }
 
 function longerDuration(a: number | null, b: number | null): number | null {

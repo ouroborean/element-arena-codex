@@ -102,6 +102,11 @@ export interface StatusSpec {
   onExpire?: Effect[];
   /** Turns; null = round-permanent. May be a Value expression (computed at apply time). */
   duration: Value | null;
+  /** "This effect is Invisible": the opponent's wire-state omits this status (redactState). A per-effect
+   *  flag on an otherwise-visible skill (e.g. Zephyrex Wind Step's hidden DR self-buff). A whole-skill
+   *  isHidden already makes ALL of its applied statuses invisible via the execution context, so this is only
+   *  needed to hide one effect of a visible skill. */
+  invisible?: boolean;
 }
 
 // --------------------------------------------------------------------------- //

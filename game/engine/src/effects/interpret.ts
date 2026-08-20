@@ -30,6 +30,13 @@ export interface Ctx {
   /** The declared targeting of the skill currently executing ("single" vs an AOE category) — the true
    *  signal for "single-target damage" (a resolved defender count of 1 can also be an AOE hitting one enemy). */
   targeting?: string;
+  /** Invisible execution context: while true, each status applied within it is stamped `invisible` (frozen)
+   *  — every direct status creator honours it (buildStatus/applyStatus, addStack, the channeling install,
+   *  seeded minion statuses), so an isHidden skill's whole effect tree is concealed with no per-node
+   *  authoring. Propagates through nested contexts (forEach / inline useSkill) via `{ ...ctx }`. A `schedule`d
+   *  effect's later re-run does NOT inherit it (a deferred effect re-runs with a fresh context) — an
+   *  "invisible until triggered" trap is handled by the temporal-reveal work, not this flag. */
+  invisible?: boolean;
   /** Set of unit ids this skill's effects touched (damaged/statused) — for "affected N targets" reads. */
   affected?: Set<string>;
   /** Present inside a trigger: the event that fired it. */
@@ -347,6 +354,9 @@ function buildStatus(spec: StatusSpec, ctx: Ctx) {
     appliedBy: ctx.caster.id,
     appliedTurn: ctx.state.turn,
     sourceId: ctx.skillId,
+    // Frozen invisibility: an isHidden skill's context (ctx.invisible) hides ALL its effects; a status-spec
+    // `invisible:true` hides just this one. Either makes the opponent's wire-state omit this status.
+    invisible: ctx.invisible || spec.invisible || undefined,
   };
 }
 
@@ -474,6 +484,9 @@ export function exec(effect: Effect, ctx: Ctx): void {
           appliedBy: ctx.caster.id,
           appliedTurn: ctx.state.turn,
           sourceId: ctx.skillId,
+          // Inherit the invisible execution context, exactly like buildStatus — an isHidden skill that lays
+          // stacks (saya3 "Spider Mines") must place them Invisibly, not just its applyStatus effects.
+          invisible: ctx.invisible || undefined,
         });
       return;
     }
@@ -602,7 +615,7 @@ function summonMinion(ctx: Ctx, templateName: string, hpOverride: number | null)
     id, kind: "minion", name: tmpl?.name ?? templateName, team: ctx.caster.team,
     hp: maxHp, maxHp, shields: [],
     baseElement: element, currentElement: element,
-    statuses: (tmpl?.statuses ?? []).map((s) => ({ ...s, appliedBy: ctx.caster.id, appliedTurn: ctx.state.turn })),
+    statuses: (tmpl?.statuses ?? []).map((s) => ({ ...s, appliedBy: ctx.caster.id, appliedTurn: ctx.state.turn, invisible: ctx.invisible || s.invisible || undefined })),
     alive: true, summoner: ctx.caster.id,
     skills: (tmpl?.skills ?? []).map((s) => ({ ...s, currentCd: 0 })),
     triggers: (tmpl?.triggers ?? []).map((t) => ({ ...t, owner: id })),
@@ -828,7 +841,7 @@ export function resolveDeclaration(state: MatchState, caster: Unit, skill: Skill
 export function runEffects(
   state: MatchState,
   effects: Effect[],
-  opts: { caster: Unit; self?: Unit; targets?: Unit[]; skillId?: string; targeting?: string },
+  opts: { caster: Unit; self?: Unit; targets?: Unit[]; skillId?: string; targeting?: string; invisible?: boolean },
 ): string[] {
   const rng = Rng.fromState(state.rngState);
   const bus = createBus(state, rng);
@@ -842,6 +855,7 @@ export function runEffects(
     vars: {},
     skillId: opts.skillId,
     targeting: opts.targeting,
+    invisible: opts.invisible,
     affected,
     emit: bus.emit,
   };
