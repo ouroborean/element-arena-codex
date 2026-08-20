@@ -8289,6 +8289,15 @@ export const FUSIONS: FusionForm[] = [
        }
       ]
      }
+    },
+    {
+     "op": "custom",
+     "fn": "removeMarkOnSkillUse",
+     "args": {
+      "mark": "Curse of Darkness",
+      "window": 3,
+      "owner": "target"
+     }
     }
    ],
    "currentCd": 0
