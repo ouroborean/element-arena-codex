@@ -5,7 +5,7 @@
  * Kept in its own module so `types.ts` can reference it for `Unit.skills` with a
  * type-only import (no runtime cycle with the effect AST).
  */
-import type { Condition, SkillDef } from "./effects/ast.ts";
+import type { Condition, SkillDef, Value } from "./effects/ast.ts";
 import type { SkillClass, UnitKind } from "./types.ts";
 
 /** GENERIC = any energy; SPECIFIC = energy of the skill's current element. */
@@ -38,6 +38,7 @@ export interface SkillInstance extends SkillDef {
   /** If this holds at declaration, the skill cannot be countered/reflected (conditional Uncounterable). */
   uncounterableIf?: Condition;
   /** Per-cast conditional cost deltas, evaluated live at each cast (keeper3 "Plot Twist": -1 while solo).
+   *  `magnitude` may be a Value, so the delta can scale with live state (zevkir5: -1 per Call Tides stack).
    *  Distinct from cost_mod statuses (which the round-wipe clears) — this rides on the skill, which persists. */
-  costMods?: Array<{ magnitude: number; when?: Condition }>;
+  costMods?: Array<{ magnitude: number | Value; when?: Condition }>;
 }

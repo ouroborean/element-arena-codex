@@ -16,7 +16,7 @@
  */
 import type { EnergyPool, MatchState, TeamId, Unit } from "./types.ts";
 import type { SkillInstance } from "./skill.ts";
-import { emit, evalConditionReadOnly, evalSkillCondition, resolveDeclaration, runEffects } from "./effects/interpret.ts";
+import { emit, evalConditionReadOnly, evalSkillCondition, evalValueReadOnly, resolveDeclaration, runEffects } from "./effects/interpret.ts";
 import { applyDamage, applyHeal, outgoingDtypeOverride, tickShieldsForTeam } from "./damage.ts";
 import { Rng } from "./rng.ts";
 import { applyStatus, clearRoundStatuses, removeStatus, tickDurationsForTeam } from "./status.ts";
@@ -339,7 +339,10 @@ export function effectiveCost(caster: Unit, skill: SkillInstance, state?: MatchS
   for (const s of caster.statuses) if (s.kind === "cost_mod" && (!s.skillId || s.skillId === skill.id)) delta += s.magnitude ?? 0;
   // Per-cast conditional cost mods carried on the skill, re-evaluated live at each cast.
   if (state && skill.costMods) {
-    for (const m of skill.costMods) if (!m.when || evalConditionReadOnly(state, caster, m.when)) delta += m.magnitude;
+    for (const m of skill.costMods) {
+      if (m.when && !evalConditionReadOnly(state, caster, m.when)) continue;
+      delta += typeof m.magnitude === "number" ? m.magnitude : evalValueReadOnly(state, caster, m.magnitude);
+    }
   }
   const remap = caster.statuses.some((s) => s.kind === "cost_currency_remap" && (!s.skillId || s.skillId === skill.id));
   if (delta === 0 && !remap) return skill.cost;

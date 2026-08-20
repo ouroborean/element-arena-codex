@@ -7164,6 +7164,21 @@ export const FUSIONS: FusionForm[] = [
     "generic": 5,
     "specific": 0
    },
+   "costMods": [
+    {
+     "magnitude": {
+      "op": "mul",
+      "args": [
+       {
+        "ref": "stackCount",
+        "name": "Chronicle Fragments",
+        "of": "self"
+       },
+       -1
+      ]
+     }
+    }
+   ],
    "cooldown": 2,
    "effects": [
     {

@@ -7270,8 +7270,19 @@
      "generic": 5,
      "specific": 0
     },
+    "costMods": [
+     {
+      "magnitude": {
+       "op": "mul",
+       "args": [
+        { "ref": "stackCount", "name": "Chronicle Fragments", "of": "self" },
+        -1
+       ]
+      }
+     }
+    ],
     "cooldown": 2,
-    "note": "Adds 60 Shield to Tales to Tell and consumes all Chronicle Fragments stacks. The clause 'costs 1 less generic per Chronicle Fragments stack' is a cast-time cost computation resolved BEFORE effects run; the static cost field cannot be discounted per-stack from within the effect tree (cost_mod only affects future casts), so the discount is documented and not modeled -- only the Shield grant and stack consumption are authored.",
+    "note": "Adds 60 Shield to Tales to Tell and consumes all Chronicle Fragments stacks. 'Costs 1 less generic per Chronicle Fragments stack' is a costMods entry of -stackCount('Chronicle Fragments') on generic, evaluated at cast time BEFORE the effects consume the stacks (effectiveCost runs before pay/effects). The Shield grant and stack consumption are authored below.",
     "effects": [
      {
       "op": "grantShield",
