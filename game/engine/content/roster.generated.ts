@@ -2222,6 +2222,10 @@ export const MINIONS: MinionTemplate[] = [
       }
      },
      {
+      "op": "custom",
+      "fn": "prismaLaunchBypass"
+     },
+     {
       "op": "if",
       "cond": {
        "and": [

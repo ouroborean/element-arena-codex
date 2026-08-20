@@ -916,7 +916,7 @@
       "specific": 1
      },
      "cooldown": 1,
-     "note": "'until the end of Gommar's next turn' = duration 1 (durations tick at the applier's turn-end). Frost-Covered branch makes the hit Piercing AND uncounterable. Per-skill conditional counter-immunity is the only part of Gommar's kit with no clean primitive: the 'Uncounterable' tag is unconditional (compare gaiamagnet1/sylangel1 which carry it) and the engine reads caster uncounterable state at skill-declaration, before the effect tree runs. Hence the single custom node, which flags 'resolve counter-immunity at declaration if Frost-Covered'. The -5 outgoing_damage_mod is applied unconditionally.",
+     "note": "'until the end of Gommar's next turn' = duration 1 (durations tick at the applier's turn-end). Frost-Covered branch makes the hit Piercing AND uncounterable. Conditional counter-immunity is a real primitive: gommar3 carries uncounterableIf:{has mark 'Frost-Covered' of caster}, which resolveDeclaration checks at skill-declaration (before the interrupt/counter path) so the hit is uncounterable exactly while Gommar is Frost-Covered. The -5 outgoing_damage_mod is applied unconditionally.",
      "effects": [
       {
        "op": "if",
@@ -13671,6 +13671,10 @@
          }
         },
         {
+         "op": "custom",
+         "fn": "prismaLaunchBypass"
+        },
+        {
          "op": "if",
          "cond": {
           "and": [
@@ -13701,7 +13705,7 @@
          ]
         }
        ],
-       "note": "Oracle: 'Until the end of the next turn, Prisma Saffron's skills will Bypass against target enemy. If used on another Prisma Ranger that is using their Lens, their skills will also Bypass during this time and they become invulnerable for one turn.' The buddy branch grants Invulnerable. LIMITATION: the engine's Bypass is a STATIC skill tag ('Bypassing') read by targeting; there is no per-target dynamic-Bypass primitive, so the 'Prisma Launch: Bypass' mark documents the intended bypass window but is not enforced by legalTargets without an engine hook. 'Until the end of the next turn' modeled as duration 1."
+       "note": "Oracle: 'Until the end of the next turn, Prisma Saffron's skills will Bypass against target enemy. If used on another Prisma Ranger that is using their Lens, their skills will also Bypass during this time and they become invulnerable for one turn.' The target is marked 'Prisma Launch: Bypass' (dur 1 = 'until end of next turn'); prismaLaunchBypass then applies a conditional_bypass keyed to that mark — to Saffron for an enemy target (her skills ignore DR+Shield vs the marked enemy), or to a lensing-ally Ranger target (their skills also Bypass), who the if-branch also makes Invulnerable. Bypass = the canonical ignore-DR+Shield (bypassesAgainst, damage.ts)."
       },
       {
        "id": "trinitysaffron3",

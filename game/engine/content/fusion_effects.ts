@@ -1011,6 +1011,20 @@ registerCustom("stunFrostBeastUntilFrostLost", (ctx) => {
   }, null); // round-permanent: it waits however long until Gommar loses the mark this round
 });
 
+// trinity Prisma Saffron / Prisma Launch (trinitysaffron2): "Until the end of the next turn, Prisma Saffron's
+// skills will Bypass against target enemy. If used on another Prisma Ranger that is using their Lens, their
+// skills will also Bypass..." The authored effects mark the target 'Prisma Launch: Bypass' (and make a lensing
+// ally invulnerable); this grants the dynamic per-target Bypass capability keyed to that mark — a
+// conditional_bypass (ignore DR+Shield). buildStatus can't carry bypassCond, so it's applied here (mirrors
+// xyris:ninja bypassVsDreamscapeAffected). Enemy target → Saffron bypasses it; lensing-ally target → that ally does.
+registerCustom("prismaLaunchBypass", (ctx) => {
+  const target = ctx.targets[0];
+  if (!target) return;
+  const bypass = (): Status => ({ kind: "conditional_bypass", bypassCond: { kind: "mark", name: "Prisma Launch: Bypass" }, duration: 1, appliedBy: ctx.self.id, appliedTurn: ctx.state.turn });
+  const buddy = target.id !== ctx.self.id && target.statuses.some((s) => s.kind === "mark" && s.name === "Lens");
+  applyStatus(buddy ? target : ctx.self, bypass());
+});
+
 registerCustom("worldfistAuras", (ctx, a) => {
   const turns = num(a.turns, 4);
   applyStatus(ctx.self, { kind: "cost_currency_remap", skillId: (a.rampartId as string) ?? "gaia4", duration: turns, appliedBy: ctx.self.id, appliedTurn: ctx.state.turn });
