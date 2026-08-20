@@ -28,6 +28,9 @@ export interface SkillInstance extends SkillDef {
   targetKind?: UnitKind;
   /** Channel skills (tag "Channel"): how many extra turns they re-run (null = until interrupted). */
   channelTurns?: number | null;
+  /** Max concurrent copies of this channel the caster may sustain (galazax1 Twin Storms = 2). Absent/1 =
+   *  the single-channel default. >1 gives each live copy a distinct instanceId and preserves siblings on recast. */
+  channelCopies?: number;
   /** Using this skill does NOT interrupt an active channel (per-skill opt-out). */
   doesNotInterrupt?: boolean;
   /** A hard castability precondition (unselectable if false) — distinct from in-effect if/else. */

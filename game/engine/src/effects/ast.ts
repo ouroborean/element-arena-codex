@@ -30,6 +30,8 @@ export type Value =
   | { ref: "shield"; of?: Selector }
   | { ref: "count"; of: Selector }
   | { ref: "statusDuration"; kind: StatusKind; name?: string; of?: Selector } // remaining turns (0 if absent/permanent)
+  | { ref: "statusMag"; kind: StatusKind; name?: string; of?: Selector } // a status's magnitude (0 if absent)
+  | { ref: "statusCount"; kind: StatusKind; name?: string; of?: Selector } // how many status instances of this kind (+name) the unit holds
   | { ref: "sum"; metric: "missingHp" | "currentHp" | "shield"; of: Selector } // aggregate across a selector
   | { ref: "var"; name: string }
   | { op: "add" | "sub" | "mul" | "min" | "max"; args: Value[] }

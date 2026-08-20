@@ -51,7 +51,7 @@ export function registerAugmentCustom(name: string, fn: AugmentFn): void {
 const clone = <T>(x: T): T => JSON.parse(JSON.stringify(x)) as T;
 
 /** Find a skill by id, replace it on the unit with a deep clone, and return the clone to mutate. */
-function mutableSkill(unit: Unit, skillId: string): SkillInstance | undefined {
+export function mutableSkill(unit: Unit, skillId: string): SkillInstance | undefined {
   const skills = unit.skills ?? [];
   const i = skills.findIndex((s) => s.id === skillId);
   if (i < 0) return undefined;
