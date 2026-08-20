@@ -545,7 +545,7 @@ export function performAction(state: MatchState, action: Action): ActionResult {
     // its effects do not run. (Provisional ruling: a countered skill still pays its cost.)
     skill.currentCd = effectiveCooldown(caster, skill);
     skill.cdSetTurn = state.turn;
-    state.log.push(`${caster.name}'s ${skill.name} was countered`);
+    if (!invisibleCast) state.log.push(`${caster.name}'s ${skill.name} was countered`); // an Invisible cast leaves no counter telegraph either
     removeDeadMinions(state);
     return { ok: true, countered: true };
   }

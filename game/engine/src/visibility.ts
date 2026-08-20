@@ -56,23 +56,41 @@ function hiddenFrom(state: MatchState, status: Status, bearer: Unit, viewer: Tea
   return status.invisible === true || isConcealed(state.units[status.appliedBy]);
 }
 
+/** An Invisible cast fingerprints the caster OUTSIDE its statuses: the skill it used ticks a cooldown, and
+ *  the last-skill ledger names it. Neither is drawn in the UI, but both ride the wire — so from a FOE's view
+ *  scrub the cooldown of any Invisible skill and blank a last-skill ledger that names one. Only isHidden
+ *  skills are touched, so ordinary skills' cooldowns are unchanged. Returns the unit unchanged if nothing
+ *  needs hiding. */
+function redactFoeFingerprints(u: Unit): Unit {
+  const skills = u.skills;
+  let out = u;
+  if (skills?.some((s) => s.isHidden && (s.currentCd > 0 || s.cdSetTurn !== undefined))) {
+    out = { ...out, skills: skills.map((s) => (s.isHidden && (s.currentCd > 0 || s.cdSetTurn !== undefined) ? { ...s, currentCd: 0, cdSetTurn: undefined } : s)) };
+  }
+  if (u.lastSkillId && skills?.some((s) => s.id === u.lastSkillId && s.isHidden)) {
+    out = { ...out, lastSkillId: undefined };
+  }
+  return out;
+}
+
 /**
  * Project the authoritative state into `viewer`'s view: the opponent's Invisible statuses (and every effect
- * created by a cloaked enemy) are removed. Copies only the units whose statuses actually change, so an
- * ordinary board with no invisibility returns the input object untouched.
+ * created by a cloaked enemy) are removed, and the wire-only fingerprints of an Invisible cast on a foe
+ * (an Invisible skill's cooldown, the last-skill ledger naming it) are scrubbed. Copies only what changes,
+ * so an ordinary board with no invisibility returns the input object untouched.
  */
 export function redactState(state: MatchState, viewer: TeamId): MatchState {
   const reveal = viewerHasReveal(state, viewer);
   let changed = false;
   const units: Record<string, Unit> = {};
   for (const [id, u] of Object.entries(state.units)) {
+    let out = u;
     const visible = u.statuses.filter((s) => !hiddenFrom(state, s, u, viewer, reveal));
-    if (visible.length === u.statuses.length) {
-      units[id] = u;
-    } else {
-      units[id] = { ...u, statuses: visible };
-      changed = true;
-    }
+    if (visible.length !== u.statuses.length) out = { ...out, statuses: visible };
+    // A viewer with True Sight sees the opponent's Invisible skills whole (incl. their cooldowns).
+    if (u.team !== viewer && !reveal) out = redactFoeFingerprints(out);
+    if (out !== u) changed = true;
+    units[id] = out;
   }
   return changed ? { ...state, units } : state;
 }
