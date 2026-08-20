@@ -22,7 +22,7 @@ EFFECT_OPS = {"damage", "heal", "healthLoss", "grantShield", "applyStatus", "rem
               "modifyStatus", "addStack", "grantEnergy", "modifyCooldown", "summon", "revive",
               "defeat", "transform", "useSkill", "swapPositions", "shuffleTeam", "if", "forEach",
               "seq", "schedule", "custom"}
-VALUE_REFS = {"stackCount", "missingHp", "currentHp", "shield", "count", "statusDuration", "statusMag", "statusCount", "sum", "var"}
+VALUE_REFS = {"stackCount", "missingHp", "currentHp", "shield", "spendableShield", "count", "statusDuration", "statusMag", "statusCount", "sum", "var"}
 VALUE_OPS = {"add", "sub", "mul", "min", "max", "div"}
 SELECTOR_STRINGS = {"self", "caster", "target", "summoner", "it", "across", "adjacent",
                     "eventSource", "eventTarget", "eventTargets", "eventUnit"}

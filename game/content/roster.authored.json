@@ -1306,7 +1306,7 @@
        "cond": {
         "cmp": ">=",
         "left": {
-         "ref": "shield",
+         "ref": "spendableShield",
          "of": "caster"
         },
         "right": 25
@@ -1353,7 +1353,7 @@
        "cond": {
         "cmp": ">=",
         "left": {
-         "ref": "shield",
+         "ref": "spendableShield",
          "of": "caster"
         },
         "right": 25
@@ -1428,7 +1428,7 @@
        "cond": {
         "cmp": ">=",
         "left": {
-         "ref": "shield",
+         "ref": "spendableShield",
          "of": "caster"
         },
         "right": 20
@@ -1477,7 +1477,7 @@
        "cond": {
         "cmp": ">=",
         "left": {
-         "ref": "shield",
+         "ref": "spendableShield",
          "of": "caster"
         },
         "right": 75

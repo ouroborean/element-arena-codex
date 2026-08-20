@@ -28,6 +28,7 @@ export type Value =
   | { ref: "missingHp"; of?: Selector }
   | { ref: "currentHp"; of?: Selector }
   | { ref: "shield"; of?: Selector }
+  | { ref: "spendableShield"; of?: Selector } // totalShield + 10 per Chronicle Fragments stack (keeper:crystal: Fragments count as 10 Shield each when paying a Shield cost)
   | { ref: "count"; of: Selector }
   | { ref: "statusDuration"; kind: StatusKind; name?: string; of?: Selector } // remaining turns (0 if absent/permanent)
   | { ref: "statusMag"; kind: StatusKind; name?: string; of?: Selector } // a status's magnitude (0 if absent)

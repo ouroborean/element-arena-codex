@@ -3554,7 +3554,7 @@ export const ROSTER: HeroDef[] = [
       "cond": {
        "cmp": ">=",
        "left": {
-        "ref": "shield",
+        "ref": "spendableShield",
         "of": "caster"
        },
        "right": 25
@@ -3600,7 +3600,7 @@ export const ROSTER: HeroDef[] = [
       "cond": {
        "cmp": ">=",
        "left": {
-        "ref": "shield",
+        "ref": "spendableShield",
         "of": "caster"
        },
        "right": 25
@@ -3674,7 +3674,7 @@ export const ROSTER: HeroDef[] = [
       "cond": {
        "cmp": ">=",
        "left": {
-        "ref": "shield",
+        "ref": "spendableShield",
         "of": "caster"
        },
        "right": 20
@@ -3722,7 +3722,7 @@ export const ROSTER: HeroDef[] = [
       "cond": {
        "cmp": ">=",
        "left": {
-        "ref": "shield",
+        "ref": "spendableShield",
         "of": "caster"
        },
        "right": 75

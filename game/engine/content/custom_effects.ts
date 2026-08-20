@@ -9,7 +9,7 @@
  * import so any consumer of the roster gets them.
  */
 import { registerCustom, resolveSelector, runInContext } from "../src/effects/interpret.ts";
-import { applyStatus, removeStatus } from "../src/status.ts";
+import { applyStatus, removeStatus, stackCount } from "../src/status.ts";
 import { applyHeal, spendShield } from "../src/damage.ts";
 import type { Unit } from "../src/types.ts";
 import type { Selector } from "../src/effects/ast.ts";
@@ -155,7 +155,16 @@ registerCustom("aoeBecomesSingleTarget", (ctx, args) => {
 // keeper1/2/4/5 — spend N Shield from the caster's real Shield pool as a skill cost. Faithful.
 registerCustom("consumeShield", (ctx, args) => {
   const amount = (args.amount as number) ?? 0;
-  for (const u of resolveSelector((args.of as Selector) ?? "caster", ctx)) spendShield(u, amount);
+  for (const u of resolveSelector((args.of as Selector) ?? "caster", ctx)) {
+    const spent = spendShield(u, amount);
+    const shortfall = amount - spent;
+    if (shortfall > 0) {
+      // keeper:crystal — Chronicle Fragments count as 10 Shield each; cover the shortfall with WHOLE stacks
+      // (a Fragment can't be split). Non-Keeper callers hold 0 Fragments, so this is a no-op for them.
+      const need = Math.min(stackCount(u, "Chronicle Fragments"), Math.ceil(shortfall / 10));
+      if (need > 0) applyStatus(u, { kind: "stack", name: "Chronicle Fragments", magnitude: -need, duration: null, appliedBy: u.id, appliedTurn: ctx.state.turn });
+    }
+  }
 });
 
 // xyris4 "Somnic Apparition" — clone the just-countered skill onto the freshly-summoned Dream
