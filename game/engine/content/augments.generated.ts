@@ -6472,34 +6472,18 @@ export const AUGMENTS: Augment[] = [
   "owner": "scratch",
   "patches": [
    {
-    "op": "appendEffect",
+    "op": "setSkillMeta",
     "skillId": "scratch1",
-    "effect": [
-     {
-      "op": "applyStatus",
-      "to": "target",
-      "status": {
-       "kind": "mark",
-       "name": "Concealed",
-       "duration": 1
-      }
-     }
-    ]
+    "meta": {
+     "isHidden": true
+    }
    },
    {
-    "op": "appendEffect",
+    "op": "setSkillMeta",
     "skillId": "scratch2",
-    "effect": [
-     {
-      "op": "applyStatus",
-      "to": "target",
-      "status": {
-       "kind": "mark",
-       "name": "Concealed",
-       "duration": 1
-      }
-     }
-    ]
+    "meta": {
+     "isHidden": true
+    }
    }
   ]
  },

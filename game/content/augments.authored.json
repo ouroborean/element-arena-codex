@@ -6588,39 +6588,21 @@
    "owner": "scratch",
    "name": "Dramatic Irony",
    "description": "Deal: Defeat Your Enemies and Deal: Save Your Friends are now invisible until triggered.",
-   "note": "Deal: Defeat = scratch1, Deal: Save = scratch2. 'invisible until triggered' is a presentation/isHidden property with no mechanical representation in the effect DSL (same class of flag noted on aramao3 Mirage Trap and fate5 Fox's Cunning). Modeled as an inert 'Concealed' mark applied to each Deal's target for the Deal window, documenting the hidden state for a future isHidden-aware presentation layer; nothing reads it, so there is no gameplay change.",
+   "note": "Deal: Defeat = scratch1, Deal: Save = scratch2. Modeled as real isHidden: each Deal becomes Invisible, so its cast leaves no telegraph and the boon it arms is stamped invisible (redactState hides it from the opponent). 'Until triggered' falls out for free — when the Deal fires, the payoff runs in a fresh trigger context (visible) and the armed boon lapses, so the opponent only ever sees the resolution, never the set-up.",
    "patches": [
     {
-     "op": "appendEffect",
+     "op": "setSkillMeta",
      "skillId": "scratch1",
-     "effect": [
-      {
-       "op": "applyStatus",
-       "to": "target",
-       "status": {
-        "kind": "mark",
-        "name": "Concealed",
-        "duration": 1
-       },
-       "note": "Presentation-only: records 'invisible until triggered'; no trigger reads this mark."
-      }
-     ]
+     "meta": {
+      "isHidden": true
+     }
     },
     {
-     "op": "appendEffect",
+     "op": "setSkillMeta",
      "skillId": "scratch2",
-     "effect": [
-      {
-       "op": "applyStatus",
-       "to": "target",
-       "status": {
-        "kind": "mark",
-        "name": "Concealed",
-        "duration": 1
-       },
-       "note": "Presentation-only: records 'invisible until triggered'; no trigger reads this mark."
-      }
-     ]
+     "meta": {
+      "isHidden": true
+     }
     }
    ]
   },

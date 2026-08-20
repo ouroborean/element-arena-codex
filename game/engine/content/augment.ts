@@ -17,9 +17,12 @@ import type { Effect, NodeId } from "../src/effects/ast.ts";
 import { replaceNode } from "../src/effects/patch.ts";
 import type { HeroTrigger } from "./hero.ts";
 
-/** Fields an augment may overwrite on a skill (metadata only — effects go through patchNode/appendEffect). */
+/** Fields an augment may overwrite on a skill (metadata only — effects go through patchNode/appendEffect).
+ *  `isHidden` lets an augment make a skill Invisible ("Elegant Sweep is now invisible", Fate's Deals
+ *  "invisible until triggered"): it flows through the normal isHidden path (redaction + the unified hidden
+ *  event flag), so the skill's cast and every effect it applies become concealed. */
 type SkillMeta = Partial<Pick<SkillInstance,
-  "name" | "cost" | "cooldown" | "tags" | "targeting" | "element" | "klass" | "requires" | "uncounterableIf" | "channelTurns" | "doesNotInterrupt">>;
+  "name" | "cost" | "cooldown" | "tags" | "targeting" | "element" | "klass" | "requires" | "uncounterableIf" | "channelTurns" | "doesNotInterrupt" | "isHidden">>;
 
 export type Patch =
   | { op: "addTrigger"; trigger: HeroTrigger }
