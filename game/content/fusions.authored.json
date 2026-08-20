@@ -7869,16 +7869,14 @@
    "passive": {
     "name": "Reading in the Dark",
     "description": "Whenever an invisible skill is used, Keeper of Fables adds 10 Shield to Tales to Tell.",
-    "note": "Skill invisibility has no engine primitive (it is cosmetic). The only source of invisible skills in this kit is Tale of Endless Night (keepernight1), which tags the allied team with the 'Endless Night' window mark for 2 turns; the trigger below reads that mark. Skills made invisible by any other means are not detected."
+    "note": "Reads the unified invisibility flag: the eventHidden condition is true for ANY Invisible skill use — an inherently isHidden skill OR one cast from a cloak (veiled / Endless Night). So this fires for every invisible skill, not just Keeper's own Endless Night window (which is now a `cloak` status)."
    },
    "passiveTriggers": [
     {
      "on": "skillUsed",
      "source": "Reading in the Dark",
      "when": {
-      "has": "mark",
-      "name": "Endless Night",
-      "of": "eventSource"
+      "eventHidden": true
      },
      "effect": [
       {
@@ -7888,7 +7886,7 @@
        "duration": null
       }
      ],
-     "note": "Fires when any unit carrying the Endless Night invisibility window uses a skill -> add 10 Shield to Tales to Tell."
+     "note": "Fires whenever an Invisible skill is used (eventHidden) -> add 10 Shield to Tales to Tell."
     }
    ],
    "skill": {
@@ -7906,7 +7904,7 @@
      "specific": 0
     },
     "cooldown": 3,
-    "note": "For 2 turns the allied team's skills are Invisible. Invisibility is cosmetic with no status primitive, so it is carried as the 'Endless Night' window mark on each ally (including Keeper); Reading in the Dark (keepernight0) reads this mark to bank Shield when a marked ally acts.",
+    "note": "For 2 turns the allied team's skills are Invisible. Modeled as a `cloak` status (a non-breaking concealment window) on each ally including Keeper: while cloaked, isConcealed() makes their skill-uses read as Invisible (redactState hides their effects; the hidden event flag drives Reading in the Dark) — and unlike veiled, a Harmful action does not strip it, so the whole 2-turn window stays Invisible.",
     "effects": [
      {
       "op": "applyStatus",
@@ -7915,7 +7913,7 @@
        "includeSelf": true
       },
       "status": {
-       "kind": "mark",
+       "kind": "cloak",
        "name": "Endless Night",
        "duration": 2
       }
