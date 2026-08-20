@@ -33,6 +33,8 @@ export interface SkillInstance extends SkillDef {
   channelCopies?: number;
   /** Using this skill does NOT interrupt an active channel (per-skill opt-out). */
   doesNotInterrupt?: boolean;
+  /** Using this Harmful skill does NOT break the caster's Veiled status (aramao1/aramao2 opt-out). */
+  doesNotBreakVeil?: boolean;
   /** A hard castability precondition (unselectable if false) — distinct from in-effect if/else. */
   requires?: Condition;
   /** If this holds at declaration, the skill cannot be countered/reflected (conditional Uncounterable). */

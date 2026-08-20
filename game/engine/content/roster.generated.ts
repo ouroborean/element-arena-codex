@@ -12471,6 +12471,7 @@ export const ROSTER: HeroDef[] = [
   "skills": [
    {
     "id": "aramao1",
+    "doesNotBreakVeil": true,
     "name": "Desert Knife",
     "element": "nomad",
     "targeting": "single",
@@ -12514,6 +12515,7 @@ export const ROSTER: HeroDef[] = [
    },
    {
     "id": "aramao2",
+    "doesNotBreakVeil": true,
     "name": "Sand Quake",
     "element": "nomad",
     "targeting": "all-enemies",

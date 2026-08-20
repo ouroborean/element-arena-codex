@@ -582,6 +582,10 @@ export function performAction(state: MatchState, action: Action): ActionResult {
     });
   }
 
+  // Veiled breaks on a HARMFUL action by the veiled unit itself (stealth-break-on-action), unless the skill
+  // opts out (aramao1/aramao2 "does not break Veiled"). Concealment while veiled is a separate redaction concern.
+  if (skill.tags.includes("Harmful") && !skill.doesNotBreakVeil) removeStatus(caster, "veiled");
+
   state.log.push(`${caster.name} used ${skill.name}`);
   emit(state, { type: "skillUsed", caster: caster.id, skillId: skill.id, targets: decl.finalTargets.map((t) => t.id), tags: skill.tags, affected, hidden: skill.isHidden });
   removeDeadMinions(state);
