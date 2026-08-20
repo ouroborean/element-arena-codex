@@ -34,4 +34,7 @@ export interface SkillInstance extends SkillDef {
   requires?: Condition;
   /** If this holds at declaration, the skill cannot be countered/reflected (conditional Uncounterable). */
   uncounterableIf?: Condition;
+  /** Per-cast conditional cost deltas, evaluated live at each cast (keeper3 "Plot Twist": -1 while solo).
+   *  Distinct from cost_mod statuses (which the round-wipe clears) — this rides on the skill, which persists. */
+  costMods?: Array<{ magnitude: number; when?: Condition }>;
 }

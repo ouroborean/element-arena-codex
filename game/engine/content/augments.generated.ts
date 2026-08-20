@@ -911,9 +911,19 @@ export const AUGMENTS: Augment[] = [
     "fn": "conditionalCostReduction",
     "args": {
      "skillId": "keeper5",
-     "condition": "soloLivingHero",
-     "element": "generic",
-     "amount": 1
+     "amount": 1,
+     "when": {
+      "cmp": "==",
+      "left": {
+       "ref": "count",
+       "of": {
+        "faction": "allies",
+        "kind": "hero",
+        "includeSelf": true
+       }
+      },
+      "right": 1
+     }
     }
    }
   ]

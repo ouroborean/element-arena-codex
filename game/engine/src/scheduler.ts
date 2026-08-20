@@ -16,7 +16,7 @@
  */
 import type { EnergyPool, MatchState, TeamId, Unit } from "./types.ts";
 import type { SkillInstance } from "./skill.ts";
-import { emit, evalSkillCondition, resolveDeclaration, runEffects } from "./effects/interpret.ts";
+import { emit, evalConditionReadOnly, evalSkillCondition, resolveDeclaration, runEffects } from "./effects/interpret.ts";
 import { applyDamage, applyHeal, outgoingDtypeOverride, tickShieldsForTeam } from "./damage.ts";
 import { Rng } from "./rng.ts";
 import { applyStatus, clearRoundStatuses, removeStatus, tickDurationsForTeam } from "./status.ts";
@@ -321,19 +321,38 @@ function poolTotal(pool: EnergyPool): number {
   return t;
 }
 
-/** A skill's cost after the caster's cost_mod statuses (delta applied to generic, spilling to specific). */
-export function effectiveCost(caster: Unit, skill: SkillInstance): SkillInstance["cost"] {
+/**
+ * A skill's cost after cost mods. `cost_mod` statuses apply a flat delta (spilling onto specific);
+ * per-cast `skill.costMods` (keeper3 "Plot Twist") apply a delta gated by a live Condition (needs `state`);
+ * a `cost_currency_remap` status (titania5 "Jealousy") moves the remaining Specific cost onto Generic so
+ * any color pays it.
+ *
+ * ALWAYS pass `state` when you have it: conditional `costMods` can only be evaluated with it, so the 2-arg
+ * form silently omits them — every UI/display caller MUST pass `state` or it will show a cost the engine
+ * won't charge. `state` stays optional only so pure cost_mod-status unit tests (no costMods) can stay 2-arg.
+ */
+export function effectiveCost(caster: Unit, skill: SkillInstance, state?: MatchState): SkillInstance["cost"] {
   let delta = 0;
   // Global cost_mods (no skillId) apply to every skill; scoped ones only to their skill.
   for (const s of caster.statuses) if (s.kind === "cost_mod" && (!s.skillId || s.skillId === skill.id)) delta += s.magnitude ?? 0;
-  if (delta === 0) return skill.cost;
+  // Per-cast conditional cost mods carried on the skill, re-evaluated live at each cast.
+  if (state && skill.costMods) {
+    for (const m of skill.costMods) if (!m.when || evalConditionReadOnly(state, caster, m.when)) delta += m.magnitude;
+  }
+  const remap = caster.statuses.some((s) => s.kind === "cost_currency_remap" && (!s.skillId || s.skillId === skill.id));
+  if (delta === 0 && !remap) return skill.cost;
   let generic = skill.cost.generic + delta;
   let specific = skill.cost.specific;
   if (generic < 0) {
     specific += generic; // spill the leftover discount onto the specific cost
     generic = 0;
   }
-  return { generic, specific: Math.max(0, specific) };
+  specific = Math.max(0, specific);
+  if (remap && specific > 0) { // Specific → Generic: any color may now pay the remapped portion
+    generic += specific;
+    specific = 0;
+  }
+  return { generic, specific };
 }
 
 /** The cooldown a skill goes on when used, after the caster's cooldown_mod statuses (floored at 0). */
@@ -471,7 +490,7 @@ export function canUse(state: MatchState, caster: Unit, skill: SkillInstance): b
     const cands = unitsOf(state, side).filter((u) => u.alive);
     if (legalTargets(state, caster, skill, cands, rng).length === 0) return false;
   }
-  return canPay(team(state, caster.team).energy, caster.currentElement, effectiveCost(caster, skill));
+  return canPay(team(state, caster.team).energy, caster.currentElement, effectiveCost(caster, skill, state));
 }
 
 /** Validate + perform one action: legality → pay → run effects → set cooldown. */
@@ -493,7 +512,7 @@ export function performAction(state: MatchState, action: Action): ActionResult {
   if (needsTarget && targets.length === 0) return { ok: false, reason: "no-legal-target" };
 
   const pool = team(state, caster.team).energy;
-  const cost = effectiveCost(caster, skill);
+  const cost = effectiveCost(caster, skill, state);
   if (!canPay(pool, caster.currentElement, cost)) {
     return { ok: false, reason: "insufficient-energy" };
   }

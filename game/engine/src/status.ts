@@ -19,8 +19,8 @@ export interface ExpiredStatus {
 function sameSlot(a: Status, b: Status): boolean {
   if (a.kind !== b.kind) return false;
   if (a.kind === "mark" || a.kind === "stack" || a.kind === "dot" || a.kind === "stack_read_mod") return a.name === b.name;
-  // A skill-scoped cost/cooldown mod (or instant_cast) occupies its own slot per skill.
-  if (a.kind === "cost_mod" || a.kind === "cooldown_mod" || a.kind === "instant_cast") return a.skillId === b.skillId;
+  // A skill-scoped cost/cooldown mod (or instant_cast / currency remap) occupies its own slot per skill.
+  if (a.kind === "cost_mod" || a.kind === "cooldown_mod" || a.kind === "instant_cast" || a.kind === "cost_currency_remap") return a.skillId === b.skillId;
   return true;
 }
 

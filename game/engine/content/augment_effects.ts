@@ -65,10 +65,19 @@ registerCustom("scopedCostDiscountOnUse", (ctx, a) => {
   applyStatus(ctx.self, { kind: "cost_mod", skillId, magnitude: next, duration: null, appliedBy: ctx.self.id, appliedTurn: ctx.state.turn });
 });
 
-// jealousyBasicsToGeneric — DEBT: converting a skill's specific cost to generic for a duration has
-// no clean primitive (cost_mod is a flat delta, not a currency change). Apply an observable mark.
-registerCustom("jealousyBasicsToGeneric", (ctx) => {
-  applyStatus(ctx.self, { kind: "mark", name: "Jealousy", duration: 1, appliedBy: ctx.self.id, appliedTurn: ctx.state.turn });
+// jealousyBasicsToGeneric — titania5 "Jealousy": when an ALLY triggers Prance, the OTHER ally (not the
+// trigger-er, not Titania) has their basic abilities' Specific costs changed to Generic the following turn.
+// Applies a skillId-scoped cost_currency_remap (read by effectiveCost) to each of that ally's basic skills.
+registerCustom("jealousyBasicsToGeneric", (ctx, a) => {
+  const trigger = resolveSelector("eventSource", ctx)[0]; // the ally who triggered Prance
+  const others = resolveSelector({ faction: "allies", kind: "hero", includeSelf: false }, ctx).filter((u) => u.id !== trigger?.id);
+  const dur = (a.duration as number | null) ?? 1;
+  for (const ally of others) {
+    for (const sk of ally.skills ?? []) {
+      if (sk.klass !== "basic") continue;
+      applyStatus(ally, { kind: "cost_currency_remap", skillId: sk.id, duration: dur, appliedBy: ctx.self.id, appliedTurn: ctx.state.turn });
+    }
+  }
 });
 
 // healIfExpiredStatusNamed — reactive heal when a specifically-named status lapses (statusExpired).
@@ -151,11 +160,14 @@ registerAugmentCustom("buffMinionMaxHp", (unit, a) => {
   void unit;
 });
 
-// conditionalCostReduction — a scoped cost_mod gated by a condition evaluated at apply time.
-// DEBT: the gate is checked once here, not re-evaluated per cast (no per-cast conditional cost hook).
+// conditionalCostReduction — keeper3 "Plot Twist": a cost reduction gated by a Condition that is
+// RE-EVALUATED at each cast. Carried as a per-cast costMod on the skill itself (skills persist across
+// rounds, so it survives the per-round status wipe — unlike a cost_mod status). effectiveCost evaluates
+// the `when` live at cast time.
 registerAugmentCustom("conditionalCostReduction", (unit, a) => {
-  const skillId = a.skillId as string;
-  applyStatus(unit, { kind: "cost_mod", skillId, magnitude: -num(a.amount), duration: null, appliedBy: unit.id, appliedTurn: 0 });
+  const skill = (unit.skills ?? []).find((s) => s.id === (a.skillId as string));
+  if (!skill) return;
+  skill.costMods = [...(skill.costMods ?? []), { magnitude: -num(a.amount), when: a.when as Condition }];
 });
 
 // retunePassiveThreshold — rewrite the numeric right-hand side of a base trigger's cmp gate.

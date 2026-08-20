@@ -654,6 +654,18 @@ export function evalSkillCondition(state: MatchState, caster: Unit, cond: Condit
   return result;
 }
 
+/**
+ * Evaluate a condition WITHOUT persisting the rng — a read-only gate for cost/cooldown previews
+ * (effectiveCost is called from the read-only canUse as well as from performAction, so it must not
+ * advance rng as a side effect). A cost gate that depends on rng would be a design smell anyway.
+ */
+export function evalConditionReadOnly(state: MatchState, caster: Unit, cond: Condition): boolean {
+  const rng = Rng.fromState(state.rngState);
+  const bus = createBus(state, rng);
+  const ctx: Ctx = { state, rng, caster, self: caster, targets: [], it: null, vars: {}, emit: bus.emit };
+  return evalCondition(cond, ctx); // rng intentionally not written back
+}
+
 /** Emit a standalone event (scheduler turn/round hooks, DoT deaths). Saves rng state. */
 export function emit(state: MatchState, event: GameEvent): void {
   const rng = Rng.fromState(state.rngState);

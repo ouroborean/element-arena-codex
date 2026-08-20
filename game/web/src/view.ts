@@ -157,7 +157,7 @@ function skillTiles(state: MatchState, u: Unit, ui: UiState): string {
   const chosen = ui.plannedSkill.get(u.id);
   const tiles = (u.skills ?? []).map((s) => {
     const ok = canUse(state, u, s);
-    const cost = effectiveCost(u, s);
+    const cost = effectiveCost(u, s, state);
     const costStr = [cost.generic ? `${cost.generic} generic` : "", cost.specific ? `${cost.specific} ${s.element}` : ""].filter(Boolean).join(" + ") || "free";
     const text = SKILL_TEXT[s.id];
     const tip = `${text?.n ?? s.name} — ${costStr}${s.currentCd > 0 ? ` — on cooldown (${s.currentCd})` : ""}${text?.d ? `\n${text.d}` : ""}`;
@@ -286,7 +286,7 @@ function skillPanel(state: MatchState, ui: UiState): string {
   const skill = (u?.skills ?? []).find((s) => s.id === sel.skillId);
   const text = SKILL_TEXT[sel.skillId];
   const ic = iconOf(sel.skillId, u?.heroId ?? undefined);
-  const cost = u && skill ? effectiveCost(u, skill) : null;
+  const cost = u && skill ? effectiveCost(u, skill, state) : null;
   const costEl = cost ? costIcons(cost, skill!.element) : "";
   const name = text?.n ?? ui.targeting?.skillName ?? skill?.name ?? sel.skillId;
   const foot = examining
