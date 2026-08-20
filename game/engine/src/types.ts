@@ -30,6 +30,8 @@ export type StatusKind =
   | "outgoing_dtype_override" // dtype: forces the holder's outgoing damage to this type (e.g. Piercing)
   | "conditional_bypass" // the holder's damage ignores DR+Shield against targets that satisfy bypassCond
   | "shield_absorb_cap" // magnitude: max Shield the holder may spend absorbing a single hit (overflow falls through to HP)
+  | "shield_grant_bonus" // magnitude: N added to every Shield grant the holder receives (keeperlich0 Licherature)
+  | "shield_non_absorbing" // the holder's Shield stops absorbing incoming damage (still a resource pool) — keepermyth0 Wise Old Man
   | "split_incoming" // the holder's single-target hits are split evenly among the holder + opposing-team bearers of mark `name`
   | "skill_damage_bonus" // skillId-scoped: flat bonus added to the named skill's damage-op hits while it holds (empowerThornPrick)
   | "skill_targeting_override" // skillId-scoped: overrides the named skill's targeting; name = the new category (bannerAffectsAllEnemies)
