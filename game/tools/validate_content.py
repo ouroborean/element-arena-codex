@@ -135,6 +135,9 @@ def v_condition(c, path):
         v_selector(c["isKind"], path + ".isKind")
         if c.get("kind") not in {"hero", "minion"}:
             err(path, f"invalid isKind '{c.get('kind')}'")
+    elif "skillOnCooldown" in c:
+        if not isinstance(c["skillOnCooldown"], str):
+            err(path, "skillOnCooldown must be a skill id string")
     elif "declaredTargetsSelf" in c or "eventHasTag" in c or "eventStatusKind" in c or "eventTeamIsSelf" in c or "eventRedirectedToSelf" in c or "eventHidden" in c or "chance" in c:
         pass
     elif "and" in c:
