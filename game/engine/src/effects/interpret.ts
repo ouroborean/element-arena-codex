@@ -75,7 +75,10 @@ function ownerPassiveId(u: Unit): string | undefined {
 // --------------------------------------------------------------------------- //
 //  Selector resolution
 // --------------------------------------------------------------------------- //
-export function resolveSelector(sel: Selector, ctx: Ctx): Unit[] {
+// `admitUnderstudy` (default true) admits an understudy hero (Dennis) for a selector naming the minion
+// template it stands in for. Structural minion-lifecycle ops (defeat/revive/transform/useSkill-by) pass
+// false: a hero can be REFERENCED like the minion but never summoned/consumed/revived/made-to-act as one.
+export function resolveSelector(sel: Selector, ctx: Ctx, admitUnderstudy = true): Unit[] {
   if (sel === "self") return [ctx.self];
   if (sel === "caster") return [ctx.caster];
   if (sel === "target") return ctx.targets.slice();
@@ -118,15 +121,19 @@ export function resolveSelector(sel: Selector, ctx: Ctx): Unit[] {
     const wantAlive = sel.alive ?? true;
     return pool.filter((u) => {
       if (u.alive !== wantAlive) return false;
-      if (sel.kind && u.kind !== sel.kind) return false;
-      if (sel.template && u.name !== sel.template) return false;
+      // An "understudy" hero stands in for a named minion template (Dennis for Hector's "Dennis the
+      // Apprentice"): a selector naming that EXACT template admits it, bypassing the kind (minion) check.
+      // A blanket kind selector (no template) never admits it — only a Dennis-by-name reference retargets.
+      const isUnderstudy = admitUnderstudy && sel.template !== undefined && u.understudyFor === sel.template;
+      if (sel.kind && u.kind !== sel.kind && !isUnderstudy) return false;
+      if (sel.template && u.name !== sel.template && !isUnderstudy) return false;
       if (sel.includeSelf === false && u.id === ctx.caster.id) return false;
       return true;
     });
   }
 
   if ("pick" in sel) {
-    const from = resolveSelector(sel.from, ctx);
+    const from = resolveSelector(sel.from, ctx, admitUnderstudy); // propagate so a lifecycle op nesting a template selector stays excluded
     const count = sel.count ?? 1;
     if (sel.pick === "random") return ctx.rng.shuffle(from.slice()).slice(0, count);
     const sorted = from
@@ -136,7 +143,7 @@ export function resolveSelector(sel: Selector, ctx: Ctx): Unit[] {
   }
 
   // filter
-  const base = resolveSelector(sel.filter, ctx);
+  const base = resolveSelector(sel.filter, ctx, admitUnderstudy);
   return base.filter((u) => {
     if (sel.with && !hasStatusMatch(u, sel.with)) return false;
     if (sel.without && hasStatusMatch(u, sel.without)) return false;
@@ -175,8 +182,8 @@ function resolveOne(sel: Selector | undefined, ctx: Ctx): Unit {
 }
 
 /** The units an effect applies to: its own `to`, else the skill's chosen targets. */
-function effectTargets(to: Selector | undefined, ctx: Ctx): Unit[] {
-  return to ? resolveSelector(to, ctx) : ctx.targets;
+function effectTargets(to: Selector | undefined, ctx: Ctx, admitUnderstudy = true): Unit[] {
+  return to ? resolveSelector(to, ctx, admitUnderstudy) : ctx.targets;
 }
 
 // --------------------------------------------------------------------------- //
@@ -472,7 +479,7 @@ export function exec(effect: Effect, ctx: Ctx): void {
       return;
     }
     case "defeat": {
-      for (const u of effectTargets(effect.to, ctx)) {
+      for (const u of effectTargets(effect.to, ctx, false)) { // never consume the understudy hero as a minion
         if (!u.alive) continue;
         u.hp = 0;
         u.alive = false;
@@ -482,7 +489,7 @@ export function exec(effect: Effect, ctx: Ctx): void {
     }
     case "revive": {
       const hp = applyRounding(evalValue(effect.hp, ctx));
-      for (const u of effectTargets(effect.to, ctx)) {
+      for (const u of effectTargets(effect.to, ctx, false)) { // a minion-revive never resurrects the understudy hero
         if (u.alive) continue;
         u.alive = true;
         u.hp = Math.max(1, Math.min(u.maxHp, hp));
@@ -492,7 +499,7 @@ export function exec(effect: Effect, ctx: Ctx): void {
     case "transform": {
       const tmpl = getMinionTemplate(effect.template);
       if (!tmpl) return;
-      for (const u of effectTargets(effect.to, ctx)) {
+      for (const u of effectTargets(effect.to, ctx, false)) { // never retemplate the understudy hero
         u.name = tmpl.name;
         if (tmpl.element) u.currentElement = tmpl.element;
         u.maxHp = tmpl.maxHp;
@@ -503,7 +510,9 @@ export function exec(effect: Effect, ctx: Ctx): void {
       return;
     }
     case "useSkill": {
-      const by = effect.by ? resolveSelector(effect.by, ctx)[0] : ctx.caster;
+      // The understudy hero can't be MADE to act as the minion (it lacks the minion's skills), so `by` does
+      // not admit it — a Dennis-cast reference (e.g. Dennisyphus) no-ops rather than mis-resolving to the hero.
+      const by = effect.by ? resolveSelector(effect.by, ctx, false)[0] : ctx.caster;
       const sk = (by?.skills ?? []).find((s) => s.id === effect.skillId);
       if (by && sk) {
         const targets = effect.on ? resolveSelector(effect.on, ctx) : ctx.targets;

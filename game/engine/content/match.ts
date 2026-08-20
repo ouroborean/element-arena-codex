@@ -58,6 +58,17 @@ export function buildMatch(draft: Draft): MatchState {
   const aIds = load("A", draft.A);
   const bIds = load("B", draft.B);
 
+  // Dennis "Second-Rate Copy" Part A: a hero Dennis sharing Hector's team stands in for Hector's summoned
+  // "Dennis the Apprentice" minion — so Hector's roundStart summon (count-guarded) is suppressed and every
+  // Dennis-by-template reference in Hector's kit (Protect Me! redirect, Serum targets) resolves to hero-Dennis.
+  for (const ids of [aIds, bIds]) {
+    const team = ids.map((id) => units[id]).filter((u): u is Unit => !!u);
+    // Tag exactly ONE Dennis (first in slot order) — the frozen prose assumes a single Dennis, and a lone
+    // understudy keeps every reference (redirect[0], all-target refreshes) operating on the same hero.
+    const dennis = team.find((u) => u.heroId === "dennis");
+    if (dennis && team.some((u) => u.heroId === "hector")) dennis.understudyFor = "Dennis the Apprentice";
+  }
+
   return {
     round: 0, // startRound increments to 1 for the first fresh battle
     turn: 1,
