@@ -154,6 +154,9 @@ export interface Unit {
   fused?: string;
   /** Augment ids applied to this hero so far (cumulative across rounds). */
   augments?: string[];
+  /** This hero stands in for a named minion template (Dennis for Hector's "Dennis the Apprentice") — a
+   *  selector naming that exact template resolves to this hero. Set at match build for a cross-hero pairing. */
+  understudyFor?: string;
 }
 
 /** Energy is a shared per-team pool (ENERGY_POOL_SCOPE = team). */
