@@ -2145,7 +2145,7 @@
    "owner": "zephyrex",
    "name": "Wind Dancer",
    "description": "Wind Step now targets an enemy, lowering their non-Affliction damage by 10 for 1 turn. If that enemy uses a new harmful skill during this time, Zephyrex gains Elemental Essence. This effect is invisible.",
-   "note": "Wind Step (zephyrex4) is redefined from a self-buff to an enemy debuff: it now targets an enemy and lowers their non-Affliction damage by 10 for 1 turn — modeled via `outgoing_damage_mod` magnitude -10 (which the engine applies to normal/piercing only, i.e. non-Affliction). A `Wind Dancer` mark tags that enemy; a skillUsed trigger grants Zephyrex Essence when the marked enemy uses a Harmful skill (skillUsed carries no tags, so eventHasTag supplies the Harmful check). This replaces the base Wind Step's self-15-DR and its receives-a-skill->Essence behavior. Skill/status invisibility is not representable in the engine model (fidelity debt). Sonic Thrust's 'usable only if Wind Step is on cooldown' still holds (cooldown unchanged at 2).",
+   "note": "Wind Step (zephyrex4) is redefined from a self-buff to an enemy debuff: it now targets an enemy and lowers their non-Affliction damage by 10 for 1 turn — modeled via `outgoing_damage_mod` magnitude -10 (which the engine applies to normal/piercing only, i.e. non-Affliction). A `Wind Dancer` mark tags that enemy; a skillUsed trigger grants Zephyrex Essence when the marked enemy uses a Harmful skill (skillUsed carries no tags, so eventHasTag supplies the Harmful check). This replaces the base Wind Step's self-15-DR and its receives-a-skill->Essence behavior. 'This effect is invisible' is real: the replacement skill is isHidden, so the whole enemy-side application (the -10 debuff and the Wind Dancer mark) is stamped invisible and hidden from the opponent by redactState, and the cast leaves no telegraph. Sonic Thrust's 'usable only if Wind Step is on cooldown' still holds (cooldown unchanged at 2).",
    "patches": [
     {
      "op": "replaceSkill",
@@ -2153,6 +2153,7 @@
      "skill": {
       "id": "zephyrex4",
       "name": "Wind Step",
+      "isHidden": true,
       "element": "wind",
       "targeting": "single",
       "klass": "defensive",
@@ -2247,7 +2248,7 @@
    "owner": "zephyrex",
    "name": "Polite Denial",
    "description": "Elegant Sweep is now invisible, and Zephyrex gains the effect of Wind Step while it is active.",
-   "note": "'Gains the effect of Wind Step while active' = Zephyrex gets Wind Step's core self-buff, 15 damage-reduction, for the duration of the Elegant Sweep channel; applied on cast (appended to zephyrex2). 'Elegant Sweep is now invisible' is not representable — the engine's skill model has no invisibility flag — recorded as fidelity debt.",
+   "note": "'Gains the effect of Wind Step while active' = Zephyrex gets Wind Step's core self-buff, 15 damage-reduction, for the duration of the Elegant Sweep channel; applied on cast (appended to zephyrex2). 'Elegant Sweep is now invisible' = setSkillMeta isHidden on zephyrex2: the cast leaves no telegraph and every status it applies is stamped invisible (redactState hides them from the opponent).",
    "patches": [
     {
      "op": "appendEffect",
@@ -2263,6 +2264,13 @@
        }
       }
      ]
+    },
+    {
+     "op": "setSkillMeta",
+     "skillId": "zephyrex2",
+     "meta": {
+      "isHidden": true
+     }
     }
    ]
   },
@@ -7034,7 +7042,7 @@
    "owner": "sera",
    "name": "Proto-Prophecy",
    "description": "Enemies targeted by Heavenly Parry deal 10 reduced damage for their next turn. This effect is invisible.",
-   "note": "Appends to Heavenly Parry (sera3): the targeted enemy gets outgoing_damage_mod magnitude -10 ('deals 10 less') for 1 turn ('their next turn'). 'This effect is invisible' has no per-effect invisibility flag in the DSL.",
+   "note": "Appends to Heavenly Parry (sera3): the targeted enemy gets outgoing_damage_mod magnitude -10 ('deals 10 less') for 1 turn ('their next turn'). 'This effect is invisible' = invisible:true on that status spec, so redactState hides the debuff from the debuffed enemy.",
    "patches": [
     {
      "op": "appendEffect",
@@ -7046,7 +7054,8 @@
        "status": {
         "kind": "outgoing_damage_mod",
         "magnitude": -10,
-        "duration": 1
+        "duration": 1,
+        "invisible": true
        }
       }
      ]
