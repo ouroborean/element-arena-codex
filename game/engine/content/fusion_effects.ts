@@ -8,7 +8,7 @@
  * to a Value/Condition, so these are the sanctioned native form — but they are FAITHFUL (no
  * approximation): they read the real event off the context and act on it.
  */
-import { registerCustom, resolveSelector, runInContext } from "../src/effects/interpret.ts";
+import { registerCustom, resolveSelector, runInContext, disguiseFieldsOf } from "../src/effects/interpret.ts";
 import type { Ctx } from "../src/effects/interpret.ts";
 import { applyStatus, removeStatus, rawStackCount, stackCount } from "../src/status.ts";
 import { applyDamage, applyHeal, addShield, totalShield } from "../src/damage.ts";
@@ -1294,8 +1294,11 @@ registerCustom("mistyMireTick", (ctx, a) => {
 registerCustom("cleaveTheVeil", (ctx, a) => {
   const target = resolveSelector((a.target as Selector) ?? "target", ctx)[0];
   if (!target) return;
-  applyStatus(target, { kind: "mark", name: "Cleave Target", duration: 2, appliedBy: ctx.self.id, appliedTurn: ctx.state.turn });
-  applyStatus(ctx.self, { kind: "mark", name: "Cleave Charging", duration: 2, appliedBy: ctx.self.id, appliedTurn: ctx.state.turn });
+  // The custom applies its marks directly (not via buildStatus), so stamp the display-disguise here too, so
+  // the opponent sees Cleave the Veil's marks as Elegant Sweep (seeded from the skill's disguiseAs → ctx).
+  const dis = disguiseFieldsOf(ctx);
+  applyStatus(target, { kind: "mark", name: "Cleave Target", duration: 2, appliedBy: ctx.self.id, appliedTurn: ctx.state.turn, ...dis });
+  applyStatus(ctx.self, { kind: "mark", name: "Cleave Charging", duration: 2, appliedBy: ctx.self.id, appliedTurn: ctx.state.turn, ...dis });
   if (a.cancelOnHarmfulSkillReceived) {
     installWatch(ctx, { on: "skillUsed", source: "Cleave the Veil", effect: [{ op: "custom", fn: "cleaveInterrupt", args: {} }] }, 2);
   }

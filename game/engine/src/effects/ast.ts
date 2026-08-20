@@ -149,6 +149,9 @@ export interface SkillDef {
    *  eventHidden Condition (Sera's non-Invisible filter, Keeper's invisible-skill reader); the concealment
    *  itself is a redaction concern (server-side, out of scope here). */
   isHidden?: boolean;
+  /** Display disguise: to the opponent, this skill's cast (its log telegraph) and the effects it applies are
+   *  shown as skill `disguiseAs` — Cleave the Veil displayed as Elegant Sweep. Cosmetic; effects unchanged. */
+  disguiseAs?: string;
 }
 
 // Node addressing (findNode / replaceNode / mapNode) lives in ./patch.ts — the single walker
