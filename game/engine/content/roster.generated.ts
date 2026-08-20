@@ -5257,7 +5257,37 @@ export const ROSTER: HeroDef[] = [
         {
          "op": "mul",
          "args": [
-          10,
+          {
+           "op": "add",
+           "args": [
+            10,
+            {
+             "op": "mul",
+             "args": [
+              {
+               "ref": "statusMag",
+               "kind": "coil_damage_bonus",
+               "of": "self"
+              },
+              {
+               "op": "add",
+               "args": [
+                {
+                 "ref": "stackCount",
+                 "name": "Saya Coil",
+                 "of": "self"
+                },
+                {
+                 "ref": "stackCount",
+                 "name": "Enhanced Saya Coil",
+                 "of": "self"
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          },
           {
            "ref": "stackCount",
            "name": "Saya Coil",
@@ -5268,7 +5298,37 @@ export const ROSTER: HeroDef[] = [
         {
          "op": "mul",
          "args": [
-          20,
+          {
+           "op": "add",
+           "args": [
+            20,
+            {
+             "op": "mul",
+             "args": [
+              {
+               "ref": "statusMag",
+               "kind": "coil_damage_bonus",
+               "of": "self"
+              },
+              {
+               "op": "add",
+               "args": [
+                {
+                 "ref": "stackCount",
+                 "name": "Saya Coil",
+                 "of": "self"
+                },
+                {
+                 "ref": "stackCount",
+                 "name": "Enhanced Saya Coil",
+                 "of": "self"
+                }
+               ]
+              }
+             ]
+            }
+           ]
+          },
           {
            "ref": "stackCount",
            "name": "Enhanced Saya Coil",

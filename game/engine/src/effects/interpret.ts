@@ -203,6 +203,12 @@ export function evalValue(v: Value, ctx: Ctx): number {
         const s = resolveOne(v.of, ctx).statuses.find((x) => x.kind === v.kind && (v.name === undefined || x.name === v.name));
         return s && s.duration !== null ? s.duration : 0;
       }
+      case "statusMag": {
+        const s = resolveOne(v.of, ctx).statuses.find((x) => x.kind === v.kind && (v.name === undefined || x.name === v.name));
+        return s?.magnitude ?? 0;
+      }
+      case "statusCount":
+        return resolveOne(v.of, ctx).statuses.filter((x) => x.kind === v.kind && (v.name === undefined || x.name === v.name)).length;
       case "sum": {
         let total = 0;
         for (const u of resolveSelector(v.of, ctx)) {

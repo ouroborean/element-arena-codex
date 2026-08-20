@@ -2597,7 +2597,7 @@
     {
      "on": "turnEnd",
      "source": "Saya Coil",
-     "note": "Ongoing damage of saya2, fires 'at the end of every turn' (both teams' turn-ends — correct). Normal coils tick 10 each, Enhanced coils tick 20 each. No repeat-N loop, so per-coil hits on a random enemy are aggregated: 10*normalCoils + 20*enhancedCoils onto one random enemy.",
+     "note": "Ongoing damage of saya2, fires 'at the end of every turn' (both teams' turn-ends — correct). Normal coils tick 10 each, Enhanced coils tick 20 each, aggregated onto one random enemy. Each coil's per-hit base is +statusMag(coil_damage_bonus)*totalCoils — 0 unless the saya2 'Link Coils' augment is drafted, which sets coil_damage_bonus=5 so each coil deals +5 per active coil (quadratic, per the augment note).",
      "when": {
       "cmp": ">",
       "left": {
@@ -2626,7 +2626,7 @@
          {
           "op": "mul",
           "args": [
-           10,
+           { "op": "add", "args": [10, { "op": "mul", "args": [{ "ref": "statusMag", "kind": "coil_damage_bonus", "of": "self" }, { "op": "add", "args": [{ "ref": "stackCount", "name": "Saya Coil", "of": "self" }, { "ref": "stackCount", "name": "Enhanced Saya Coil", "of": "self" }] }] }] },
            {
             "ref": "stackCount",
             "name": "Saya Coil",
@@ -2637,7 +2637,7 @@
          {
           "op": "mul",
           "args": [
-           20,
+           { "op": "add", "args": [20, { "op": "mul", "args": [{ "ref": "statusMag", "kind": "coil_damage_bonus", "of": "self" }, { "op": "add", "args": [{ "ref": "stackCount", "name": "Saya Coil", "of": "self" }, { "ref": "stackCount", "name": "Enhanced Saya Coil", "of": "self" }] }] }] },
            {
             "ref": "stackCount",
             "name": "Enhanced Saya Coil",

@@ -11,7 +11,7 @@
  * ../design/ENGINE_GAPS.md. None is a silent no-op except where the base rule itself is unencoded.
  */
 import { registerCustom, resolveSelector, runInContext, evalCondition } from "../src/effects/interpret.ts";
-import { registerAugmentCustom } from "./augment.ts";
+import { registerAugmentCustom, mutableSkill } from "./augment.ts";
 import { applyStatus, removeStatus } from "../src/status.ts";
 import { applyHeal, addShield } from "../src/damage.ts";
 import { getMinionTemplate } from "../src/minions.ts";
@@ -186,10 +186,17 @@ registerAugmentCustom("retunePassiveThreshold", (unit, a) => {
   }
 });
 
-// scaleCoilDamage — DEBT: retuning a live per-tick amount inside an existing trigger's Value tree
-// has no general rewrite; mark the hero so the intent is observable and record the debt.
+// scaleCoilDamage — saya2 "Link Coils": Saya Coil deals an additional `perCoilBonus` damage for every active
+// coil. A `coil_damage_bonus` status that Saya's coil-tick amount reads live (statusMag) and adds to each coil
+// hit — so N coils each deal +perCoilBonus×N (quadratic, per the authored note). Round-scoped, so a static
+// roundStart trigger re-applies it each battle (and once immediately for the drafted round).
 registerAugmentCustom("scaleCoilDamage", (unit, a) => {
-  unit.statuses.push({ kind: "mark", name: `CoilBonus:${num(a.perCoilBonus)}`, duration: null, appliedBy: unit.id, appliedTurn: 0 });
+  const bonus = num(a.perCoilBonus);
+  applyStatus(unit, { kind: "coil_damage_bonus", magnitude: bonus, duration: null, appliedBy: unit.id, appliedTurn: 0 });
+  unit.triggers = [...(unit.triggers ?? []), {
+    on: "roundStart", owner: unit.id, source: "Link Coils", origin: "augment",
+    effect: [{ op: "applyStatus", to: "self", status: { kind: "coil_damage_bonus", magnitude: bonus, duration: null } }],
+  }];
 });
 
 // relaxSerumTargeting — FAITHFUL no-op: the "only Dennis" restriction the augment relaxes was never
@@ -209,10 +216,17 @@ registerAugmentCustom("capShieldAbsorbPerHit", (unit, a) => {
   }];
 });
 
-// channelCopies — DEBT: the engine keys one `channeling` status per skill id, so two concurrent
-// copies of one Channel skill aren't representable. Mark the intent.
+// channelCopies — galazax1 "Twin Storms": Galazax may Channel up to `maxCopies` separate copies of The Sky
+// Darkens. Set channelCopies on the skill (each live copy then gets a distinct instanceId and re-runs
+// independently; sibling copies survive a re-cast) and relax its base single-copy gate to "< maxCopies live
+// copies". Rides on the skill (persists across rounds) — clone-safe via mutableSkill.
 registerAugmentCustom("channelCopies", (unit, a) => {
-  unit.statuses.push({ kind: "mark", name: `ChannelCopies:${a.skillId}:${num(a.maxCopies, 2)}`, duration: null, appliedBy: unit.id, appliedTurn: 0 });
+  const skillId = a.skillId as string;
+  const maxCopies = num(a.maxCopies, 2);
+  const sk = mutableSkill(unit, skillId);
+  if (!sk) return;
+  sk.channelCopies = maxCopies;
+  sk.requires = { cmp: "<", left: { ref: "statusCount", kind: "channeling", name: skillId, of: "self" }, right: maxCopies };
 });
 
 // splitIncomingSingleTargetDamageAcrossCinders — "Blackened Soul": Jarrik splits all single-target damage

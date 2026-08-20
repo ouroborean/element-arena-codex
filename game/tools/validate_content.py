@@ -22,7 +22,7 @@ EFFECT_OPS = {"damage", "heal", "healthLoss", "grantShield", "applyStatus", "rem
               "modifyStatus", "addStack", "grantEnergy", "modifyCooldown", "summon", "revive",
               "defeat", "transform", "useSkill", "swapPositions", "shuffleTeam", "if", "forEach",
               "seq", "schedule", "custom"}
-VALUE_REFS = {"stackCount", "missingHp", "currentHp", "shield", "count", "statusDuration", "sum", "var"}
+VALUE_REFS = {"stackCount", "missingHp", "currentHp", "shield", "count", "statusDuration", "statusMag", "statusCount", "sum", "var"}
 VALUE_OPS = {"add", "sub", "mul", "min", "max", "div"}
 SELECTOR_STRINGS = {"self", "caster", "target", "summoner", "it", "across", "adjacent",
                     "eventSource", "eventTarget", "eventTargets", "eventUnit"}
@@ -34,7 +34,7 @@ STATUS_KINDS = {"damage_reduction", "incoming_damage_mod", "outgoing_damage_mod"
                 "damage_ignore", "non_damage_ignore", "immortal", "revive_ward", "invulnerable",
                 "isolated", "untargetable", "elemental_essence", "cost_mod", "cost_currency_remap", "silence", "paralysis",
                 "stealth", "veiled", "taunt", "blind", "stun", "channeling", "dot", "regen",
-                "heal_lock", "uncounterable", "mark", "stack"}
+                "heal_lock", "uncounterable", "coil_damage_bonus", "mark", "stack"}
 EVENTS = {"damageDealt", "shieldDamaged", "shieldBroken", "unitDied", "skillUsed", "skillDeclared",
           "skillGranted", "minionSummoned", "healReceived", "statusApplied", "statusExpired", "skillRedirected",
           "counterFired", "energyFromEssence", "turnStart", "turnEnd", "roundStart"}

@@ -60,6 +60,7 @@ export type StatusKind =
   | "uncounterable" // the holder's skills cannot be countered/reflected
   | "stack_read_mod" // adjusts the EFFECTIVE stackCount read of a named stack (mode: mult|floorZero|missingHp) — "treated as though they had N stacks"
   | "instant_cast" // skillId-scoped: suppresses the named skill's channel so it resolves entirely on cast
+  | "coil_damage_bonus" // magnitude: extra per-active-coil damage added to each Saya Coil hit (0 if absent)
   | "mark" // a named marker (name required)
   | "stack"; // a named accumulating resource (name required)
 
@@ -83,6 +84,9 @@ export interface Status {
   unitRef?: UnitId;
   /** For channeling: the targets the sustained skill re-runs against each turn. */
   channelTargets?: UnitId[];
+  /** For a multi-copy channel (galazax1 Twin Storms): distinguishes concurrent channeling instances of one
+   *  skill id. Absent = the single-slot default (one channel per skill id). */
+  instanceId?: string;
   /** Effects to run when this status expires naturally (see onExpire). */
   onExpire?: Effect[];
   /** Turns remaining. null = lasts until end of round (a round-"permanent" effect). */

@@ -173,7 +173,9 @@ export function runChannels(state: MatchState, id: TeamId): void {
       runEffects(state, skill.effects, { caster: u, self: u, targets, skillId: skill.id });
       if (s.magnitude !== undefined) {
         s.magnitude -= 1;
-        if (s.magnitude <= 0) removeStatus(u, "channeling", s.name);
+        // Remove only THIS expiring copy (by identity), not every same-named channel — so the other
+        // copies of a finite multi-copy channel keep ticking until their own turns run out.
+        if (s.magnitude <= 0) u.statuses = u.statuses.filter((x) => x !== s);
       }
     }
   }
@@ -538,8 +540,12 @@ export function performAction(state: MatchState, action: Action): ActionResult {
   // resolveDeclaration, never by this react emit (collectTriggers filters to react-kind).
   emit(state, { type: "skillDeclared", caster: caster.id, skillId: skill.id, tags: skill.tags, targets: decl.finalTargets.map((t) => t.id) });
 
-  // Using a new skill cancels any active channel (unless this skill opts out).
-  if (!skill.doesNotInterrupt) removeStatus(caster, "channeling");
+  // Using a new skill cancels active channels — unless it opts out, or it is another copy of a multi-copy
+  // channel (galazax1 Twin Storms), in which case it preserves its sibling copies and cancels only other channels.
+  if (!skill.doesNotInterrupt) {
+    if ((skill.channelCopies ?? 1) > 1) caster.statuses = caster.statuses.filter((s) => !(s.kind === "channeling" && s.name !== skill.id));
+    else removeStatus(caster, "channeling");
+  }
 
   const affected = runEffects(state, skill.effects, { caster, self: caster, targets: decl.finalTargets, skillId: skill.id, targeting: skill.targeting });
   skill.currentCd = effectiveCooldown(caster, skill);
@@ -550,10 +556,17 @@ export function performAction(state: MatchState, action: Action): ActionResult {
   // instant_cast status for this skill suppresses the channel (it resolved entirely on cast above).
   const instantCast = caster.statuses.some((s) => s.kind === "instant_cast" && s.skillId === skill.id);
   if (isChannel(skill) && !instantCast) {
+    // A multi-copy channel gives each concurrent instance a distinct id, so they occupy separate slots
+    // (galazax1#0, galazax1#1) and each re-runs independently; a single-copy channel keeps instanceId undefined.
+    const copies = skill.channelCopies ?? 1;
+    const instanceId = copies > 1
+      ? `${skill.id}#${caster.statuses.filter((s) => s.kind === "channeling" && s.name === skill.id).length}`
+      : undefined;
     applyStatus(caster, {
       kind: "channeling", name: skill.id,
       magnitude: skill.channelTurns ?? undefined,
       channelTargets: decl.finalTargets.map((t) => t.id),
+      instanceId,
       duration: null, appliedBy: caster.id, appliedTurn: state.turn,
     });
   }
