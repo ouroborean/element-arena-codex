@@ -991,6 +991,21 @@ registerCustom("untargetableByBlindedSkills", (ctx, a) => {
 // deferred, unmodelled presentation concept, so there is nothing mechanical to reveal (faithful no-op).
 registerCustom("revealEnemyInvisibleEffects", () => { /* cosmetic: no hidden-effect system to reveal */ });
 
+// gaia:nomad (gaianomad1 "Sandstorm") — the two "during this time" auras riding the 4-turn Sandstorm window.
+// Aura 1: "Rampart costs [65]" (= 1 generic): a duration-bounded cost_currency_remap moves Rampart's single
+// [earth] specific onto generic (any color pays it), auto-reverting at the window's end. Aura 2: "enemies
+// damaged by Worldfist are Blinded for 1 turn": a self-owned watch over the window on Gaia's damageDealt — the
+// Sandstorm dot ticks carry source=Gaia (tickDots), so they blind too, as does any other Worldfist hit.
+registerCustom("worldfistAuras", (ctx, a) => {
+  const turns = num(a.turns, 4);
+  applyStatus(ctx.self, { kind: "cost_currency_remap", skillId: (a.rampartId as string) ?? "gaia4", duration: turns, appliedBy: ctx.self.id, appliedTurn: ctx.state.turn });
+  installWatch(ctx, {
+    on: "damageDealt", source: "Worldfist Blind",
+    when: { and: [{ sameUnit: ["eventSource", "self"] }, { isFaction: "eventTarget", faction: "enemy" }] },
+    effect: [{ op: "applyStatus", to: "eventTarget", status: { kind: "blind", duration: 1 } }],
+  }, turns);
+});
+
 // ── Cluster 12 — shields, watch-afflict, clone & stack mechanics (to exact prose) ─────────────── //
 
 // saya:aurora (Plasma Shield -> all allied Heroes get the shield + 2-turn Affliction immunity).
