@@ -29,6 +29,8 @@ export type StatusKind =
   | "outgoing_damage_mult" // magnitude: multiplier on the DEALER's outgoing damage (e.g. triple)
   | "outgoing_dtype_override" // dtype: forces the holder's outgoing damage to this type (e.g. Piercing)
   | "conditional_bypass" // the holder's damage ignores DR+Shield against targets that satisfy bypassCond
+  | "shield_absorb_cap" // magnitude: max Shield the holder may spend absorbing a single hit (overflow falls through to HP)
+  | "split_incoming" // the holder's single-target hits are split evenly among the holder + opposing-team bearers of mark `name`
   | "damage_becomes_heal" // inverted HP: incoming damage heals the holder instead
   | "heal_becomes_damage" // inverted HP: incoming healing damages the holder instead
   | "dies_at_max" // inverted HP: the holder dies at MAX hp, and does not die at 0

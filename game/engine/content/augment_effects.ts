@@ -184,10 +184,17 @@ registerAugmentCustom("scaleCoilDamage", (unit, a) => {
 // encoded in this engine (the serums already target `single`), so there is nothing to lift.
 registerAugmentCustom("relaxSerumTargeting", () => { /* nothing to relax */ });
 
-// capShieldAbsorbPerHit — DEBT: a per-hit shield-absorb cap is a damage-pipeline modifier the engine
-// doesn't have. Mark the hero with the cap so the intent is recorded/observable.
+// capShieldAbsorbPerHit — "Good Pacing": Keeper's Shield can only absorb up to `max` from a single hit
+// (overflow falls through to HP). A `shield_absorb_cap` status the damage pipeline reads (damage.ts). The
+// status is round-scoped, so a static roundStart trigger re-applies it each battle (and once immediately for
+// the drafted round). (Shields aren't source-tagged, so the cap applies to all of Keeper's shield — see note.)
 registerAugmentCustom("capShieldAbsorbPerHit", (unit, a) => {
-  unit.statuses.push({ kind: "mark", name: `ShieldCap:${num(a.max)}`, duration: null, appliedBy: unit.id, appliedTurn: 0 });
+  const max = num(a.max);
+  applyStatus(unit, { kind: "shield_absorb_cap", magnitude: max, duration: null, appliedBy: unit.id, appliedTurn: 0 });
+  unit.triggers = [...(unit.triggers ?? []), {
+    on: "roundStart", owner: unit.id, source: "Good Pacing", origin: "augment",
+    effect: [{ op: "applyStatus", to: "self", status: { kind: "shield_absorb_cap", magnitude: max, duration: null } }],
+  }];
 });
 
 // channelCopies — DEBT: the engine keys one `channeling` status per skill id, so two concurrent
@@ -196,8 +203,14 @@ registerAugmentCustom("channelCopies", (unit, a) => {
   unit.statuses.push({ kind: "mark", name: `ChannelCopies:${a.skillId}:${num(a.maxCopies, 2)}`, duration: null, appliedBy: unit.id, appliedTurn: 0 });
 });
 
-// splitIncomingSingleTargetDamageAcrossCinders — DEBT: redistributing incoming damage needs a
-// pre-mitigation pipeline hook that doesn't exist. Mark the intent.
+// splitIncomingSingleTargetDamageAcrossCinders — "Blackened Soul": Jarrik splits all single-target damage
+// received between him and any active Cinders (marks on his enemies). A `split_incoming` status the damage op
+// reads to divide a single-target hit evenly across Jarrik + the opposing-team bearers of the "Cinders" mark.
+// Round-scoped, so a static roundStart trigger re-applies it each battle (and once immediately for the draft).
 registerAugmentCustom("splitIncomingSingleTargetDamageAcrossCinders", (unit) => {
-  unit.statuses.push({ kind: "mark", name: "SplitDamageAcrossCinders", duration: null, appliedBy: unit.id, appliedTurn: 0 });
+  applyStatus(unit, { kind: "split_incoming", name: "Cinders", duration: null, appliedBy: unit.id, appliedTurn: 0 });
+  unit.triggers = [...(unit.triggers ?? []), {
+    on: "roundStart", owner: unit.id, source: "Blackened Soul", origin: "augment",
+    effect: [{ op: "applyStatus", to: "self", status: { kind: "split_incoming", name: "Cinders", duration: null } }],
+  }];
 });

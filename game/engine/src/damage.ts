@@ -114,6 +114,13 @@ export function incomingDamageMod(u: Unit): number {
   return sumMagnitude(u, "incoming_damage_mod");
 }
 
+/** Per-hit cap on how much Shield the unit may spend absorbing one hit (Infinity = uncapped; most restrictive wins). */
+export function shieldAbsorbCap(u: Unit): number {
+  let m = Infinity;
+  for (const s of u.statuses) if (s.kind === "shield_absorb_cap") m = Math.min(m, s.magnitude ?? Infinity);
+  return m;
+}
+
 /**
  * Net attacker-side outgoing modifier; +N means the DEALER deals N more. Applies only
  * to normal/piercing (Affliction is "commonly not affected by damage-boosting effects";
@@ -214,15 +221,18 @@ export function applyDamage(target: Unit, dmg: DamageInstance): DamageResult {
   // 3. Damage Reduction (suppressed by Shatter/Bypass; bypassed by Piercing/Affliction/True).
   if (!cap.dr && !shattered && !dmg.bypass) amount = Math.max(0, amount - damageReduction(target));
 
-  // 4. Shields (suppressed by Shatter/Bypass; bypassed by Affliction/True). Absorb in order.
+  // 4. Shields (suppressed by Shatter/Bypass; bypassed by Affliction/True). Absorb in order,
+  //    up to the per-hit shield-absorb cap (shield_absorb_cap) — overflow above the cap falls through to HP.
   const shieldBefore = totalShield(target);
   let shieldAbsorbed = 0;
   if (!cap.shield && !shattered && !dmg.bypass && shieldBefore > 0) {
+    let absorbable = Math.min(amount, shieldAbsorbCap(target));
     for (const sh of target.shields) {
-      if (amount <= 0) break;
-      const take = Math.min(sh.amount, amount);
+      if (absorbable <= 0) break;
+      const take = Math.min(sh.amount, absorbable);
       sh.amount -= take;
       amount -= take;
+      absorbable -= take;
       shieldAbsorbed += take;
     }
     target.shields = target.shields.filter((sh) => sh.amount > 0);
