@@ -11690,6 +11690,7 @@
    "skills": [
     {
      "id": "aramao1",
+     "doesNotBreakVeil": true,
      "name": "Desert Knife",
      "element": "nomad",
      "targeting": "single",
@@ -11703,7 +11704,7 @@
       "specific": 0
      },
      "cooldown": 0,
-     "note": "Deals 10 Piercing to target. If the target enemy is NOT directly across from Aramao, he swaps positions with the ally that IS across from that enemy (the teammate occupying the target's slot), leaving Aramao across from the target. 'Using this skill does not break Veiled' is a Veiled-interaction ruling; the engine does not currently auto-break Veiled on harmful use, so it is a no-op note here.",
+     "note": "Deals 10 Piercing to target. If the target enemy is NOT directly across from Aramao, he swaps positions with the ally that IS across from that enemy (the teammate occupying the target's slot), leaving Aramao across from the target. 'Using this skill does not break Veiled' is doesNotBreakVeil:true: performAction now removes a caster's Veiled on Harmful skill use, and this opt-out exempts Desert Knife.",
      "effects": [
       {
        "op": "damage",
@@ -11734,6 +11735,7 @@
     },
     {
      "id": "aramao2",
+     "doesNotBreakVeil": true,
      "name": "Sand Quake",
      "element": "nomad",
      "targeting": "all-enemies",
@@ -11747,7 +11749,7 @@
       "specific": 0
      },
      "cooldown": 2,
-     "note": "Deals 10 Piercing to all enemies and extends every Veiled effect on the field by 2 turns. 'does not break Veiled' -> ruling note (no engine auto-break). Frozen targeting_type was 'all'; recorded as 'all-enemies' since the damage is enemies-only and the Veil-extension uses an explicit selector.",
+     "note": "Deals 10 Piercing to all enemies and extends every Veiled effect on the field by 2 turns. 'does not break Veiled' is doesNotBreakVeil:true (performAction breaks Veiled on Harmful use; this exempts it). Frozen targeting_type was 'all'; recorded as 'all-enemies' since the damage is enemies-only and the Veil-extension uses an explicit selector.",
      "effects": [
       {
        "op": "damage",

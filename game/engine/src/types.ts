@@ -51,7 +51,7 @@ export type StatusKind =
   | "silence" // suppresses Elemental Essence income
   | "paralysis" // cooldowns do not advance
   | "stealth" // does not trigger enemy effects
-  | "veiled" // details hidden until a harmful skill is used
+  | "veiled" // concealed until the veiled unit uses a Harmful skill (removed then, unless doesNotBreakVeil); the concealment itself is server-side redaction
   | "taunt" // forced to target a specific unit
   | "blind" // single-target skills retarget at random
   | "stun" // cannot use skills (optionally tag-scoped)
