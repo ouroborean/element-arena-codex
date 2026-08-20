@@ -306,6 +306,11 @@ export function evalCondition(c: Condition, ctx: Ctx): boolean {
     const e = ctx.event;
     return !!e && e.type === "skillRedirected" && e.to === ctx.self.id;
   }
+  if ("eventHidden" in c) {
+    // (skillUsed/skillDeclared) whether the used skill is Invisible (isHidden). Absent flag = visible.
+    const e = ctx.event;
+    return !!e && "hidden" in e && !!(e as { hidden?: boolean }).hidden === c.eventHidden;
+  }
   if ("and" in c) return c.and.every((x) => evalCondition(x, ctx));
   if ("or" in c) return c.or.some((x) => evalCondition(x, ctx));
   if ("not" in c) return !evalCondition(c.not, ctx);
@@ -766,7 +771,7 @@ export function resolveDeclaration(state: MatchState, caster: Unit, skill: Skill
     // A "replace" trigger (The Whimsy Engine) substitutes the declared skill entirely. Checked BEFORE
     // Uncounterable, because a replacement is not a counter/reflect and applies even to uncounterable skills.
     {
-      const event: GameEvent = { type: "skillDeclared", caster: caster.id, skillId: skill.id, tags: skill.tags, targets: current.map((t) => t.id) };
+      const event: GameEvent = { type: "skillDeclared", caster: caster.id, skillId: skill.id, tags: skill.tags, targets: current.map((t) => t.id), hidden: skill.isHidden };
       const rep = findReplace(state, rng, bus, event);
       if (rep) {
         const tctx: Ctx = { state, rng, caster: rep.owner, self: rep.owner, targets: [], it: null, vars: {}, skillId: rep.trig.sourceSkillId ?? ownerPassiveId(rep.owner), event, emit: bus.emit };
@@ -784,7 +789,7 @@ export function resolveDeclaration(state: MatchState, caster: Unit, skill: Skill
       return { cancelled: false, finalTargets: current };
     }
     for (let bounce = 0; bounce < MAX_TRIGGER_DEPTH; bounce++) {
-      const event: GameEvent = { type: "skillDeclared", caster: caster.id, skillId: skill.id, tags: skill.tags, targets: current.map((t) => t.id) };
+      const event: GameEvent = { type: "skillDeclared", caster: caster.id, skillId: skill.id, tags: skill.tags, targets: current.map((t) => t.id), hidden: skill.isHidden };
       const hit = findInterrupt(state, rng, bus, event);
       if (!hit) return { cancelled: false, finalTargets: current };
       const { owner, trig } = hit;

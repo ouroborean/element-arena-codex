@@ -23,11 +23,12 @@ OUT = os.path.join(HERE, "..", "engine", "content", "roster.generated.ts")
 
 
 # Authoring-only / deferred-cosmetic keys that are not valid engine fields.
-COSMETIC_KEYS = {"note", "invisible", "isHidden", "hidden", "hidden_targets"}
+COSMETIC_KEYS = {"note", "invisible", "hidden", "hidden_targets"}  # isHidden is now a real per-skill flag (kept)
 
 
 def strip_notes(obj):
-    """Recursively drop authoring-only / cosmetic keys (documentation, the deferred isHidden flag)."""
+    """Recursively drop authoring-only / cosmetic keys (documentation notes, status-level `invisible`
+    redaction flags, frozen `hidden`/`hidden_targets` leakage). The per-skill `isHidden` flag is REAL and kept."""
     if isinstance(obj, dict):
         return {k: strip_notes(v) for k, v in obj.items() if k not in COSMETIC_KEYS}
     if isinstance(obj, list):
@@ -36,7 +37,7 @@ def strip_notes(obj):
 
 
 SKILL_FIELDS = {"id", "name", "element", "targeting", "targetKind", "effects", "cost", "cooldown",
-                "klass", "tags", "channelTurns", "doesNotInterrupt", "requires", "uncounterableIf", "costMods"}
+                "klass", "tags", "channelTurns", "doesNotInterrupt", "requires", "uncounterableIf", "costMods", "isHidden"}
 
 
 def clean_skill(s):

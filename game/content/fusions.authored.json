@@ -478,6 +478,7 @@
    ],
    "skill": {
     "id": "andomagnet1",
+    "isHidden": true,
     "name": "Opposites Attract",
     "element": "magnet",
     "klass": "fusion",
@@ -8700,6 +8701,7 @@
    ],
    "skill": {
     "id": "lariamirror1",
+    "isHidden": true,
     "name": "Shadow Rebound",
     "element": "mirror",
     "targeting": "single",
@@ -10751,6 +10753,7 @@
    ],
    "skill": {
     "id": "pyrrhabrimstone1",
+    "isHidden": true,
     "name": "Sulphur Vent",
     "element": "brimstone",
     "targeting": "self",
@@ -14011,6 +14014,7 @@
    ],
    "skill": {
     "id": "sayamagnet1",
+    "isHidden": true,
     "name": "Personal Magnetism",
     "element": "magnet",
     "klass": "fusion",
@@ -15472,6 +15476,7 @@
    ],
    "skill": {
     "id": "tarynangel1",
+    "isHidden": true,
     "name": "Hand of Michael",
     "element": "angel",
     "klass": "fusion",
@@ -16106,6 +16111,7 @@
    ],
    "skill": {
     "id": "tarynvengeance1",
+    "isHidden": true,
     "name": "Not Today",
     "element": "vengeance",
     "klass": "fusion",
@@ -16526,6 +16532,7 @@
    ],
    "skill": {
     "id": "titaniaassassin1",
+    "isHidden": true,
     "name": "Drop of Moonglove",
     "element": "assassin",
     "klass": "fusion",

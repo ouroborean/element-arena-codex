@@ -3598,6 +3598,7 @@ export const ROSTER: HeroDef[] = [
    },
    {
     "id": "keeper3",
+    "isHidden": true,
     "name": "Chronicle Deeds",
     "element": "ice",
     "targeting": "single",
@@ -3947,6 +3948,7 @@ export const ROSTER: HeroDef[] = [
    },
    {
     "id": "riverdaughter3",
+    "isHidden": true,
     "name": "River Clone",
     "element": "water",
     "targeting": "single",
@@ -4452,6 +4454,7 @@ export const ROSTER: HeroDef[] = [
    },
    {
     "id": "zevkir4",
+    "isHidden": true,
     "name": "Repulse",
     "element": "water",
     "targeting": "single",
@@ -4855,6 +4858,7 @@ export const ROSTER: HeroDef[] = [
    },
    {
     "id": "saya3",
+    "isHidden": true,
     "name": "Spider Mines",
     "element": "lightning",
     "targeting": "self",
@@ -4930,6 +4934,7 @@ export const ROSTER: HeroDef[] = [
    },
    {
     "id": "saya4",
+    "isHidden": true,
     "name": "Plasma Shield",
     "element": "lightning",
     "targeting": "single",
@@ -6243,6 +6248,7 @@ export const ROSTER: HeroDef[] = [
    },
    {
     "id": "zephyrex4",
+    "isHidden": true,
     "name": "Wind Step",
     "element": "wind",
     "targeting": "self",
@@ -7029,6 +7035,7 @@ export const ROSTER: HeroDef[] = [
    },
    {
     "id": "hector4",
+    "isHidden": true,
     "name": "Protect Me!",
     "element": "poison",
     "targeting": "self",
@@ -9964,6 +9971,7 @@ export const ROSTER: HeroDef[] = [
    },
    {
     "id": "blackknight4",
+    "isHidden": true,
     "name": "Dead or Alive",
     "element": "unholy",
     "targeting": "single",
@@ -11006,6 +11014,7 @@ export const ROSTER: HeroDef[] = [
    },
    {
     "id": "xyris4",
+    "isHidden": true,
     "name": "Somnic Apparition",
     "element": "shadow",
     "targeting": "single",
@@ -11305,6 +11314,7 @@ export const ROSTER: HeroDef[] = [
    },
    {
     "id": "fate5",
+    "isHidden": true,
     "name": "Fox's Cunning",
     "element": "apocalypse",
     "targeting": "all",
@@ -12543,6 +12553,7 @@ export const ROSTER: HeroDef[] = [
    },
    {
     "id": "aramao3",
+    "isHidden": true,
     "name": "Mirage Trap",
     "element": "nomad",
     "targeting": "single",
@@ -12897,7 +12908,7 @@ export const ROSTER: HeroDef[] = [
   "passive": {
    "name": "Eyes of Vengeance",
    "description": "Enemy Heroes who use non-Invisible Harmful skills on Sera or her allies gain a stack of Eyes of Vengeance.",
-   "pending": "Modeled as an on-skillUsed trigger. 'On Sera or her allies' = a declared target on Sera's team (isFaction ally on eventTargets). 'non-Invisible': the engine already suppresses triggers from stealthed (invisible) actors; there is no per-skill 'Invisible' flag in the frozen tag set, so that filter is only partially expressible. sera4 (Scan) extends the same passive to enemy Strategic skills for 1 turn via the 'Scan of the All-Knowing' mark, which this trigger's condition ORs in."
+   "pending": "Modeled as an on-skillUsed trigger. 'On Sera or her allies' = a declared target on Sera's team (isFaction ally on eventTargets). 'non-Invisible' is a real filter now: {not:{eventHidden:true}} reads the used skill's isHidden flag (the skillUsed event carries hidden), so the passive does not fire off the 20 inherently-Invisible skills. sera4 (Scan) extends the same passive to enemy Strategic skills for 1 turn via the 'Scan of the All-Knowing' mark, which this trigger's condition ORs in."
   },
   "skills": [
    {
@@ -13079,6 +13090,7 @@ export const ROSTER: HeroDef[] = [
    },
    {
     "id": "sera3",
+    "isHidden": true,
     "name": "Heavenly Parry",
     "element": "vengeance",
     "targeting": "single",
@@ -13130,6 +13142,7 @@ export const ROSTER: HeroDef[] = [
    },
    {
     "id": "sera4",
+    "isHidden": true,
     "name": "Scan of the All-Knowing",
     "element": "vengeance",
     "targeting": "single",
@@ -13246,6 +13259,11 @@ export const ROSTER: HeroDef[] = [
       {
        "isFaction": "eventTargets",
        "faction": "ally"
+      },
+      {
+       "not": {
+        "eventHidden": true
+       }
       },
       {
        "or": [

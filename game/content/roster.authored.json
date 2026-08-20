@@ -1379,6 +1379,7 @@
     },
     {
      "id": "keeper3",
+     "isHidden": true,
      "name": "Chronicle Deeds",
      "element": "ice",
      "targeting": "single",
@@ -1762,6 +1763,7 @@
     },
     {
      "id": "riverdaughter3",
+     "isHidden": true,
      "name": "River Clone",
      "element": "water",
      "targeting": "single",
@@ -2380,6 +2382,7 @@
     },
     {
      "id": "zevkir4",
+     "isHidden": true,
      "name": "Repulse",
      "element": "water",
      "targeting": "single",
@@ -2886,6 +2889,7 @@
     },
     {
      "id": "saya3",
+     "isHidden": true,
      "name": "Spider Mines",
      "element": "lightning",
      "targeting": "self",
@@ -2961,6 +2965,7 @@
     },
     {
      "id": "saya4",
+     "isHidden": true,
      "name": "Plasma Shield",
      "element": "lightning",
      "targeting": "single",
@@ -4131,6 +4136,7 @@
     },
     {
      "id": "zephyrex4",
+     "isHidden": true,
      "name": "Wind Step",
      "element": "wind",
      "targeting": "self",
@@ -5389,6 +5395,7 @@
     },
     {
      "id": "hector4",
+     "isHidden": true,
      "name": "Protect Me!",
      "element": "poison",
      "targeting": "self",
@@ -8902,6 +8909,7 @@
     },
     {
      "id": "blackknight4",
+     "isHidden": true,
      "name": "Dead or Alive",
      "element": "unholy",
      "targeting": "single",
@@ -10137,6 +10145,7 @@
     },
     {
      "id": "xyris4",
+     "isHidden": true,
      "name": "Somnic Apparition",
      "element": "shadow",
      "targeting": "single",
@@ -10796,6 +10805,7 @@
     },
     {
      "id": "fate5",
+     "isHidden": true,
      "name": "Fox's Cunning",
      "element": "apocalypse",
      "targeting": "all",
@@ -11763,6 +11773,7 @@
     },
     {
      "id": "aramao3",
+     "isHidden": true,
      "name": "Mirage Trap",
      "element": "nomad",
      "targeting": "single",
@@ -11979,7 +11990,7 @@
    "passive": {
     "name": "Eyes of Vengeance",
     "description": "Enemy Heroes who use non-Invisible Harmful skills on Sera or her allies gain a stack of Eyes of Vengeance.",
-    "note": "Modeled as an on-skillUsed trigger. 'On Sera or her allies' = a declared target on Sera's team (isFaction ally on eventTargets). 'non-Invisible': the engine already suppresses triggers from stealthed (invisible) actors; there is no per-skill 'Invisible' flag in the frozen tag set, so that filter is only partially expressible. sera4 (Scan) extends the same passive to enemy Strategic skills for 1 turn via the 'Scan of the All-Knowing' mark, which this trigger's condition ORs in."
+    "note": "Modeled as an on-skillUsed trigger. 'On Sera or her allies' = a declared target on Sera's team (isFaction ally on eventTargets). 'non-Invisible' is a real filter now: {not:{eventHidden:true}} reads the used skill's isHidden flag (the skillUsed event carries hidden), so the passive does not fire off the 20 inherently-Invisible skills. sera4 (Scan) extends the same passive to enemy Strategic skills for 1 turn via the 'Scan of the All-Knowing' mark, which this trigger's condition ORs in."
    },
    "triggers": [
     {
@@ -11998,6 +12009,11 @@
        {
         "isFaction": "eventTargets",
         "faction": "ally"
+       },
+       {
+        "not": {
+         "eventHidden": true
+        }
        },
        {
         "or": [
@@ -12252,6 +12268,7 @@
     },
     {
      "id": "sera3",
+     "isHidden": true,
      "name": "Heavenly Parry",
      "element": "vengeance",
      "targeting": "single",
@@ -12303,6 +12320,7 @@
     },
     {
      "id": "sera4",
+     "isHidden": true,
      "name": "Scan of the All-Knowing",
      "element": "vengeance",
      "targeting": "single",

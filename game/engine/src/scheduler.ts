@@ -549,7 +549,7 @@ export function performAction(state: MatchState, action: Action): ActionResult {
   // so reads here see pre-cast state (e.g. the Stinking Marsh 0-stack penalty reads Call Tides before the
   // skill mutates it). Interrupt-kind (counter/reflect/replace) triggers are dispatched only by
   // resolveDeclaration, never by this react emit (collectTriggers filters to react-kind).
-  emit(state, { type: "skillDeclared", caster: caster.id, skillId: skill.id, tags: skill.tags, targets: decl.finalTargets.map((t) => t.id) });
+  emit(state, { type: "skillDeclared", caster: caster.id, skillId: skill.id, tags: skill.tags, targets: decl.finalTargets.map((t) => t.id), hidden: skill.isHidden });
 
   // Using a new skill cancels active channels — unless it opts out, or it is another copy of a multi-copy
   // channel (galazax1 Twin Storms), in which case it preserves its sibling copies and cancels only other channels.
@@ -583,7 +583,7 @@ export function performAction(state: MatchState, action: Action): ActionResult {
   }
 
   state.log.push(`${caster.name} used ${skill.name}`);
-  emit(state, { type: "skillUsed", caster: caster.id, skillId: skill.id, targets: decl.finalTargets.map((t) => t.id), tags: skill.tags, affected });
+  emit(state, { type: "skillUsed", caster: caster.id, skillId: skill.id, targets: decl.finalTargets.map((t) => t.id), tags: skill.tags, affected, hidden: skill.isHidden });
   removeDeadMinions(state);
   return { ok: true };
 }

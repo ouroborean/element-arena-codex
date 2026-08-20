@@ -77,6 +77,7 @@ export type Condition =
   | { eventStatusKind: string; name?: string } // (statusApplied/statusExpired) the event's status kind (+name) matches
   | { eventTeamIsSelf: true } // (turnStart/turnEnd) the event's team is the trigger owner's team ("my team's turn")
   | { eventRedirectedToSelf: true } // (skillRedirected) the reflected skill was redirected ONTO the trigger owner (reads `to`)
+  | { eventHidden: boolean } // (skillUsed/skillDeclared) whether the used skill is Invisible (isHidden) — Sera's "non-Invisible" filter
   | { and: Condition[] }
   | { or: Condition[] }
   | { not: Condition }
@@ -136,6 +137,10 @@ export interface SkillDef {
   /** How the primary target(s) are chosen when cast. */
   targeting: "single" | "self" | "all-enemies" | "all-allies" | "all" | "none";
   effects: Effect[];
+  /** "This effect is Invisible": the skill is hidden from the opponent. The mechanical consumers are the
+   *  eventHidden Condition (Sera's non-Invisible filter, Keeper's invisible-skill reader); the concealment
+   *  itself is a redaction concern (server-side, out of scope here). */
+  isHidden?: boolean;
 }
 
 // Node addressing (findNode / replaceNode / mapNode) lives in ./patch.ts — the single walker

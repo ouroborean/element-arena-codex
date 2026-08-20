@@ -1719,7 +1719,7 @@ registerCustom("whimsyReplace", (ctx) => {
   runInContext(chosen.effects, { ...actorCtx, targets });
   // The substitution IS a real skill use — surface it as skillUsed (NOT skillDeclared, to keep the
   // no-declaration-recursion guarantee) so other skillUsed reactions observe it.
-  ctx.emit({ type: "skillUsed", caster: actor.id, skillId: chosen.id, targets: targets.map((t) => t.id), tags: chosen.tags, affected: [...affected] });
+  ctx.emit({ type: "skillUsed", caster: actor.id, skillId: chosen.id, targets: targets.map((t) => t.id), tags: chosen.tags, affected: [...affected], hidden: chosen.isHidden });
 });
 
 // saya:ion (Ion Coils): "Saya Coils can no longer be Enhanced and gain a maximum stack of 2, but are
