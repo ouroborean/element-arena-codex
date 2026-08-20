@@ -1694,6 +1694,15 @@ export const FUSIONS: FusionForm[] = [
       "name": "Prism Sentence",
       "duration": 2
      }
+    },
+    {
+     "op": "applyStatus",
+     "to": "self",
+     "status": {
+      "kind": "reveal",
+      "name": "Illumination",
+      "duration": 2
+     }
     }
    ],
    "currentCd": 0

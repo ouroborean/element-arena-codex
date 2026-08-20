@@ -1673,7 +1673,7 @@
    "passive": {
     "name": "Illumination",
     "description": "While Prism Sentence is active, all invisible skills become visible.",
-    "note": "'Invisible skills become visible' maps to the deferred cosmetic isHidden/'invisible' flag, which has no mechanical effect and no reactive event - there is nothing to transcribe, so no trigger. The 'Prism Sentence' mark applied by the active records the window this passive keys on."
+    "note": "Modeled as True Sight: the active grants Ayana's team a `reveal` status for the same 2-turn window as the Prism Sentence mark, so viewerHasReveal() is true and redactState stops hiding the opponent's Invisible effects from this team — every enemy invisible skill/effect becomes visible to Ayana's player while the window lasts."
    },
    "passiveTriggers": [],
    "skill": {
@@ -1707,6 +1707,15 @@
       "status": {
        "kind": "mark",
        "name": "Prism Sentence",
+       "duration": 2
+      }
+     },
+     {
+      "op": "applyStatus",
+      "to": "self",
+      "status": {
+       "kind": "reveal",
+       "name": "Illumination",
        "duration": 2
       }
      }
