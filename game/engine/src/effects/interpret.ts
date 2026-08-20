@@ -672,6 +672,15 @@ export function evalConditionReadOnly(state: MatchState, caster: Unit, cond: Con
   return evalCondition(cond, ctx); // rng intentionally not written back
 }
 
+/** Evaluate a Value WITHOUT persisting the rng — a read-only cost preview (see evalConditionReadOnly).
+ *  Lets a per-cast cost mod scale live with a stack count (e.g. "1 less per Call Tides stack"). */
+export function evalValueReadOnly(state: MatchState, caster: Unit, value: Value): number {
+  const rng = Rng.fromState(state.rngState);
+  const bus = createBus(state, rng);
+  const ctx: Ctx = { state, rng, caster, self: caster, targets: [], it: null, vars: {}, emit: bus.emit };
+  return evalValue(value, ctx); // rng intentionally not written back
+}
+
 /** Emit a standalone event (scheduler turn/round hooks, DoT deaths). Saves rng state. */
 export function emit(state: MatchState, event: GameEvent): void {
   const rng = Rng.fromState(state.rngState);

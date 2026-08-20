@@ -231,6 +231,14 @@ def v_skill(s, path):
         err(path, "cooldown must be a number")
     if "requires" in s:
         v_condition(s["requires"], path + ".requires")
+    for i, m in enumerate(s.get("costMods", []) or []):
+        mp = f"{path}.costMods[{i}]"
+        if "magnitude" not in m:
+            err(mp, "costMod needs a magnitude")
+        elif not (isinstance(m["magnitude"], (int, float)) and not isinstance(m["magnitude"], bool)):
+            v_value(m["magnitude"], mp + ".magnitude")  # bool excluded: a non-numeric magnitude must be a Value
+        if "when" in m:
+            v_condition(m["when"], mp + ".when")
     v_effects(s.get("effects", []), path + ".effects")
 
 def v_minion(m, path):

@@ -2448,6 +2448,17 @@
       "generic": 0,
       "specific": 5
      },
+     "costMods": [
+      {
+       "magnitude": {
+        "op": "mul",
+        "args": [
+         { "ref": "stackCount", "name": "Call Tides", "of": "self" },
+         -1
+        ]
+       }
+      }
+     ],
      "cooldown": 1,
      "effects": [
       {
@@ -2503,7 +2514,7 @@
        ]
       }
      ],
-     "note": "45 piercing to target. The specific [water] cost is reduced by 1 per Call Tides stack (min 0); the {generic:0,specific:5} shown is the 0-stack cost. Dynamic cost cannot be expressed in the effects tree, so it is documented here. Oceans Gather: >=2 stacks stun primary 1 turn; >=3 stacks hit all enemies. Stacks consumed after use."
+     "note": "45 piercing to target. The specific [water] cost is reduced by 1 per Call Tides stack (min 0): a costMods entry of -stackCount('Call Tides') on generic, which spills onto the specific-5 base (floored at 0) since generic is 0. The {generic:0,specific:5} shown is the 0-stack cost. Oceans Gather: >=2 stacks stun primary 1 turn; >=3 stacks hit all enemies. Stacks consumed after use."
     }
    ]
   },

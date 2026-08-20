@@ -4520,6 +4520,21 @@ export const ROSTER: HeroDef[] = [
      "generic": 0,
      "specific": 5
     },
+    "costMods": [
+     {
+      "magnitude": {
+       "op": "mul",
+       "args": [
+        {
+         "ref": "stackCount",
+         "name": "Call Tides",
+         "of": "self"
+        },
+        -1
+       ]
+      }
+     }
+    ],
     "cooldown": 1,
     "effects": [
      {
