@@ -13,6 +13,7 @@ import type { Ctx } from "../src/effects/interpret.ts";
 import { applyStatus, removeStatus, rawStackCount, stackCount } from "../src/status.ts";
 import { applyDamage, applyHeal, addShield, totalShield } from "../src/damage.ts";
 import { legalTargets } from "../src/scheduler.ts";
+import { skillIsInvisible } from "../src/visibility.ts";
 import type { Effect, Selector } from "../src/effects/ast.ts";
 import type { TriggeredEffect } from "../src/events.ts";
 import type { SkillInstance } from "../src/skill.ts";
@@ -1733,7 +1734,7 @@ registerCustom("whimsyReplace", (ctx) => {
   runInContext(chosen.effects, { ...actorCtx, targets });
   // The substitution IS a real skill use — surface it as skillUsed (NOT skillDeclared, to keep the
   // no-declaration-recursion guarantee) so other skillUsed reactions observe it.
-  ctx.emit({ type: "skillUsed", caster: actor.id, skillId: chosen.id, targets: targets.map((t) => t.id), tags: chosen.tags, affected: [...affected], hidden: chosen.isHidden });
+  ctx.emit({ type: "skillUsed", caster: actor.id, skillId: chosen.id, targets: targets.map((t) => t.id), tags: chosen.tags, affected: [...affected], hidden: skillIsInvisible(actor, chosen) });
 });
 
 // saya:ion (Ion Coils): "Saya Coils can no longer be Enhanced and gain a maximum stack of 2, but are

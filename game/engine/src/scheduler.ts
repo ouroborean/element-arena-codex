@@ -20,6 +20,7 @@ import { emit, evalConditionReadOnly, evalSkillCondition, evalValueReadOnly, res
 import { applyDamage, applyHeal, outgoingDtypeOverride, tickShieldsForTeam } from "./damage.ts";
 import { Rng } from "./rng.ts";
 import { applyStatus, clearRoundStatuses, removeStatus, tickDurationsForTeam } from "./status.ts";
+import { isConcealed } from "./visibility.ts";
 
 /** Provisional base income (ENERGY_INCOME, ruling open): +1 generic per living hero. */
 const GENERIC_PER_LIVING_HERO = 1;
@@ -517,6 +518,11 @@ export function performAction(state: MatchState, action: Action): ActionResult {
   if (isStunnedFor(caster, skill)) return { ok: false, reason: "stunned" };
   if (skill.requires && !evalSkillCondition(state, caster, skill.requires)) return { ok: false, reason: "requirements-not-met" };
 
+  // Was the caster concealed at cast time? Captured BEFORE the veil-break below (a Harmful cast strips a
+  // caster's veiled), so a skill struck from stealth is reported Invisible for its OWN cast even though the
+  // cloak drops afterwards. Feeds the `hidden` flag on this cast's events + the log-telegraph suppression.
+  const invisibleCast = skill.isHidden || isConcealed(caster);
+
   // Targeting legality (before paying cost — an illegal action can't be declared).
   const rng = Rng.fromState(state.rngState);
   const targets = legalTargets(state, caster, skill, resolveTargets(state, caster, skill, action.targets), rng);
@@ -549,7 +555,7 @@ export function performAction(state: MatchState, action: Action): ActionResult {
   // so reads here see pre-cast state (e.g. the Stinking Marsh 0-stack penalty reads Call Tides before the
   // skill mutates it). Interrupt-kind (counter/reflect/replace) triggers are dispatched only by
   // resolveDeclaration, never by this react emit (collectTriggers filters to react-kind).
-  emit(state, { type: "skillDeclared", caster: caster.id, skillId: skill.id, tags: skill.tags, targets: decl.finalTargets.map((t) => t.id), hidden: skill.isHidden });
+  emit(state, { type: "skillDeclared", caster: caster.id, skillId: skill.id, tags: skill.tags, targets: decl.finalTargets.map((t) => t.id), hidden: invisibleCast });
 
   // Using a new skill cancels active channels — unless it opts out, or it is another copy of a multi-copy
   // channel (galazax1 Twin Storms), in which case it preserves its sibling copies and cancels only other channels.
@@ -587,9 +593,9 @@ export function performAction(state: MatchState, action: Action): ActionResult {
   // opts out (aramao1/aramao2 "does not break Veiled"). Concealment while veiled is a separate redaction concern.
   if (skill.tags.includes("Harmful") && !skill.doesNotBreakVeil) removeStatus(caster, "veiled");
 
-  // An Invisible skill leaves no telegraph in the shared log (the opponent must not learn it was used).
-  if (!skill.isHidden) state.log.push(`${caster.name} used ${skill.name}`);
-  emit(state, { type: "skillUsed", caster: caster.id, skillId: skill.id, targets: decl.finalTargets.map((t) => t.id), tags: skill.tags, affected, hidden: skill.isHidden });
+  // An Invisible skill (inherently, or cast from a cloak) leaves no telegraph in the shared log.
+  if (!invisibleCast) state.log.push(`${caster.name} used ${skill.name}`);
+  emit(state, { type: "skillUsed", caster: caster.id, skillId: skill.id, targets: decl.finalTargets.map((t) => t.id), tags: skill.tags, affected, hidden: invisibleCast });
   removeDeadMinions(state);
   return { ok: true };
 }

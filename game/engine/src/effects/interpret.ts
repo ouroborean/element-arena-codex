@@ -15,6 +15,7 @@ import type { GameEvent, TriggeredEffect } from "../events.ts";
 import { MAX_TRIGGER_DEPTH } from "../events.ts";
 import type { SkillInstance } from "../skill.ts";
 import { getMinionTemplate } from "../minions.ts";
+import { skillIsInvisible } from "../visibility.ts";
 import type { Condition, Effect, Selector, StatusMatch, StatusSpec, Value } from "./ast.ts";
 
 export interface Ctx {
@@ -795,7 +796,7 @@ export function resolveDeclaration(state: MatchState, caster: Unit, skill: Skill
     // A "replace" trigger (The Whimsy Engine) substitutes the declared skill entirely. Checked BEFORE
     // Uncounterable, because a replacement is not a counter/reflect and applies even to uncounterable skills.
     {
-      const event: GameEvent = { type: "skillDeclared", caster: caster.id, skillId: skill.id, tags: skill.tags, targets: current.map((t) => t.id), hidden: skill.isHidden };
+      const event: GameEvent = { type: "skillDeclared", caster: caster.id, skillId: skill.id, tags: skill.tags, targets: current.map((t) => t.id), hidden: skillIsInvisible(caster, skill) };
       const rep = findReplace(state, rng, bus, event);
       if (rep) {
         const tctx: Ctx = { state, rng, caster: rep.owner, self: rep.owner, targets: [], it: null, vars: {}, skillId: rep.trig.sourceSkillId ?? ownerPassiveId(rep.owner), event, emit: bus.emit };
@@ -813,7 +814,7 @@ export function resolveDeclaration(state: MatchState, caster: Unit, skill: Skill
       return { cancelled: false, finalTargets: current };
     }
     for (let bounce = 0; bounce < MAX_TRIGGER_DEPTH; bounce++) {
-      const event: GameEvent = { type: "skillDeclared", caster: caster.id, skillId: skill.id, tags: skill.tags, targets: current.map((t) => t.id), hidden: skill.isHidden };
+      const event: GameEvent = { type: "skillDeclared", caster: caster.id, skillId: skill.id, tags: skill.tags, targets: current.map((t) => t.id), hidden: skillIsInvisible(caster, skill) };
       const hit = findInterrupt(state, rng, bus, event);
       if (!hit) return { cancelled: false, finalTargets: current };
       const { owner, trig } = hit;
