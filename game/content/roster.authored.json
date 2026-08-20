@@ -9265,13 +9265,15 @@
        "status": {
         "kind": "mark",
         "name": "Grasping Vines",
-        "duration": 2
+        "duration": 2,
+        "invisible": true
        }
       },
       {
        "op": "schedule",
        "delayTurns": 1,
        "to": "target",
+       "invisible": true,
        "effect": [
         {
          "op": "if",
@@ -9298,7 +9300,7 @@
        ]
       }
      ],
-     "note": "Prepares on target (target invisible to enemy = hidden_targets metadata). Next turn deals 15, guarded by the still-present 'Grasping Vines' mark. Stun-on-skill-use rider and cancel-if-Maggie-stunned live in Maggie's hero triggers, both gated by this mark. Damage is mark-guarded so cancellation (mark removal) also suppresses the delayed hit."
+     "note": "Prepares on target. 'target invisible to enemy' is real: the Grasping Vines mark and its queued strike are both invisible:true, so redactState hides them from the enemy — they cannot see which of their units is prepared until the delayed hit lands. Next turn deals 15, guarded by the still-present 'Grasping Vines' mark. Stun-on-skill-use rider and cancel-if-Maggie-stunned live in Maggie's hero triggers, both gated by this mark. Damage is mark-guarded so cancellation (mark removal) also suppresses the delayed hit."
     },
     {
      "id": "maggie3",

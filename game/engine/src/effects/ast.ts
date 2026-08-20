@@ -134,7 +134,7 @@ export type Effect =
   | { op: "if"; cond: Condition; then: Effect[]; else?: Effect[]; id?: NodeId }
   | { op: "forEach"; each: Selector; do: Effect[]; id?: NodeId }
   | { op: "seq"; steps: Effect[]; id?: NodeId }
-  | { op: "schedule"; delayTurns: number; effect: Effect[]; to?: Selector; id?: NodeId }
+  | { op: "schedule"; delayTurns: number; effect: Effect[]; to?: Selector; invisible?: boolean; id?: NodeId } // invisible:true hides the queued entry from the opponent's wire (a concealed/"hidden-target" preparation)
   | { op: "custom"; fn: string; args?: Record<string, unknown>; id?: NodeId };
 
 /** A skill's authored form: targeting + the effect tree its active use runs. */
