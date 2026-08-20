@@ -8423,13 +8423,19 @@
         {
          "op": "custom",
          "fn": "copyCurseIfNoSkillUsed",
-         "note": "If the holder used no skill during Curse of Darkness's 3 turns, copy Curse of Darkness onto one of the holder's own allies at its current/remaining duration."
+         "note": "Fires only on NATURAL expiry (the holder never acted — otherwise removeMarkOnSkillUse stripped the mark, and removeStatus does not fire onExpire). Copies the full curse onto a random living ally hero of the holder by re-running lariacurse1's effects at full duration ('copy itself')."
         }
        ]
       }
+     },
+     {
+      "op": "custom",
+      "fn": "removeMarkOnSkillUse",
+      "args": { "mark": "Curse of Darkness", "window": 3, "owner": "target" },
+      "note": "Cancel: if the cursed holder uses ANY skill during the 3-turn window, strip the Curse of Darkness MARK via removeStatus (which does NOT fire onExpire), so no copy is made. owner:'target' parks the watch on the HOLDER (not Laria), so acting cancels the copy even if Laria has died and even if the holder is stealthed; its expiry stays anchored to Laria, in lockstep with the mark."
      }
     ],
-    "note": "15 Affliction/turn for 3 turns (dot) plus 1 Deepening Shadows each of those turns (three scheduled stacks). The 'copy to an ally if they never used a skill' clause is carried by the Curse of Darkness mark's onExpire."
+    "note": "15 Affliction/turn for 3 turns (dot) plus 1 Deepening Shadows each of those turns (three scheduled stacks). If the holder never uses a skill during the mark's 3 turns, the mark survives to natural expiry and its onExpire copies the full curse onto a random living ally hero (copyCurseIfNoSkillUsed, re-running these effects so the copy is itself spreadable + cancelable); acting even once strips the mark early (removeMarkOnSkillUse) so no copy fires."
    }
   },
   {

@@ -243,11 +243,39 @@ registerCustom("armSkillUseTrap", (ctx, a) => {
 // the "…unless they use a skill" half of a use-or-be-punished clause (hector:faerie enemy branch).
 registerCustom("removeMarkOnSkillUse", (ctx, a) => {
   const markName = a.mark as string;
+  // `owner` (a selector) parks the watch on that unit instead of the caster — so it survives the caster's
+  // death and isn't stealth-suppressed against the marked unit's own actions. installWatch still anchors the
+  // watch's expiry to ctx.self, so a holder-owned watch stays in lockstep with a caster-anchored mark.
+  const owner = a.owner ? resolveSelector(a.owner as Selector, ctx)[0] : undefined;
   installWatch(ctx, {
     on: "skillUsed", source: `Cancel ${markName}`,
     when: { has: "mark", name: markName, of: "eventSource" },
     effect: [{ op: "removeStatus", kind: "mark", name: markName, from: "eventSource" }],
-  }, num(a.window, 1));
+  }, num(a.window, 1), owner);
+});
+
+// copyCurseIfNoSkillUsed (lariacurse1 "Curse of Darkness" onExpire) — fires ONLY on the mark's natural
+// expiry, i.e. the holder never used a skill during its 3 turns (had they acted, removeMarkOnSkillUse would
+// have stripped the mark, and removeStatus does not fire onExpire). Copy the full curse onto a random living
+// ally hero of the holder. onExpire ctx: caster = the mark's applier (Laria, who carries lariacurse1),
+// targets = [the holder]. Re-running lariacurse1's own effects on the ally is the faithful "copy itself" —
+// it re-lays the dot + Deepening Shadows + the mark(onExpire) + the cancel watch, so the copy is itself
+// spreadable and cancelable, at full authored duration.
+registerCustom("copyCurseIfNoSkillUsed", (ctx) => {
+  const holder = ctx.targets[0];
+  if (!holder) return;
+  const allies = ctx.state.teams[holder.team].units
+    .map((id) => ctx.state.units[id])
+    .filter((u): u is Unit => !!u && u.alive && u.kind === "hero" && u.id !== holder.id);
+  if (!allies.length) { ctx.state.log.push("Curse of Darkness expired: no ally to copy onto"); return; }
+  const ally = ctx.rng.shuffle(allies.slice())[0]!;
+  const sk = ctx.caster.skills?.find((s) => s.id === "lariacurse1");
+  if (sk) {
+    runInContext(sk.effects, { ...ctx, self: ctx.caster, targets: [ally], it: null, skillId: sk.id });
+  } else {
+    // Laria's unit somehow lacks the skill — reconstruct the core curse so the copy still bites.
+    applyStatus(ally, { kind: "dot", name: "Curse of Darkness", magnitude: 15, dtype: "affliction", duration: 3, appliedBy: ctx.caster.id, appliedTurn: ctx.state.turn });
+  }
 });
 
 // hector:faerie — for 1 turn, if the watched ally uses a skill they gain Essence.
