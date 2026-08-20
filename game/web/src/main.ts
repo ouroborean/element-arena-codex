@@ -215,7 +215,13 @@ async function boot(): Promise<void> {
 function targetsFor(u: Unit, skillId: string): Set<string> {
   const skill = (u.skills ?? []).find((s) => s.id === skillId)!;
   const enemy: TeamId = u.team === "A" ? "B" : "A";
-  const pool = skill.tags.includes("Harmful") ? living(state, enemy)
+  // Merciless (black knight "evil" fusion): "Oathbreaker Strike may now be used on allied Heroes."
+  // The engine already permits ally-targeting (no faction filter) and scores the +10-on-ally-kill clause;
+  // this is only the client offering those allied heroes (not self, not allied minions) as candidates.
+  const merciless = skillId === "blackknight1" && u.fused === "evil";
+  const pool = merciless
+    ? [...living(state, enemy), ...living(state, u.team).filter((x) => x.kind === "hero" && x.id !== u.id)]
+    : skill.tags.includes("Harmful") ? living(state, enemy)
     : skill.tags.includes("Helpful") ? living(state, u.team)
     : [...living(state, u.team), ...living(state, enemy)];
   return new Set(legalTargets(state, u, skill, pool, Rng.fromState(state.rngState)).map((x) => x.id));
