@@ -10209,13 +10209,15 @@ export const ROSTER: HeroDef[] = [
       "status": {
        "kind": "mark",
        "name": "Grasping Vines",
-       "duration": 2
+       "duration": 2,
+       "invisible": true
       }
      },
      {
       "op": "schedule",
       "delayTurns": 1,
       "to": "target",
+      "invisible": true,
       "effect": [
        {
         "op": "if",
