@@ -23,11 +23,20 @@ export function statusOwnerTeam(state: MatchState, status: Status, bearer: Unit)
   return state.units[status.appliedBy]?.team ?? bearer.team;
 }
 
-/** Is this unit concealed by a team cloak right now? While concealed, the effects it creates and the skills
- *  it uses are Invisible to the enemy. Today the sole cloak is the `veiled` status; a later PR folds in the
- *  Keeper "Endless Night" mark and Laria "Deep, Dark Night" so this stays the one place cloak is defined. */
+/** Is this unit concealed by a cloak right now? While concealed, the effects it creates and the skills it
+ *  uses are Invisible to the enemy. Two cloak kinds, both handled here so this is the one place cloak is
+ *  defined: `veiled` (breaks when the holder acts Harmfully) and `cloak` (a timed, non-breaking window,
+ *  Keeper "Endless Night"). Laria "Deep, Dark Night" uses `veiled`, so it is covered too. */
 export function isConcealed(unit: Unit | undefined): boolean {
-  return !!unit && unit.statuses.some((s) => s.kind === "veiled");
+  return !!unit && unit.statuses.some((s) => s.kind === "veiled" || s.kind === "cloak");
+}
+
+/** Is this SKILL USE Invisible to the opponent? Either the skill is inherently Invisible (isHidden) or its
+ *  caster is currently concealed by a cloak. This is the single predicate behind the `hidden` flag on the
+ *  skillDeclared/skillUsed events — so a reader like Sera ("non-Invisible") or Keeper ("whenever an
+ *  invisible skill is used") reacts to BOTH sources uniformly. */
+export function skillIsInvisible(caster: Unit, skill: { isHidden?: boolean }): boolean {
+  return !!skill.isHidden || isConcealed(caster);
 }
 
 /** Does `viewer`'s team currently see through the opponent's invisibility (a reveal / True Sight)? Wired in a

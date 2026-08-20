@@ -54,6 +54,7 @@ export type StatusKind =
   | "paralysis" // cooldowns do not advance
   | "stealth" // does not trigger enemy effects
   | "veiled" // concealed until the veiled unit uses a Harmful skill (removed then, unless doesNotBreakVeil); the concealment itself is server-side redaction
+  | "cloak" // a timed, NON-breaking concealment window (keeper "Endless Night"): the holder's effects + skill-uses are Invisible to the enemy for its duration, and — unlike veiled — a Harmful action does NOT strip it
   | "taunt" // forced to target a specific unit
   | "blind" // single-target skills retarget at random
   | "stun" // cannot use skills (optionally tag-scoped)
