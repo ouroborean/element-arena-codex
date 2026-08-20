@@ -3711,9 +3711,14 @@
        "dtype": "normal",
        "duration": 4
       }
+     },
+     {
+      "op": "custom",
+      "fn": "worldfistAuras",
+      "args": { "turns": 4, "rampartId": "gaia4" }
      }
     ],
-    "note": "'Deals 5 to the enemy team for 4 turns' = a 4-turn, magnitude-5 dot on each enemy. NOT expressed (documented debt): the two 'during this time' auras -- Rampart costing [65] (a specific->generic currency change, not a flat cost_mod delta) and 'enemies damaged by Worldfist are Blinded for 1 turn' -- require installing temporary triggers from within an active's effect tree, which the DSL has no op for."
+    "note": "'Deals 5 to the enemy team for 4 turns' = a 4-turn, magnitude-5 dot on each enemy. The two 'during this time' auras are installed by worldfistAuras: (1) 'Rampart costs [65]' = a 4-turn cost_currency_remap on gaia4 (moves its single [earth] onto generic, i.e. 1 generic = [65], any color pays; auto-reverts); (2) 'enemies damaged by Worldfist are Blinded 1 turn' = a 4-turn self-owned watch on Gaia's damageDealt vs enemies (the Sandstorm dot ticks carry source=Gaia, so they blind too)."
    }
   },
   {

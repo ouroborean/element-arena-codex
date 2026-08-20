@@ -3680,6 +3680,14 @@ export const FUSIONS: FusionForm[] = [
       "dtype": "normal",
       "duration": 4
      }
+    },
+    {
+     "op": "custom",
+     "fn": "worldfistAuras",
+     "args": {
+      "turns": 4,
+      "rampartId": "gaia4"
+     }
     }
    ],
    "currentCd": 0
