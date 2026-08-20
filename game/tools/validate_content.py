@@ -29,7 +29,7 @@ SELECTOR_STRINGS = {"self", "caster", "target", "summoner", "it", "across", "adj
 STATUS_KINDS = {"damage_reduction", "incoming_damage_mod", "outgoing_damage_mod",
                 "incoming_damage_mult", "outgoing_damage_mult",
                 "outgoing_dtype_override", "conditional_bypass",
-                "shield_absorb_cap", "split_incoming",
+                "shield_absorb_cap", "split_incoming", "skill_damage_bonus", "skill_targeting_override",
                 "damage_becomes_heal", "heal_becomes_damage", "dies_at_max", "shatter",
                 "damage_ignore", "non_damage_ignore", "immortal", "revive_ward", "invulnerable",
                 "isolated", "untargetable", "elemental_essence", "cost_mod", "cost_currency_remap", "silence", "paralysis",

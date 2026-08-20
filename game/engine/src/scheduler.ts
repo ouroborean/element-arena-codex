@@ -398,11 +398,17 @@ function pay(pool: EnergyPool, element: string, cost: SkillInstance["cost"], all
   }
 }
 
+/** A skill's effective targeting, honoring a temporary skill_targeting_override (bannerAffectsAllEnemies). */
+export function effectiveTargeting(caster: Unit, skill: SkillInstance): SkillInstance["targeting"] {
+  const o = caster.statuses.find((s) => s.kind === "skill_targeting_override" && s.skillId === skill.id);
+  return (o?.name as SkillInstance["targeting"] | undefined) ?? skill.targeting;
+}
+
 function resolveTargets(state: MatchState, caster: Unit, skill: SkillInstance, chosen?: string[]): Unit[] {
   // "Twisted Nightmares" (xyris3): while the caster is marked, its all-* skills hit only one.
   const narrowed = caster.statuses.some((s) => s.kind === "mark" && s.name === "Twisted Nightmares");
   const maybeNarrow = (us: Unit[]): Unit[] => (narrowed && us.length > 1 ? us.slice(0, 1) : us);
-  switch (skill.targeting) {
+  switch (effectiveTargeting(caster, skill)) {
     case "self":
       return [caster];
     case "none":
@@ -454,7 +460,7 @@ export function legalTargets(state: MatchState, caster: Unit, skill: SkillInstan
     !(harmful && !bypass && hasStatus(u, "invulnerable")) &&
     !(helpful && !bypass && hasStatus(u, "isolated"));
 
-  if (skill.targeting !== "single") return chosen.filter(isLegal);
+  if (effectiveTargeting(caster, skill) !== "single") return chosen.filter(isLegal);
 
   // Taunt (single-target Harmful): forced onto the taunter.
   if (harmful) {
@@ -484,7 +490,7 @@ export function canUse(state: MatchState, caster: Unit, skill: SkillInstance): b
   if (isStunnedFor(caster, skill)) return false;
   if (skill.requires && !evalSkillCondition(state, caster, skill.requires)) return false;
   const rng = Rng.fromState(state.rngState); // a throwaway clone; we never write it back (read-only)
-  const needsTarget = skill.targeting === "single" && (skill.tags.includes("Harmful") || skill.tags.includes("Helpful"));
+  const needsTarget = effectiveTargeting(caster, skill) === "single" && (skill.tags.includes("Harmful") || skill.tags.includes("Helpful"));
   if (needsTarget) {
     // Probe the proper side's FULL roster (heroes AND minions) so a kind-restricted skill (Feed → minion)
     // finds its target — not resolveTargets' "first living enemy" default, which a targetKind filter rejects.
@@ -510,7 +516,7 @@ export function performAction(state: MatchState, action: Action): ActionResult {
   const rng = Rng.fromState(state.rngState);
   const targets = legalTargets(state, caster, skill, resolveTargets(state, caster, skill, action.targets), rng);
   state.rngState = rng.state;
-  const needsTarget = skill.targeting === "single" && (skill.tags.includes("Harmful") || skill.tags.includes("Helpful"));
+  const needsTarget = effectiveTargeting(caster, skill) === "single" && (skill.tags.includes("Harmful") || skill.tags.includes("Helpful"));
   if (needsTarget && targets.length === 0) return { ok: false, reason: "no-legal-target" };
 
   const pool = team(state, caster.team).energy;
@@ -547,7 +553,7 @@ export function performAction(state: MatchState, action: Action): ActionResult {
     else removeStatus(caster, "channeling");
   }
 
-  const affected = runEffects(state, skill.effects, { caster, self: caster, targets: decl.finalTargets, skillId: skill.id, targeting: skill.targeting });
+  const affected = runEffects(state, skill.effects, { caster, self: caster, targets: decl.finalTargets, skillId: skill.id, targeting: effectiveTargeting(caster, skill) });
   skill.currentCd = effectiveCooldown(caster, skill);
   skill.cdSetTurn = state.turn; // birth turn — advanceCooldowns skips it (see below), so cooldown N blocks N turns
   caster.lastSkillId = skill.id; // the "used a skill" ledger (read by clone/last-skill mechanics)

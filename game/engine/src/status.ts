@@ -20,7 +20,8 @@ function sameSlot(a: Status, b: Status): boolean {
   if (a.kind !== b.kind) return false;
   if (a.kind === "mark" || a.kind === "stack" || a.kind === "dot" || a.kind === "stack_read_mod") return a.name === b.name;
   // A skill-scoped cost/cooldown mod (or instant_cast / currency remap) occupies its own slot per skill.
-  if (a.kind === "cost_mod" || a.kind === "cooldown_mod" || a.kind === "instant_cast" || a.kind === "cost_currency_remap") return a.skillId === b.skillId;
+  if (a.kind === "cost_mod" || a.kind === "cooldown_mod" || a.kind === "instant_cast" || a.kind === "cost_currency_remap"
+    || a.kind === "skill_damage_bonus" || a.kind === "skill_targeting_override") return a.skillId === b.skillId;
   // Concurrent channels of one skill occupy distinct slots by instanceId (undefined = the single-slot default).
   if (a.kind === "channeling") return a.instanceId === b.instanceId;
   return true;
