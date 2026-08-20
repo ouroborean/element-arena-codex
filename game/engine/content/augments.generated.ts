@@ -2112,6 +2112,7 @@ export const AUGMENTS: Augment[] = [
     "skill": {
      "id": "zephyrex4",
      "name": "Wind Step",
+     "isHidden": true,
      "element": "wind",
      "targeting": "single",
      "klass": "defensive",
@@ -2220,6 +2221,13 @@ export const AUGMENTS: Augment[] = [
       }
      }
     ]
+   },
+   {
+    "op": "setSkillMeta",
+    "skillId": "zephyrex2",
+    "meta": {
+     "isHidden": true
+    }
    }
   ]
  },
@@ -6919,7 +6927,8 @@ export const AUGMENTS: Augment[] = [
       "status": {
        "kind": "outgoing_damage_mod",
        "magnitude": -10,
-       "duration": 1
+       "duration": 1,
+       "invisible": true
       }
      }
     ]
