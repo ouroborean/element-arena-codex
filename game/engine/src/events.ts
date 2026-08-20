@@ -61,6 +61,9 @@ export interface TriggeredEffect {
    * static trigger; null = round-permanent (cleared at round start). Ticks at the installer's turn-end; removed at 0.
    */
   duration?: number | null;
+  /** Redaction: this dynamic watch was armed by an Invisible cast (installWatch under ctx.invisible), so
+   *  redactState hides it from the opponent — a newly-armed reflect/trap must not be broadcast by name. */
+  invisible?: boolean;
   appliedBy?: UnitId;
   appliedTurn?: number;
   /**

@@ -16,11 +16,18 @@
  * renderer (which does `for (const s of u.statuses)`) never trips on a missing field.
  */
 import type { MatchState, Status, TeamId, Unit } from "./types.ts";
+import type { TriggeredEffect } from "./events.ts";
 
 /** The team that created a status — the scope of its invisibility. Derived from the applier; if that unit
  *  has left the board, fall back to the bearer's team (an orphaned effect is treated as the bearer's own). */
 export function statusOwnerTeam(state: MatchState, status: Status, bearer: Unit): TeamId {
   return state.units[status.appliedBy]?.team ?? bearer.team;
+}
+
+/** The team that installed a dynamic watch — the scope of ITS invisibility (installWatch stamps
+ *  appliedBy = the installer). Undefined if that unit is gone (then an invisible watch hides from everyone). */
+function installerTeamOf(state: MatchState, t: TriggeredEffect): TeamId | undefined {
+  return t.appliedBy ? state.units[t.appliedBy]?.team : undefined;
 }
 
 /** Is this unit concealed by a cloak right now? While concealed, the effects it creates and the skills it
@@ -87,10 +94,23 @@ export function redactState(state: MatchState, viewer: TeamId): MatchState {
     let out = u;
     const visible = u.statuses.filter((s) => !hiddenFrom(state, s, u, viewer, reveal));
     if (visible.length !== u.statuses.length) out = { ...out, statuses: visible };
+    // A dynamic watch armed by an Invisible cast (a reflect/trap installed via installWatch under an isHidden
+    // skill) is broadcast by name in `triggers` — on whichever unit it sits, incl. an enemy target. Drop it
+    // from anyone who is not on the INSTALLING team (derived from appliedBy), so an armed trap isn't readable.
+    if (!reveal && u.triggers?.some((t) => t.invisible && installerTeamOf(state, t) !== viewer)) {
+      out = { ...out, triggers: u.triggers.filter((t) => !(t.invisible && installerTeamOf(state, t) !== viewer)) };
+    }
     // A viewer with True Sight sees the opponent's Invisible skills whole (incl. their cooldowns).
     if (u.team !== viewer && !reveal) out = redactFoeFingerprints(out);
     if (out !== u) changed = true;
     units[id] = out;
   }
-  return changed ? { ...state, units } : state;
+  // A scheduled effect an Invisible foe cast queued names its skill + carries its pending payload — omit it
+  // from the opponent's wire (kept for the owner, and for a viewer with True Sight).
+  let scheduled = state.scheduled;
+  if (!reveal && state.scheduled.some((e) => e.invisible && state.units[e.caster]?.team !== viewer)) {
+    scheduled = state.scheduled.filter((e) => !(e.invisible && state.units[e.caster]?.team !== viewer));
+    changed = true;
+  }
+  return changed ? { ...state, units, scheduled } : state;
 }
