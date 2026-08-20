@@ -9322,7 +9322,7 @@ export const ROSTER: HeroDef[] = [
   "passive": {
    "name": "Protector of the Song",
    "description": "When Taryn has an ability reflected to him, he gains 10 DR for 1 turn and Elemental Essence.",
-   "pending": "Authored as a react trigger on skillRedirected granting self 10 damage_reduction (1 turn) + elemental_essence. Ideal gate is 'redirect destination == Taryn', but the engine's skillRedirected event exposes `to` yet no selector/condition reads the redirect DESTINATION (only eventSource=original caster). All of Taryn's own reflects (Banner of Harmony, Stalwart Shield) redirect to Taryn, so this fires correctly for them; the `not sameUnit(eventSource,self)` guard suppresses the case where Taryn's OWN skill is reflected away from him. Residual over-trigger only on a foreign reflect that redirects to a non-Taryn unit while Taryn is on the field — accepted pending a redirect-destination selector (cf. ENGINE_GAPS 'make reflect observable'). Zero custom used."
+   "pending": "Authored as a react trigger on skillRedirected granting self 10 damage_reduction (1 turn) + elemental_essence, gated on eventRedirectedToSelf (the reflect destination == Taryn). This is exactly \"an ability reflected TO HIM\": it fires iff the skill is redirected onto Taryn (including his own skill reflected back onto him) and never on a foreign reflect that redirects to a non-Taryn unit. Zero custom used."
   },
   "skills": [
    {
@@ -9559,12 +9559,7 @@ export const ROSTER: HeroDef[] = [
     "on": "skillRedirected",
     "source": "Protector of the Song",
     "when": {
-     "not": {
-      "sameUnit": [
-       "eventSource",
-       "self"
-      ]
-     }
+     "eventRedirectedToSelf": true
     },
     "effect": [
      {

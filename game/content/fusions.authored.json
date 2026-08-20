@@ -15708,12 +15708,7 @@
      "on": "skillRedirected",
      "source": "Divine Hymn",
      "when": {
-      "not": {
-       "sameUnit": [
-        "eventSource",
-        "self"
-       ]
-      }
+      "eventRedirectedToSelf": true
      },
      "effect": [
       {
@@ -15746,7 +15741,7 @@
        }
       }
      ],
-     "note": "Re-authors Protector of the Song: when an ability is reflected to Taryn, 10 DR now lasts 2 turns and also covers both allied heroes; Essence still to Taryn only (prose changes the DR, not the Essence). Same skillRedirected gating limitation as the base passive — no selector reads the redirect DESTINATION, but all of Taryn's own reflects redirect to him; the not-sameUnit guard suppresses the case where his own skill is reflected away."
+     "note": "Re-authors Protector of the Song: when an ability is reflected to Taryn, 10 DR now lasts 2 turns and also covers both allied heroes; Essence still to Taryn only (prose changes the DR, not the Essence). Gated on eventRedirectedToSelf (the reflect destination == Taryn), exactly like the base passive: fires iff the skill is redirected onto Taryn."
     }
    ],
    "skill": {
@@ -16281,12 +16276,7 @@
      "on": "skillRedirected",
      "source": "Flag of Inquisition",
      "when": {
-      "not": {
-       "sameUnit": [
-        "eventSource",
-        "self"
-       ]
-      }
+      "eventRedirectedToSelf": true
      },
      "effect": [
       {
@@ -16307,7 +16297,7 @@
        }
       }
      ],
-     "note": "Re-authors Protector of the Song: on an ability reflected to Taryn, gain +10 outgoing damage until the end of his next turn (stacks — each reflect adds another instance, matching Ando's God of Thunder pattern) instead of DR; Essence retained (prose changes only the DR). Same skillRedirected gating limitation as the base passive."
+     "note": "Re-authors Protector of the Song: on an ability reflected to Taryn, gain +10 outgoing damage until the end of his next turn (stacks — each reflect adds another instance, matching Ando's God of Thunder pattern) instead of DR; Essence retained (prose changes only the DR). Gated on eventRedirectedToSelf (the reflect destination == Taryn), exactly like the base passive."
     }
    ],
    "skill": {

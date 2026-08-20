@@ -15422,12 +15422,7 @@ export const FUSIONS: FusionForm[] = [
     "on": "skillRedirected",
     "source": "Divine Hymn",
     "when": {
-     "not": {
-      "sameUnit": [
-       "eventSource",
-       "self"
-      ]
-     }
+     "eventRedirectedToSelf": true
     },
     "effect": [
      {
@@ -15980,12 +15975,7 @@ export const FUSIONS: FusionForm[] = [
     "on": "skillRedirected",
     "source": "Flag of Inquisition",
     "when": {
-     "not": {
-      "sameUnit": [
-       "eventSource",
-       "self"
-      ]
-     }
+     "eventRedirectedToSelf": true
     },
     "effect": [
      {
