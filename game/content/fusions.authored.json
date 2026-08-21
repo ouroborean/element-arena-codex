@@ -12054,7 +12054,7 @@
        },
        {
         "has": "stun",
-        "of": "eventTarget"
+        "of": "eventUnit"
        }
       ]
      },
@@ -12201,7 +12201,7 @@
        },
        {
         "has": "stun",
-        "of": "eventTarget"
+        "of": "eventUnit"
        }
       ]
      },
@@ -12238,13 +12238,13 @@
       "and": [
        {
         "sameUnit": [
-         "eventTarget",
+         "eventUnit",
          "self"
         ]
        },
        {
         "has": "elemental_essence",
-        "of": "eventTarget"
+        "of": "eventUnit"
        }
       ]
      },
@@ -12672,7 +12672,7 @@
        },
        {
         "has": "stun",
-        "of": "eventTarget"
+        "of": "eventUnit"
        }
       ]
      },
@@ -12938,7 +12938,7 @@
        },
        {
         "has": "stun",
-        "of": "eventTarget"
+        "of": "eventUnit"
        }
       ]
      },
@@ -18987,10 +18987,10 @@
      "when": {
       "and": [
        {
-        "eventHasTag": "invulnerable"
+        "eventStatusKind": "invulnerable"
        },
        {
-        "isFaction": "eventTarget",
+        "isFaction": "eventUnit",
         "faction": "enemy"
        }
       ]
@@ -18999,7 +18999,7 @@
       {
        "op": "healthLoss",
        "amount": 15,
-       "to": "eventTarget"
+       "to": "eventUnit"
       }
      ],
      "note": "Re-declares Biting Wind under the Fell Wind rework: when an enemy becomes Invulnerable, Zephyrex inflicts 15 health loss (not damage) on them. healthLoss counts as no form of damage and bypasses Shield/DR/Invulnerability, so it resolves 'first' as the original prose requires."
@@ -19058,10 +19058,10 @@
      "when": {
       "and": [
        {
-        "eventHasTag": "invulnerable"
+        "eventStatusKind": "invulnerable"
        },
        {
-        "isFaction": "eventTarget",
+        "isFaction": "eventUnit",
         "faction": "enemy"
        }
       ]
@@ -19071,7 +19071,7 @@
        "op": "damage",
        "amount": 15,
        "dtype": "affliction",
-       "to": "eventTarget"
+       "to": "eventUnit"
       }
      ],
      "note": "Re-declares Biting Wind dealing Affliction instead of Piercing: when an enemy becomes Invulnerable, deal 15 Affliction to them."
@@ -19255,10 +19255,10 @@
      "when": {
       "and": [
        {
-        "eventHasTag": "invulnerable"
+        "eventStatusKind": "invulnerable"
        },
        {
-        "isFaction": "eventTarget",
+        "isFaction": "eventUnit",
         "faction": "enemy"
        }
       ]
@@ -19268,7 +19268,7 @@
        "op": "damage",
        "amount": 15,
        "dtype": "piercing",
-       "to": "eventTarget"
+       "to": "eventUnit"
       },
       {
        "op": "custom",
