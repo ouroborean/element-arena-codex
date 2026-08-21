@@ -24,6 +24,7 @@ export type SkillClass = "basic" | "defensive" | "ultimate" | "fusion" | "passiv
 export type StatusKind =
   | "damage_reduction" // magnitude: flat DR
   | "incoming_damage_mod" // magnitude: +N = takes N more (e.g. gommarwinter0)
+  | "incoming_heal_mod" // magnitude: +N added to every heal this unit RECEIVES, from any source; non-stacking (MAX across instances) — ayana:anointment Blessed Leylines
   | "outgoing_damage_mod" // magnitude: +N = the DEALER deals N more (normal/piercing only)
   | "incoming_damage_mult" // magnitude: multiplier on incoming damage (0.5 = half, 2 = double); newDamageOnly gates to skill hits
   | "outgoing_damage_mult" // magnitude: multiplier on the DEALER's outgoing damage (e.g. triple)

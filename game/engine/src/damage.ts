@@ -296,8 +296,12 @@ export function applyHeal(
     if (dropped <= 0 && !has(target, "dies_at_max")) target.alive = false;
     return { requested, healed: 0, finalHp: dropped };
   }
+  // "+N healing received from all sources (does not stack)" (ayana Blessed Leylines): boost every heal by the
+  // largest incoming_heal_mod the target holds (MAX, not sum, so multiple copies do not stack).
+  const healMods = requested > 0 ? target.statuses.filter((s) => s.kind === "incoming_heal_mod").map((s) => s.magnitude ?? 0) : [];
+  const boosted = requested + (healMods.length ? Math.max(...healMods) : 0);
   const ceiling = opts.allowOverheal ? Number.POSITIVE_INFINITY : target.maxHp;
-  const finalHp = Math.min(ceiling, target.hp + requested);
+  const finalHp = Math.min(ceiling, target.hp + boosted);
   const healed = finalHp - target.hp;
   target.hp = finalHp;
   if (has(target, "dies_at_max") && target.hp >= target.maxHp) target.alive = false; // dies at MAX hp
