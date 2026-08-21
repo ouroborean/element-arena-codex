@@ -413,8 +413,33 @@
       "name": "Brimsteel Scabbard",
       "of": "caster"
      },
-     "note": "'Deals 10 damage to target enemy and permanently marks them with Cinders.' 'Permanently' = round-scoped (duration null). Under Blade of Dancing Lights this base skill retargets to the whole enemy team; the AOE branch is gated on the caster's Dancing Lights mark. Damage lands before the mark, so the first hit on an unmarked enemy does not proc Cinders (the target is only marked afterward). jarrik:brimstone Brimsteel Scabbard arms a one-shot rider: +20 skill_damage_bonus (triple), uncounterableIf, and the consume branch below (summon a Cinderling + clear the mark and bonus).",
+     "note": "'Deals 10 damage to target enemy and permanently marks them with Cinders.' 'Permanently' = round-scoped (duration null). Under Blade of Dancing Lights this base skill retargets to the whole enemy team; the AOE branch is gated on the caster's Dancing Lights mark. Damage lands before the mark, so the first hit on an unmarked enemy does not proc Cinders (the target is only marked afterward). jarrik:brimstone Brimsteel Scabbard arms a one-shot rider: +20 skill_damage_bonus (triple), uncounterableIf, a Cinderling summon gated on the target ALREADY bearing Cinders (the pre-strike branch at the top), and the consume branch below that clears the mark + bonus.",
      "effects": [
+      {
+       "op": "if",
+       "cond": {
+        "and": [
+         {
+          "has": "mark",
+          "name": "Brimsteel Scabbard",
+          "of": "caster"
+         },
+         {
+          "has": "mark",
+          "name": "Cinders",
+          "of": "target"
+         }
+        ]
+       },
+       "then": [
+        {
+         "op": "summon",
+         "template": "Cinderling",
+         "count": 1
+        }
+       ],
+       "note": "Brimsteel Scabbard rider: 'if it strikes an enemy affected by Cinders, it automatically creates a Cinderling.' Checked BEFORE the strike applies Cinders (base note: damage lands before the mark), so it procs only when the target ALREADY bore Cinders from a prior hit, not from this strike's own mark."
+      },
       {
        "op": "if",
        "cond": {
@@ -474,11 +499,6 @@
        },
        "then": [
         {
-         "op": "summon",
-         "template": "Cinderling",
-         "count": 1
-        },
-        {
          "op": "removeStatus",
          "kind": "mark",
          "name": "Brimsteel Scabbard",
@@ -490,7 +510,8 @@
          "name": "Brimsteel Scabbard",
          "from": "caster"
         }
-       ]
+       ],
+       "note": "The rider is one-shot: consume the Brimsteel Scabbard mark + its +20 skill_damage_bonus after the strike. The conditional Cinderling summon is handled up top (gated on a PRE-strike Cinders), so this branch only clears the rider."
       }
      ]
     },
