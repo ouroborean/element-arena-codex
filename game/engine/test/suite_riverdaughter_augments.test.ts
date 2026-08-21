@@ -282,7 +282,7 @@ test("Restorative Retreat control: the heal is tied to Dive — a different skil
 // (enemy == River Daughter) never holds and the reactive Ripple never casts. The sibling passive Healing
 // Tears' counter-half correctly uses sameUnit[eventCounterer, self]. The frozen prose says a triggered
 // River Clone MUST cast Ripple (10 to the enemy team); the engine deals nothing. Assertions preserved.
-test.skip("SUSPECTED BUG: River Within — a triggered River Clone should make River Daughter cast Ripple (10 to the enemy team)", () => {
+test("River Within: a triggered River Clone makes River Daughter cast Ripple (10 to the enemy team)", () => {
   const { state, enemies } = setup({ augment: "riverdaughter5", allies: 1, enemies: 2 });
   const [e1, e2] = enemies as [Unit, Unit];
   e1.skills = [attack(30)];
