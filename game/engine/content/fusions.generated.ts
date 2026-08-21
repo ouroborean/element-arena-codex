@@ -2522,40 +2522,51 @@ export const FUSIONS: FusionForm[] = [
   },
   "passiveTriggers": [
    {
-    "on": "damageDealt",
+    "on": "skillUsed",
     "source": "Hellfire",
     "when": {
-     "and": [
-      {
-       "sameUnit": [
-        "eventSource",
-        "self"
-       ]
-      },
-      {
-       "isFaction": "eventTarget",
-       "faction": "enemy"
-      },
-      {
-       "not": {
-        "has": "dot",
-        "name": "Hellfire",
-        "of": "eventTarget"
-       }
-      }
+     "sameUnit": [
+      "eventSource",
+      "self"
      ]
     },
     "effect": [
      {
-      "op": "applyStatus",
-      "to": "eventTarget",
-      "status": {
-       "kind": "dot",
-       "name": "Hellfire",
-       "magnitude": 5,
-       "dtype": "affliction",
-       "duration": null
-      }
+      "op": "forEach",
+      "each": "eventAffected",
+      "do": [
+       {
+        "op": "if",
+        "cond": {
+         "and": [
+          {
+           "isFaction": "it",
+           "faction": "enemy"
+          },
+          {
+           "not": {
+            "has": "dot",
+            "name": "Hellfire",
+            "of": "it"
+           }
+          }
+         ]
+        },
+        "then": [
+         {
+          "op": "applyStatus",
+          "to": "it",
+          "status": {
+           "kind": "dot",
+           "name": "Hellfire",
+           "magnitude": 5,
+           "dtype": "affliction",
+           "duration": null
+          }
+         }
+        ]
+       }
+      ]
      }
     ]
    }
