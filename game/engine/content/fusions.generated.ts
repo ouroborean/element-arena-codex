@@ -9068,15 +9068,10 @@ export const FUSIONS: FusionForm[] = [
       "op": "addStack",
       "name": "Ritual Power",
       "amount": {
-       "ref": "count",
+       "ref": "stackSum",
+       "name": "Deepening Shadows",
        "of": {
-        "filter": {
-         "faction": "all"
-        },
-        "with": {
-         "kind": "stack",
-         "name": "Deepening Shadows"
-        }
+        "faction": "all"
        }
       },
       "duration": null,
