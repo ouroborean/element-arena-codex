@@ -34,7 +34,9 @@ Suite files land as `engine/test/suite_<hero>_base.test.ts`, `suite_<hero>_fusio
 
 ### Phase 2 — fusion forms
 - Wave 1 (13): pyrrha…titania — **DONE (496 tests, 45 suspects)**
-- Wave 2 (14): gaia, roland, ayana, taryn, blackknight, maggie, laria, xyris, fate, scratch, aramao, sera, galazax, trinity — _pending_
+- Wave 2 (14): gaia, roland, ayana, taryn, blackknight, maggie, laria, xyris, fate, scratch, aramao, sera, galazax, trinity — **DONE (478 tests, 37 suspects)**
+
+**Phase 2 (fusions) complete: 974 tests, 82 suspects.** Wave 2 reconfirms the systemic classes (scope-blind invulnerable — rolandmyth0/gaia; skillUsed over-fire with no skill gate — rolandmoon0/gaiaslime0; missing requires/usability gate; unread marks Magnetized/Mooncursed; damage `from` unset so a launched-Boulder's source is the hero; template-scoped respawn — gaiagrave0/rolandgrave0 Boulder).
 
 Big systemic clusters from fusion wave 1 (fix once → clears many across base+fusion+augment):
 - **scope-blind `invulnerable`** (ignores its `scope`, blocks ALL harmful): gommar4, gommaraurora1, …
