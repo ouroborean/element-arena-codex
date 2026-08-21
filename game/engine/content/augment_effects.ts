@@ -80,10 +80,11 @@ registerCustom("jealousyBasicsToGeneric", (ctx, a) => {
   }
 });
 
-// healIfExpiredStatusNamed — reactive heal when a specifically-named status lapses (statusExpired).
+// healIfExpiredStatusNamed — reactive heal when a specifically-named status LEAVES a unit, whether it lapsed
+// naturally (statusExpired) or was explicitly removed/consumed (statusLost). Both events carry {kind,name}.
 registerCustom("healIfExpiredStatusNamed", (ctx, a) => {
   const e = ctx.event;
-  if (!e || e.type !== "statusExpired" || e.kind !== (a.kind as string) || e.name !== (a.name as string)) return;
+  if (!e || (e.type !== "statusExpired" && e.type !== "statusLost") || e.kind !== (a.kind as string) || e.name !== (a.name as string)) return;
   for (const u of resolveSelector((a.to as Selector) ?? "self", ctx)) applyHeal(u, num(a.amount));
 });
 

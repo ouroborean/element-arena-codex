@@ -6684,6 +6684,24 @@ export const FUSIONS: FusionForm[] = [
       }
      }
     ]
+   },
+   {
+    "on": "statusLost",
+    "source": "Blazer Board",
+    "when": {
+     "eventStatusKind": "mark",
+     "name": "Cinders"
+    },
+    "effect": [
+     {
+      "op": "applyStatus",
+      "to": "self",
+      "status": {
+       "kind": "invulnerable",
+       "duration": 1
+      }
+     }
+    ]
    }
   ],
   "skill": {
