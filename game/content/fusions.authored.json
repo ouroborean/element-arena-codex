@@ -3675,9 +3675,20 @@
    "passive": {
     "name": "Branch of the World Tree",
     "description": "Channel Vitality now costs [65] and affects all targets, but can only target minions.",
-    "note": "This passive re-authors the base skill Channel Vitality (gaia3): its cost (1 specific -> 1 generic), targeting (single -> all) and legal targets (minions only). A FusionForm installs reactive triggers only and cannot patch a base skill's cost/targeting metadata (that is an augment-style setSkillMeta patch, unavailable here), so no trigger is installed. Documented as debt: needs a base-skill metadata patch channel on fusion forms."
+    "note": "Re-authors base Channel Vitality (gaia3) via a roundStart mutableSkill patch (branchOfWorldTree, idempotent): cost 1-specific -> 1-generic, targeting single -> all-allies, targetKind -> minion (heals all allied minions, since Channel Vitality is Helpful). mutableSkill is the base-skill metadata patch channel."
    },
-   "passiveTriggers": [],
+   "passiveTriggers": [
+    {
+     "on": "roundStart",
+     "source": "Branch of the World Tree",
+     "effect": [
+      {
+       "op": "custom",
+       "fn": "branchOfWorldTree"
+      }
+     ]
+    }
+   ],
    "skill": {
     "id": "gaiamyth1",
     "name": "Yggdrasil",

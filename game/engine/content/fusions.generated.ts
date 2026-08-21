@@ -3649,7 +3649,18 @@ export const FUSIONS: FusionForm[] = [
    "name": "Branch of the World Tree",
    "description": "Channel Vitality now costs [65] and affects all targets, but can only target minions."
   },
-  "passiveTriggers": [],
+  "passiveTriggers": [
+   {
+    "on": "roundStart",
+    "source": "Branch of the World Tree",
+    "effect": [
+     {
+      "op": "custom",
+      "fn": "branchOfWorldTree"
+     }
+    ]
+   }
+  ],
   "skill": {
    "id": "gaiamyth1",
    "name": "Yggdrasil",
