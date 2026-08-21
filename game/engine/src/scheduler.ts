@@ -309,6 +309,8 @@ export interface ActionResult {
 }
 
 function isStunnedFor(unit: Unit, skill: SkillInstance): boolean {
+  // An "Unstunnable" skill (ayana:divine Verse of Ascension) is castable even while its caster is stunned.
+  if (skill.tags.includes("Unstunnable")) return false;
   // A "Stun Immunity" mark (granted by some augments) makes the unit immune to all stuns.
   if (unit.statuses.some((s) => s.kind === "mark" && s.name === "Stun Immunity")) return false;
   return unit.statuses.some((s) => {

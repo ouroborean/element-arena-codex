@@ -1263,10 +1263,14 @@
        "to": "self"
       },
       {
-       "op": "removeStatus",
-       "kind": "stun",
-       "from": "self",
-       "note": "'ignores stuns' approximated by wiping any stun on Zev'kir each channel tick (no stun-immunity status exists)."
+       "op": "applyStatus",
+       "to": "self",
+       "status": {
+        "kind": "mark",
+        "name": "Stun Immunity",
+        "duration": 1
+       },
+       "note": "'ignores stuns' = a real 'Stun Immunity' mark (isStunnedFor honors it) refreshed each channel tick with duration 1, so Zev'kir is immune THROUGHOUT the channel (a stun landing between his ticks no longer stuns him), not merely wiped after the fact."
       }
      ]
     }

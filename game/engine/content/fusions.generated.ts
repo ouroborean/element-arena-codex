@@ -1515,7 +1515,8 @@ export const FUSIONS: FusionForm[] = [
    "targeting": "self",
    "tags": [
     "Strategic",
-    "Instant"
+    "Instant",
+    "Unstunnable"
    ],
    "cost": {
     "generic": 0,
@@ -10939,7 +10940,8 @@ export const FUSIONS: FusionForm[] = [
    "tags": [
     "Harmful",
     "Instant",
-    "Bypassing"
+    "Bypassing",
+    "Uncounterable"
    ],
    "cost": {
     "generic": 1,

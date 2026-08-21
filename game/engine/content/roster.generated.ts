@@ -12922,6 +12922,9 @@ export const ROSTER: HeroDef[] = [
       },
       {
        "declaredTargetsSelf": true
+      },
+      {
+       "eventHasTag": "Harmful"
       }
      ]
     },
