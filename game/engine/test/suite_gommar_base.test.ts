@@ -313,7 +313,7 @@ test("gommar4 control: if he was NOT Frost-Covered, he regains the mark but gain
 
 // Adversarial: the frozen carve-out is \"invulnerable to NON-strategic skills\" — a STRATEGIC skill
 // should still land on Gommar while Ice Body is up.
-test.skip("SUSPECTED BUG: gommar4's invulnerable blocks ALL harmful skills — frozen says invulnerable only to NON-strategic skills, so a Strategic harmful skill should still land on Gommar", () => {
+test("gommar4 Ice Body: invulnerable to NON-strategic skills only — a Strategic harmful skill still lands", () => {
   const g = loadHero(heroById("gommar"), "A", "g");
   const enemy = makeUnit({ id: "e", team: "B", kind: "hero", hp: 100, maxHp: 100, skills: [vStratHit()] });
   const state = makeState([g], [enemy]);

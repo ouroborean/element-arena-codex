@@ -4410,7 +4410,7 @@
        },
        "duration": 1
       },
-      "note": "'invulnerable to Strategic skills for 1 turn'. Engine invulnerable is not tag-scoped (see gommar4/Ice Body note), so the scope is carried for fidelity but may resolve as plain invulnerable."
+      "note": "'invulnerable to Strategic skills for 1 turn' -> scoped invulnerable {tag:Strategic, mode:only}, honored by legalTargets (blocks only Strategic harmful skills)."
      },
      {
       "op": "schedule",

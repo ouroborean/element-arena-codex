@@ -3522,7 +3522,11 @@ export const ROSTER: HeroDef[] = [
       "to": "caster",
       "status": {
        "kind": "invulnerable",
-       "duration": 1
+       "duration": 1,
+       "scope": {
+        "tag": "Strategic",
+        "mode": "except"
+       }
       }
      },
      {

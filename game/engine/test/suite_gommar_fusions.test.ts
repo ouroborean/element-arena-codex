@@ -251,7 +251,7 @@ test("aurora Aurora Veil: the FOLLOWING turn the cover flips to non-Strategic sk
 
 // Adversarial: phase 1 is "invulnerable to Strategic skills" — a NON-Strategic harmful skill should still land.
 // The engine's invulnerable ignores its scope, so it blocks everything.
-test.skip("SUSPECTED BUG: aurora Aurora Veil phase 1 also blocks NON-Strategic skills — frozen makes the team invulnerable only to STRATEGIC skills, so a non-Strategic hit should land", () => {
+test("aurora Aurora Veil: invulnerable to Strategic skills only — a non-Strategic hit still lands", () => {
   const g = fuse("aurora");
   const ally = makeUnit({ id: "al", team: "A", kind: "hero", hp: 100, maxHp: 100 });
   const e = makeUnit({ id: "e", team: "B", kind: "hero", hp: 100, maxHp: 100, skills: [eBasicHit(10)] });

@@ -328,6 +328,19 @@ function isStunnedFor(unit: Unit, skill: SkillInstance): boolean {
   });
 }
 
+// Does this unit's invulnerable block the given (harmful) skill? An unscoped invulnerable blocks every harmful
+// skill; a scoped one ("invulnerable to Strategic skills" / "…to non-Strategic skills") blocks only skills that
+// match its {tag, mode} — same tag/mode test as a scoped stun. A unit with several invulnerables blocks if ANY
+// applies.
+function invulnerableBlocks(unit: Unit, skill: SkillInstance): boolean {
+  return unit.statuses.some((s) => {
+    if (s.kind !== "invulnerable") return false;
+    if (!s.scope) return true;
+    const hasTag = skill.tags.includes(s.scope.tag);
+    return s.scope.mode === "only" ? hasTag : !hasTag;
+  });
+}
+
 /** Total energy in a pool. */
 function poolTotal(pool: EnergyPool): number {
   let t = 0;
@@ -481,7 +494,7 @@ export function legalTargets(state: MatchState, caster: Unit, skill: SkillInstan
     reanimatedOk(u) &&
     (!skill.targetKind || u.kind === skill.targetKind) && // e.g. Feed may only target a minion (the Eagle)
     !(u.id !== caster.id && hasStatus(u, "untargetable")) && // others can't target it; self can
-    !(harmful && !bypass && hasStatus(u, "invulnerable")) &&
+    !(harmful && !bypass && invulnerableBlocks(u, skill)) &&
     !(helpful && !bypass && hasStatus(u, "isolated"));
 
   if (effectiveTargeting(caster, skill) !== "single") return chosen.filter(isLegal);
