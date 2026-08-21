@@ -4134,7 +4134,7 @@
      },
      "cooldown": 0,
      "autoTargetMark": "Ominous Rumble",
-     "note": "Making an enemy Invulnerable triggers Biting Wind (15 piercing first). Durations are 'until the end of their (the target's) next turn'; encoded as 1. autoTargetMark forces this onto an Ominous Rumble-marked enemy when one exists (zephyrex:storm), and the marked-hit branch consumes the mark + grants Elemental Essence, mirroring Jolt.",
+     "note": "Making an enemy Invulnerable triggers Biting Wind (15 piercing first). Durations are 'until the end of their (the target's) next turn'; encoded as 1. autoTargetMark forces this onto an Ominous Rumble-marked enemy when one exists (zephyrex:storm), and the marked-hit branch CONSUMES the mark only. Elemental Essence on a marked hit belongs to Jolt (zephyrexstorm1), not Arcadian Duet — its frozen text grants no Essence.",
      "effects": [
       {
        "op": "applyStatus",
@@ -4161,20 +4161,13 @@
        },
        "then": [
         {
-         "op": "applyStatus",
-         "to": "self",
-         "status": {
-          "kind": "elemental_essence",
-          "duration": null
-         }
-        },
-        {
          "op": "removeStatus",
          "kind": "mark",
          "name": "Ominous Rumble",
          "from": "target"
         }
-       ]
+       ],
+       "note": "Ominous Rumble (zephyrex:storm): Arcadian Duet auto-targets a marked enemy and 'consumes the mark in the process' — consume ONLY. Elemental Essence on a marked hit belongs to JOLT (zephyrexstorm1), not Arcadian Duet; its frozen text grants no Essence."
       }
      ]
     },
