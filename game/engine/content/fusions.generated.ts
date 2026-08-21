@@ -7172,6 +7172,17 @@ export const FUSIONS: FusionForm[] = [
       "name": "Cinders",
       "duration": 3
      }
+    },
+    {
+     "op": "applyStatus",
+     "to": {
+      "faction": "enemies"
+     },
+     "status": {
+      "kind": "mark",
+      "name": "Dawnbreak Cinders",
+      "duration": 3
+     }
     }
    ],
    "currentCd": 0

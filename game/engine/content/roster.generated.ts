@@ -2991,15 +2991,27 @@ export const ROSTER: HeroDef[] = [
         "to": "it"
        },
        {
-        "op": "removeStatus",
-        "kind": "mark",
-        "name": "Cinders",
-        "from": "it"
-       },
-       {
-        "op": "summon",
-        "template": "Cinderling",
-        "count": 1
+        "op": "if",
+        "cond": {
+         "not": {
+          "has": "mark",
+          "name": "Dawnbreak Cinders",
+          "of": "it"
+         }
+        },
+        "then": [
+         {
+          "op": "removeStatus",
+          "kind": "mark",
+          "name": "Cinders",
+          "from": "it"
+         },
+         {
+          "op": "summon",
+          "template": "Cinderling",
+          "count": 1
+         }
+        ]
        }
       ]
      }
