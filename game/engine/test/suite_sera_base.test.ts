@@ -302,7 +302,7 @@ test("sera5: the 20 Shield is granted AFTER the 20 True damage lands (True damag
 
 // SUSPECTED BUG: frozen skills.json gives sera5 (Proactivity Protocol) cooldown 4, but the authored/generated
 // content ships cooldown 3, so a real cast puts it on cd 3 instead of the frozen 4. Kept as a bug report.
-test.skip("sera5: frozen cooldown is 4", () => {
+test("sera5: frozen cooldown is 4", () => {
   const { state, sera } = fresh();
   const ally = makeUnit({ id: "a", team: "A", hp: 50, maxHp: 100 });
   state.units["a"] = ally;

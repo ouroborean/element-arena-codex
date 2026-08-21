@@ -5371,9 +5371,16 @@ export const ROSTER: HeroDef[] = [
     "on": "turnEnd",
     "source": "Universal Energy Conduit",
     "when": {
-     "has": "mark",
-     "name": "Universal Energy Conduit",
-     "of": "self"
+     "and": [
+      {
+       "has": "mark",
+       "name": "Universal Energy Conduit",
+       "of": "self"
+      },
+      {
+       "eventTeamIsSelf": true
+      }
+     ]
     },
     "effect": [
      {
@@ -5822,7 +5829,8 @@ export const ROSTER: HeroDef[] = [
     "klass": "basic",
     "tags": [
      "Harmful",
-     "Instant"
+     "Instant",
+     "Unstunnable"
     ],
     "cost": {
      "generic": 0,
@@ -8909,6 +8917,9 @@ export const ROSTER: HeroDef[] = [
    {
     "on": "turnEnd",
     "source": "Living Stone",
+    "when": {
+     "eventTeamIsSelf": true
+    },
     "effect": [
      {
       "op": "forEach",
@@ -13443,7 +13454,7 @@ export const ROSTER: HeroDef[] = [
      "generic": 0,
      "specific": 1
     },
-    "cooldown": 3,
+    "cooldown": 4,
     "effects": [
      {
       "op": "damage",

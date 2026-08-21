@@ -397,7 +397,7 @@ test("saya0: it arms only the FIRST time — a later sub-40 drop does not re-arm
 // Universal Energy Conduit turn-end trigger has no team gate, so it fires on the ENEMY team's turn-end too
 // (verified: a team-B turnEnd grants Saya's side an Essence). That doubles the intended Essence income. The
 // real assertion is preserved below as an executable bug report; skipped so the committed suite stays green.
-test.skip("SUSPECTED BUG: saya1 grants Essence on the ENEMY's turn-end too (frozen scopes it to Saya's turns)", () => {
+test("saya1: Universal Energy Conduit grants Essence only at the end of Saya's turns (not the enemy's)", () => {
   const { state } = setup({ allies: 1, enemies: 1 });
   performAction(state, { unit: "s", skillId: "saya1", targets: [] });
   emit(state, { type: "turnEnd", team: "B" }); // the ENEMY team's turn-end
