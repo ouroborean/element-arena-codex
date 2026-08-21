@@ -2186,7 +2186,7 @@ export const FUSIONS: FusionForm[] = [
   },
   "passiveTriggers": [
    {
-    "on": "damageDealt",
+    "on": "skillUsed",
     "source": "Plaguebringer",
     "when": {
      "and": [
@@ -2200,41 +2200,52 @@ export const FUSIONS: FusionForm[] = [
        "has": "mark",
        "name": "Exile",
        "of": "self"
-      },
-      {
-       "isFaction": "eventTarget",
-       "faction": "enemy"
       }
      ]
     },
     "effect": [
      {
-      "op": "if",
-      "cond": {
-       "has": "dot",
-       "name": "Plaguebringer",
-       "of": "eventTarget"
-      },
-      "then": [
+      "op": "forEach",
+      "each": "eventAffected",
+      "do": [
        {
-        "op": "modifyStatus",
-        "kind": "dot",
-        "name": "Plaguebringer",
-        "magnitudeDelta": 5,
-        "from": "eventTarget"
-       }
-      ],
-      "else": [
-       {
-        "op": "applyStatus",
-        "to": "eventTarget",
-        "status": {
-         "kind": "dot",
-         "name": "Plaguebringer",
-         "magnitude": 5,
-         "dtype": "affliction",
-         "duration": null
-        }
+        "op": "if",
+        "cond": {
+         "isFaction": "it",
+         "faction": "enemy"
+        },
+        "then": [
+         {
+          "op": "if",
+          "cond": {
+           "has": "dot",
+           "name": "Plaguebringer",
+           "of": "it"
+          },
+          "then": [
+           {
+            "op": "modifyStatus",
+            "kind": "dot",
+            "name": "Plaguebringer",
+            "magnitudeDelta": 5,
+            "from": "it"
+           }
+          ],
+          "else": [
+           {
+            "op": "applyStatus",
+            "to": "it",
+            "status": {
+             "kind": "dot",
+             "name": "Plaguebringer",
+             "magnitude": 5,
+             "dtype": "affliction",
+             "duration": null
+            }
+           }
+          ]
+         }
+        ]
        }
       ]
      }

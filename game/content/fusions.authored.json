@@ -2201,11 +2201,11 @@
    "passive": {
     "name": "Plaguebringer",
     "description": "Enemies affected by the Black Knight's enhanced abilities take 5 Affliction damage each turn, permanently (stacks).",
-    "note": "'Enhanced' = the Black Knight's acts-alone state, modeled kit-wide as self mark 'Exile' (base-kit convention). 'Affected by' approximated as 'damaged by' (damageDealt is the closest reactive hook). 'Permanently (stacks)' = a duration-null affliction dot whose per-turn magnitude grows +5 each application (modifyStatus pattern). The enhanced gate also guards re-entrancy: the Plaguebringer tick emits a self-sourced damageDealt, but it fires while un-enhanced (Exile absent), so it does not re-stack. Under the default 'replace' fusion the base Exile maintainer is swapped out, so whether this ever fires depends on the enhanced state being present (same dependency the Ando fusions note)."
+    "note": "'Enhanced' = the Black Knight's acts-alone state (self mark 'Exile'); its maintainer trigger is now origin:'innate' so it SURVIVES replace-mode fusion, so the enhanced state is actually reachable post-fusion. 'Affected by' is faithful: reacts on skillUsed(eventSource==self) and forEaches eventAffected, applying/growing the dot on each affected enemy. 'Permanently (stacks)' = a duration-null affliction dot whose magnitude grows +5 each enhanced ability (modifyStatus). No re-entrancy: the dot tick emits damageDealt, not skillUsed."
    },
    "passiveTriggers": [
     {
-     "on": "damageDealt",
+     "on": "skillUsed",
      "source": "Plaguebringer",
      "when": {
       "and": [
@@ -2219,41 +2219,52 @@
         "has": "mark",
         "name": "Exile",
         "of": "self"
-       },
-       {
-        "isFaction": "eventTarget",
-        "faction": "enemy"
        }
       ]
      },
      "effect": [
       {
-       "op": "if",
-       "cond": {
-        "has": "dot",
-        "name": "Plaguebringer",
-        "of": "eventTarget"
-       },
-       "then": [
+       "op": "forEach",
+       "each": "eventAffected",
+       "do": [
         {
-         "op": "modifyStatus",
-         "kind": "dot",
-         "name": "Plaguebringer",
-         "magnitudeDelta": 5,
-         "from": "eventTarget"
-        }
-       ],
-       "else": [
-        {
-         "op": "applyStatus",
-         "to": "eventTarget",
-         "status": {
-          "kind": "dot",
-          "name": "Plaguebringer",
-          "magnitude": 5,
-          "dtype": "affliction",
-          "duration": null
-         }
+         "op": "if",
+         "cond": {
+          "isFaction": "it",
+          "faction": "enemy"
+         },
+         "then": [
+          {
+           "op": "if",
+           "cond": {
+            "has": "dot",
+            "name": "Plaguebringer",
+            "of": "it"
+           },
+           "then": [
+            {
+             "op": "modifyStatus",
+             "kind": "dot",
+             "name": "Plaguebringer",
+             "magnitudeDelta": 5,
+             "from": "it"
+            }
+           ],
+           "else": [
+            {
+             "op": "applyStatus",
+             "to": "it",
+             "status": {
+              "kind": "dot",
+              "name": "Plaguebringer",
+              "magnitude": 5,
+              "dtype": "affliction",
+              "duration": null
+             }
+            }
+           ]
+          }
+         ]
         }
        ]
       }
