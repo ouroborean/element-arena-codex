@@ -7266,7 +7266,19 @@
        "name": "Cinders",
        "duration": 3
       },
-      "note": "'For 3 turns, all enemies are treated as affected by Cinders' = a 3-turn Cinders mark on every enemy. The base kit's Cinders readers key on the name 'Cinders', so 'this effect cannot be consumed to create Cinderling minions' is not enforceable without a distinct non-consumable Cinders variant — tracked debt."
+      "note": "'For 3 turns, all enemies are treated as affected by Cinders' = a 3-turn Cinders mark on every enemy; the base kit's name-keyed Cinders readers all count it."
+     },
+     {
+      "op": "applyStatus",
+      "to": {
+       "faction": "enemies"
+      },
+      "status": {
+       "kind": "mark",
+       "name": "Dawnbreak Cinders",
+       "duration": 3
+      },
+      "note": "'This effect cannot be consumed to create Cinderling minions': a companion marker. Call Cinders (jarrik3) still damages these enemies as Cinders-marked, but skips the mark-removal + Cinderling summon for any enemy also bearing 'Dawnbreak Cinders'."
      }
     ]
    }
