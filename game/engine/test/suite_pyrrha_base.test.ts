@@ -254,7 +254,7 @@ test("Control: without Wraith in White, an enemy stun lands on Pyrrha", () => {
   assert.ok(p.statuses.some((s) => s.kind === "stun"), "stun lands normally when Pyrrha is unprotected");
 });
 
-test.skip("SUSPECTED BUG: Wraith in White does not make Pyrrha ignore a non-damage effect (enemy stun still lands)", () => {
+test("Wraith in White: Pyrrha ignores an enemy-applied non-damage effect (a stun does not land)", () => {
   const enemy = makeUnit({
     id: "e", team: "B", hp: 100,
     skills: [skill("flash", [{ op: "applyStatus", to: "target", status: { kind: "stun", duration: 1 } }], { tags: ["Harmful", "Instant"] })],

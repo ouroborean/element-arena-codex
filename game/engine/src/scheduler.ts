@@ -208,7 +208,10 @@ export function tickDots(state: MatchState, id: TeamId): void {
       if (s.kind !== "dot" && s.kind !== "regen") continue;
       const owner = state.units[s.appliedBy];
       const byThisTeam = owner ? owner.team === id : false;
-      if (!(byThisTeam && s.duration !== null && s.appliedTurn < state.turn)) continue;
+      // A permanent (duration:null) dot/regen ticks EVERY turn — "deals 5 affliction permanently" / "heals 5
+      // each turn" mean a non-expiring per-turn effect, not a no-op. (Finite dots are unaffected: their
+      // duration is non-null and counts down elsewhere.) `appliedTurn < state.turn` still skips the apply turn.
+      if (!(byThisTeam && s.appliedTurn < state.turn)) continue;
       if (s.kind === "regen") {
         applyHeal(u, s.magnitude ?? 0);
         continue;

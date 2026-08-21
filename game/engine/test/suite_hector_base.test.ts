@@ -257,7 +257,7 @@ test("hector3: the non-Strategic stun blocks a non-Strategic skill but allows a 
 // SUSPECTED BUG: Mindfog frozen says it makes Dennis "ignore stuns" for 3 turns, but the engine applies a
 // `non_damage_ignore` status that NO code reads (no consumer in isStunnedFor or the applyStatus op), so a
 // Mindfogged Dennis is still stopped by a stun. Assertions preserved; the control test above proves the harness.
-test.skip("SUSPECTED BUG: hector3 Mindfog should make Dennis ignore stuns, but non_damage_ignore is never enforced", () => {
+test("hector3: Mindfog Serum makes its target ignore stuns (an enemy stun does not land)", () => {
   const { state, dennis, enemy } = setup();
   castSerum(state, "hector3", dennis.id);
   // Apply a plain (unscoped) stun to Dennis via the real status-apply path.
