@@ -6364,6 +6364,41 @@
       }
      ],
      "note": "'At the end of each turn' fires on every turn-end (both teams); turnEnd cannot be scoped to only Jarrik's turns."
+    },
+    {
+     "on": "skillUsed",
+     "source": "Cindersprig Brew",
+     "when": {
+      "has": "outgoing_damage_mod",
+      "name": "Cindersprig Brew",
+      "of": "eventSource"
+     },
+     "effect": [
+      {
+       "op": "if",
+       "cond": {
+        "has": "mark",
+        "name": "Cindersprig Grace",
+        "of": "eventSource"
+       },
+       "then": [
+        {
+         "op": "removeStatus",
+         "kind": "mark",
+         "name": "Cindersprig Grace",
+         "from": "eventSource"
+        }
+       ],
+       "else": [
+        {
+         "op": "removeStatus",
+         "kind": "outgoing_damage_mod",
+         "name": "Cindersprig Brew",
+         "from": "eventSource"
+        }
+       ]
+      }
+     ]
     }
    ],
    "skill": {
@@ -6387,10 +6422,31 @@
       "to": "target",
       "status": {
        "kind": "outgoing_damage_mod",
+       "name": "Cindersprig Brew",
        "magnitude": 5,
        "duration": 4
       },
-      "note": "'5 more non-Affliction damage for 4 turns' = outgoing_damage_mod, which the engine sums only for normal/piercing hits — an exact fit for 'non-Affliction'. Target may be Jarrik or an ally (single Helpful). 'Ends if they use a new skill' is a target-attached early-cancel a flat status can't self-enforce — tracked debt."
+      "note": "'5 more non-Affliction damage for 4 turns' = a named outgoing_damage_mod (engine sums it only for normal/piercing = 'non-Affliction'). Target may be Jarrik or an ally (single Helpful). 'Ends if they use a new skill' = the Drunken Swordsman skillUsed cancel trigger below; when Jarrik buffs HIMSELF a one-shot 'Cindersprig Grace' mark spares the very cast that applied it (his next skill still ends it)."
+     },
+     {
+      "op": "if",
+      "cond": {
+       "sameUnit": [
+        "target",
+        "self"
+       ]
+      },
+      "then": [
+       {
+        "op": "applyStatus",
+        "to": "target",
+        "status": {
+         "kind": "mark",
+         "name": "Cindersprig Grace",
+         "duration": 4
+        }
+       }
+      ]
      }
     ]
    }
