@@ -9,7 +9,21 @@
 
 import type { SkillInstance } from "./skill.ts";
 import type { TriggeredEffect } from "./events.ts";
-import type { Effect } from "./effects/ast.ts";
+import type { Effect, NodeId } from "./effects/ast.ts";
+
+/** An augment patch whose target skill lives on this hero's minion TEMPLATES, not the hero itself
+ *  (Trinity's "The Power of Friendship" appends to the Rangers' Ruby/Sapphire/Citrine Lens skills). It is
+ *  recorded when an augment's appendEffect / setSkillMeta / patchNode names a skill the hero does not own,
+ *  then replayed onto each minion this hero summons — so the upgrade reaches the per-instance minion skill
+ *  without mutating the shared template (no cross-team / cross-summon leak). */
+export interface MinionSkillPatch {
+  op: "appendEffect" | "setSkillMeta" | "patchNode";
+  skillId: string;
+  effect?: Effect[];
+  meta?: Record<string, unknown>;
+  nodeId?: NodeId;
+  replace?: Effect;
+}
 
 export type TeamId = "A" | "B";
 export type UnitId = string;
@@ -181,6 +195,9 @@ export interface Unit {
   fused?: string;
   /** Augment ids applied to this hero so far (cumulative across rounds). */
   augments?: string[];
+  /** Augment patches whose target skill lives on this hero's minion templates (see MinionSkillPatch);
+   *  replayed onto every minion this hero summons. */
+  minionSkillPatches?: MinionSkillPatch[];
   /** This hero stands in for a named minion template (Dennis for Hector's "Dennis the Apprentice") — a
    *  selector naming that exact template resolves to this hero. Set at match build for a cross-hero pairing. */
   understudyFor?: string;

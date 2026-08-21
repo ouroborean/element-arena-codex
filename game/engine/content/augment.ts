@@ -11,7 +11,7 @@
  * `cost`) with the authored `HeroDef`. Every patch that mutates a skill first deep-clones it onto
  * the unit, so one hero's augment never leaks into the shared content or a teammate.
  */
-import type { Unit } from "../src/types.ts";
+import type { MinionSkillPatch, Unit } from "../src/types.ts";
 import type { SkillInstance } from "../src/skill.ts";
 import type { Effect, NodeId } from "../src/effects/ast.ts";
 import { replaceNode } from "../src/effects/patch.ts";
@@ -53,6 +53,12 @@ export function registerAugmentCustom(name: string, fn: AugmentFn): void {
 
 const clone = <T>(x: T): T => JSON.parse(JSON.stringify(x)) as T;
 
+/** Park a patch whose target skill the hero does not own — it addresses a skill on the hero's minion
+ *  TEMPLATES (Trinity's Lens skills). summonMinion replays these onto each minion the hero summons. */
+function recordMinionPatch(unit: Unit, p: MinionSkillPatch): void {
+  unit.minionSkillPatches = [...(unit.minionSkillPatches ?? []), p];
+}
+
 /** Find a skill by id, replace it on the unit with a deep clone, and return the clone to mutate. */
 export function mutableSkill(unit: Unit, skillId: string): SkillInstance | undefined {
   const skills = unit.skills ?? [];
@@ -91,16 +97,19 @@ export function applyPatch(unit: Unit, patch: Patch): void {
     case "setSkillMeta": {
       const s = mutableSkill(unit, patch.skillId);
       if (s) Object.assign(s, clone(patch.meta));
+      else recordMinionPatch(unit, { op: "setSkillMeta", skillId: patch.skillId, meta: clone(patch.meta) as Record<string, unknown> });
       return;
     }
     case "appendEffect": {
       const s = mutableSkill(unit, patch.skillId);
       if (s) s.effects = [...s.effects, ...clone(patch.effect)];
+      else recordMinionPatch(unit, { op: "appendEffect", skillId: patch.skillId, effect: clone(patch.effect) });
       return;
     }
     case "patchNode": {
       const s = mutableSkill(unit, patch.skillId);
       if (s) replaceNode(s.effects, patch.nodeId, clone(patch.replace));
+      else recordMinionPatch(unit, { op: "patchNode", skillId: patch.skillId, nodeId: patch.nodeId, replace: clone(patch.replace) });
       return;
     }
     case "custom": {

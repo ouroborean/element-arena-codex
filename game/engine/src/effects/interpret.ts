@@ -17,6 +17,7 @@ import type { SkillInstance } from "../skill.ts";
 import { getMinionTemplate } from "../minions.ts";
 import { skillIsInvisible } from "../visibility.ts";
 import type { Condition, Effect, Selector, StatusMatch, StatusSpec, Value } from "./ast.ts";
+import { replaceNode } from "./patch.ts";
 
 export interface Ctx {
   state: MatchState;
@@ -686,8 +687,28 @@ function summonMinion(ctx: Ctx, templateName: string, hpOverride: number | null)
     skills: (tmpl?.skills ?? []).map((s) => ({ ...s, currentCd: 0 })),
     triggers: (tmpl?.triggers ?? []).map((t) => ({ ...t, owner: id })),
   };
+  applyMinionSkillPatches(ctx.state.units[id]!, ctx.caster);
   team.units.push(id);
   ctx.emit({ type: "minionSummoned", unit: id, template: templateName, summoner: ctx.caster.id });
+}
+
+/** Replay the summoner's recorded minion-skill patches (an augment that appends/patches a skill living on
+ *  the hero's minion templates, e.g. Trinity's "The Power of Friendship" → the Rangers' Lens skills) onto a
+ *  freshly-summoned minion. Each touched skill is deep-cloned first so the shared template is never mutated. */
+function applyMinionSkillPatches(minion: Unit, summoner: Unit): void {
+  const patches = summoner.minionSkillPatches;
+  if (!patches?.length || !minion.skills) return;
+  for (const p of patches) {
+    const i = minion.skills.findIndex((s) => s.id === p.skillId);
+    if (i < 0) continue;
+    const s = JSON.parse(JSON.stringify(minion.skills[i]!)) as SkillInstance; // clone so we never touch the template
+    minion.skills[i] = s;
+    // Clone the hero-stored payload too: each summoned minion must own its effect/meta/replace nodes, never
+    // share them across summons or with the hero's minionSkillPatches record (clone-before-mutate discipline).
+    if (p.op === "appendEffect" && p.effect) s.effects = [...s.effects, ...(JSON.parse(JSON.stringify(p.effect)) as Effect[])];
+    else if (p.op === "setSkillMeta" && p.meta) Object.assign(s, JSON.parse(JSON.stringify(p.meta)));
+    else if (p.op === "patchNode" && p.nodeId && p.replace) replaceNode(s.effects, p.nodeId, JSON.parse(JSON.stringify(p.replace)) as Effect);
+  }
 }
 
 function runAll(effects: Effect[], ctx: Ctx): void {
