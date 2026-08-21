@@ -10467,8 +10467,7 @@ export const FUSIONS: FusionForm[] = [
        ]
       },
       {
-       "has": "stun",
-       "of": "self"
+       "eventStatusKind": "stun"
       }
      ]
     },

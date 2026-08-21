@@ -10629,8 +10629,7 @@
         ]
        },
        {
-        "has": "stun",
-        "of": "self"
+        "eventStatusKind": "stun"
        }
       ]
      },
