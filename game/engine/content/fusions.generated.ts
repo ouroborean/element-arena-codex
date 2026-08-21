@@ -184,14 +184,12 @@ export const FUSIONS: FusionForm[] = [
       {
        "or": [
         {
-         "has": "mark",
-         "name": "Charged",
-         "of": "self"
+         "eventStatusKind": "mark",
+         "name": "Charged"
         },
         {
-         "has": "mark",
-         "name": "Supercharged",
-         "of": "self"
+         "eventStatusKind": "mark",
+         "name": "Supercharged"
         }
        ]
       }
@@ -660,9 +658,8 @@ export const FUSIONS: FusionForm[] = [
        ]
       },
       {
-       "has": "mark",
-       "name": "Charged",
-       "of": "self"
+       "eventStatusKind": "mark",
+       "name": "Charged"
       }
      ]
     },
@@ -686,9 +683,8 @@ export const FUSIONS: FusionForm[] = [
        ]
       },
       {
-       "has": "mark",
-       "name": "Supercharged",
-       "of": "self"
+       "eventStatusKind": "mark",
+       "name": "Supercharged"
       }
      ]
     },
@@ -11061,9 +11057,8 @@ export const FUSIONS: FusionForm[] = [
        "faction": "enemy"
       },
       {
-       "has": "dot",
-       "name": "Fan the Flames",
-       "of": "eventUnit"
+       "eventStatusKind": "dot",
+       "name": "Fan the Flames"
       },
       {
        "not": {
@@ -17877,8 +17872,7 @@ export const FUSIONS: FusionForm[] = [
     "on": "statusApplied",
     "source": "Shadow Court Ritual",
     "when": {
-     "has": "elemental_essence",
-     "of": "eventUnit"
+     "eventStatusKind": "elemental_essence"
     },
     "effect": [
      {

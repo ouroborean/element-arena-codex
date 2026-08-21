@@ -183,14 +183,12 @@
        {
         "or": [
          {
-          "has": "mark",
-          "name": "Charged",
-          "of": "self"
+          "eventStatusKind": "mark",
+          "name": "Charged"
          },
          {
-          "has": "mark",
-          "name": "Supercharged",
-          "of": "self"
+          "eventStatusKind": "mark",
+          "name": "Supercharged"
          }
         ]
        }
@@ -204,7 +202,7 @@
        "to": "self"
       }
      ],
-     "note": "Each time Ando gains Charged or Supercharged, add a Capacitor Upgrade stack (each stack = +5 Expel Energy damage). statusApplied approximates the charge-gain hook."
+     "note": "Each time Ando gains Charged or Supercharged, add a Capacitor Upgrade stack (each stack = +5 Expel Energy damage). Fires exactly on the charge-gain via eventStatusKind (the applied status IS Charged/Supercharged), not merely while holding it."
     },
     {
      "on": "skillUsed",
@@ -665,9 +663,8 @@
         ]
        },
        {
-        "has": "mark",
-        "name": "Charged",
-        "of": "self"
+        "eventStatusKind": "mark",
+        "name": "Charged"
        }
       ]
      },
@@ -678,7 +675,7 @@
        "to": "self"
       }
      ],
-     "note": "On gaining Charged, heal 5. statusApplied approximates the charge-gain hook."
+     "note": "On gaining Charged, heal 5. Fires exactly on the Charged application via eventStatusKind (not merely while holding it)."
     },
     {
      "on": "statusApplied",
@@ -692,9 +689,8 @@
         ]
        },
        {
-        "has": "mark",
-        "name": "Supercharged",
-        "of": "self"
+        "eventStatusKind": "mark",
+        "name": "Supercharged"
        }
       ]
      },
@@ -705,7 +701,7 @@
        "to": "self"
       }
      ],
-     "note": "On gaining Supercharged, heal 10."
+     "note": "On gaining Supercharged, heal 10 (fires exactly on the Supercharged application via eventStatusKind)."
     }
    ],
    "skill": {
@@ -11241,9 +11237,8 @@
         "faction": "enemy"
        },
        {
-        "has": "dot",
-        "name": "Fan the Flames",
-        "of": "eventUnit"
+        "eventStatusKind": "dot",
+        "name": "Fan the Flames"
        },
        {
         "not": {
@@ -11263,7 +11258,7 @@
        }
       }
      ],
-     "note": "'Fan the Flames now Shatters the affected enemy for its duration.' When Pyrrha applies a status to an enemy that now bears the Fan the Flames dot and is not already Shattered, apply Shatter for the burn's 3-turn duration. The not-Shattered guard stops the trigger re-firing on its own Shatter application. FIDELITY DEBT: statusApplied carries no name-matching Condition, so this keys off 'Pyrrha applied a status to a burning enemy' rather than specifically the Fan the Flames application; Shatter uses Fan the Flames' base 3-turn duration (won't track a Pyrokinesis-extended burn)."
+     "note": "'Fan the Flames now Shatters the affected enemy for its duration.' Fires specifically on the Fan the Flames APPLICATION (eventStatusKind dot 'Fan the Flames'), not on any status Pyrrha lands on a burning enemy; the not-Shattered guard stops re-firing on its own Shatter. Shatter duration 3 = Fan the Flames' base burn (always applied fresh at 3)."
     }
    ],
    "skill": {
@@ -18208,8 +18203,7 @@
      "on": "statusApplied",
      "source": "Shadow Court Ritual",
      "when": {
-      "has": "elemental_essence",
-      "of": "eventUnit"
+      "eventStatusKind": "elemental_essence"
      },
      "effect": [
       {

@@ -2809,8 +2809,7 @@ export const AUGMENTS: Augment[] = [
         ]
        },
        {
-        "has": "stun",
-        "of": "self"
+        "eventStatusKind": "stun"
        }
       ]
      },
