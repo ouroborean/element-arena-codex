@@ -21,6 +21,9 @@ export interface MinionTemplate {
   /** Statuses the minion is summoned WITH (intrinsic properties — e.g. Gaia, Enraged's +10 mods + Enraged
    *  mark). `appliedBy`/`appliedTurn` are filled at summon; use duration null for round-permanent. */
   statuses?: Array<Omit<Status, "appliedBy" | "appliedTurn">>;
+  /** A second template name this minion also answers to in `template:` selectors (Azure Sparkling is a plasma
+   *  re-skin of Cinderling, so it must be counted/consumed by base-kit "Cinderling" selectors). */
+  templateAlias?: string;
 }
 
 const REGISTRY = new Map<string, MinionTemplate>();

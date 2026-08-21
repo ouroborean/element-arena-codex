@@ -145,7 +145,7 @@ export function resolveSelector(sel: Selector, ctx: Ctx, admitUnderstudy = true)
       // A blanket kind selector (no template) never admits it — only a Dennis-by-name reference retargets.
       const isUnderstudy = admitUnderstudy && sel.template !== undefined && u.understudyFor === sel.template;
       if (sel.kind && u.kind !== sel.kind && !isUnderstudy) return false;
-      if (sel.template && u.name !== sel.template && !isUnderstudy) return false;
+      if (sel.template && u.name !== sel.template && u.templateAlias !== sel.template && !isUnderstudy) return false;
       if (sel.includeSelf === false && u.id === ctx.caster.id) return false;
       return true;
     });
@@ -595,6 +595,7 @@ export function exec(effect: Effect, ctx: Ctx): void {
       if (!tmpl) return;
       for (const u of effectTargets(effect.to, ctx, false)) { // never retemplate the understudy hero
         u.name = tmpl.name;
+        u.templateAlias = tmpl.templateAlias; // keep the alias in step with the new template (undefined clears a prior one)
         if (tmpl.element) u.currentElement = tmpl.element;
         u.maxHp = tmpl.maxHp;
         u.hp = effect.keepHp ? Math.min(u.hp, tmpl.maxHp) : tmpl.maxHp;
@@ -684,6 +685,7 @@ function summonMinion(ctx: Ctx, templateName: string, hpOverride: number | null)
     baseElement: element, currentElement: element,
     statuses: (tmpl?.statuses ?? []).map((s) => ({ ...s, appliedBy: ctx.caster.id, appliedTurn: ctx.state.turn, invisible: ctx.invisible || s.invisible || undefined })),
     alive: true, summoner: ctx.caster.id,
+    templateAlias: tmpl?.templateAlias,
     skills: (tmpl?.skills ?? []).map((s) => ({ ...s, currentCd: 0 })),
     triggers: (tmpl?.triggers ?? []).map((t) => ({ ...t, owner: id })),
   };

@@ -815,6 +815,8 @@
      "name": "Azure Sparkling",
      "maxHp": 10,
      "element": "plasma",
+     "templateAlias": "Cinderling",
+     "note": "jarrik:plasma Blue Flame Spirits replaces Cinderlings with Azure Sparklings. templateAlias 'Cinderling' makes base-kit template:'Cinderling' selectors (Wall of Sparks shield count, Blade of Dancing Lights duration count + defeat-consume) treat an Azure Sparkling exactly as the Cinderling it stands in for.",
      "skills": [
       {
        "id": "azure1",
