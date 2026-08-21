@@ -171,6 +171,37 @@ test("Conducted Emotion (current) B: her gaining Essence re-triggers Healing Tea
   }
 });
 
+// Conducted Emotion (current) B — "from ANOTHER source": essence River Daughter grants HERSELF (source==self,
+// e.g. via Healing Tears' own counter/stun halves) must NOT re-fire the essence half (that was the loop the
+// author flagged). Only an external essence gain counts. (Gate now: eventStatusKind essence + eventUnit==self
+// + eventSource != self.)
+test("Conducted Emotion (current) B: essence she grants HERSELF does not re-fire Healing Tears", () => {
+  const { state, rd, ally } = setup("current");
+  rd.statuses.push(essence("rd")); // self-granted
+  emit(state, { type: "statusApplied", unit: "rd", source: "rd", kind: "elemental_essence" });
+
+  assert.equal(!!regen(rd, "Healing Tears"), false, "self-granted essence (source==self) must not re-fire Healing Tears");
+  assert.equal(!!regen(ally, "Healing Tears"), false, "no team heal from her own essence grant (no loop)");
+});
+
+// Blood in the Water (blood) — the bonus is ADDITIVE ("10 additional health"): the base Healing Tears
+// (regen 5/3 + Essence) is preserved on top of the +10-per-40 instant heal (replace-mode fusion had dropped it).
+test("Blood in the Water (blood): base Healing Tears (regen 5/3 + Essence) applies IN ADDITION to +10/40", () => {
+  const { state, rd, ally, enemy } = setup("blood");
+  rd.hp = 50; ally.hp = 50;
+  rd.statuses.push({ kind: "stack", name: "Blood in the Water", magnitude: 80, duration: null, appliedBy: "rd", appliedTurn: 0 });
+  enemy.statuses.push(stun("rd"));
+
+  emit(state, { type: "statusApplied", unit: "e1", source: "rd", kind: "stun" });
+
+  assert.equal(regen(rd, "Healing Tears")?.magnitude, 5, "base Healing Tears regen 5 is preserved");
+  assert.equal(regen(rd, "Healing Tears")?.duration, 3, "base regen lasts 3 turns");
+  assert.equal(regen(ally, "Healing Tears")?.magnitude, 5, "ally gets the base regen too");
+  assert.equal(hasEssence(rd), true, "River Daughter gains Essence (base Healing Tears)");
+  assert.equal(rd.hp, 70, "the +20 blood bonus (10 per 40 of 80 stored) still applies instantly");
+  assert.equal(storedStack(rd), undefined, "stored damage emptied");
+});
+
 // --------------------------------------------------------------------------------------------------- //
 // Bubbling Mire (riverdaughterslime0) — the slime form routes Healing Tears' stun half into "Congeal"
 // (riverdaughterslime1), which heals allied Slime minions +15 (overheal -> Max HP).

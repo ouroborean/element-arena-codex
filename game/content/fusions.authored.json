@@ -12010,6 +12010,27 @@
      },
      "effect": [
       {
+       "op": "applyStatus",
+       "status": {
+        "kind": "regen",
+        "name": "Healing Tears",
+        "magnitude": 5,
+        "duration": 3
+       },
+       "to": {
+        "faction": "allies",
+        "includeSelf": true
+       }
+      },
+      {
+       "op": "applyStatus",
+       "status": {
+        "kind": "elemental_essence",
+        "duration": null
+       },
+       "to": "self"
+      },
+      {
        "op": "heal",
        "amount": {
         "op": "mul",
@@ -12039,7 +12060,7 @@
        "from": "self"
       }
      ],
-     "note": "'Whenever Healing Tears triggers' = whenever River Daughter counters an enemy (Healing Tears part 1). Heal team +10 per full 40 damage stored, then empty the store."
+     "note": "'Whenever Healing Tears triggers' = River Daughter counters an enemy. Blood in the Water is ADDITIVE ('10 additional health'): first the BASE Healing Tears (regen 5/3 + essence, which replace-mode fusion had dropped), THEN +10 per full 40 damage stored, then empty the store."
     },
     {
      "on": "statusApplied",
@@ -12060,6 +12081,27 @@
      },
      "effect": [
       {
+       "op": "applyStatus",
+       "status": {
+        "kind": "regen",
+        "name": "Healing Tears",
+        "magnitude": 5,
+        "duration": 3
+       },
+       "to": {
+        "faction": "allies",
+        "includeSelf": true
+       }
+      },
+      {
+       "op": "applyStatus",
+       "status": {
+        "kind": "elemental_essence",
+        "duration": null
+       },
+       "to": "self"
+      },
+      {
        "op": "heal",
        "amount": {
         "op": "mul",
@@ -12089,7 +12131,7 @@
        "from": "self"
       }
      ],
-     "note": "'Whenever Healing Tears triggers' = whenever River Daughter stuns an enemy (Healing Tears part 2). Same bonus heal + empty."
+     "note": "'Whenever Healing Tears triggers' = River Daughter stuns an enemy (Healing Tears part 2). Same as the counter half: BASE Healing Tears (regen 5/3 + essence) THEN the +10-per-40 additional heal + empty."
     }
    ],
    "skill": {
@@ -12237,14 +12279,21 @@
      "when": {
       "and": [
        {
+        "eventStatusKind": "elemental_essence"
+       },
+       {
         "sameUnit": [
          "eventUnit",
          "self"
         ]
        },
        {
-        "has": "elemental_essence",
-        "of": "eventUnit"
+        "not": {
+         "sameUnit": [
+          "eventSource",
+          "self"
+         ]
+        }
        }
       ]
      },
@@ -12263,7 +12312,7 @@
        }
       }
      ],
-     "note": "Healing Tears also activates whenever River Daughter gains Elemental Essence from ANOTHER source: heal team 10/1 but grant NO essence. Source-distinction ('from another source') is not expressible as a Condition; the engine should skip firing when the essence was granted by Healing Tears itself (the two triggers above) to avoid a loop."
+     "note": "Healing Tears also activates whenever River Daughter gains Elemental Essence FROM ANOTHER SOURCE: heal team 10/1, grant NO essence. Gated on the applied status being an elemental_essence (eventStatusKind) landing on her (eventUnit==self) from ANOTHER unit (eventSource != self) -- so essence she grants herself via Healing Tears' own counter/stun halves does not re-fire this (the loop the author flagged), and only a genuinely external essence gain triggers it. eventStatusKind also stops the self-recursion the old has(essence,eventUnit) gate caused (its regen application re-entered)."
     }
    ],
    "skill": {
