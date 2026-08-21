@@ -82,7 +82,8 @@ export const MINIONS: MinionTemplate[] = [
     "currentCd": 0
    }
   ],
-  "triggers": []
+  "triggers": [],
+  "templateAlias": "Cinderling"
  },
  {
   "name": "Bjorn, True King",

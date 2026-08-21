@@ -33,3 +33,16 @@ test("a non-plasma Jarrik still summons Cinderlings", () => {
   runEffects(state, [{ op: "summon", template: "Cinderling", count: 1 }], { caster: jarrik, self: jarrik });
   assert.ok(names(state).includes("Cinderling"), "unfused Jarrik summons a Cinderling");
 });
+
+test("Azure Sparklings count as Cinderlings for base-kit template:'Cinderling' selectors (templateAlias)", () => {
+  const jarrik = loadHero(heroById("jarrik"), "A", "j");
+  applyFusion(jarrik, fusionForm("jarrik", "plasma")!);
+  const state = makeState([jarrik], [makeUnit({ id: "e", team: "B" })]);
+  emit(state, { type: "roundStart" }); // Blue Flame Spirits mark
+  runEffects(state, [{ op: "summon", template: "Cinderling", count: 1 }], { caster: jarrik, self: jarrik });
+  assert.ok(names(state).includes("Azure Sparkling") && !names(state).includes("Cinderling"), "the summon minted an Azure Sparkling");
+
+  // A base-kit "Cinderling" selector (Wall of Sparks / Blade of Dancing Lights count on this) must see it.
+  runEffects(state, [{ op: "addStack", name: "CinderlingCount", amount: { ref: "count", of: { faction: "allies", template: "Cinderling" } }, to: "self" }], { caster: jarrik, self: jarrik });
+  assert.equal(jarrik.statuses.find((s) => s.name === "CinderlingCount")?.magnitude, 1, "the Azure Sparkling is counted as a Cinderling via templateAlias");
+});

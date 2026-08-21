@@ -189,6 +189,9 @@ export interface Unit {
   triggers?: TriggeredEffect[];
   /** For a minion: the hero that summoned it (referenced by its skills/triggers). */
   summoner?: UnitId;
+  /** A second template name this minion also answers to in `template:` selectors (an Azure Sparkling is a
+   *  plasma re-skin of Cinderling, so base-kit "Cinderling" selectors must count/consume it). */
+  templateAlias?: string;
   /** The id of the last skill this unit successfully used (set on cast, reset each round). */
   lastSkillId?: string;
   /** The fusion form this hero took, if any (once per match — the between-round metagame). */

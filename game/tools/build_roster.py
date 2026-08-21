@@ -91,6 +91,8 @@ def main():
             entry["triggers"] = norm_triggers(m.get("triggers"), m["name"])
             if m.get("statuses"):
                 entry["statuses"] = strip_notes(m["statuses"])
+            if m.get("templateAlias"):
+                entry["templateAlias"] = m["templateAlias"]
             minions[m["name"]] = entry
 
     parts = [
