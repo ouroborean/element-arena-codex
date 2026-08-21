@@ -2869,6 +2869,30 @@ export const ROSTER: HeroDef[] = [
      {
       "op": "if",
       "cond": {
+       "and": [
+        {
+         "has": "mark",
+         "name": "Brimsteel Scabbard",
+         "of": "caster"
+        },
+        {
+         "has": "mark",
+         "name": "Cinders",
+         "of": "target"
+        }
+       ]
+      },
+      "then": [
+       {
+        "op": "summon",
+        "template": "Cinderling",
+        "count": 1
+       }
+      ]
+     },
+     {
+      "op": "if",
+      "cond": {
        "has": "mark",
        "name": "Dancing Lights",
        "of": "caster"
@@ -2924,11 +2948,6 @@ export const ROSTER: HeroDef[] = [
        "of": "caster"
       },
       "then": [
-       {
-        "op": "summon",
-        "template": "Cinderling",
-        "count": 1
-       },
        {
         "op": "removeStatus",
         "kind": "mark",
