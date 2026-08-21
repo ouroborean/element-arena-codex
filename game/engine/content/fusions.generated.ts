@@ -11814,7 +11814,7 @@ export const FUSIONS: FusionForm[] = [
     "source": "Blood in the Water (riverdaughterblood0)",
     "when": {
      "sameUnit": [
-      "eventSource",
+      "eventCounterer",
       "self"
      ]
     },
@@ -12007,7 +12007,7 @@ export const FUSIONS: FusionForm[] = [
     "source": "Conducted Emotion (riverdaughtercurrent0)",
     "when": {
      "sameUnit": [
-      "eventSource",
+      "eventCounterer",
       "self"
      ]
     },
@@ -12473,7 +12473,7 @@ export const FUSIONS: FusionForm[] = [
     "source": "Triton's Blessing (riverdaughterocean0)",
     "when": {
      "sameUnit": [
-      "eventSource",
+      "eventCounterer",
       "self"
      ]
     },
@@ -12748,7 +12748,7 @@ export const FUSIONS: FusionForm[] = [
     "source": "Bubbling Mire (riverdaughterslime0)",
     "when": {
      "sameUnit": [
-      "eventSource",
+      "eventCounterer",
       "self"
      ]
     },

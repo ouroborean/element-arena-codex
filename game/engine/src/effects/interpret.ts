@@ -112,7 +112,7 @@ export function resolveSelector(sel: Selector, ctx: Ctx, admitUnderstudy = true)
       (u) => u.alive && u.kind === "hero" && u.id !== ctx.self.id && u.slot !== undefined && Math.abs(u.slot - slot) === 1,
     );
   }
-  if (sel === "eventSource" || sel === "eventTarget" || sel === "eventUnit") {
+  if (sel === "eventSource" || sel === "eventTarget" || sel === "eventUnit" || sel === "eventCounterer") {
     return eventUnits(sel, ctx);
   }
   if (sel === "eventTargets") {
@@ -183,7 +183,7 @@ function healLocked(u: Unit, healerId: string): boolean {
   return lock.unitRef === undefined ? true : lock.unitRef !== healerId;
 }
 
-function eventUnits(sel: "eventSource" | "eventTarget" | "eventUnit", ctx: Ctx): Unit[] {
+function eventUnits(sel: "eventSource" | "eventTarget" | "eventUnit" | "eventCounterer", ctx: Ctx): Unit[] {
   const e = ctx.event;
   if (!e) return [];
   let id: string | null = null;
@@ -191,6 +191,7 @@ function eventUnits(sel: "eventSource" | "eventTarget" | "eventUnit", ctx: Ctx):
     id = "source" in e ? e.source : "caster" in e ? e.caster : e.type === "unitDied" ? e.killer : null;
   } else if (sel === "eventTarget" && "target" in e) id = e.target;
   else if (sel === "eventUnit") id = "unit" in e ? e.unit : null;
+  else if (sel === "eventCounterer") id = "counterer" in e ? e.counterer : null;
   const u = id ? ctx.state.units[id] : undefined;
   return u ? [u] : [];
 }

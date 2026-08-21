@@ -237,7 +237,7 @@ test("Healing Tears does NOT fire from a non-stunning Undertow (no counter, no s
 // SUSPECTED BUG: the frozen passive fires on COUNTERS as well as stuns, but the engine's counterFired
 // trigger never fires for River Daughter's own counter (its gate reads the countered attacker as
 // `eventSource`, not the counterer), so no team regen / Essence is granted. Kept as an executable bug report.
-test.skip("SUSPECTED BUG: countering an enemy (River Clone) should heal the team 5/3 + grant Essence, but does not", () => {
+test("Healing Tears (counter half): countering an enemy heals the team 5/3 + grants Essence", () => {
   const { state, rd, ally } = setup({ enemies: 1 });
   state.units["e1"]!.skills = [attack(30)];
   performAction(state, { unit: "rd", skillId: "riverdaughter3", targets: ["e1"] });
