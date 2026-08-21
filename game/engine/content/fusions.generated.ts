@@ -1726,6 +1726,11 @@ export const FUSIONS: FusionForm[] = [
        ]
       },
       {
+       "not": {
+        "eventSourceId": "Consecrate"
+       }
+      },
+      {
        "has": "dot",
        "name": "Consecrate",
        "of": "eventTarget"
@@ -3345,6 +3350,9 @@ export const FUSIONS: FusionForm[] = [
       {
        "isFaction": "eventTarget",
        "faction": "enemy"
+      },
+      {
+       "eventSourceId": "gaia2"
       }
      ]
     },
@@ -10514,6 +10522,9 @@ export const FUSIONS: FusionForm[] = [
       {
        "isFaction": "eventTarget",
        "faction": "enemy"
+      },
+      {
+       "eventSourceId": "pyrrha2"
       }
      ]
     },
@@ -10894,9 +10905,7 @@ export const FUSIONS: FusionForm[] = [
        "faction": "enemy"
       },
       {
-       "has": "dot",
-       "name": "Fan the Flames",
-       "of": "eventTarget"
+       "eventSourceId": "Fan the Flames"
       }
      ]
     },
