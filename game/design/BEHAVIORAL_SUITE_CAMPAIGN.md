@@ -46,7 +46,14 @@ Big systemic clusters from fusion wave 1 (fix once → clears many across base+f
 - **no `requires`/usability gate primitive** ("cannot be used if…"): gommarmyth1, xyris5, …
 - **`has(of: …)` uses resolveOne (first target only)** → "each affected enemy" filters mis-fire: pyrrha dragon, …
 
-### Phase 3 — augments — _pending_
+### Phase 3 — augments
+- Wave 1 (13) — **DONE (201 tests, 16 suspects)**
+- Wave 2 (14) — **DONE (224 tests, 14 suspects)**
+
+## COVERAGE COMPLETE (2026-08-21)
+Every base skill, fusion form, and augment now has a spec-derived behavioral suite. Full suite ~2642 tests, 0 fail, 128 skipped. **~140 suspected bugs found, ~17 fixed → the 128 skips are the live fixing backlog.**
+
+New systemic class from augments: **`addStack` never emits `statusApplied`** (only the `applyStatus` op does), so statusApplied triggers meant to react to a stack landing (Nightwalker/laria4 Bypass, laria5 Vanish) never fire via a real skill — my earlier fidelity3_cov_nightwalker test masked it with a hand-rolled emit. Also: **in-cast self-cooldown reduction is clobbered** by performAction's `effectiveCooldown` overwrite (xyris3, sera2) — needs the engine to fold pending self-cd deltas.
 
 ## Suspected-bug backlog (spec-derived tests that fail → likely broken skills; each is a `test.skip` in its suite)
 ### Wave 1 (18) — grouped by root cause
