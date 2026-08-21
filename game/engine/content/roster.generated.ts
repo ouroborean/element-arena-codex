@@ -12096,7 +12096,8 @@ export const ROSTER: HeroDef[] = [
         "id": "realize.discount",
         "status": {
          "kind": "cost_mod",
-         "magnitude": -2,
+         "genericDelta": -1,
+         "specificDelta": -1,
          "duration": 1
         }
        }

@@ -339,9 +339,17 @@ function poolTotal(pool: EnergyPool): number {
  * won't charge. `state` stays optional only so pure cost_mod-status unit tests (no costMods) can stay 2-arg.
  */
 export function effectiveCost(caster: Unit, skill: SkillInstance, state?: MatchState): SkillInstance["cost"] {
-  let delta = 0;
+  let delta = 0, genDelta = 0, specDelta = 0;
   // Global cost_mods (no skillId) apply to every skill; scoped ones only to their skill.
-  for (const s of caster.statuses) if (s.kind === "cost_mod" && (!s.skillId || s.skillId === skill.id)) delta += s.magnitude ?? 0;
+  for (const s of caster.statuses) {
+    if (s.kind !== "cost_mod" || (s.skillId && s.skillId !== skill.id)) continue;
+    // A tag-scoped cost_mod (titania Hallucinogenic Spores: "non-Strategic skills cost +1") applies only to
+    // skills matching its scope — same tag/mode test as a scoped stun.
+    if (s.scope && (s.scope.mode === "only") !== skill.tags.includes(s.scope.tag)) continue;
+    delta += s.magnitude ?? 0;
+    genDelta += s.genericDelta ?? 0; // per-channel deltas (scratch3 "-1 Generic AND -1 Specific"): applied
+    specDelta += s.specificDelta ?? 0; // to each channel independently, floored, with NO spill.
+  }
   // Per-cast conditional cost mods carried on the skill, re-evaluated live at each cast.
   if (state && skill.costMods) {
     for (const m of skill.costMods) {
@@ -350,14 +358,15 @@ export function effectiveCost(caster: Unit, skill: SkillInstance, state?: MatchS
     }
   }
   const remap = caster.statuses.some((s) => s.kind === "cost_currency_remap" && (!s.skillId || s.skillId === skill.id));
-  if (delta === 0 && !remap) return skill.cost;
+  if (delta === 0 && genDelta === 0 && specDelta === 0 && !remap) return skill.cost;
   let generic = skill.cost.generic + delta;
   let specific = skill.cost.specific;
   if (generic < 0) {
-    specific += generic; // spill the leftover discount onto the specific cost
+    specific += generic; // spill the leftover scalar discount onto the specific cost
     generic = 0;
   }
-  specific = Math.max(0, specific);
+  generic = Math.max(0, generic + genDelta); // per-channel: independent, floored, no cross-channel spill
+  specific = Math.max(0, specific + specDelta);
   if (remap && specific > 0) { // Specific → Generic: any color may now pay the remapped portion
     generic += specific;
     specific = 0;

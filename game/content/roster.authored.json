@@ -11350,7 +11350,7 @@
       "specific": 1
      },
      "cooldown": 1,
-     "note": "Until the end of their next turn (duration 1, applier-anchored), target's skills cost 1 less Specific and 1 less Generic. Engine gap: cost_mod is a single scalar delta applied generic-first then spilling onto specific (effectiveCost), so per-channel '-1 generic AND -1 specific' is approximated as magnitude -2 (a 2-energy total discount); it matches exactly for skills costing >=1 generic and >=1 specific and is the closest scalar otherwise ('scoped cost' is tracked engine debt). 'If they use a new skill, stunned 1 turn' = the reaction trigger. Faustian: skip discount vs enemies; flag 'no-trigger' vs allies.",
+     "note": "Until the end of their next turn (duration 1, applier-anchored), target's skills cost 1 less Specific AND 1 less Generic — a cost_mod with per-channel genericDelta:-1/specificDelta:-1, applied to each channel independently (floored, no cross-channel spill) by effectiveCost. 'If they use a new skill, stunned 1 turn' = the reaction trigger. Faustian: skip discount vs enemies; flag 'no-trigger' vs allies.",
      "effects": [
       {
        "op": "if",
@@ -11376,7 +11376,8 @@
          "id": "realize.discount",
          "status": {
           "kind": "cost_mod",
-          "magnitude": -2,
+          "genericDelta": -1,
+          "specificDelta": -1,
           "duration": 1
          }
         }
