@@ -120,6 +120,10 @@ export interface Status {
   disguiseName?: string;
   /** For a cost_mod / cooldown_mod that applies to ONE skill only (absent = all skills). */
   skillId?: string;
+  /** For a cost_mod: per-channel deltas applied to Generic / Specific independently (floored, no cross-channel
+   *  spill) — for "reduce Generic by 1 AND Specific by 1" which a single scalar magnitude cannot express. */
+  genericDelta?: number;
+  specificDelta?: number;
   /** For an incoming_damage_mult: apply only to NEW skill hits (isNew), not ongoing DoT ticks. */
   newDamageOnly?: boolean;
   /** For a conditional_bypass: the target must hold this status (kind + optional name) for the bypass to apply. */
