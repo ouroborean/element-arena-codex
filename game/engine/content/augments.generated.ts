@@ -1243,9 +1243,13 @@ export const AUGMENTS: Augment[] = [
       "to": "self"
      },
      {
-      "op": "removeStatus",
-      "kind": "stun",
-      "from": "self"
+      "op": "applyStatus",
+      "to": "self",
+      "status": {
+       "kind": "mark",
+       "name": "Stun Immunity",
+       "duration": 1
+      }
      }
     ]
    }

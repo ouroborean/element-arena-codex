@@ -11703,10 +11703,13 @@
        },
        {
         "declaredTargetsSelf": true
+       },
+       {
+        "eventHasTag": "Harmful"
        }
       ]
      },
-     "note": "aramao6: 'Aramao will use Desert Knife on any enemy that uses a Harmful skill on him.' Retaliates with Desert Knife (useSkill aramao1) on the attacker. Engine caveat: the skillUsed event carries no class tags, so the 'Harmful' qualifier cannot be tested here; approximated as 'an enemy targets Aramao with a skill' (enemies effectively never spend a non-Harmful skill on him). useSkill runs aramao1's effects inline and emits no skillUsed, so this does not recurse.",
+     "note": "aramao6: 'Aramao will use Desert Knife on any enemy that uses a Harmful skill on him.' Retaliates with Desert Knife (useSkill aramao1) on the attacker who targeted Aramao with a Harmful skill (eventHasTag 'Harmful' gates out non-Harmful skills). useSkill runs aramao1's effects inline and emits no skillUsed, so this does not recurse.",
      "effect": [
       {
        "op": "useSkill",

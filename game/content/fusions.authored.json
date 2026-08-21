@@ -1527,14 +1527,15 @@
     "targeting": "self",
     "tags": [
      "Strategic",
-     "Instant"
+     "Instant",
+     "Unstunnable"
     ],
     "cost": {
      "generic": 0,
      "specific": 2
     },
     "cooldown": 3,
-    "note": "'Ignores harmful effects for 2 turns' = damage_ignore (all damage) + non_damage_ignore (harmful non-damage) for 2. 'Activates Chorus' = useSkill ayana2. 'This skill cannot be stunned' has no skill-meta primitive (a skill castable while stunned) - tracked debt.",
+    "note": "'Ignores harmful effects for 2 turns' = damage_ignore (all damage) + non_damage_ignore (harmful non-damage) for 2. 'Activates Chorus' = useSkill ayana2. 'This skill cannot be stunned' = the Unstunnable tag, which isStunnedFor honors (the skill is castable even while Ayana is stunned).",
     "effects": [
      {
       "op": "applyStatus",
@@ -11117,7 +11118,8 @@
     "tags": [
      "Harmful",
      "Instant",
-     "Bypassing"
+     "Bypassing",
+     "Uncounterable"
     ],
     "cost": {
      "generic": 1,
