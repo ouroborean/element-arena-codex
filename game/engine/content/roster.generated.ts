@@ -13250,6 +13250,24 @@ export const ROSTER: HeroDef[] = [
      "specific": 3
     },
     "cooldown": 6,
+    "costMods": [
+     {
+      "magnitude": {
+       "op": "mul",
+       "args": [
+        {
+         "ref": "count",
+         "of": {
+          "faction": "allies",
+          "alive": false,
+          "kind": "hero"
+         }
+        },
+        -1
+       ]
+      }
+     }
+    ],
     "effects": [
      {
       "op": "applyStatus",
