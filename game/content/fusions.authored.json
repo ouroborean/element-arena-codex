@@ -1885,7 +1885,7 @@
    "passive": {
     "name": "Divine Ire",
     "description": "Whenever an enemy deals damage to Ayana's allies, she permanently deals 5 additional damage to them with Voice of Light (stacks).",
-    "note": "Records the +5-per-occurrence Voice-of-Light bonus as a stacking 'Divine Ire' marker (magnitude +5) on the offending enemy (eventSource = 'them'). Base Voice of Light (ayana1) does not consume this stack (skill-scoped outgoing bonus is not wired) - tracked debt. 'Allies' = Ayana's team heroes."
+    "note": "Records the +5-per-occurrence Voice-of-Light bonus as a stacking 'Divine Ire' marker (magnitude +5) on the offending enemy (eventSource = 'them'). Base Voice of Light (ayana1) reads it: each enemy's VoL hit deals 15 + statusMag(Divine Ire of that enemy) — permanent, not consumed (both the Chorus forEach and single-target branches). statusMag is 0 for a non-Divine-Ire ayana. 'Allies' = Ayana's team heroes."
    },
    "passiveTriggers": [
     {

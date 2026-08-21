@@ -8851,13 +8851,30 @@ export const ROSTER: HeroDef[] = [
       },
       "then": [
        {
-        "op": "damage",
-        "amount": 15,
-        "dtype": "normal",
-        "to": {
+        "op": "forEach",
+        "each": {
          "faction": "enemies"
         },
-        "id": "ayana1.hit"
+        "do": [
+         {
+          "op": "damage",
+          "amount": {
+           "op": "add",
+           "args": [
+            15,
+            {
+             "ref": "statusMag",
+             "kind": "stack",
+             "name": "Divine Ire",
+             "of": "it"
+            }
+           ]
+          },
+          "dtype": "normal",
+          "to": "it",
+          "id": "ayana1.hit"
+         }
+        ]
        },
        {
         "op": "applyStatus",
@@ -8884,7 +8901,18 @@ export const ROSTER: HeroDef[] = [
       "else": [
        {
         "op": "damage",
-        "amount": 15,
+        "amount": {
+         "op": "add",
+         "args": [
+          15,
+          {
+           "ref": "statusMag",
+           "kind": "stack",
+           "name": "Divine Ire",
+           "of": "target"
+          }
+         ]
+        },
         "dtype": "normal",
         "to": "target",
         "id": "ayana1.hit"
