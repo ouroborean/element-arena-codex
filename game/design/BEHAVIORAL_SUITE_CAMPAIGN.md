@@ -32,7 +32,18 @@ Suite files land as `engine/test/suite_<hero>_base.test.ts`, `suite_<hero>_fusio
 - **permanent (`duration:null`) dot/regen now ticks** → titania1, dennis5 (+ revived 15 more dead dots/regens).
 - **`non_damage_ignore` now enforced** → pyrrha5, dennis3, hector3. _(Follow-up: scope Mindfog/Absolute Power to stuns.)_
 
-### Phase 2 — fusion forms — _pending_
+### Phase 2 — fusion forms
+- Wave 1 (13): pyrrha…titania — **DONE (496 tests, 45 suspects)**
+- Wave 2 (14): gaia, roland, ayana, taryn, blackknight, maggie, laria, xyris, fate, scratch, aramao, sera, galazax, trinity — _pending_
+
+Big systemic clusters from fusion wave 1 (fix once → clears many across base+fusion+augment):
+- **scope-blind `invulnerable`** (ignores its `scope`, blocks ALL harmful): gommar4, gommaraurora1, …
+- **`outgoing_damage_mod` only applies to normal/piercing** — not Affliction or True ("non-Affliction"/"more Affliction" clauses dead): jarrikdragon0, fate0, …
+- **`non_damage_ignore` over-broad** (no stun-only/scoped variant): gommar apocalypse/glacier, hector Mindfog, scratch1.
+- **`damage_ignore` over-broad** (no "periodic-only" scope): gommarlich0.
+- **no `requires`/usability gate primitive** ("cannot be used if…"): gommarmyth1, xyris5, …
+- **`has(of: …)` uses resolveOne (first target only)** → "each affected enemy" filters mis-fire: pyrrha dragon, …
+
 ### Phase 3 — augments — _pending_
 
 ## Suspected-bug backlog (spec-derived tests that fail → likely broken skills; each is a `test.skip` in its suite)
