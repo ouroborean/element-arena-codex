@@ -2849,7 +2849,7 @@
    "owner": "dennis",
    "name": "Auto-Injectors",
    "description": "Dennis will automatically use HS-46 Ascendant Serum on himself any time he receives a stun effect.",
-   "note": "HS-46 Ascendant Serum=dennis3. Reactive on statusApplied to Dennis; the applied status being a stun is approximated by testing that Dennis now has a stun ({has:'stun',of:'self'}) — no condition inspects the specific applied status kind. HS-46 applies no stun, so no loop.",
+   "note": "HS-46 Ascendant Serum=dennis3. Reactive on statusApplied to Dennis, gated on the APPLIED status being a stun (eventStatusKind:'stun') so it fires only when a stun lands, not on any status while Dennis happens to hold one. HS-46 applies no stun, so no loop.",
    "patches": [
     {
      "op": "addTrigger",
@@ -2867,8 +2867,7 @@
          ]
         },
         {
-         "has": "stun",
-         "of": "self"
+         "eventStatusKind": "stun"
         }
        ]
       },
