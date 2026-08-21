@@ -16850,7 +16850,7 @@
        "amount": 1,
        "to": "self",
        "duration": null,
-       "note": "Each Arcadian Advancement stack extends the duration of every effect Titania applies by +1 turn; the engine reads this counter when it stamps a status' duration. No primitive expresses 'all my applied effects last +1', so the counter carries the intent (fidelity debt: engine-side read of the counter)."
+       "note": "Each Arcadian Advancement stack extends every non-round-permanent status Titania applies by +1 turn: buildStatus adds stackCount('Arcadian Advancement') of the caster to each applied duration (null/round-permanent untouched; zero for any other caster, so it is self-gating to Titania)."
       }
      ],
      "note": "'Each time an ally triggers Prance' = the moment an allied hero is the first unit to use a new skill on Titania while her Prance Watch mark is up (the same condition base Prance uses to grant Elemental Essence), gated to allies. Ordering caveat: base Prance consumes 'Prance Watch' in the same skillUsed event, so this trigger must resolve before that consumption."
