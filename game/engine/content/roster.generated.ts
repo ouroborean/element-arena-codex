@@ -6308,14 +6308,6 @@ export const ROSTER: HeroDef[] = [
       },
       "then": [
        {
-        "op": "applyStatus",
-        "to": "self",
-        "status": {
-         "kind": "elemental_essence",
-         "duration": null
-        }
-       },
-       {
         "op": "removeStatus",
         "kind": "mark",
         "name": "Ominous Rumble",
