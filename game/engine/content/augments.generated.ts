@@ -4817,7 +4817,7 @@ export const AUGMENTS: Augment[] = [
       "and": [
        {
         "sameUnit": [
-         "eventTarget",
+         "eventUnit",
          "self"
         ]
        },
@@ -5478,14 +5478,14 @@ export const AUGMENTS: Augment[] = [
       "left": {
        "ref": "stackCount",
        "name": "Deepening Shadows",
-       "of": "eventTarget"
+       "of": "eventUnit"
       },
       "right": 3
      },
      "effect": [
       {
        "op": "applyStatus",
-       "to": "eventTarget",
+       "to": "eventUnit",
        "status": {
         "kind": "damage_reduction",
         "name": "Vanish",
@@ -5536,7 +5536,7 @@ export const AUGMENTS: Augment[] = [
       "and": [
        {
         "sameUnit": [
-         "eventTarget",
+         "eventUnit",
          "self"
         ]
        },

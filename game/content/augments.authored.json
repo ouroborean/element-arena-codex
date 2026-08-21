@@ -4904,7 +4904,7 @@
        "and": [
         {
          "sameUnit": [
-          "eventTarget",
+          "eventUnit",
           "self"
          ]
         },
@@ -5575,14 +5575,14 @@
        "left": {
         "ref": "stackCount",
         "name": "Deepening Shadows",
-        "of": "eventTarget"
+        "of": "eventUnit"
        },
        "right": 3
       },
       "effect": [
        {
         "op": "applyStatus",
-        "to": "eventTarget",
+        "to": "eventUnit",
         "status": {
          "kind": "damage_reduction",
          "name": "Vanish",
@@ -5635,7 +5635,7 @@
        "and": [
         {
          "sameUnit": [
-          "eventTarget",
+          "eventUnit",
           "self"
          ]
         },

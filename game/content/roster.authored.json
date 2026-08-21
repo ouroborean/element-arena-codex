@@ -1686,7 +1686,7 @@
        },
        {
         "has": "stun",
-        "of": "eventTarget"
+        "of": "eventUnit"
        }
       ]
      },
@@ -2156,7 +2156,7 @@
       "and": [
        {
         "sameUnit": [
-         "eventTarget",
+         "eventUnit",
          "self"
         ]
        },
@@ -2218,7 +2218,7 @@
       "and": [
        {
         "sameUnit": [
-         "eventTarget",
+         "eventUnit",
          "self"
         ]
        },
@@ -4392,10 +4392,10 @@
      "when": {
       "and": [
        {
-        "eventHasTag": "invulnerable"
+        "eventStatusKind": "invulnerable"
        },
        {
-        "isFaction": "eventTarget",
+        "isFaction": "eventUnit",
         "faction": "enemy"
        }
       ]
@@ -4405,7 +4405,7 @@
        "op": "damage",
        "amount": 15,
        "dtype": "piercing",
-       "to": "eventTarget"
+       "to": "eventUnit"
       }
      ],
      "kind": "react",
@@ -9404,7 +9404,7 @@
       "and": [
        {
         "sameUnit": [
-         "eventTarget",
+         "eventUnit",
          "self"
         ]
        },

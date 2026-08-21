@@ -11852,7 +11852,7 @@ export const FUSIONS: FusionForm[] = [
       },
       {
        "has": "stun",
-       "of": "eventTarget"
+       "of": "eventUnit"
       }
      ]
     },
@@ -11996,7 +11996,7 @@ export const FUSIONS: FusionForm[] = [
       },
       {
        "has": "stun",
-       "of": "eventTarget"
+       "of": "eventUnit"
       }
      ]
     },
@@ -12032,13 +12032,13 @@ export const FUSIONS: FusionForm[] = [
      "and": [
       {
        "sameUnit": [
-        "eventTarget",
+        "eventUnit",
         "self"
        ]
       },
       {
        "has": "elemental_essence",
-       "of": "eventTarget"
+       "of": "eventUnit"
       }
      ]
     },
@@ -12456,7 +12456,7 @@ export const FUSIONS: FusionForm[] = [
       },
       {
        "has": "stun",
-       "of": "eventTarget"
+       "of": "eventUnit"
       }
      ]
     },
@@ -12716,7 +12716,7 @@ export const FUSIONS: FusionForm[] = [
       },
       {
        "has": "stun",
-       "of": "eventTarget"
+       "of": "eventUnit"
       }
      ]
     },
@@ -18643,10 +18643,10 @@ export const FUSIONS: FusionForm[] = [
     "when": {
      "and": [
       {
-       "eventHasTag": "invulnerable"
+       "eventStatusKind": "invulnerable"
       },
       {
-       "isFaction": "eventTarget",
+       "isFaction": "eventUnit",
        "faction": "enemy"
       }
      ]
@@ -18655,7 +18655,7 @@ export const FUSIONS: FusionForm[] = [
      {
       "op": "healthLoss",
       "amount": 15,
-      "to": "eventTarget"
+      "to": "eventUnit"
      }
     ]
    }
@@ -18713,10 +18713,10 @@ export const FUSIONS: FusionForm[] = [
     "when": {
      "and": [
       {
-       "eventHasTag": "invulnerable"
+       "eventStatusKind": "invulnerable"
       },
       {
-       "isFaction": "eventTarget",
+       "isFaction": "eventUnit",
        "faction": "enemy"
       }
      ]
@@ -18726,7 +18726,7 @@ export const FUSIONS: FusionForm[] = [
       "op": "damage",
       "amount": 15,
       "dtype": "affliction",
-      "to": "eventTarget"
+      "to": "eventUnit"
      }
     ]
    },
@@ -18906,10 +18906,10 @@ export const FUSIONS: FusionForm[] = [
     "when": {
      "and": [
       {
-       "eventHasTag": "invulnerable"
+       "eventStatusKind": "invulnerable"
       },
       {
-       "isFaction": "eventTarget",
+       "isFaction": "eventUnit",
        "faction": "enemy"
       }
      ]
@@ -18919,7 +18919,7 @@ export const FUSIONS: FusionForm[] = [
       "op": "damage",
       "amount": 15,
       "dtype": "piercing",
-      "to": "eventTarget"
+      "to": "eventUnit"
      },
      {
       "op": "custom",

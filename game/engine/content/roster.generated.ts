@@ -4312,7 +4312,7 @@ export const ROSTER: HeroDef[] = [
       },
       {
        "has": "stun",
-       "of": "eventTarget"
+       "of": "eventUnit"
       }
      ]
     },
@@ -4761,7 +4761,7 @@ export const ROSTER: HeroDef[] = [
      "and": [
       {
        "sameUnit": [
-        "eventTarget",
+        "eventUnit",
         "self"
        ]
       },
@@ -4821,7 +4821,7 @@ export const ROSTER: HeroDef[] = [
      "and": [
       {
        "sameUnit": [
-        "eventTarget",
+        "eventUnit",
         "self"
        ]
       },
@@ -6535,10 +6535,10 @@ export const ROSTER: HeroDef[] = [
     "when": {
      "and": [
       {
-       "eventHasTag": "invulnerable"
+       "eventStatusKind": "invulnerable"
       },
       {
-       "isFaction": "eventTarget",
+       "isFaction": "eventUnit",
        "faction": "enemy"
       }
      ]
@@ -6548,7 +6548,7 @@ export const ROSTER: HeroDef[] = [
       "op": "damage",
       "amount": 15,
       "dtype": "piercing",
-      "to": "eventTarget"
+      "to": "eventUnit"
      }
     ],
     "kind": "react",
@@ -10710,7 +10710,7 @@ export const ROSTER: HeroDef[] = [
      "and": [
       {
        "sameUnit": [
-        "eventTarget",
+        "eventUnit",
         "self"
        ]
       },
