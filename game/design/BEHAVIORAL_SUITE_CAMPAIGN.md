@@ -15,7 +15,22 @@ Suite files land as `engine/test/suite_<hero>_base.test.ts`, `suite_<hero>_fusio
 
 ### Phase 1 — base kits
 - Wave 1 (13): pyrrha, jarrik, gommar, keeper, riverdaughter, zevkir, saya, ando, zephyrex, syl, hector, dennis, titania — **DONE (290 tests, 18 suspects)**
-- Wave 2 (14): gaia, roland, ayana, taryn, blackknight, maggie, laria, xyris, fate, scratch, aramao, sera, galazax, trinity — _pending_
+- Wave 2 (14): gaia, roland, ayana, taryn, blackknight, maggie, laria, xyris, fate, scratch, aramao, sera, galazax, trinity — **DONE (298 tests, 10 suspects)**
+
+**Phase 1 base kits: DONE — 588 tests, 27 heroes, 28 suspects (5 fixed so far).**
+
+### Wave 2 backlog (10)
+**Systemic (clusters forming):**
+- **turnEnd over-fire (no `eventTeamIsSelf`)**: roland0 Living Stone (also saya1 from wave 1). → scan all turn triggers.
+- **"until a new skill" buff stripped by its OWN granting cast** (skillUsed reactor missing an eventSkillId/appliedTurn guard): laria4 Vanish.
+- **skillUsed reactor missing a Harmful gate** (fires on any enemy skill): trinityazure2 Prisma Whirl (cf. fate2 target-side scope).
+- **`requires` target-selector inert** (evalSkillCondition binds targets:[] so `sameUnit[target,caster]` never holds): xyris5 "cannot target Xyris".
+
+**Individual:** taryn4 target-invisibility not stamped · maggie1 essence-half unwired · fate0 outgoing_damage_mod skips True damage ("non-Affliction" should include True) · fate2 retaliation not scoped to on-Fate-team · sera2 in-cast modifyCooldown overwritten by the cd set · sera5 authored cooldown 3 ≠ frozen 4.
+
+### Fixed so far (PR #109 + follow-ups)
+- **permanent (`duration:null`) dot/regen now ticks** → titania1, dennis5 (+ revived 15 more dead dots/regens).
+- **`non_damage_ignore` now enforced** → pyrrha5, dennis3, hector3. _(Follow-up: scope Mindfog/Absolute Power to stuns.)_
 
 ### Phase 2 — fusion forms — _pending_
 ### Phase 3 — augments — _pending_
