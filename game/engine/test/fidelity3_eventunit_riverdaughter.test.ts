@@ -65,16 +65,16 @@ test("Healing Tears: stunning an enemy heals the team (regen 5/3) and grants Ess
     assert.equal(hasEssence(rd), true, "stunning an enemy grants River Daughter Elemental Essence");
   }
 
-  // Control — the stun sits on RIVER DAUGHTER HERSELF; the enemy is NOT stunned. Only the event's `unit`
-  // differs (still source==rd). eventUnit == enemy (no stun) -> gate fails; a `self`-reading gate would fire.
+  // Over-fire control — RD applies a NON-stun status to an ALREADY-stunned enemy. Pre-fix the gate read
+  // has(stun, eventUnit), so it fired on ANY status she applied to a still-stunned enemy (a spurious heal +
+  // Essence). The eventStatusKind:"stun" gate requires the APPLIED status itself to be a stun.
   {
-    const { state, rd, ally } = setup();
-    rd.statuses.push(stun("e1")); // she is stunned, the enemy is not
-    emit(state, { type: "statusApplied", unit: "e1", source: "rd", kind: "stun" });
+    const { state, rd, enemy } = setup();
+    enemy.statuses.push(stun("rd")); // the enemy is already stunned from a prior real stun
+    emit(state, { type: "statusApplied", unit: "e1", source: "rd", kind: "mark", name: "River Clone" });
 
-    assert.equal(!!regen(rd, "Healing Tears"), false, "her own stun (eventUnit != stunned enemy) must not heal the team");
-    assert.equal(!!regen(ally, "Healing Tears"), false, "ally not healed by her own stun");
-    assert.equal(hasEssence(rd), false, "no Essence off her own stun");
+    assert.equal(!!regen(rd, "Healing Tears"), false, "a non-stun applied to a stunned enemy must not re-fire the heal");
+    assert.equal(hasEssence(rd), false, "no Essence from a non-stun application");
   }
 });
 
@@ -95,15 +95,14 @@ test("Triton's Blessing (ocean): stunning an enemy grants a Triton's Blessing re
     assert.equal(hasEssence(rd), true, "stunning an enemy grants Elemental Essence");
   }
 
-  // Control — she is stunned, the enemy is not; eventUnit == enemy (no stun) -> no heal.
+  // Over-fire control — a NON-stun status applied to an already-stunned enemy must not re-fire.
   {
-    const { state, rd, ally } = setup("ocean");
-    rd.statuses.push(stun("e1"));
-    emit(state, { type: "statusApplied", unit: "e1", source: "rd", kind: "stun" });
+    const { state, rd, enemy } = setup("ocean");
+    enemy.statuses.push(stun("rd"));
+    emit(state, { type: "statusApplied", unit: "e1", source: "rd", kind: "mark", name: "River Clone" });
 
-    assert.equal(!!regen(rd, "Triton's Blessing"), false, "her own stun must not grant a Triton's Blessing regen");
-    assert.equal(!!regen(ally, "Triton's Blessing"), false, "ally not healed");
-    assert.equal(hasEssence(rd), false, "no Essence off her own stun");
+    assert.equal(!!regen(rd, "Triton's Blessing"), false, "a non-stun on a stunned enemy must not grant a Triton's Blessing regen");
+    assert.equal(hasEssence(rd), false, "no Essence from a non-stun application");
   }
 });
 
@@ -129,15 +128,14 @@ test("Conducted Emotion (current) A: stunning an enemy heals 10/1 + Essence; her
     assert.equal(hasEssence(rd), true, "stunning an enemy grants Elemental Essence");
   }
 
-  // Control — her own stun; enemy not stunned; eventUnit == enemy (no stun) -> no heal.
+  // Over-fire control — a NON-stun status applied to an already-stunned enemy must not re-fire the stun half.
   {
-    const { state, rd, ally } = setup("current");
-    rd.statuses.push(stun("e1"));
-    emit(state, { type: "statusApplied", unit: "e1", source: "rd", kind: "stun" });
+    const { state, rd, enemy } = setup("current");
+    enemy.statuses.push(stun("rd"));
+    emit(state, { type: "statusApplied", unit: "e1", source: "rd", kind: "mark", name: "River Clone" });
 
-    assert.equal(!!regen(rd, "Healing Tears"), false, "her own stun must not heal the team");
-    assert.equal(!!regen(ally, "Healing Tears"), false, "ally not healed");
-    assert.equal(hasEssence(rd), false, "no Essence off her own stun");
+    assert.equal(!!regen(rd, "Healing Tears"), false, "a non-stun on a stunned enemy must not heal the team");
+    assert.equal(hasEssence(rd), false, "no Essence from a non-stun application");
   }
 });
 
@@ -231,13 +229,13 @@ test("Bubbling Mire (slime): stunning an enemy casts Congeal to heal a Slime min
     assert.equal(state.units["sl1"]!.maxHp, 20, "the overheal became Max HP");
   }
 
-  // Control — she is stunned, the enemy is not; eventUnit == enemy (no stun) -> Congeal does not fire.
+  // Over-fire control — a NON-stun status applied to an already-stunned enemy must not cast Congeal.
   {
-    const { state, rd, slime } = slimeState();
-    rd.statuses.push(stun("e1"));
-    emit(state, { type: "statusApplied", unit: "e1", source: "rd", kind: "stun" });
+    const { state, slime, enemy } = slimeState();
+    enemy.statuses.push(stun("rd"));
+    emit(state, { type: "statusApplied", unit: "e1", source: "rd", kind: "mark", name: "River Clone" });
 
-    assert.equal(state.units["sl1"]!.hp, 5, "her own stun must not cast Congeal; the Slime stays damaged");
+    assert.equal(state.units["sl1"]!.hp, 5, "a non-stun on a stunned enemy must not cast Congeal; the Slime stays damaged");
   }
 });
 
@@ -263,17 +261,18 @@ test("Blood in the Water (blood): stunning an enemy spends stored damage into a 
     assert.equal(storedStack(rd), undefined, "the stored damage was emptied");
   }
 
-  // Control — her own stun; enemy not stunned; eventUnit == enemy (no stun) -> no heal, stored damage kept.
+  // Over-fire control — a NON-stun status applied to an already-stunned enemy must NOT empty the blood store.
+  // This is the concrete over-fire bug: pre-fix, marking a still-stunned enemy prematurely drained the store.
   {
-    const { state, rd, ally } = setup("blood");
+    const { state, rd, ally, enemy } = setup("blood");
     rd.hp = 50; ally.hp = 50;
     rd.statuses.push(bloodStack());
-    rd.statuses.push(stun("e1"));
+    enemy.statuses.push(stun("rd"));
 
-    emit(state, { type: "statusApplied", unit: "e1", source: "rd", kind: "stun" });
+    emit(state, { type: "statusApplied", unit: "e1", source: "rd", kind: "mark", name: "River Clone" });
 
-    assert.equal(rd.hp, 50, "her own stun must not heal");
+    assert.equal(rd.hp, 50, "a non-stun application must not heal");
     assert.equal(ally.hp, 50, "ally not healed");
-    assert.equal(storedStack(rd)?.magnitude, 80, "stored damage is retained (nothing triggered)");
+    assert.equal(storedStack(rd)?.magnitude, 80, "stored damage is NOT prematurely emptied");
   }
 });

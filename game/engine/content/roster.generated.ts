@@ -3896,8 +3896,7 @@ export const ROSTER: HeroDef[] = [
        }
       },
       {
-       "has": "elemental_essence",
-       "of": "eventUnit"
+       "eventStatusKind": "elemental_essence"
       }
      ]
     },
@@ -4311,8 +4310,7 @@ export const ROSTER: HeroDef[] = [
        ]
       },
       {
-       "has": "stun",
-       "of": "eventUnit"
+       "eventStatusKind": "stun"
       }
      ]
     },

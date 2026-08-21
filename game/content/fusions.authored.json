@@ -4932,9 +4932,8 @@
         ]
        },
        {
-        "has": "mark",
-        "name": "Frost-Covered",
-        "of": "self"
+        "eventStatusKind": "mark",
+        "name": "Frost-Covered"
        }
       ]
      },
@@ -6267,8 +6266,7 @@
         "kind": "hero"
        },
        {
-        "has": "invulnerable",
-        "of": "eventUnit"
+        "eventStatusKind": "invulnerable"
        }
       ]
      },
@@ -8933,6 +8931,10 @@
      "when": {
       "and": [
        {
+        "eventStatusKind": "stack",
+        "name": "Deepening Shadows"
+       },
+       {
         "isKind": "eventUnit",
         "kind": "hero"
        },
@@ -8945,7 +8947,7 @@
         }
        },
        {
-        "cmp": ">=",
+        "cmp": "==",
         "left": {
          "ref": "stackCount",
          "name": "Deepening Shadows",
@@ -9335,9 +9337,8 @@
         ]
        },
        {
-        "has": "stack",
-        "name": "Deepening Shadows",
-        "of": "eventUnit"
+        "eventStatusKind": "stack",
+        "name": "Deepening Shadows"
        }
       ]
      },
@@ -12074,8 +12075,7 @@
         ]
        },
        {
-        "has": "stun",
-        "of": "eventUnit"
+        "eventStatusKind": "stun"
        }
       ]
      },
@@ -12242,8 +12242,7 @@
         ]
        },
        {
-        "has": "stun",
-        "of": "eventUnit"
+        "eventStatusKind": "stun"
        }
       ]
      },
@@ -12720,8 +12719,7 @@
         ]
        },
        {
-        "has": "stun",
-        "of": "eventUnit"
+        "eventStatusKind": "stun"
        }
       ]
      },
@@ -12986,8 +12984,7 @@
         ]
        },
        {
-        "has": "stun",
-        "of": "eventUnit"
+        "eventStatusKind": "stun"
        }
       ]
      },
@@ -13229,9 +13226,8 @@
         "faction": "enemy"
        },
        {
-        "has": "mark",
-        "name": "Earth Pillar",
-        "of": "eventUnit"
+        "eventStatusKind": "mark",
+        "name": "Earth Pillar"
        }
       ]
      },
@@ -13415,9 +13411,8 @@
         "faction": "ally"
        },
        {
-        "has": "mark",
-        "name": "Earth Pillar",
-        "of": "eventUnit"
+        "eventStatusKind": "mark",
+        "name": "Earth Pillar"
        }
       ]
      },
@@ -14461,8 +14456,7 @@
         ]
        },
        {
-        "has": "elemental_essence",
-        "of": "self"
+        "eventStatusKind": "elemental_essence"
        }
       ]
      },
@@ -14770,8 +14764,7 @@
      "on": "statusApplied",
      "source": "Reverberation",
      "when": {
-      "has": "invulnerable",
-      "of": "eventUnit"
+      "eventStatusKind": "invulnerable"
      },
      "effect": [
       {
@@ -15660,8 +15653,7 @@
         ]
        },
        {
-        "has": "elemental_essence",
-        "of": "self"
+        "eventStatusKind": "elemental_essence"
        }
       ]
      },
@@ -16774,9 +16766,8 @@
         ]
        },
        {
-        "has": "mark",
-        "name": "Prance Watch",
-        "of": "self"
+        "eventStatusKind": "mark",
+        "name": "Prance Watch"
        }
       ]
      },
@@ -18831,8 +18822,7 @@
         ]
        },
        {
-        "has": "damage_reduction",
-        "of": "self"
+        "eventStatusKind": "damage_reduction"
        }
       ]
      },

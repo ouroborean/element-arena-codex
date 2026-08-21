@@ -4887,9 +4887,8 @@ export const FUSIONS: FusionForm[] = [
        ]
       },
       {
-       "has": "mark",
-       "name": "Frost-Covered",
-       "of": "self"
+       "eventStatusKind": "mark",
+       "name": "Frost-Covered"
       }
      ]
     },
@@ -6192,8 +6191,7 @@ export const FUSIONS: FusionForm[] = [
        "kind": "hero"
       },
       {
-       "has": "invulnerable",
-       "of": "eventUnit"
+       "eventStatusKind": "invulnerable"
       }
      ]
     },
@@ -8798,6 +8796,10 @@ export const FUSIONS: FusionForm[] = [
     "when": {
      "and": [
       {
+       "eventStatusKind": "stack",
+       "name": "Deepening Shadows"
+      },
+      {
        "isKind": "eventUnit",
        "kind": "hero"
       },
@@ -8810,7 +8812,7 @@ export const FUSIONS: FusionForm[] = [
        }
       },
       {
-       "cmp": ">=",
+       "cmp": "==",
        "left": {
         "ref": "stackCount",
         "name": "Deepening Shadows",
@@ -9193,9 +9195,8 @@ export const FUSIONS: FusionForm[] = [
        ]
       },
       {
-       "has": "stack",
-       "name": "Deepening Shadows",
-       "of": "eventUnit"
+       "eventStatusKind": "stack",
+       "name": "Deepening Shadows"
       }
      ]
     },
@@ -11872,8 +11873,7 @@ export const FUSIONS: FusionForm[] = [
        ]
       },
       {
-       "has": "stun",
-       "of": "eventUnit"
+       "eventStatusKind": "stun"
       }
      ]
     },
@@ -12037,8 +12037,7 @@ export const FUSIONS: FusionForm[] = [
        ]
       },
       {
-       "has": "stun",
-       "of": "eventUnit"
+       "eventStatusKind": "stun"
       }
      ]
     },
@@ -12504,8 +12503,7 @@ export const FUSIONS: FusionForm[] = [
        ]
       },
       {
-       "has": "stun",
-       "of": "eventUnit"
+       "eventStatusKind": "stun"
       }
      ]
     },
@@ -12764,8 +12762,7 @@ export const FUSIONS: FusionForm[] = [
        ]
       },
       {
-       "has": "stun",
-       "of": "eventUnit"
+       "eventStatusKind": "stun"
       }
      ]
     },
@@ -13002,9 +12999,8 @@ export const FUSIONS: FusionForm[] = [
        "faction": "enemy"
       },
       {
-       "has": "mark",
-       "name": "Earth Pillar",
-       "of": "eventUnit"
+       "eventStatusKind": "mark",
+       "name": "Earth Pillar"
       }
      ]
     },
@@ -13184,9 +13180,8 @@ export const FUSIONS: FusionForm[] = [
        "faction": "ally"
       },
       {
-       "has": "mark",
-       "name": "Earth Pillar",
-       "of": "eventUnit"
+       "eventStatusKind": "mark",
+       "name": "Earth Pillar"
       }
      ]
     },
@@ -14216,8 +14211,7 @@ export const FUSIONS: FusionForm[] = [
        ]
       },
       {
-       "has": "elemental_essence",
-       "of": "self"
+       "eventStatusKind": "elemental_essence"
       }
      ]
     },
@@ -14520,8 +14514,7 @@ export const FUSIONS: FusionForm[] = [
     "on": "statusApplied",
     "source": "Reverberation",
     "when": {
-     "has": "invulnerable",
-     "of": "eventUnit"
+     "eventStatusKind": "invulnerable"
     },
     "effect": [
      {
@@ -15388,8 +15381,7 @@ export const FUSIONS: FusionForm[] = [
        ]
       },
       {
-       "has": "elemental_essence",
-       "of": "self"
+       "eventStatusKind": "elemental_essence"
       }
      ]
     },
@@ -16472,9 +16464,8 @@ export const FUSIONS: FusionForm[] = [
        ]
       },
       {
-       "has": "mark",
-       "name": "Prance Watch",
-       "of": "self"
+       "eventStatusKind": "mark",
+       "name": "Prance Watch"
       }
      ]
     },
@@ -18493,8 +18484,7 @@ export const FUSIONS: FusionForm[] = [
        ]
       },
       {
-       "has": "damage_reduction",
-       "of": "self"
+       "eventStatusKind": "damage_reduction"
       }
      ]
     },

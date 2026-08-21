@@ -4442,8 +4442,7 @@ export const AUGMENTS: Augment[] = [
         ]
        },
        {
-        "has": "stun",
-        "of": "self"
+        "eventStatusKind": "stun"
        }
       ]
      },
@@ -4822,8 +4821,7 @@ export const AUGMENTS: Augment[] = [
         ]
        },
        {
-        "has": "elemental_essence",
-        "of": "self"
+        "eventStatusKind": "elemental_essence"
        }
       ]
      },
@@ -5474,13 +5472,21 @@ export const AUGMENTS: Augment[] = [
      "on": "statusApplied",
      "source": "Vanishing Powder",
      "when": {
-      "cmp": "==",
-      "left": {
-       "ref": "stackCount",
-       "name": "Deepening Shadows",
-       "of": "eventUnit"
-      },
-      "right": 3
+      "and": [
+       {
+        "eventStatusKind": "stack",
+        "name": "Deepening Shadows"
+       },
+       {
+        "cmp": "==",
+        "left": {
+         "ref": "stackCount",
+         "name": "Deepening Shadows",
+         "of": "eventUnit"
+        },
+        "right": 3
+       }
+      ]
      },
      "effect": [
       {
@@ -5541,8 +5547,7 @@ export const AUGMENTS: Augment[] = [
         ]
        },
        {
-        "has": "elemental_essence",
-        "of": "self"
+        "eventStatusKind": "elemental_essence"
        }
       ]
      },
