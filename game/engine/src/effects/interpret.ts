@@ -660,6 +660,11 @@ export function exec(effect: Effect, ctx: Ctx): void {
 
 /** Summon a minion from its registered template; respects the 6-minion cap. */
 function summonMinion(ctx: Ctx, templateName: string, hpOverride: number | null): void {
+  // jarrik:plasma "Blue Flame Spirits": while Jarrik carries the mark, every Cinderling he would summon (from
+  // any base-kit path) is minted as an Azure Sparkling instead.
+  if (templateName === "Cinderling" && ctx.caster.statuses.some((s) => s.kind === "mark" && s.name === "Blue Flame Spirits")) {
+    templateName = "Azure Sparkling";
+  }
   const team = ctx.state.teams[ctx.caster.team];
   const minionCount = team.units.filter((id) => ctx.state.units[id]?.kind === "minion").length;
   if (minionCount >= 6) return; // MINION_CAP

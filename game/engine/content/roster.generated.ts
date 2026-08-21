@@ -45,6 +45,46 @@ export const MINIONS: MinionTemplate[] = [
   "triggers": []
  },
  {
+  "name": "Azure Sparkling",
+  "maxHp": 10,
+  "element": "plasma",
+  "skills": [
+   {
+    "id": "azure1",
+    "name": "Azure Splash",
+    "element": "plasma",
+    "targeting": "all-enemies",
+    "klass": "basic",
+    "tags": [
+     "Harmful",
+     "Instant",
+     "Affliction"
+    ],
+    "cost": {
+     "generic": 0,
+     "specific": 0
+    },
+    "cooldown": 0,
+    "effects": [
+     {
+      "op": "damage",
+      "amount": 10,
+      "dtype": "affliction",
+      "to": {
+       "faction": "enemies"
+      }
+     },
+     {
+      "op": "defeat",
+      "to": "self"
+     }
+    ],
+    "currentCd": 0
+   }
+  ],
+  "triggers": []
+ },
+ {
   "name": "Bjorn, True King",
   "maxHp": 80,
   "element": "myth",
