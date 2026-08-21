@@ -300,7 +300,7 @@ test("dennis3 CONTROL: without the Ascendant window, Big Green Fist deals only i
   assert.equal(100 - e.hp, 10 + 5 * stacks, "no Ascendant → base 10 only");
 });
 
-test.skip("SUSPECTED BUG dennis3: 'ignores non-damage effects for 1 turn' is not enforced — a stun still lands", () => {
+test("dennis3: HS-46 Ascendant Serum makes Dennis ignore non-damage effects for 1 turn (a stun does not land)", () => {
   const { state, dennis, e } = freshDennisVsOne();
   performAction(state, { unit: "dennis", skillId: "dennis3", targets: [] }); // gain non_damage_ignore for 1 turn
   assert.equal(hasNonDamageIgnore(dennis), true);
@@ -376,7 +376,7 @@ test("dennis5: '(stacks)' — a second cast grows the per-turn heal to 10", () =
   assert.equal(reconRegen(dennis), 10, "two casts → heals 10 per turn (stacks)");
 });
 
-test.skip("SUSPECTED BUG dennis5: 'heals 5 HP each turn' never actually heals — the regen never ticks", () => {
+test("dennis5: HS-88 Reconstitution regen heals 5 HP each turn (null-duration regen ticks)", () => {
   const { state, dennis } = freshDennisVsOne();
   dennis.hp = 50;
   performAction(state, { unit: "dennis", skillId: "dennis5", targets: ["dennis"] }); // turn 1

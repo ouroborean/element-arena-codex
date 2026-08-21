@@ -77,7 +77,7 @@ test("Thorn Prick: applies a permanent (non-expiring) affliction DoT named 'Thor
 
 // FROZEN: "5 affliction damage permanently" — a permanent per-turn affliction. Faithfully, the DoT must
 // keep dealing 5/turn. The engine's tickDots() skips null-duration DoTs, so this permanent tick never fires.
-test.skip("SUSPECTED BUG: Thorn Prick's permanent affliction DoT never deals its 5/turn (null-duration DoTs are skipped by tickDots)", () => {
+test("Thorn Prick: the permanent affliction DoT deals 5 per turn (null-duration DoTs tick)", () => {
   const t = mkTitania();
   const e = makeUnit({ id: "e", team: "B" });
   const st = makeState([t], [e]);

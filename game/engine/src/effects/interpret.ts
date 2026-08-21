@@ -396,6 +396,21 @@ function extendedDuration(d: number | null, ctx: Ctx): number | null {
   return d === null ? null : d + stackCount(ctx.caster, "Arcadian Advancement");
 }
 
+// A harmful NON-damage effect — the control/debuff statuses a `non_damage_ignore` buff wards off. This is the
+// harmful-status set MINUS `dot` (dots are damage, warded by `damage_ignore` instead). Kept in the engine
+// layer so applyStatus can consult it without importing the content-layer classifier.
+function isIgnorableNonDamageEffect(s: { kind: string; magnitude?: number }): boolean {
+  switch (s.kind) {
+    case "stun": case "silence": case "paralysis": case "blind": case "taunt": case "isolated":
+    case "heal_lock": case "shatter": case "heal_becomes_damage": return true;
+    case "incoming_damage_mod": case "cost_mod": case "cooldown_mod": return (s.magnitude ?? 0) > 0;
+    case "outgoing_damage_mod": return (s.magnitude ?? 0) < 0;
+    case "incoming_damage_mult": return (s.magnitude ?? 1) > 1;
+    case "outgoing_damage_mult": return (s.magnitude ?? 1) < 1;
+    default: return false;
+  }
+}
+
 function buildStatus(spec: StatusSpec, ctx: Ctx) {
   return {
     kind: spec.kind,
@@ -510,8 +525,11 @@ export function exec(effect: Effect, ctx: Ctx): void {
       if (effect.status.kind === "mark" && effect.status.name === "Cinders" &&
           ctx.caster.statuses.some((s) => s.kind === "mark" && s.name === "Drakken")) return;
       for (const u of effectTargets(effect.to, ctx)) {
-        ctx.affected?.add(u.id);
         const st = buildStatus(effect.status, ctx);
+        // non_damage_ignore: a unit holding this buff IGNORES an ENEMY-applied harmful non-damage effect
+        // (stun/blind/taunt/debuff…) — it does not land. Damage and dots are damage_ignore's domain, not this.
+        if (ctx.caster.team !== u.team && u.statuses.some((s) => s.kind === "non_damage_ignore") && isIgnorableNonDamageEffect(st)) continue;
+        ctx.affected?.add(u.id);
         applyStatus(u, st);
         ctx.emit({ type: "statusApplied", unit: u.id, source: ctx.caster.id, kind: st.kind, name: st.name });
       }
