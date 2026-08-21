@@ -3045,7 +3045,8 @@ export const AUGMENTS: Augment[] = [
          "dtype": "normal",
          "to": {
           "faction": "enemies"
-         }
+         },
+         "from": "it"
         }
        ]
       },
@@ -3061,7 +3062,8 @@ export const AUGMENTS: Augment[] = [
          "dtype": "piercing",
          "to": {
           "faction": "allies"
-         }
+         },
+         "from": "it"
         }
        ]
       }

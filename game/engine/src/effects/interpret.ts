@@ -388,16 +388,19 @@ function buildStatus(spec: StatusSpec, ctx: Ctx) {
 export function exec(effect: Effect, ctx: Ctx): void {
   switch (effect.op) {
     case "damage": {
-      // The dealer's outgoing type may be forced (e.g. Piercing), which also changes what mods apply.
-      const dtype = outgoingDtypeOverride(ctx.caster) ?? effect.dtype ?? "normal";
+      // The credited dealer is the caster, unless the node names one (from) — a fanned self-hit like dennis4
+      // "all enemies deal 5 to him" sets from:"it" so each enemy is the real dealer (its type/mods, and the
+      // source of the damageDealt/unitDied events, so damager-identity reactions like Fury see the enemy).
+      const dealer = effect.from ? (resolveSelector(effect.from, ctx)[0] ?? ctx.caster) : ctx.caster;
+      const dtype = outgoingDtypeOverride(dealer) ?? effect.dtype ?? "normal";
       // Attacker-side empower/weaken: additive mods (global + this-skill-scoped), then multiplicative mult.
-      const amount = Math.max(0, (evalValue(effect.amount, ctx) + outgoingDamageMod(ctx.caster, dtype) + skillDamageBonus(ctx.caster, ctx.skillId)) * outgoingDamageMult(ctx.caster));
+      const amount = Math.max(0, (evalValue(effect.amount, ctx) + outgoingDamageMod(dealer, dtype) + skillDamageBonus(dealer, ctx.skillId)) * outgoingDamageMult(dealer));
       // Land one share of this damage on one defender (`src` = the credited dealer), running its full
       // mitigation and emitting its events. The damage's own character (type + bypass) stays the attacker's.
       const land = (u: Unit, amt: number, src: string): void => {
         ctx.affected?.add(u.id);
         const wasAlive = u.alive;
-        const r = applyDamage(u, { amount: amt, type: dtype, isNew: true, sourceId: effect.id, bypass: bypassesAgainst(ctx.caster, u) });
+        const r = applyDamage(u, { amount: amt, type: dtype, isNew: true, sourceId: effect.id, bypass: bypassesAgainst(dealer, u) });
         if (r.shieldAbsorbed > 0) ctx.emit({ type: "shieldDamaged", unit: u.id, source: src, amount: r.shieldAbsorbed });
         if (r.shieldBroke) ctx.emit({ type: "shieldBroken", unit: u.id, source: src });
         // The event's sourceId identifies what dealt the damage for reactions (eventSourceId): a damage node's
@@ -422,10 +425,10 @@ export function exec(effect: Effect, ctx: Ctx): void {
             (x) => x.alive && x.id !== u.id && x.statuses.some((s) => s.kind === "mark" && s.name === split.name),
           );
           const per = applyRounding(amount / (1 + co.length));
-          land(u, per, ctx.caster.id);
+          land(u, per, dealer.id);
           for (const d of co) land(d, per, u.id);
         } else {
-          land(u, amount, ctx.caster.id);
+          land(u, amount, dealer.id);
         }
       }
       return;

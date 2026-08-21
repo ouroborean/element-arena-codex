@@ -7574,7 +7574,8 @@ export const ROSTER: HeroDef[] = [
         "op": "damage",
         "amount": 5,
         "dtype": "piercing",
-        "to": "caster"
+        "to": "caster",
+        "from": "it"
        }
       ]
      }
