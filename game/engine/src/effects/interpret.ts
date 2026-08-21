@@ -119,6 +119,13 @@ export function resolveSelector(sel: Selector, ctx: Ctx, admitUnderstudy = true)
     if (!e || !("targets" in e)) return [];
     return e.targets.map((id) => ctx.state.units[id]).filter((u): u is Unit => !!u);
   }
+  if (sel === "eventAffected") {
+    // (skillUsed) every unit the skill actually touched (damaged OR statused) — for "all targets affected".
+    const e = ctx.event;
+    const affected = e && "affected" in e ? e.affected : undefined;
+    if (!affected) return [];
+    return affected.map((id) => ctx.state.units[id]).filter((u): u is Unit => !!u);
+  }
 
   if ("faction" in sel) {
     const casterTeam = ctx.caster.team;

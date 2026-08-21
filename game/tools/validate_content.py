@@ -25,7 +25,7 @@ EFFECT_OPS = {"damage", "heal", "healthLoss", "grantShield", "applyStatus", "rem
 VALUE_REFS = {"stackCount", "missingHp", "currentHp", "shield", "spendableShield", "count", "statusDuration", "statusMag", "statusCount", "sum", "stackSum", "var"}
 VALUE_OPS = {"add", "sub", "mul", "min", "max", "div"}
 SELECTOR_STRINGS = {"self", "caster", "target", "summoner", "it", "across", "adjacent",
-                    "eventSource", "eventTarget", "eventTargets", "eventUnit"}
+                    "eventSource", "eventTarget", "eventTargets", "eventAffected", "eventUnit"}
 STATUS_KINDS = {"damage_reduction", "incoming_damage_mod", "incoming_heal_mod", "outgoing_damage_mod",
                 "incoming_damage_mult", "outgoing_damage_mult",
                 "outgoing_dtype_override", "conditional_bypass",

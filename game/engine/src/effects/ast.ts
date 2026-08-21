@@ -56,6 +56,7 @@ export type Selector =
   | "eventSource" // in a trigger: the unit that caused the event (dealer/caster)
   | "eventTarget" // in a trigger: the event's target
   | "eventTargets" // in a trigger: ALL of a multi-target skill's targets
+  | "eventAffected" // in a skillUsed trigger: every unit the skill actually touched (damaged OR statused)
   | "eventUnit" // in a trigger: the subject of a unit event (e.g. the unit that died)
   | "across" // the living enemy hero in the SAME formation slot as self
   | "adjacent" // living allied heroes in a neighbouring formation slot to self
