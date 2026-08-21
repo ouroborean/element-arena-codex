@@ -10088,6 +10088,7 @@ export const ROSTER: HeroDef[] = [
    {
     "on": "turnEnd",
     "source": "Exile",
+    "origin": "innate",
     "effect": [
      {
       "op": "custom",
