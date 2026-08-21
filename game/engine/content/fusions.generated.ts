@@ -6288,6 +6288,41 @@ export const FUSIONS: FusionForm[] = [
       }
      }
     ]
+   },
+   {
+    "on": "skillUsed",
+    "source": "Cindersprig Brew",
+    "when": {
+     "has": "outgoing_damage_mod",
+     "name": "Cindersprig Brew",
+     "of": "eventSource"
+    },
+    "effect": [
+     {
+      "op": "if",
+      "cond": {
+       "has": "mark",
+       "name": "Cindersprig Grace",
+       "of": "eventSource"
+      },
+      "then": [
+       {
+        "op": "removeStatus",
+        "kind": "mark",
+        "name": "Cindersprig Grace",
+        "from": "eventSource"
+       }
+      ],
+      "else": [
+       {
+        "op": "removeStatus",
+        "kind": "outgoing_damage_mod",
+        "name": "Cindersprig Brew",
+        "from": "eventSource"
+       }
+      ]
+     }
+    ]
    }
   ],
   "skill": {
@@ -6311,9 +6346,30 @@ export const FUSIONS: FusionForm[] = [
      "to": "target",
      "status": {
       "kind": "outgoing_damage_mod",
+      "name": "Cindersprig Brew",
       "magnitude": 5,
       "duration": 4
      }
+    },
+    {
+     "op": "if",
+     "cond": {
+      "sameUnit": [
+       "target",
+       "self"
+      ]
+     },
+     "then": [
+      {
+       "op": "applyStatus",
+       "to": "target",
+       "status": {
+        "kind": "mark",
+        "name": "Cindersprig Grace",
+        "duration": 4
+       }
+      }
+     ]
     }
    ],
    "currentCd": 0
