@@ -6755,12 +6755,30 @@
    "passive": {
     "name": "Blazer Board",
     "description": "Whenever Jarrik consumes a mark from Cinders, he becomes Invulnerable until the end of his next turn. This effect is automatically activated at the start of each round.",
-    "note": "The round-start auto-activation is modelled directly. A general 'whenever Jarrik consumes a Cinders mark' re-trigger has no event (removeStatus is silent); it is realised only along the Pop Off consume path here. Duration 1 approximates 'until the end of his next turn'."
+    "note": "Two triggers: the round-start auto-activation, and the general 'whenever Jarrik consumes a Cinders mark' -> Invulnerable, now realised via statusLost (the removeStatus op emits it). Cinders removal is Jarrik-exclusive (natural lapse emits statusExpired, not statusLost), so the {mark 'Cinders'} gate faithfully means 'Jarrik consumed a Cinders'. Duration 1 approximates 'until the end of his next turn'."
    },
    "passiveTriggers": [
     {
      "on": "roundStart",
      "source": "Blazer Board",
+     "effect": [
+      {
+       "op": "applyStatus",
+       "to": "self",
+       "status": {
+        "kind": "invulnerable",
+        "duration": 1
+       }
+      }
+     ]
+    },
+    {
+     "on": "statusLost",
+     "source": "Blazer Board",
+     "when": {
+      "eventStatusKind": "mark",
+      "name": "Cinders"
+     },
      "effect": [
       {
        "op": "applyStatus",

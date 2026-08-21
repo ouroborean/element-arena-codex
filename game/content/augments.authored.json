@@ -56,12 +56,31 @@
    "owner": "pyrrha",
    "name": "Flickering Form",
    "description": "Pyrrha heals for 10 health any time Fan the Flames expires or is removed.",
-   "note": "Source-agnostic reactive heal ('any time' the Fan the Flames dot leaves an enemy, however applied) -> a statusExpired trigger rather than an onExpire hook on one application site. statusExpired carries {kind,name} but NO Condition primitive matches an expired status's name (selectors can name-match, conditions cannot), so the 'Fan the Flames' gate lives in a custom effect (fn healIfExpiredStatusNamed: heals args.amount to args.to iff event.kind==='dot' && event.name===args.name). Gap: 'or is removed' cannot fire — removeStatus emits no event; only natural duration lapse emits statusExpired (scheduler.ts). A cleansed Fan the Flames is uncovered (fidelity debt).",
+   "note": "'any time Fan the Flames expires OR is removed' -> two triggers: statusExpired (natural lapse) and statusLost (explicit removeStatus, e.g. Pyrokinesis consuming the burn or a cleanse). Both carry {kind,name}; the 'Fan the Flames' gate lives in the shared custom healIfExpiredStatusNamed (heals args.amount to args.to iff the leaving status is dot 'Fan the Flames'), which now accepts both event types.",
    "patches": [
     {
      "op": "addTrigger",
      "trigger": {
       "on": "statusExpired",
+      "source": "Flickering Form",
+      "effect": [
+       {
+        "op": "custom",
+        "fn": "healIfExpiredStatusNamed",
+        "args": {
+         "kind": "dot",
+         "name": "Fan the Flames",
+         "to": "self",
+         "amount": 10
+        }
+       }
+      ]
+     }
+    },
+    {
+     "op": "addTrigger",
+     "trigger": {
+      "on": "statusLost",
       "source": "Flickering Form",
       "effect": [
        {

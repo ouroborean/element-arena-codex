@@ -77,6 +77,25 @@ export const AUGMENTS: Augment[] = [
       }
      ]
     }
+   },
+   {
+    "op": "addTrigger",
+    "trigger": {
+     "on": "statusLost",
+     "source": "Flickering Form",
+     "effect": [
+      {
+       "op": "custom",
+       "fn": "healIfExpiredStatusNamed",
+       "args": {
+        "kind": "dot",
+        "name": "Fan the Flames",
+        "to": "self",
+        "amount": 10
+       }
+      }
+     ]
+    }
    }
   ]
  },
