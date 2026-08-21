@@ -5527,7 +5527,7 @@
    "owner": "laria",
    "name": "Nightwalker",
    "description": "Characters with 3 or more stacks of Deepening Shadows Bypass.",
-   "note": "Standing rule over all characters approximated reactively: when any status is applied to a unit now holding >=3 Deepening Shadows, tag it with a 'Bypass' mark. Engine limitation (per the Prisma Saffron precedent): Bypass is a static skill tag not enforced dynamically by targeting, so the mark documents the intended state. Does not strip the mark if stacks later drop (Deepening Shadows is round-permanent).",
+   "note": "Standing rule over all characters, applied reactively: when any status is applied to a unit now holding >=3 Deepening Shadows, grant it an unconditional conditional_bypass (bypassCond absent), so bypassesAgainst makes its outgoing damage ignore DR+Shield. Not stripped if stacks later drop (Deepening Shadows is round-permanent).",
    "patches": [
     {
      "op": "addTrigger",
@@ -5548,7 +5548,7 @@
         "op": "applyStatus",
         "to": "eventTarget",
         "status": {
-         "kind": "mark",
+         "kind": "conditional_bypass",
          "name": "Bypass",
          "duration": null
         }
