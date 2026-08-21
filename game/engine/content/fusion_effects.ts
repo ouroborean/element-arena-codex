@@ -438,6 +438,25 @@ registerCustom("flamesOfGreedRewrite", (ctx, a) => {
   if (s) s.targeting = "all";
 });
 
+// taryn:divine — during Radiant Glory, Holy Word: Peace (taryndivine1) is cast in place of Refrain: repoint
+// taryn3/taryn4's Radiant-Glory `useSkill taryn2` nodes to taryndivine1. Idempotent (a repointed node no
+// longer matches taryn2), so it may fire every round.
+registerCustom("castHolyWordInsteadOfRefrain", (ctx) => {
+  for (const id of ["taryn3", "taryn4"]) {
+    const s = mutableSkill(ctx, id);
+    if (s) walkNodes(s.effects, (e) => { if (e.op === "useSkill" && e.skillId === "taryn2") e.skillId = "taryndivine1"; });
+  }
+});
+
+// taryn:vengeance (Wingman) — Stalwart Shield "no longer grants Taryn Shield, is fully Invisible" (the reflect
+// clause is the passiveTrigger below): strip taryn4's top-level grantShield and set isHidden. Idempotent.
+registerCustom("wingmanPatchStalwart", (ctx) => {
+  const s = mutableSkill(ctx, "taryn4");
+  if (!s) return;
+  s.isHidden = true;
+  s.effects = s.effects.filter((e) => e.op !== "grantShield");
+});
+
 // pyrrha:dragon — Feed the Fire: +5 damage and healing, and it hits all enemies (apply once).
 registerCustom("dragonsHungerRewrite", (ctx, a) => {
   const s = mutableSkill(ctx, a.skillId as string);

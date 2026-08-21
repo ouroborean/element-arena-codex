@@ -15493,6 +15493,16 @@ export const FUSIONS: FusionForm[] = [
   },
   "passiveTriggers": [
    {
+    "on": "roundStart",
+    "source": "Divine Hymn",
+    "effect": [
+     {
+      "op": "custom",
+      "fn": "castHolyWordInsteadOfRefrain"
+     }
+    ]
+   },
+   {
     "on": "skillRedirected",
     "source": "Divine Hymn",
     "when": {
@@ -15857,6 +15867,16 @@ export const FUSIONS: FusionForm[] = [
    "description": "Stalwart Shield no longer grants Taryn Shield, is fully Invisible, and reflects skills back at their user instead."
   },
   "passiveTriggers": [
+   {
+    "on": "roundStart",
+    "source": "Wingman",
+    "effect": [
+     {
+      "op": "custom",
+      "fn": "wingmanPatchStalwart"
+     }
+    ]
+   },
    {
     "on": "skillDeclared",
     "kind": "reflect",
