@@ -1866,6 +1866,9 @@ export const MINIONS: MinionTemplate[] = [
     "when": {
      "and": [
       {
+       "eventHasTag": "Harmful"
+      },
+      {
        "has": "mark",
        "name": "Prisma Whirl",
        "of": "self"
@@ -2173,6 +2176,9 @@ export const MINIONS: MinionTemplate[] = [
     "source": "Prisma Whirl",
     "when": {
      "and": [
+      {
+       "eventHasTag": "Harmful"
+      },
       {
        "has": "mark",
        "name": "Prisma Whirl",
@@ -2482,6 +2488,9 @@ export const MINIONS: MinionTemplate[] = [
     "source": "Prisma Whirl",
     "when": {
      "and": [
+      {
+       "eventHasTag": "Harmful"
+      },
       {
        "has": "mark",
        "name": "Prisma Whirl",
@@ -11132,6 +11141,11 @@ export const ROSTER: HeroDef[] = [
        "has": "damage_reduction",
        "name": "Vanish",
        "of": "self"
+      },
+      {
+       "not": {
+        "eventSkillId": "laria4"
+       }
       }
      ]
     },

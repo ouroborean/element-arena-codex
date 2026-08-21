@@ -9764,6 +9764,11 @@
         "has": "damage_reduction",
         "name": "Vanish",
         "of": "self"
+       },
+       {
+        "not": {
+         "eventSkillId": "laria4"
+        }
        }
       ]
      },
@@ -13521,6 +13526,9 @@
        "when": {
         "and": [
          {
+          "eventHasTag": "Harmful"
+         },
+         {
           "has": "mark",
           "name": "Prisma Whirl",
           "of": "self"
@@ -13831,6 +13839,9 @@
        "source": "Prisma Whirl",
        "when": {
         "and": [
+         {
+          "eventHasTag": "Harmful"
+         },
          {
           "has": "mark",
           "name": "Prisma Whirl",
@@ -14143,6 +14154,9 @@
        "source": "Prisma Whirl",
        "when": {
         "and": [
+         {
+          "eventHasTag": "Harmful"
+         },
          {
           "has": "mark",
           "name": "Prisma Whirl",
