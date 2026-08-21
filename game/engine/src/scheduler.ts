@@ -170,6 +170,7 @@ export function runChannels(state: MatchState, id: TeamId): void {
       const skill = (u.skills ?? []).find((k) => k.id === s.name);
       if (!skill || isStunnedFor(u, skill)) {
         removeStatus(u, "channeling", s.name); // interrupted
+        emit(state, { type: "statusExpired", unit: u.id, kind: "channeling", name: s.name }); // channel ended (interrupt)
         continue;
       }
       const targets = (s.channelTargets ?? []).map((t) => state.units[t]).filter((t): t is Unit => !!t && t.alive);
@@ -178,7 +179,10 @@ export function runChannels(state: MatchState, id: TeamId): void {
         s.magnitude -= 1;
         // Remove only THIS expiring copy (by identity), not every same-named channel — so the other
         // copies of a finite multi-copy channel keep ticking until their own turns run out.
-        if (s.magnitude <= 0) u.statuses = u.statuses.filter((x) => x !== s);
+        if (s.magnitude <= 0) {
+          u.statuses = u.statuses.filter((x) => x !== s);
+          emit(state, { type: "statusExpired", unit: u.id, kind: "channeling", name: s.name }); // channel ended (ran out)
+        }
       }
     }
   }
@@ -577,6 +581,12 @@ export function performAction(state: MatchState, action: Action): ActionResult {
   // resolveDeclaration, never by this react emit (collectTriggers filters to react-kind).
   emit(state, { type: "skillDeclared", caster: caster.id, skillId: skill.id, tags: skill.tags, targets: decl.finalTargets.map((t) => t.id), hidden: invisibleCast });
 
+  // Snapshot active channels before a possible interrupt so we can announce any that END this action (channeling
+  // is a status; channel-end reactors like Static Maelstrom gate on statusExpired{channeling}). A same-channel
+  // recast re-adds an identical marker (same name+instanceId) and is NOT reported as ended; cancelling by acting,
+  // or switching to a different channel, is. Teardown emits fire after the action fully resolves (below).
+  const channelsBefore = caster.statuses.filter((s) => s.kind === "channeling").map((s) => ({ name: s.name, instanceId: s.instanceId }));
+
   // Using a new skill cancels active channels — unless it opts out, or it is another copy of a multi-copy
   // channel (galazax1 Twin Storms), in which case it preserves its sibling copies and cancels only other channels.
   if (!skill.doesNotInterrupt) {
@@ -610,6 +620,19 @@ export function performAction(state: MatchState, action: Action): ActionResult {
       // channel machinery; redactState swaps only the displayed name for the opponent).
       disguiseAs: skill.disguiseAs, disguiseName,
     });
+    // Channeling is a status like any other, so announce its application: reactors that key on a channel
+    // beginning (e.g. Static Maelstrom) can gate on {eventStatusKind:"channeling"} instead of the over-firing
+    // has(channeling) state proxy. The channel's name is the skill id.
+    emit(state, { type: "statusApplied", unit: caster.id, source: caster.id, kind: "channeling", name: skill.id });
+  }
+
+  // Announce any channels that ENDED as a result of this action — cancel-by-acting, or switching channels. A
+  // marker still present by name+instanceId was preserved (a same-channel recast) and is not reported, so the
+  // remap/teardown reactors fire exactly once when a channel truly stops (not on a refresh).
+  for (const c of channelsBefore) {
+    if (!caster.statuses.some((s) => s.kind === "channeling" && s.name === c.name && s.instanceId === c.instanceId)) {
+      emit(state, { type: "statusExpired", unit: caster.id, kind: "channeling", name: c.name });
+    }
   }
 
   // Veiled breaks on a HARMFUL action by the veiled unit itself (stealth-break-on-action), unless the skill

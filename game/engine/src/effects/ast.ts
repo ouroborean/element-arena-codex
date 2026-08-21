@@ -79,6 +79,7 @@ export type Condition =
   | { declaredTargetsSelf: true } // (skillDeclared) the trigger owner is among the declared targets
   | { eventHasTag: string } // (skillDeclared/skillUsed) the skill carries this class tag
   | { eventStatusKind: string; name?: string } // (statusApplied/statusExpired) the event's status kind (+name) matches
+  | { eventStatusNameIncludes: string } // (statusApplied/statusExpired) the event's status NAME contains this substring, any kind (hectorspore0: "a Serum effect ends" = a "...Serum"-named status expires)
   | { eventSourceId: string } // (damageDealt) the event's sourceId matches — a dot's name (dot ticks) or a damage node's id (direct hits); scopes a reaction to one source skill/effect
   | { eventTeamIsSelf: true } // (turnStart/turnEnd) the event's team is the trigger owner's team ("my team's turn")
   | { eventSourceSummonedBySelf: true } // (any event with a source) the event's source unit is a minion the trigger owner summoned (gaia3: only "Gaia's minions")

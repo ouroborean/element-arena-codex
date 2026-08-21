@@ -6099,12 +6099,15 @@
    "passive": {
     "name": "Lingering Spores",
     "description": "Whenever a Serum effect ends, a stack of Lingering Spores is placed on Dennis and a random enemy, dealing 5 affliction damage per turn if they are an enemy, and 5 healing per turn if they are an ally. This effect stacks.",
-    "note": "statusExpired carries no unit and no name field, so the trigger cannot confirm the expired status is a Serum nor whose it was; it fires on any status expiry. Lingering Spores is modeled as a stacking status whose per-turn magnitude scales with its stack count (5 x stacks), delivered as regen on the ally Dennis and a dot on a random enemy."
+    "note": "'A Serum effect ends' = a status whose name contains 'Serum' expires (statusExpired carries the name). Hector's Serum skills apply their effects under names like 'Burning Blood Serum' / 'Stoneseal Serum' / 'Mindfog Serum' / 'Rejuvenation Serum', so {eventStatusNameIncludes:'Serum'} matches exactly those and is future-proof to new Serums. RULING: each Serum-named status expiry places one Lingering Spore, so a Serum applying two sub-statuses contributes once per sub-status as they lapse. Lingering Spores is modeled as a stacking status whose per-turn magnitude scales with its stack count (5 x stacks), delivered as regen on the ally Dennis and a dot on a random enemy."
    },
    "passiveTriggers": [
     {
      "on": "statusExpired",
      "source": "Lingering Spores",
+     "when": {
+      "eventStatusNameIncludes": "Serum"
+     },
      "effect": [
       {
        "op": "addStack",
@@ -19977,8 +19980,7 @@
         ]
        },
        {
-        "has": "channeling",
-        "of": "self"
+        "eventStatusKind": "channeling"
        }
       ]
      },
@@ -20018,10 +20020,7 @@
         ]
        },
        {
-        "not": {
-         "has": "channeling",
-         "of": "self"
-        }
+        "eventStatusKind": "channeling"
        }
       ]
      },
@@ -20033,7 +20032,7 @@
        "from": "self"
       }
      ],
-     "note": "Generic-cost conversion ends when Channeling ends."
+     "note": "Generic-cost conversion ends when the Call Tides channel ends. The scheduler now emits statusExpired {kind:channeling} at every channel end (interrupt or run-out), so eventStatusKind:channeling fires exactly once when Channeling stops -- no longer the not-has(channeling) proxy that over-fired on any unrelated expiry."
     }
    ],
    "skill": {
