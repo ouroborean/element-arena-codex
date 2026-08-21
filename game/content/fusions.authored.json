@@ -1689,7 +1689,7 @@
      "specific": 2
     },
     "cooldown": 3,
-    "note": "Stun 2 turns is native. 'Receive double damage from Voice of Light' and 'casting Voice of Light on them also casts it on the enemy team, Bypassing' are Voice-of-Light-scoped; base Voice of Light (ayana1) does not read fusion marks and skill-scoped incoming doubling / target-spread has no primitive. The 'Prism Sentence' mark (duration 2) records the debuff window (read by the Illumination passive) - tracked debt for the VoL-interaction clauses.",
+    "note": "Stun 2 turns is native. 'Receive double damage from Voice of Light' = a source-scoped incoming_damage_mult (x2, viaSourceId ayana1.hit) applied with the mark. 'Casting VoL on them also casts it on the enemy team, Bypassing' = base ayana1, when the target is Prism-marked, additionally forEaches enemies for a bypass:true VoL hit. The 'Prism Sentence' mark also drives Illumination's reveal.",
     "effects": [
      {
       "op": "applyStatus",
@@ -1707,6 +1707,18 @@
        "name": "Prism Sentence",
        "duration": 2
       }
+     },
+     {
+      "op": "applyStatus",
+      "to": "target",
+      "status": {
+       "kind": "incoming_damage_mult",
+       "name": "Prism Sentence",
+       "magnitude": 2,
+       "viaSourceId": "ayana1.hit",
+       "duration": 2
+      },
+      "note": "'Receive double damage from Voice of Light': a source-scoped incoming_damage_mult (x2, viaSourceId ayana1.hit) so ONLY VoL hits on the marked enemy are doubled."
      },
      {
       "op": "applyStatus",
