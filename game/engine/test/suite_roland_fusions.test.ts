@@ -404,7 +404,7 @@ test("myth Spires control: Earth Pillar landing on an ENEMY grants it no Shield/
 
 // Adversarial: frozen scopes the invulnerability to STRATEGIC skills only — a non-Strategic Harmful skill must
 // still land. The engine's invulnerable gate ignores `scope`, blocking every Harmful skill.
-test.skip("SUSPECTED BUG: myth Spires invuln blocks NON-Strategic skills too — frozen makes the ally invulnerable to Strategic skills only", () => {
+test("myth Spires of the North: invulnerable to Strategic skills only — a non-Strategic hit still lands", () => {
   const r = fuse("myth");
   const ally = makeUnit({ id: "a2", team: "A", name: "Ally" });
   const st = makeState([r, ally], [enemy("e1")]);

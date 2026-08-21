@@ -1104,14 +1104,18 @@
       "specific": 0
      },
      "cooldown": 3,
-     "note": "Frozen targeting_type 'single (defaulted)' -> 'self' (every effect is on Gommar). 'invulnerable to non-strategic skills' modeled as plain invulnerable: the engine's invulnerable is not tag-scoped (it blocks new harmful skills), so it is marginally broader than the oracle's non-Strategic carve-out. The essence branch is evaluated BEFORE Frost-Covered is (re)applied, so it reads the prior state ('if he was already Frost-Covered').",
+     "note": "Frozen targeting_type 'single (defaulted)' -> 'self' (every effect is on Gommar). 'invulnerable to non-strategic skills' -> a tag-scoped invulnerable {tag:Strategic, mode:except} (blocks harmful skills WITHOUT the Strategic tag), honored by legalTargets. The essence branch is evaluated BEFORE Frost-Covered is (re)applied, so it reads the prior state ('if he was already Frost-Covered').",
      "effects": [
       {
        "op": "applyStatus",
        "to": "caster",
        "status": {
         "kind": "invulnerable",
-        "duration": 1
+        "duration": 1,
+        "scope": {
+         "tag": "Strategic",
+         "mode": "except"
+        }
        }
       },
       {
