@@ -2708,11 +2708,18 @@
     {
      "on": "turnEnd",
      "source": "Universal Energy Conduit",
-     "note": "Ongoing half of saya1: while the 'Universal Energy Conduit' mark is up, a random ally gains Elemental Essence at turn-end. Oracle scopes this to 'Saya's turns'; turnEnd fires for both teams and no condition reads event.team, so it currently ticks every turn-end (known event-scoping gap).",
+     "note": "Ongoing half of saya1: while the 'Universal Energy Conduit' mark is up, a random ally gains Elemental Essence at the end of SAYA'S turns. eventTeamIsSelf scopes it to team A's turn-end (turnEnd fires for both teams).",
      "when": {
-      "has": "mark",
-      "name": "Universal Energy Conduit",
-      "of": "self"
+      "and": [
+       {
+        "has": "mark",
+        "name": "Universal Energy Conduit",
+        "of": "self"
+       },
+       {
+        "eventTeamIsSelf": true
+       }
+      ]
      },
      "effect": [
       {
@@ -3839,7 +3846,8 @@
      "klass": "basic",
      "tags": [
       "Harmful",
-      "Instant"
+      "Instant",
+      "Unstunnable"
      ],
      "cost": {
       "generic": 0,
@@ -3847,7 +3855,7 @@
      },
      "cooldown": 1,
      "doesNotInterrupt": true,
-     "note": "Damage keyed off PRE-cast charge: Supercharged -> 30 Piercing, Charged -> 20 normal, else 10 normal. Then it removes Ando's charge state and tags 'chargeHandled' so the passive does NOT advance it. Oracle 'cannot be stunned' has no skill-level stun-immunity primitive; flagged doesNotInterrupt and noted (would carry an Unstunnable class).",
+     "note": "Damage keyed off PRE-cast charge: Supercharged -> 30 Piercing, Charged -> 20 normal, else 10 normal. Then it removes Ando's charge state and tags 'chargeHandled' so the passive does NOT advance it. 'Cannot be stunned' -> the Unstunnable tag, which isStunnedFor honors (castable even while Ando is stunned).",
      "effects": [
       {
        "op": "if",
@@ -7308,7 +7316,10 @@
     {
      "on": "turnEnd",
      "source": "Living Stone",
-     "note": "Fires at the end of Roland's own team's turn. The turnEnd event carries the ending team; intended scope is Roland's turn only.",
+     "note": "Fires at the end of Roland's OWN team's turn only ('each of his turns'), gated by eventTeamIsSelf (turnEnd fires for both teams).",
+     "when": {
+      "eventTeamIsSelf": true
+     },
      "effect": [
       {
        "op": "forEach",
@@ -12621,7 +12632,7 @@
       "generic": 0,
       "specific": 1
      },
-     "cooldown": 3,
+     "cooldown": 4,
      "effects": [
       {
        "op": "damage",

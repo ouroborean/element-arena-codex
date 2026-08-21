@@ -319,7 +319,7 @@ test("Expel Energy baseline: a plain unscoped stun blocks a normal Ando skill (c
 // while Ando is stunned. The engine carries no skill-level stun-immunity (its Unstunnable class is
 // false and isStunnedFor only exempts Unstunnable-tagged skills / a "Stun Immunity" mark), so a
 // stunned Ando is blocked from using Expel just like any other skill.
-test.skip("SUSPECTED BUG: Expel Energy 'cannot be stunned' but a stunned Ando is blocked from casting it", () => {
+test("Expel Energy: cannot be stunned — a stunned Ando can still cast it (Unstunnable)", () => {
   const ando = mkAndo();
   ando.statuses.push(status("stun", { duration: 1, appliedBy: "e1", appliedTurn: 1 }));
   const state = makeState([ando], [enemy("e1")]);

@@ -113,7 +113,7 @@ test("Living Stone: breaking a NON-Living-Stone shield does NOT grant Roland Ess
 // turnEnd trigger carries no `eventTeamIsSelf` gate (the convention other heroes use), so it also fires at
 // the END OF THE ENEMY'S TURN — a second, unearned 10 Shield each opponent turn (observed: 20 across two
 // turn ends where frozen allows only 10).
-test.skip("SUSPECTED BUG: Living Stone grants at the ENEMY's turn end too, not only 'each of his turns'", () => {
+test("Living Stone: grants 10 Shield only at the end of Roland's turns (not the enemy's)", () => {
   const r = roland();
   const ally = makeUnit({ id: "a2", team: "A", name: "Ally" });
   const st = makeState([r, ally], [enemy("e1")]);
