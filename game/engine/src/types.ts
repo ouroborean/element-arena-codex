@@ -126,6 +126,10 @@ export interface Status {
   specificDelta?: number;
   /** For an incoming_damage_mult: apply only to NEW skill hits (isNew), not ongoing DoT ticks. */
   newDamageOnly?: boolean;
+  /** For an incoming_damage_mod / incoming_damage_mult: apply ONLY to damage whose source id matches (the
+   *  damage node's id, e.g. "ayana1.hit") — scopes a bonus/mult to one skill (ayana Word of the Law: "+10
+   *  from Voice of Light"). Absent = applies to all incoming damage. */
+  viaSourceId?: string;
   /** For a conditional_bypass: the target must hold this status (kind + optional name) for the bypass to apply. */
   bypassCond?: { kind: StatusKind; name?: string };
   /** For a stack_read_mod: how it adjusts the effective stack read. mult = actual x magnitude; floorZero =

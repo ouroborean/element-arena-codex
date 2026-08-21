@@ -113,8 +113,14 @@ export function damageReduction(u: Unit): number {
 }
 
 /** Net defender-side incoming modifier; +N means the unit takes N MORE damage. */
-export function incomingDamageMod(u: Unit): number {
-  return sumMagnitude(u, "incoming_damage_mod");
+export function incomingDamageMod(u: Unit, sourceId?: string): number {
+  let total = 0;
+  for (const s of u.statuses) {
+    if (s.kind !== "incoming_damage_mod") continue;
+    if (s.viaSourceId !== undefined && s.viaSourceId !== sourceId) continue; // scoped to one source skill
+    total += s.magnitude ?? 0;
+  }
+  return total;
 }
 
 /** Flat damage bonus the caster's active skill_damage_bonus statuses add to the NAMED skill's hits (empowerThornPrick). */
@@ -142,11 +148,12 @@ export function outgoingDamageMod(u: Unit, dtype: DamageType): number {
 }
 
 /** Product of the defender's incoming multipliers (0.5 = half, 2 = double). `newDamageOnly` mults skip DoTs. */
-function incomingDamageMult(u: Unit, isNew: boolean | undefined): number {
+function incomingDamageMult(u: Unit, isNew: boolean | undefined, sourceId?: string): number {
   let f = 1;
   for (const s of u.statuses) {
     if (s.kind !== "incoming_damage_mult") continue;
     if (s.newDamageOnly && !isNew) continue;
+    if (s.viaSourceId !== undefined && s.viaSourceId !== sourceId) continue; // scoped to one source skill
     f *= s.magnitude ?? 1;
   }
   return f;
@@ -227,8 +234,8 @@ export function applyDamage(target: Unit, dmg: DamageInstance): DamageResult {
 
   // 2. Incoming damage-mods (a channel distinct from Damage Reduction): additive, then multiplicative.
   if (!cap.mods) {
-    amount = Math.max(0, amount + incomingDamageMod(target));
-    amount = Math.max(0, applyRounding(amount * incomingDamageMult(target, dmg.isNew)));
+    amount = Math.max(0, amount + incomingDamageMod(target, dmg.sourceId));
+    amount = Math.max(0, applyRounding(amount * incomingDamageMult(target, dmg.isNew, dmg.sourceId)));
   }
 
   const shattered = has(target, "shatter");
