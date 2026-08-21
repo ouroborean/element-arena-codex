@@ -44,7 +44,16 @@ export function targetPool(state: MatchState, u: Unit, skill: SkillInstance): Un
   const enemyTeam: TeamId = u.team === "A" ? "B" : "A";
   const harmful = skill.tags.includes("Harmful");
   const helpful = skill.tags.includes("Helpful");
-  const pool = harmful ? livingUnits(state, enemyTeam)
+  // Fusion targeting expansions (the engine has no faction filter; these only widen the offered pool):
+  //  - Merciless (black knight "evil"): Oathbreaker Strike may target allied Heroes.
+  //  - Mountain Rescue Team (syl "winter"): the Eagle's Swoop may target a stunned ally (for invuln).
+  const merciless = skill.id === "blackknight1" && u.fused === "evil";
+  const swoopRescue = skill.id === "sylminion2" && state.units[u.summoner ?? ""]?.fused === "winter";
+  const pool = merciless
+    ? [...livingUnits(state, enemyTeam), ...livingUnits(state, u.team).filter((x) => x.kind === "hero" && x.id !== u.id)]
+    : swoopRescue
+    ? [...livingUnits(state, enemyTeam), ...livingUnits(state, u.team).filter((x) => x.id !== u.id && x.statuses.some((s) => s.kind === "stun"))]
+    : harmful ? livingUnits(state, enemyTeam)
     : helpful ? livingUnits(state, u.team)
     : [...livingUnits(state, u.team), ...livingUnits(state, enemyTeam)];
   return legalTargets(state, u, skill, pool, Rng.fromState(state.rngState));
