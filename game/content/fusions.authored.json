@@ -11305,8 +11305,16 @@
      "on": "skillUsed",
      "source": "Flames of Judgment",
      "when": {
-      "isFaction": "eventSource",
-      "faction": "enemy"
+      "and": [
+       {
+        "isFaction": "eventSource",
+        "faction": "enemy"
+       },
+       {
+        "isFaction": "eventTargets",
+        "faction": "ally"
+       }
+      ]
      },
      "effect": [
       {
@@ -11316,7 +11324,7 @@
        "to": "eventSource"
       }
      ],
-     "note": "'... or using a skill on Pyrrha or her allies gives enemies a stack.' An enemy that uses a skill gains a Flames of Judgment stack. FIDELITY DEBT: no Condition matches 'the skill's targets include Pyrrha or an ally' (skillUsed carries target ids but there is no target-faction condition; declaredTargetsSelf only matches Pyrrha herself), so this fires on any skill an enemy uses, slightly over-counting enemy self/ally-targeted skills."
+     "note": "'... or using a skill on Pyrrha or her allies gives enemies a stack.' An enemy (isFaction eventSource enemy) whose skill targets Pyrrha or an ally (isFaction eventTargets ally, from Pyrrha's perspective) gains a Flames of Judgment stack. The eventTargets faction gate (same predicate Sera's passive uses) scopes this to skills aimed at Pyrrha's team, so an enemy's self/ally-targeted skill no longer over-counts."
     }
    ],
    "skill": {
@@ -11404,6 +11412,42 @@
       }
      ],
      "note": "'Enemies affected by Fan the Flames receive 10 Affliction damage if they target Pyrrha with a new skill.' Reacts to an enemy that bears the Fan the Flames dot and used a skill whose targets include Pyrrha (declaredTargetsSelf), dealing 10 Affliction back to that enemy. skillUsed is the post-resolution point where 'targeted Pyrrha' is known declaratively."
+    },
+    {
+     "on": "skillUsed",
+     "source": "Blastoff",
+     "when": {
+      "has": "invulnerable",
+      "name": "Blastoff",
+      "of": "eventSource"
+     },
+     "effect": [
+      {
+       "op": "if",
+       "cond": {
+        "has": "mark",
+        "name": "Blastoff Grace",
+        "of": "eventSource"
+       },
+       "then": [
+        {
+         "op": "removeStatus",
+         "kind": "mark",
+         "name": "Blastoff Grace",
+         "from": "eventSource"
+        }
+       ],
+       "else": [
+        {
+         "op": "removeStatus",
+         "kind": "invulnerable",
+         "name": "Blastoff",
+         "from": "eventSource"
+        }
+       ]
+      }
+     ],
+     "note": "'or until she uses a new skill': when Pyrrha (the only holder of the named Blastoff Invulnerable) uses a skill, the one-shot Blastoff Grace mark spares the Blastoff cast that applied it; her next skill has no grace, so the Invulnerable is stripped early. Mirrors the Cindersprig Brew / Drunken Swordsman cancel pattern."
     }
    ],
    "skill": {
@@ -11435,9 +11479,20 @@
       "to": "caster",
       "status": {
        "kind": "invulnerable",
+       "name": "Blastoff",
        "duration": 2
       },
-      "note": "'and makes Pyrrha invulnerable for 2 turns, or until she uses a new skill.' 2-turn Invulnerable. FIDELITY DEBT: 'or until she uses a new skill' (early self-cancel on Pyrrha's next skill use) is not expressible from an active's effect tree -- it would require installing a one-shot skillUsed self-trigger that removes the Invulnerable, which no effect op can register. Modeled as the fixed 2-turn cap only."
+      "note": "'and makes Pyrrha invulnerable for 2 turns, or until she uses a new skill.' A NAMED 2-turn Invulnerable so the Blastoff cancel trigger (passiveTriggers) can strip exactly it. 'or until she uses a new skill' = that skillUsed self-trigger; the one-shot 'Blastoff Grace' mark below spares the very cast (Blastoff itself) that applied the Invulnerable, so her NEXT skill is the one that ends it early."
+     },
+     {
+      "op": "applyStatus",
+      "to": "caster",
+      "status": {
+       "kind": "mark",
+       "name": "Blastoff Grace",
+       "duration": 2
+      },
+      "note": "One-shot grace: consumed by the Blastoff cancel trigger on Pyrrha's Blastoff cast itself, so the Invulnerable survives its own application and ends on her NEXT skill."
      }
     ]
    }

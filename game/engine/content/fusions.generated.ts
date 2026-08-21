@@ -11125,8 +11125,16 @@ export const FUSIONS: FusionForm[] = [
     "on": "skillUsed",
     "source": "Flames of Judgment",
     "when": {
-     "isFaction": "eventSource",
-     "faction": "enemy"
+     "and": [
+      {
+       "isFaction": "eventSource",
+       "faction": "enemy"
+      },
+      {
+       "isFaction": "eventTargets",
+       "faction": "ally"
+      }
+     ]
     },
     "effect": [
      {
@@ -11222,6 +11230,41 @@ export const FUSIONS: FusionForm[] = [
       "to": "eventSource"
      }
     ]
+   },
+   {
+    "on": "skillUsed",
+    "source": "Blastoff",
+    "when": {
+     "has": "invulnerable",
+     "name": "Blastoff",
+     "of": "eventSource"
+    },
+    "effect": [
+     {
+      "op": "if",
+      "cond": {
+       "has": "mark",
+       "name": "Blastoff Grace",
+       "of": "eventSource"
+      },
+      "then": [
+       {
+        "op": "removeStatus",
+        "kind": "mark",
+        "name": "Blastoff Grace",
+        "from": "eventSource"
+       }
+      ],
+      "else": [
+       {
+        "op": "removeStatus",
+        "kind": "invulnerable",
+        "name": "Blastoff",
+        "from": "eventSource"
+       }
+      ]
+     }
+    ]
    }
   ],
   "skill": {
@@ -11252,6 +11295,16 @@ export const FUSIONS: FusionForm[] = [
      "to": "caster",
      "status": {
       "kind": "invulnerable",
+      "name": "Blastoff",
+      "duration": 2
+     }
+    },
+    {
+     "op": "applyStatus",
+     "to": "caster",
+     "status": {
+      "kind": "mark",
+      "name": "Blastoff Grace",
       "duration": 2
      }
     }
