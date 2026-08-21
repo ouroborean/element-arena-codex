@@ -457,6 +457,17 @@ registerCustom("wingmanPatchStalwart", (ctx) => {
   s.effects = s.effects.filter((e) => e.op !== "grantShield");
 });
 
+// gaia:myth (Branch of the World Tree) — "Channel Vitality now costs [65] and affects all targets, but can
+// only target minions": re-author gaia3's metadata to cost {1 generic}, all-allies targeting, minion-only.
+// Idempotent (set-to-fixed).
+registerCustom("branchOfWorldTree", (ctx) => {
+  const s = mutableSkill(ctx, "gaia3");
+  if (!s) return;
+  s.cost = { generic: 1, specific: 0 };
+  s.targeting = "all-allies";
+  s.targetKind = "minion";
+});
+
 // pyrrha:dragon — Feed the Fire: +5 damage and healing, and it hits all enemies (apply once).
 registerCustom("dragonsHungerRewrite", (ctx, a) => {
   const s = mutableSkill(ctx, a.skillId as string);
