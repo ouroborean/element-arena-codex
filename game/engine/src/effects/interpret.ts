@@ -316,6 +316,10 @@ export function evalCondition(c: Condition, ctx: Ctx): boolean {
     const u = resolveSelector(c.isKind, ctx)[0];
     return !!u && u.kind === c.kind;
   }
+  if ("isNamed" in c) {
+    const u = resolveSelector(c.isNamed, ctx)[0];
+    return !!u && u.name === c.name;
+  }
   if ("declaredTargetsSelf" in c) {
     const e = ctx.event;
     return !!e && "targets" in e && e.targets.includes(ctx.self.id);
@@ -323,6 +327,10 @@ export function evalCondition(c: Condition, ctx: Ctx): boolean {
   if ("eventHasTag" in c) {
     const e = ctx.event;
     return !!e && "tags" in e && !!e.tags && e.tags.includes(c.eventHasTag);
+  }
+  if ("eventSkillId" in c) {
+    const e = ctx.event;
+    return !!e && "skillId" in e && e.skillId === c.eventSkillId;
   }
   if ("eventStatusKind" in c) {
     const e = ctx.event;

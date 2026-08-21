@@ -11847,15 +11847,22 @@
      "on": "skillUsed",
      "source": "Unstable Waters (riverdaughteralchemy0)",
      "when": {
-      "sameUnit": [
-       "eventSource",
-       "self"
+      "and": [
+       {
+        "sameUnit": [
+         "eventSource",
+         "self"
+        ]
+       },
+       {
+        "eventSkillId": "riverdaughter2"
+       }
       ]
      },
      "effect": [
       {
        "op": "applyStatus",
-       "to": "eventTarget",
+       "to": "eventTargets",
        "status": {
         "kind": "incoming_damage_mod",
         "name": "Unstable Waters",
@@ -11864,7 +11871,7 @@
        }
       }
      ],
-     "note": "Undertow now makes its target take +5 damage for 2 turns. Intended for Undertow (riverdaughter2) only; no Condition gates skillUsed by skill id, so the engine should require ctx.event.skillId==='riverdaughter2'. eventTarget = Undertow's declared target."
+     "note": "Undertow (riverdaughter2) now makes its target take +5 damage for 2 turns. Gated to Undertow via eventSkillId; eventTargets is Undertow's declared (single) target. (Previously used eventTarget, which does not resolve for skillUsed -- the effect landed on no one.)"
     }
    ],
    "skill": {
@@ -12476,7 +12483,7 @@
      "on": "healReceived",
      "source": "Reflection of Kindness (riverdaughtermirror0)",
      "when": {
-      "isFaction": "eventTarget",
+      "isFaction": "eventUnit",
       "faction": "enemy"
      },
      "effect": [
@@ -13763,10 +13770,14 @@
        {
         "isKind": "eventUnit",
         "kind": "minion"
+       },
+       {
+        "isNamed": "eventUnit",
+        "name": "Boulder"
        }
       ]
      },
-     "note": "Intended: only Boulder deaths (not Stonecap Mushrooms, to avoid a spawn loop).",
+     "note": "Only a Boulder's death re-summons a Stonecap (isNamed gate) -- NOT a Stonecap's own death, which would otherwise spawn-loop once destroying a Stonecap via Strength From The Earth actually works.",
      "effect": [
       {
        "op": "summon",
@@ -13779,12 +13790,23 @@
      "on": "skillUsed",
      "source": "Scattered Spores",
      "when": {
-      "sameUnit": [
-       "eventSource",
-       "self"
+      "and": [
+       {
+        "sameUnit": [
+         "eventSource",
+         "self"
+        ]
+       },
+       {
+        "eventSkillId": "roland1"
+       },
+       {
+        "isNamed": "eventTargets",
+        "name": "Stonecap Mushroom"
+       }
       ]
      },
-     "note": "Intended: only when Strength From The Earth (roland1) is used on a Stonecap Mushroom; eventTarget is that Stonecap.",
+     "note": "Only when Strength From The Earth (roland1) is used on a Stonecap Mushroom: gated by eventSkillId + isNamed on the target. Deal 15 Affliction to all enemies and defeat that Stonecap. (Previously ungated on skill/target and used eventTarget, which does not resolve for skillUsed -- so the 15 damage fired on EVERY Roland skill and the defeat hit no one.)",
      "effect": [
       {
        "op": "damage",
@@ -13796,7 +13818,7 @@
       },
       {
        "op": "defeat",
-       "to": "eventTarget"
+       "to": "eventTargets"
       }
      ]
     }
@@ -18015,10 +18037,7 @@
         "right": 1
        },
        {
-        "sameUnit": [
-         "eventTarget",
-         "self"
-        ]
+        "declaredTargetsSelf": true
        }
       ]
      },
@@ -20214,10 +20233,7 @@
         "eventHasTag": "Harmful"
        },
        {
-        "sameUnit": [
-         "eventTarget",
-         "self"
-        ]
+        "declaredTargetsSelf": true
        }
       ]
      },

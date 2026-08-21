@@ -75,9 +75,11 @@ export type Condition =
   | { sameUnit: [Selector, Selector] } // identity equality of the first unit each resolves to
   | { isFaction: Selector; faction: "ally" | "enemy" } // relative to the acting unit's team
   | { isKind: Selector; kind: "hero" | "minion" } // is the selected unit a hero or a minion?
+  | { isNamed: Selector; name: string } // the selected unit's display name equals this (e.g. a specific minion template, "Stonecap Mushroom")
   | { skillOnCooldown: string } // the caster's own skill (by id) is currently on cooldown (zephyrex3 requires Wind Step down)
   | { declaredTargetsSelf: true } // (skillDeclared) the trigger owner is among the declared targets
   | { eventHasTag: string } // (skillDeclared/skillUsed) the skill carries this class tag
+  | { eventSkillId: string } // (skillUsed/skillDeclared/skillGranted/skillRedirected/counterFired) the event's skillId matches — scopes a skill-reaction to ONE skill
   | { eventStatusKind: string; name?: string } // (statusApplied/statusExpired) the event's status kind (+name) matches
   | { eventStatusNameIncludes: string } // (statusApplied/statusExpired) the event's status NAME contains this substring, any kind (hectorspore0: "a Serum effect ends" = a "...Serum"-named status expires)
   | { eventSourceId: string } // (damageDealt) the event's sourceId matches — a dot's name (dot ticks) or a damage node's id (direct hits); scopes a reaction to one source skill/effect

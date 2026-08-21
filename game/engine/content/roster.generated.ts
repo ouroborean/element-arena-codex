@@ -4852,7 +4852,7 @@ export const ROSTER: HeroDef[] = [
       {
        "has": "mark",
        "name": "Repulse",
-       "of": "eventTarget"
+       "of": "eventTargets"
       }
      ]
     },
@@ -4861,7 +4861,7 @@ export const ROSTER: HeroDef[] = [
       "op": "removeStatus",
       "kind": "mark",
       "name": "Repulse",
-      "from": "eventTarget"
+      "from": "eventTargets"
      },
      {
       "op": "useSkill",
@@ -11350,10 +11350,7 @@ export const ROSTER: HeroDef[] = [
        "right": 1
       },
       {
-       "sameUnit": [
-        "eventTarget",
-        "self"
-       ]
+       "declaredTargetsSelf": true
       }
      ]
     },
