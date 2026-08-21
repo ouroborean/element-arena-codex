@@ -6959,7 +6959,23 @@ export const FUSIONS: FusionForm[] = [
    "name": "Blue Flame Spirits",
    "description": "Cinderling minions are replaced by Azure Sparkling minions."
   },
-  "passiveTriggers": [],
+  "passiveTriggers": [
+   {
+    "on": "roundStart",
+    "source": "Blue Flame Spirits",
+    "effect": [
+     {
+      "op": "applyStatus",
+      "to": "self",
+      "status": {
+       "kind": "mark",
+       "name": "Blue Flame Spirits",
+       "duration": null
+      }
+     }
+    ]
+   }
+  ],
   "skill": {
    "id": "jarrikplasma1",
    "name": "Awakener's Spark",

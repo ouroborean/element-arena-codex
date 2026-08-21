@@ -7048,9 +7048,25 @@
    "passive": {
     "name": "Blue Flame Spirits",
     "description": "Cinderling minions are replaced by Azure Sparkling minions.",
-    "note": "A global summon-template substitution with no reactive hook: nothing in the fusion form summons Cinderlings (the base kit does, unpatched by fusion). Swapping the base kit's Cinderling summons to Azure Sparkling requires patching those skills, so this is tracked debt with no passive trigger."
+    "note": "Jarrik holds a permanent 'Blue Flame Spirits' mark (re-applied at round start); summonMinion reads it and mints Azure Sparkling in place of every Cinderling the base kit would summon (any path), so no per-skill patching is needed."
    },
-   "passiveTriggers": [],
+   "passiveTriggers": [
+    {
+     "on": "roundStart",
+     "source": "Blue Flame Spirits",
+     "effect": [
+      {
+       "op": "applyStatus",
+       "to": "self",
+       "status": {
+        "kind": "mark",
+        "name": "Blue Flame Spirits",
+        "duration": null
+       }
+      }
+     ]
+    }
+   ],
    "skill": {
     "id": "jarrikplasma1",
     "name": "Awakener's Spark",
