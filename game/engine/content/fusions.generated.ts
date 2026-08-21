@@ -18997,6 +18997,7 @@ export const FUSIONS: FusionForm[] = [
     "specific": 0
    },
    "cooldown": 0,
+   "autoTargetMark": "Ominous Rumble",
    "effects": [
     {
      "op": "damage",
