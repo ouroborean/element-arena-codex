@@ -161,6 +161,9 @@ export interface SkillDef {
   /** Display disguise: to the opponent, this skill's cast (its log telegraph) and the effects it applies are
    *  shown as skill `disguiseAs` — Cleave the Veil displayed as Elegant Sweep. Cosmetic; effects unchanged. */
   disguiseAs?: string;
+  /** Auto-target: while any living enemy bears this mark, this single-target skill is forcibly aimed at it
+   *  (zephyrex Ominous Rumble — "marked enemies are automatically targeted by Arcadian Duet and Jolt"). */
+  autoTargetMark?: string;
 }
 
 // Node addressing (findNode / replaceNode / mapNode) lives in ./patch.ts — the single walker

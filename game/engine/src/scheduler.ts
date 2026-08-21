@@ -487,6 +487,12 @@ export function legalTargets(state: MatchState, caster: Unit, skill: SkillInstan
       return forced && isLegal(forced) ? [forced] : [];
     }
   }
+  // Auto-target-by-mark (zephyrex Ominous Rumble): while a living enemy bears the named mark, this skill is
+  // forcibly aimed at it (else the chosen target stands). Taunt above still wins.
+  if (skill.autoTargetMark) {
+    const marked = unitsOf(state, otherTeam(caster.team)).find((u) => u.statuses.some((s) => s.kind === "mark" && s.name === skill.autoTargetMark) && isLegal(u));
+    if (marked) return [marked];
+  }
   // Blind: choose a random valid target from the relevant side (excluding units immune to Blinded targeting).
   if (hasStatus(caster, "blind")) {
     const side = harmful ? unitsOf(state, otherTeam(caster.team)) : helpful ? unitsOf(state, caster.team) : chosen;

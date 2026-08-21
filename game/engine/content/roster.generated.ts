@@ -6171,6 +6171,7 @@ export const ROSTER: HeroDef[] = [
      "specific": 0
     },
     "cooldown": 0,
+    "autoTargetMark": "Ominous Rumble",
     "effects": [
      {
       "op": "applyStatus",
@@ -6187,6 +6188,30 @@ export const ROSTER: HeroDef[] = [
        "duration": 1
       },
       "to": "target"
+     },
+     {
+      "op": "if",
+      "cond": {
+       "has": "mark",
+       "name": "Ominous Rumble",
+       "of": "target"
+      },
+      "then": [
+       {
+        "op": "applyStatus",
+        "to": "self",
+        "status": {
+         "kind": "elemental_essence",
+         "duration": null
+        }
+       },
+       {
+        "op": "removeStatus",
+        "kind": "mark",
+        "name": "Ominous Rumble",
+        "from": "target"
+       }
+      ]
      }
     ],
     "currentCd": 0
