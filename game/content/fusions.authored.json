@@ -1741,6 +1741,11 @@
         ]
        },
        {
+        "not": {
+         "eventSourceId": "Consecrate"
+        }
+       },
+       {
         "has": "dot",
         "name": "Consecrate",
         "of": "eventTarget"
@@ -3359,7 +3364,7 @@
    "passive": {
     "name": "Roiling Life",
     "description": "Enemies damaged by Worldfist take 10 damage on the following turn. This effect lasts one additional turn with each time Channel Earth has been used.",
-    "note": "Realized as a 'Roiling Life' dot (10, normal) applied to the struck enemy, duration = 1 + Gaia's Channel Earth stacks (each stack = one extra turn). The dot ticks at Gaia's (applier) turn-end, i.e. 'the following turn'. 'Damaged by Worldfist' is approximated as 'damaged by Gaia' (sameUnit eventSource self): damageDealt carries a sourceId but no Condition primitive matches a skill id, so the fusion active Overgrowth's own hit also seeds the dot. The named dot doubles as the 'Roiling Life' marker Overgrowth reads."
+    "note": "Realized as a 'Roiling Life' dot (10, normal) applied to the struck enemy, duration = 1 + Gaia's Channel Earth stacks (each stack = one extra turn). The dot ticks at Gaia's (applier) turn-end, i.e. 'the following turn'. 'Damaged by Worldfist' is scoped via {eventSourceId:'gaia2'} (the damageDealt event's sourceId falls back to the casting skill id), so only Worldfist hits seed the dot — the fusion active Overgrowth's own hit no longer does. The named dot doubles as the 'Roiling Life' marker Overgrowth reads."
    },
    "passiveTriggers": [
     {
@@ -3376,6 +3381,9 @@
        {
         "isFaction": "eventTarget",
         "faction": "enemy"
+       },
+       {
+        "eventSourceId": "gaia2"
        }
       ]
      },
@@ -10679,6 +10687,9 @@
        {
         "isFaction": "eventTarget",
         "faction": "enemy"
+       },
+       {
+        "eventSourceId": "pyrrha2"
        }
       ]
      },
@@ -10693,7 +10704,7 @@
        }
       }
      ],
-     "note": "'Damaging an enemy with Feed the Fire now also lowers the target's damage by 5 for their next 2 turns.' Reactive add-on to Pyrrha's damage: a -5 outgoing_damage_mod for 2 turns on the struck enemy. FIDELITY DEBT: the damageDealt event's sourceId (which skill dealt it) has no matching Condition, so this cannot be gated specifically to Feed the Fire (pyrrha2); it fires on any damage Pyrrha deals to an enemy. outgoing_damage_mod scales only normal/piercing damage (engine), matching 'lowers their damage'."
+     "note": "'Damaging an enemy with Feed the Fire now also lowers the target's damage by 5 for their next 2 turns.' Reactive add-on scoped to Feed the Fire via {eventSourceId:'pyrrha2'} (the damageDealt event's sourceId is the casting skill id when the node is untagged): a -5 outgoing_damage_mod for 2 turns on an enemy struck specifically by pyrrha2. outgoing_damage_mod scales only normal/piercing damage (engine), matching 'lowers their damage'."
     }
    ],
    "skill": {
@@ -11070,9 +11081,7 @@
         "faction": "enemy"
        },
        {
-        "has": "dot",
-        "name": "Fan the Flames",
-        "of": "eventTarget"
+        "eventSourceId": "Fan the Flames"
        }
       ]
      },

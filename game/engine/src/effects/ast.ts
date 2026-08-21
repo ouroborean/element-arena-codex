@@ -78,6 +78,7 @@ export type Condition =
   | { declaredTargetsSelf: true } // (skillDeclared) the trigger owner is among the declared targets
   | { eventHasTag: string } // (skillDeclared/skillUsed) the skill carries this class tag
   | { eventStatusKind: string; name?: string } // (statusApplied/statusExpired) the event's status kind (+name) matches
+  | { eventSourceId: string } // (damageDealt) the event's sourceId matches — a dot's name (dot ticks) or a damage node's id (direct hits); scopes a reaction to one source skill/effect
   | { eventTeamIsSelf: true } // (turnStart/turnEnd) the event's team is the trigger owner's team ("my team's turn")
   | { eventRedirectedToSelf: true } // (skillRedirected) the reflected skill was redirected ONTO the trigger owner (reads `to`)
   | { eventHidden: boolean } // (skillUsed/skillDeclared) whether the used skill is Invisible (isHidden) — Sera's "non-Invisible" filter

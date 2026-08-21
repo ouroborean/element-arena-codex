@@ -320,6 +320,11 @@ export function evalCondition(c: Condition, ctx: Ctx): boolean {
     const e = ctx.event;
     return !!e && "kind" in e && e.kind === c.eventStatusKind && (c.name === undefined || ("name" in e && e.name === c.name));
   }
+  if ("eventSourceId" in c) {
+    // (damageDealt) match the event's sourceId — a dot's name for dot ticks, a damage node's id for direct hits.
+    const e = ctx.event;
+    return !!e && "sourceId" in e && (e as { sourceId?: string }).sourceId === c.eventSourceId;
+  }
   if ("eventTeamIsSelf" in c) {
     const e = ctx.event;
     return !!e && "team" in e && e.team === ctx.self.team;
@@ -395,7 +400,10 @@ export function exec(effect: Effect, ctx: Ctx): void {
         const r = applyDamage(u, { amount: amt, type: dtype, isNew: true, sourceId: effect.id, bypass: bypassesAgainst(ctx.caster, u) });
         if (r.shieldAbsorbed > 0) ctx.emit({ type: "shieldDamaged", unit: u.id, source: src, amount: r.shieldAbsorbed });
         if (r.shieldBroke) ctx.emit({ type: "shieldBroken", unit: u.id, source: src });
-        ctx.emit({ type: "damageDealt", source: src, target: u.id, amount: r.hpLost, dtype, sourceId: effect.id, isNew: true });
+        // The event's sourceId identifies what dealt the damage for reactions (eventSourceId): a damage node's
+        // own id if authored, else the casting skill's id — so a trigger can scope to one source skill even
+        // when its damage node is untagged. (The pipeline's sourceId at applyDamage stays the node id.)
+        ctx.emit({ type: "damageDealt", source: src, target: u.id, amount: r.hpLost, dtype, sourceId: effect.id ?? ctx.skillId, isNew: true });
         if (wasAlive && r.lethal) ctx.emit({ type: "unitDied", unit: u.id, killer: src });
       };
       // "single-target damage" is the CASTING SKILL's declared targeting, not the resolved defender count:
