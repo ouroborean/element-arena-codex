@@ -1222,7 +1222,7 @@ export const AUGMENTS: Augment[] = [
      "source": "River Within (riverdaughter5 augment)",
      "when": {
       "sameUnit": [
-       "eventSource",
+       "eventCounterer",
        "self"
       ]
      },
