@@ -1217,8 +1217,9 @@ export const FUSIONS: FusionForm[] = [
      "op": "applyStatus",
      "to": "target",
      "status": {
-      "kind": "mark",
+      "kind": "incoming_heal_mod",
       "name": "Blessed Leylines",
+      "magnitude": 5,
       "duration": null
      }
     }

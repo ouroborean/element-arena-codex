@@ -1214,7 +1214,7 @@
      "specific": 1
     },
     "cooldown": 2,
-    "note": "The permanent '+5 healing received from all sources (does not stack)' has no native status (applyHeal reads no incoming-heal modifier); represented as a permanent, non-stacking 'Blessed Leylines' mark on the target - tracked debt. Invulnerable 1 turn is native.",
+    "note": "The permanent '+5 healing received from all sources (does not stack)' is a real incoming_heal_mod (magnitude 5, duration null) that applyHeal adds to every heal the target receives, taking the MAX across instances so it does not stack. Invulnerable 1 turn is native.",
     "effects": [
      {
       "op": "applyStatus",
@@ -1228,8 +1228,9 @@
       "op": "applyStatus",
       "to": "target",
       "status": {
-       "kind": "mark",
+       "kind": "incoming_heal_mod",
        "name": "Blessed Leylines",
+       "magnitude": 5,
        "duration": null
       }
      }

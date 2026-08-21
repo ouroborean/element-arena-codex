@@ -26,7 +26,7 @@ VALUE_REFS = {"stackCount", "missingHp", "currentHp", "shield", "spendableShield
 VALUE_OPS = {"add", "sub", "mul", "min", "max", "div"}
 SELECTOR_STRINGS = {"self", "caster", "target", "summoner", "it", "across", "adjacent",
                     "eventSource", "eventTarget", "eventTargets", "eventUnit"}
-STATUS_KINDS = {"damage_reduction", "incoming_damage_mod", "outgoing_damage_mod",
+STATUS_KINDS = {"damage_reduction", "incoming_damage_mod", "incoming_heal_mod", "outgoing_damage_mod",
                 "incoming_damage_mult", "outgoing_damage_mult",
                 "outgoing_dtype_override", "conditional_bypass",
                 "shield_absorb_cap", "split_incoming", "shield_grant_bonus", "shield_non_absorbing", "skill_damage_bonus", "skill_targeting_override",
