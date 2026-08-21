@@ -328,6 +328,10 @@ export function evalCondition(c: Condition, ctx: Ctx): boolean {
     const e = ctx.event;
     return !!e && "kind" in e && e.kind === c.eventStatusKind && (c.name === undefined || ("name" in e && e.name === c.name));
   }
+  if ("eventStatusNameIncludes" in c) {
+    const e = ctx.event;
+    return !!e && "name" in e && typeof e.name === "string" && e.name.includes(c.eventStatusNameIncludes);
+  }
   if ("eventSourceId" in c) {
     // (damageDealt) match the event's sourceId — a dot's name for dot ticks, a damage node's id for direct hits.
     const e = ctx.event;

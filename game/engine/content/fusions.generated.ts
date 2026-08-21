@@ -6033,6 +6033,9 @@ export const FUSIONS: FusionForm[] = [
    {
     "on": "statusExpired",
     "source": "Lingering Spores",
+    "when": {
+     "eventStatusNameIncludes": "Serum"
+    },
     "effect": [
      {
       "op": "addStack",
@@ -19615,8 +19618,7 @@ export const FUSIONS: FusionForm[] = [
        ]
       },
       {
-       "has": "channeling",
-       "of": "self"
+       "eventStatusKind": "channeling"
       }
      ]
     },
@@ -19653,10 +19655,7 @@ export const FUSIONS: FusionForm[] = [
        ]
       },
       {
-       "not": {
-        "has": "channeling",
-        "of": "self"
-       }
+       "eventStatusKind": "channeling"
       }
      ]
     },
