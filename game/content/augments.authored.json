@@ -1261,7 +1261,7 @@
    "owner": "zevkir",
    "name": "Atlantean Waters",
    "description": "While Zev'kir is Channeling Call Tides, he heals 5 HP per turn and ignores stuns.",
-   "note": "Call Tides (zevkir1) is a Channel whose effects re-run each channel turn, so appending to it IS 'while Channeling Call Tides, each turn'. The 5 HP/turn heal is a clean appended heal. 'ignores stuns' has no stun-immunity status kind, so it is approximated by clearing any stun on Zev'kir on each channel tick (removeStatus stun from self) -- an approximation, not true immunity (a stun applied mid-enemy-turn still lands until his next channel tick wipes it). ENGINE GAP: a real stun-immunity primitive would be more faithful.",
+   "note": "Call Tides (zevkir1) is a Channel whose effects re-run each channel turn, so appending to it IS 'while Channeling Call Tides, each turn'. The 5 HP/turn heal is a clean appended heal. 'ignores stuns' = a real 'Stun Immunity' mark (isStunnedFor honors it) refreshed each channel tick with duration 1, so Zev'kir is immune THROUGHOUT the channel (a stun landing between his ticks no longer stuns him) -- true immunity, not a post-hoc wipe.",
    "patches": [
     {
      "op": "appendEffect",
@@ -5539,14 +5539,14 @@
        "left": {
         "ref": "stackCount",
         "name": "Deepening Shadows",
-        "of": "eventTarget"
+        "of": "eventUnit"
        },
        "right": 3
       },
       "effect": [
        {
         "op": "applyStatus",
-        "to": "eventTarget",
+        "to": "eventUnit",
         "status": {
          "kind": "conditional_bypass",
          "name": "Bypass",

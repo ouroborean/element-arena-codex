@@ -1739,7 +1739,7 @@
    "passive": {
     "name": "Hallowed Footsteps",
     "description": "When dealing damage to or healing a target affected by your Consecrate, deal 10 additional damage or healing to them. This effect is not triggered by Consecrate.",
-    "note": "'Affected by your Consecrate' = has the named dot 'Consecrate' (enemies) or regen 'Consecrate' (allies) that the active applies. The 'Hallowed Proc Lock' mark is the house re-entrancy guard (set before the rider, removed after) so the +10 fires once per hit. Heal side: regen ticks do not emit healReceived, so 'not triggered by Consecrate' holds natively. Damage side: the Consecrate dot tick DOES emit damageDealt (sourceId 'Consecrate') and there is no sourceId predicate to exclude it - tracked debt."
+    "note": "'Affected by your Consecrate' = has the named dot 'Consecrate' (enemies) or regen 'Consecrate' (allies) that the active applies. The 'Hallowed Proc Lock' mark is the house re-entrancy guard (set before the rider, removed after) so the +10 fires once per hit. Heal side: regen ticks do not emit healReceived, so 'not triggered by Consecrate' holds natively. Damage side: the Consecrate dot tick emits damageDealt (sourceId 'Consecrate'), and the trigger excludes it with {not:{eventSourceId:'Consecrate'}} -- so 'not triggered by Consecrate' holds on both sides."
    },
    "passiveTriggers": [
     {
@@ -6822,7 +6822,7 @@
        "name": "Drakken",
        "duration": null
       },
-      "note": "'After using this skill, Jarrik can no longer apply, trigger, or consume Cinders' — set as a permanent self-mark. The base kit (unpatched by fusion) does not read this lock, so suppressing its Cinders interactions is tracked debt; the mark is the observable hook."
+      "note": "'After using this skill, Jarrik can no longer apply, trigger, or consume Cinders' — a permanent self-mark the base kit reads at all three sites: APPLY is suppressed at the interpreter chokepoint (a Drakken-holder's Cinders applyStatus is skipped), TRIGGER is gated in the jarrik0 Cinders passive ({not has mark Drakken}), and CONSUME is gated in jarrik3 Call Cinders ({not has mark Drakken})."
      }
     ]
    }
@@ -11299,7 +11299,7 @@
        "to": "eventTarget"
       }
      ],
-     "note": "'Receiving damage from Fan the Flames ... gives enemies a stack of Flames of Judgment.' The Fan the Flames dot ticks emit damageDealt with source=Pyrrha; sourceId ('Fan the Flames') has no matching Condition, so this is gated as 'Pyrrha damaging an enemy that bears the Fan the Flames dot'. FIDELITY DEBT: also fires for Pyrrha's direct hits (Pyrokinesis/Feed the Fire) on a burning enemy, not only the dot tick."
+     "note": "'Receiving damage from Fan the Flames ... gives enemies a stack of Flames of Judgment.' The Fan the Flames dot ticks emit damageDealt with source=Pyrrha and sourceId 'Fan the Flames'; the trigger scopes to exactly those via {eventSourceId:'Fan the Flames'}. Pyrrha's direct hits (Pyrokinesis/Feed the Fire) carry their own skill-id sourceIds and do NOT count -- only the dot tick does."
     },
     {
      "on": "skillUsed",
@@ -11370,7 +11370,7 @@
         ]
        }
       ],
-      "note": "'Target enemy with 7 or more stacks of Flames of Judgment is instantly killed.' Applied to every enemy (targeting all): any bearing >=7 Flames of Judgment stacks is defeated. 'This skill Bypasses' -> the Bypassing tag (verbatim). 'cannot be countered or reflected' is a skill-level property (Uncounterable) absent from the brief's tags and not expressible from the effects array alone; noted as fidelity debt."
+      "note": "'Target enemy with 7 or more stacks of Flames of Judgment is instantly killed.' Applied to every enemy (targeting all): any bearing >=7 Flames of Judgment stacks is defeated. 'This skill Bypasses' -> the Bypassing tag (verbatim). 'cannot be countered or reflected' -> the Uncounterable tag on this skill, which interpret.ts honors by early-returning before the counter/reflect loop."
      }
     ]
    }
@@ -19435,7 +19435,7 @@
         "mark": "Ominous Rumble",
         "to": "enemies"
        },
-       "note": "When Wind Step (zephyrex4) triggers, mark all enemies with Ominous Rumble (skillUsed has no skillId Condition, so the gate is in the custom). Marked enemies are also auto-targeted by Arcadian Duet (zephyrex1) and Jolt (zephyrexstorm1), consuming the mark - a targeting override with no DSL primitive, applied by the same handler/engine and recorded as debt."
+       "note": "When Wind Step (zephyrex4) triggers, mark all enemies with Ominous Rumble (skillUsed has no skillId Condition, so the gate is in the custom). Marked enemies are auto-targeted by Arcadian Duet (zephyrex1) and Jolt (zephyrexstorm1) via the autoTargetMark skill flag (scheduler.ts forces a single-target skill onto a marked enemy), and each skill's marked-hit branch consumes the mark."
       }
      ]
     }
