@@ -1733,7 +1733,7 @@
    "owner": "saya",
    "name": "Kinetic Converter",
    "description": "Reduces the cooldown of Plasma Shield to 1 turn, but reduces the shield it grants to 25.",
-   "note": "Whole-skill re-author captures the augment's two value changes: cooldown 3 -> 1 and shield 40 -> 25. 'Ignores affliction damage for 1 turn' is modeled via a custom, because the engine only has whole-damage `damage_ignore` (no affliction-scoped ignore). Skill invisibility is not representable in the engine's skill model (no hidden/invisible field). The 'While Enhanced, damage to her Shield grants Elemental Essence' clause is a base hero trigger reading Saya's Enhanced state, not part of the on-cast tree, so it is unaffected.",
+   "note": "Whole-skill re-author captures the augment's two value changes: cooldown 3 -> 1 and shield 40 -> 25. 'Ignores affliction damage for 1 turn' is modeled via a custom. isHidden is preserved (base saya4 is Invisible, and the visibility system now honors it end-to-end) and the base's Enhanced->Plasma Charge on-cast branch is preserved — the replaceSkill must carry every base clause it does not intend to change.",
    "patches": [
     {
      "op": "replaceSkill",
@@ -1754,6 +1754,7 @@
       },
       "cooldown": 1,
       "currentCd": 0,
+      "isHidden": true,
       "effects": [
        {
         "op": "grantShield",
@@ -1768,6 +1769,31 @@
          "duration": 1,
          "to": "caster"
         }
+       },
+       {
+        "op": "if",
+        "cond": {
+         "has": "mark",
+         "name": "Enhanced",
+         "of": "self"
+        },
+        "then": [
+         {
+          "op": "applyStatus",
+          "to": "self",
+          "status": {
+           "kind": "mark",
+           "name": "Plasma Charge",
+           "duration": null
+          }
+         },
+         {
+          "op": "removeStatus",
+          "kind": "mark",
+          "name": "Enhanced",
+          "from": "self"
+         }
+        ]
        }
       ]
      }

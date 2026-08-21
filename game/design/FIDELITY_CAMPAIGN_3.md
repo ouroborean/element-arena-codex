@@ -18,6 +18,18 @@ wire-ups, or a multi-part unimplemented suite). Batch same-primitive fixes into 
 
 ---
 
+## Progress
+
+- **PR 0 — verification pass: COMPLETE** (adversarial, `wf_d45665c2-711`). Of the 53 flagged: **49 CONFIRMED
+  + 3 PARTIAL = 52 real**, **1 FALSE_POSITIVE (Merciless — removed)**. Sizes: **22 S / 22 M / 8 L**; 20 need a
+  new primitive but they cluster into the ~8 below (notably one `eventSourceId`/`eventViaSkill` condition
+  unlocks 4–5). Verified per-item fixes: `scratchpad/verified_gaps.json`.
+- **PR 1 — visibility misses: DONE** (merged): maggie:grave Bloodrose Offering `isHidden`; saya Kinetic
+  Converter augment restored `isHidden` + the dropped Enhanced→Plasma Charge branch; zev'kir Static Maelstrom
+  `cost_mod`→`cost_currency_remap` (×3 sites).
+
+---
+
 ## Existing primitives to reuse (verify each is present in PR 0, then wire — do NOT rebuild)
 
 - `eventHasTag` — class-tag test on skillUsed/skillDeclared (used by Sera).

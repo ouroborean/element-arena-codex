@@ -10240,6 +10240,7 @@
      "specific": 1
     },
     "cooldown": 4,
+    "isHidden": true,
     "effects": [
      {
       "op": "applyStatus",
@@ -10249,7 +10250,7 @@
        "name": "Bloodrose Offering",
        "duration": 1
       },
-      "note": "1-turn window mark on the ally; the death payoff is the 'Bloodrose Offering' passiveTriggers reaction keyed on this mark. 'This effect is invisible' is cosmetic (no visibility primitive)."
+      "note": "1-turn window mark on the ally; the death payoff is the 'Bloodrose Offering' passiveTriggers reaction keyed on this mark. 'This effect is invisible' is real: the skill-level isHidden conceals both the cast telegraph and this mark from the opponent (redactState), matching the peer fusion actives."
      }
     ]
    }
@@ -19647,11 +19648,11 @@
        "op": "applyStatus",
        "to": "self",
        "status": {
-        "kind": "cost_mod",
+        "kind": "cost_currency_remap",
         "name": "Static Maelstrom",
         "duration": null
        },
-       "note": "While Channeling, Zev'kir's costs become Generic. cost_mod is the closest status; the specific-to-generic conversion semantics are carried by name (no primitive expresses the conversion exactly)."
+       "note": "While Channeling, Zev'kir's costs become Generic. cost_currency_remap (unscoped — no skillId) makes every one of his skills' Specific cost payable as Generic, which is exactly the conversion."
       },
       {
        "op": "applyStatus",
@@ -19688,7 +19689,7 @@
      "effect": [
       {
        "op": "removeStatus",
-       "kind": "cost_mod",
+       "kind": "cost_currency_remap",
        "name": "Static Maelstrom",
        "from": "self"
       }
@@ -19737,7 +19738,7 @@
          "includeSelf": true
         },
         "status": {
-         "kind": "cost_mod",
+         "kind": "cost_currency_remap",
          "name": "Static Maelstrom",
          "duration": 1
         }
@@ -19756,7 +19757,7 @@
         }
        }
       ],
-      "note": "If Zev'kir has at least 3 Call Tides stacks, grant the whole team Static Maelstrom for 1 turn (Generic costs + 10 bonus damage), modeled as the same cost_mod + outgoing_damage_mod pair the passive grants."
+      "note": "If Zev'kir has at least 3 Call Tides stacks, grant the whole team Static Maelstrom for 1 turn (Generic costs via cost_currency_remap + 10 bonus damage), the same pair the passive grants."
      }
     ]
    }

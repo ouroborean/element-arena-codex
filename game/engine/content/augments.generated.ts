@@ -1721,6 +1721,7 @@ export const AUGMENTS: Augment[] = [
       "specific": 0
      },
      "cooldown": 1,
+     "isHidden": true,
      "effects": [
       {
        "op": "grantShield",
@@ -1735,6 +1736,31 @@ export const AUGMENTS: Augment[] = [
         "duration": 1,
         "to": "caster"
        }
+      },
+      {
+       "op": "if",
+       "cond": {
+        "has": "mark",
+        "name": "Enhanced",
+        "of": "self"
+       },
+       "then": [
+        {
+         "op": "applyStatus",
+         "to": "self",
+         "status": {
+          "kind": "mark",
+          "name": "Plasma Charge",
+          "duration": null
+         }
+        },
+        {
+         "op": "removeStatus",
+         "kind": "mark",
+         "name": "Enhanced",
+         "from": "self"
+        }
+       ]
       }
      ],
      "currentCd": 0

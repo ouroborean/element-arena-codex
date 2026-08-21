@@ -10085,6 +10085,7 @@ export const FUSIONS: FusionForm[] = [
     "specific": 1
    },
    "cooldown": 4,
+   "isHidden": true,
    "effects": [
     {
      "op": "applyStatus",
@@ -19290,7 +19291,7 @@ export const FUSIONS: FusionForm[] = [
       "op": "applyStatus",
       "to": "self",
       "status": {
-       "kind": "cost_mod",
+       "kind": "cost_currency_remap",
        "name": "Static Maelstrom",
        "duration": null
       }
@@ -19328,7 +19329,7 @@ export const FUSIONS: FusionForm[] = [
     "effect": [
      {
       "op": "removeStatus",
-      "kind": "cost_mod",
+      "kind": "cost_currency_remap",
       "name": "Static Maelstrom",
       "from": "self"
      }
@@ -19376,7 +19377,7 @@ export const FUSIONS: FusionForm[] = [
         "includeSelf": true
        },
        "status": {
-        "kind": "cost_mod",
+        "kind": "cost_currency_remap",
         "name": "Static Maelstrom",
         "duration": 1
        }
