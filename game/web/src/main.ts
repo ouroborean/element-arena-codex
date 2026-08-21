@@ -224,8 +224,14 @@ function targetsFor(u: Unit, skillId: string): Set<string> {
   // The engine already permits ally-targeting (no faction filter) and scores the +10-on-ally-kill clause;
   // this is only the client offering those allied heroes (not self, not allied minions) as candidates.
   const merciless = skillId === "blackknight1" && u.fused === "evil";
+  // Mountain Rescue Team (syl "winter" fusion): "Swoop can now be used to make a stunned ally invulnerable."
+  // Swoop (sylminion2) is the Eagle's skill; the engine already carries the stunned-ally invuln branch, so
+  // this only offers stunned allies (alongside its normal enemy pool) when the Eagle's summoner is winter-fused.
+  const swoopRescue = skillId === "sylminion2" && state.units[u.summoner ?? ""]?.fused === "winter";
   const pool = merciless
     ? [...living(state, enemy), ...living(state, u.team).filter((x) => x.kind === "hero" && x.id !== u.id)]
+    : swoopRescue
+    ? [...living(state, enemy), ...living(state, u.team).filter((x) => x.id !== u.id && x.statuses.some((s) => s.kind === "stun"))]
     : skill.tags.includes("Harmful") ? living(state, enemy)
     : skill.tags.includes("Helpful") ? living(state, u.team)
     : [...living(state, u.team), ...living(state, enemy)];
