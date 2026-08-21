@@ -376,6 +376,13 @@ export function disguiseFieldsOf(ctx: Ctx): { disguiseAs?: string; disguiseName?
   return { disguiseAs: ctx.disguiseAs, disguiseName: ctx.caster.skills?.find((s) => s.id === ctx.disguiseAs)?.name ?? ctx.disguiseAs };
 }
 
+/** Applied-duration bonus — titania:fae "Arcadian Advancement": each stack the CASTER holds extends every
+ *  non-round-permanent status she applies by 1 turn (round-permanent/null effects untouched). Zero for any
+ *  caster without the stack, so it is self-gating to Titania. */
+function extendedDuration(d: number | null, ctx: Ctx): number | null {
+  return d === null ? null : d + stackCount(ctx.caster, "Arcadian Advancement");
+}
+
 function buildStatus(spec: StatusSpec, ctx: Ctx) {
   return {
     kind: spec.kind,
@@ -388,7 +395,7 @@ function buildStatus(spec: StatusSpec, ctx: Ctx) {
     viaSourceId: spec.viaSourceId,
     unitRef: spec.unitRef ? resolveSelector(spec.unitRef, ctx)[0]?.id : undefined,
     onExpire: spec.onExpire,
-    duration: evalDuration(spec.duration, ctx),
+    duration: extendedDuration(evalDuration(spec.duration, ctx), ctx),
     appliedBy: ctx.caster.id,
     appliedTurn: ctx.state.turn,
     sourceId: ctx.skillId,
