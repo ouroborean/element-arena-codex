@@ -8400,6 +8400,9 @@ export const ROSTER: HeroDef[] = [
       {
        "isFaction": "eventSource",
        "faction": "ally"
+      },
+      {
+       "eventSourceSummonedBySelf": true
       }
      ]
     },
@@ -8423,6 +8426,24 @@ export const ROSTER: HeroDef[] = [
         "to": "it"
        }
       ]
+     }
+    ]
+   },
+   {
+    "on": "turnEnd",
+    "source": "Channel Vitality",
+    "when": {
+     "eventTeamIsSelf": true
+    },
+    "effect": [
+     {
+      "op": "removeStatus",
+      "kind": "mark",
+      "name": "Channel Vitality",
+      "from": {
+       "faction": "allies",
+       "includeSelf": true
+      }
      }
     ]
    }

@@ -81,6 +81,7 @@ export type Condition =
   | { eventStatusKind: string; name?: string } // (statusApplied/statusExpired) the event's status kind (+name) matches
   | { eventSourceId: string } // (damageDealt) the event's sourceId matches — a dot's name (dot ticks) or a damage node's id (direct hits); scopes a reaction to one source skill/effect
   | { eventTeamIsSelf: true } // (turnStart/turnEnd) the event's team is the trigger owner's team ("my team's turn")
+  | { eventSourceSummonedBySelf: true } // (any event with a source) the event's source unit is a minion the trigger owner summoned (gaia3: only "Gaia's minions")
   | { eventRedirectedToSelf: true } // (skillRedirected) the reflected skill was redirected ONTO the trigger owner (reads `to`)
   | { eventHidden: boolean } // (skillUsed/skillDeclared) whether the used skill is Invisible (isHidden) — Sera's "non-Invisible" filter
   | { and: Condition[] }

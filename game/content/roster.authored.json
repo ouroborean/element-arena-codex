@@ -6618,6 +6618,9 @@
        {
         "isFaction": "eventSource",
         "faction": "ally"
+       },
+       {
+        "eventSourceSummonedBySelf": true
        }
       ]
      },
@@ -6641,6 +6644,24 @@
          "to": "it"
         }
        ]
+      }
+     ]
+    },
+    {
+     "on": "turnEnd",
+     "source": "Channel Vitality",
+     "when": {
+      "eventTeamIsSelf": true
+     },
+     "effect": [
+      {
+       "op": "removeStatus",
+       "kind": "mark",
+       "name": "Channel Vitality",
+       "from": {
+        "faction": "allies",
+        "includeSelf": true
+       }
       }
      ]
     }
