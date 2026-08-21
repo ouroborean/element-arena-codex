@@ -9316,7 +9316,7 @@
    "passive": {
     "name": "Shadow Clones",
     "description": "Whenever Laria would create one or more stacks of Deepening Shadows, she instead creates a Shadow Clone minion. Shadow Clones are treated as if they are stacks of Deepening Shadows on all targets.",
-    "note": "'Would create' is a pre-application replacement the event model cannot intercept; approximated by reacting to a Deepening Shadows stack Laria applies, removing it, and summoning a Shadow Clone (larianinjaminion) instead. 'Shadow Clones count as Deepening Shadows stacks on all targets' is a global counting reinterpretation with no primitive (noted)."
+    "note": "'Would create' is approximated by reacting to a Deepening Shadows stack Laria applies, removing it, and summoning a Shadow Clone (larianinjaminion) instead. 'Shadow Clones count as Deepening Shadows stacks' is real: the Shadow Clone template carries a Deepening Shadows stack (magnitude 1), so field-wide stackSum/count reads of Deepening Shadows count each live clone (a per-unit stackCount of a specific hero does not include clones - a minor residual)."
    },
    "passiveTriggers": [
     {

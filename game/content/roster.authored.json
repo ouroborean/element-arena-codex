@@ -10094,6 +10094,14 @@
      "name": "Shadow Clone",
      "maxHp": 5,
      "element": "ninja",
+     "statuses": [
+      {
+       "kind": "stack",
+       "name": "Deepening Shadows",
+       "magnitude": 1,
+       "duration": null
+      }
+     ],
      "skills": [
       {
        "id": "shadowclone1",

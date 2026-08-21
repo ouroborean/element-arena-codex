@@ -1562,7 +1562,15 @@ export const MINIONS: MinionTemplate[] = [
     "currentCd": 0
    }
   ],
-  "triggers": []
+  "triggers": [],
+  "statuses": [
+   {
+    "kind": "stack",
+    "name": "Deepening Shadows",
+    "magnitude": 1,
+    "duration": null
+   }
+  ]
  },
  {
   "name": "Dream Reflection",
