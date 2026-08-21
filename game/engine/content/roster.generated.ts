@@ -2812,6 +2812,11 @@ export const ROSTER: HeroDef[] = [
      "specific": 0
     },
     "cooldown": 0,
+    "uncounterableIf": {
+     "has": "mark",
+     "name": "Brimsteel Scabbard",
+     "of": "caster"
+    },
     "effects": [
      {
       "op": "if",
@@ -2860,6 +2865,33 @@ export const ROSTER: HeroDef[] = [
          "name": "Cinders",
          "duration": null
         }
+       }
+      ]
+     },
+     {
+      "op": "if",
+      "cond": {
+       "has": "mark",
+       "name": "Brimsteel Scabbard",
+       "of": "caster"
+      },
+      "then": [
+       {
+        "op": "summon",
+        "template": "Cinderling",
+        "count": 1
+       },
+       {
+        "op": "removeStatus",
+        "kind": "mark",
+        "name": "Brimsteel Scabbard",
+        "from": "caster"
+       },
+       {
+        "op": "removeStatus",
+        "kind": "skill_damage_bonus",
+        "name": "Brimsteel Scabbard",
+        "from": "caster"
        }
       ]
      }
