@@ -580,6 +580,16 @@ export const AUGMENTS: Augment[] = [
         "has": "outgoing_damage_mod",
         "name": "Winter's Howl",
         "of": "eventSource"
+       },
+       {
+        "cmp": "<",
+        "left": {
+         "ref": "statusMag",
+         "kind": "outgoing_damage_mod",
+         "name": "Winter's Howl",
+         "of": "eventSource"
+        },
+        "right": 0
        }
       ]
      },

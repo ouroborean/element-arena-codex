@@ -511,7 +511,7 @@
    "owner": "gommar",
    "name": "Winter's Howl",
    "description": "Breath of the North now lowers the targets damage by 15, lowered by 5 every time they use a skill.",
-   "note": "Re-authors Breath of the North so its outgoing_damage_mod is -15 (up from -5) and named 'Winter's Howl' (so the decay scopes to exactly this debuff, not the -5 mods Gommar's other skills leave). Duration made permanent (null): with no turn-duration in the prose, the debuff is spent down by the target's skill uses, not by a clock. The Frost-Covered piercing/normal branch and the uncounterableIf gate are preserved. Second patch: a skillUsed trigger decays it +5 toward 0 each time the debuffed enemy uses a skill (-15 -> -10 -> -5 -> 0). GAP: no Value reads a status's magnitude, so the decay cannot floor at 0 — a 4th+ skill use would push it positive (a damage buff); a native handler would clamp it. Fidelity debt, faithful across the intended 3 uses.",
+   "note": "Re-authors Breath of the North so its outgoing_damage_mod is -15 (up from -5) and named 'Winter's Howl' (so the decay scopes to exactly this debuff, not the -5 mods Gommar's other skills leave). Duration made permanent (null): with no turn-duration in the prose, the debuff is spent down by the target's skill uses, not by a clock. The Frost-Covered piercing/normal branch and the uncounterableIf gate are preserved. Second patch: a skillUsed trigger decays it +5 toward 0 each time the debuffed enemy uses a skill (-15 -> -10 -> -5 -> 0), guarded by {statusMag('Winter's Howl') < 0} so it floors at 0 and never overshoots into a positive (a damage BUFF) on the 4th+ use.",
    "patches": [
     {
      "op": "replaceSkill",
@@ -589,6 +589,16 @@
          "has": "outgoing_damage_mod",
          "name": "Winter's Howl",
          "of": "eventSource"
+        },
+        {
+         "cmp": "<",
+         "left": {
+          "ref": "statusMag",
+          "kind": "outgoing_damage_mod",
+          "name": "Winter's Howl",
+          "of": "eventSource"
+         },
+         "right": 0
         }
        ]
       },
