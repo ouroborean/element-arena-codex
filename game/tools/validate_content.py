@@ -138,7 +138,7 @@ def v_condition(c, path):
     elif "skillOnCooldown" in c:
         if not isinstance(c["skillOnCooldown"], str):
             err(path, "skillOnCooldown must be a skill id string")
-    elif "declaredTargetsSelf" in c or "eventHasTag" in c or "eventStatusKind" in c or "eventStatusNameIncludes" in c or "eventSourceId" in c or "eventTeamIsSelf" in c or "eventSourceSummonedBySelf" in c or "eventRedirectedToSelf" in c or "eventHidden" in c or "chance" in c:
+    elif "declaredTargetsSelf" in c or "eventHasTag" in c or "eventSkillId" in c or "eventStatusKind" in c or "eventStatusNameIncludes" in c or "eventSourceId" in c or "eventTeamIsSelf" in c or "eventSourceSummonedBySelf" in c or "eventRedirectedToSelf" in c or "eventHidden" in c or "chance" in c or "isNamed" in c:
         pass
     elif "and" in c:
         for i, x in enumerate(c["and"]):

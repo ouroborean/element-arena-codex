@@ -11648,15 +11648,22 @@ export const FUSIONS: FusionForm[] = [
     "on": "skillUsed",
     "source": "Unstable Waters (riverdaughteralchemy0)",
     "when": {
-     "sameUnit": [
-      "eventSource",
-      "self"
+     "and": [
+      {
+       "sameUnit": [
+        "eventSource",
+        "self"
+       ]
+      },
+      {
+       "eventSkillId": "riverdaughter2"
+      }
      ]
     },
     "effect": [
      {
       "op": "applyStatus",
-      "to": "eventTarget",
+      "to": "eventTargets",
       "status": {
        "kind": "incoming_damage_mod",
        "name": "Unstable Waters",
@@ -12266,7 +12273,7 @@ export const FUSIONS: FusionForm[] = [
     "on": "healReceived",
     "source": "Reflection of Kindness (riverdaughtermirror0)",
     "when": {
-     "isFaction": "eventTarget",
+     "isFaction": "eventUnit",
      "faction": "enemy"
     },
     "effect": [
@@ -13528,6 +13535,10 @@ export const FUSIONS: FusionForm[] = [
       {
        "isKind": "eventUnit",
        "kind": "minion"
+      },
+      {
+       "isNamed": "eventUnit",
+       "name": "Boulder"
       }
      ]
     },
@@ -13543,9 +13554,20 @@ export const FUSIONS: FusionForm[] = [
     "on": "skillUsed",
     "source": "Scattered Spores",
     "when": {
-     "sameUnit": [
-      "eventSource",
-      "self"
+     "and": [
+      {
+       "sameUnit": [
+        "eventSource",
+        "self"
+       ]
+      },
+      {
+       "eventSkillId": "roland1"
+      },
+      {
+       "isNamed": "eventTargets",
+       "name": "Stonecap Mushroom"
+      }
      ]
     },
     "effect": [
@@ -13559,7 +13581,7 @@ export const FUSIONS: FusionForm[] = [
      },
      {
       "op": "defeat",
-      "to": "eventTarget"
+      "to": "eventTargets"
      }
     ]
    }
@@ -17689,10 +17711,7 @@ export const FUSIONS: FusionForm[] = [
        "right": 1
       },
       {
-       "sameUnit": [
-        "eventTarget",
-        "self"
-       ]
+       "declaredTargetsSelf": true
       }
      ]
     },
@@ -19846,10 +19865,7 @@ export const FUSIONS: FusionForm[] = [
        "eventHasTag": "Harmful"
       },
       {
-       "sameUnit": [
-        "eventTarget",
-        "self"
-       ]
+       "declaredTargetsSelf": true
       }
      ]
     },
