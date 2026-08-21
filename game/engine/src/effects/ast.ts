@@ -102,6 +102,9 @@ export interface StatusSpec {
   /** For a cost_mod: per-channel deltas applied to Generic / Specific independently (scratch3 "-1 each"). */
   genericDelta?: number;
   specificDelta?: number;
+  /** For an incoming_damage_mod / incoming_damage_mult: scope the bonus/mult to damage from one source id
+   *  (a damage node's id, e.g. "ayana1.hit"). Absent = all incoming damage. */
+  viaSourceId?: string;
   /** For a taunt: the unit to force the bearer to target (resolved at apply time). */
   unitRef?: Selector;
   /** Effects to run when this status expires naturally (duration lapse). */

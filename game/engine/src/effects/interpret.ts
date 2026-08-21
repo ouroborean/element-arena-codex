@@ -380,6 +380,7 @@ function buildStatus(spec: StatusSpec, ctx: Ctx) {
     scope: spec.scope,
     genericDelta: spec.genericDelta,
     specificDelta: spec.specificDelta,
+    viaSourceId: spec.viaSourceId,
     unitRef: spec.unitRef ? resolveSelector(spec.unitRef, ctx)[0]?.id : undefined,
     onExpire: spec.onExpire,
     duration: evalDuration(spec.duration, ctx),

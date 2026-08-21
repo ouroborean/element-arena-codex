@@ -2017,7 +2017,8 @@ export const FUSIONS: FusionForm[] = [
       "status": {
        "kind": "incoming_damage_mod",
        "magnitude": 10,
-       "duration": 2
+       "duration": 2,
+       "viaSourceId": "ayana1.hit"
       }
      },
      {
