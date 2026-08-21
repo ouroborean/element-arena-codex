@@ -3076,7 +3076,7 @@
    "owner": "dennis",
    "name": "Dennis So Popular Now",
    "description": "Shared Agony now costs 1 Generic energy, but both parts of its activation now include all allied units.",
-   "note": "Shared Agony=dennis4. Cost -> {generic:1, specific:0}. 'Both parts include all allied units': part 1 (Dennis deals 5 to all enemies) becomes each allied unit dealing 5 to all enemies; part 2 (all enemies deal 5 Piercing to Dennis) becomes each enemy dealing 5 Piercing to all allied units. Whole-skill re-author via replaceSkill. Engine attributes forEach-sourced damage to the caster, so per-ally/per-enemy source attribution is approximated.",
+   "note": "Shared Agony=dennis4. Cost -> {generic:1, specific:0}. 'Both parts include all allied units': part 1 (Dennis deals 5 to all enemies) becomes each allied unit dealing 5 to all enemies; part 2 (all enemies deal 5 Piercing to Dennis) becomes each enemy dealing 5 Piercing to all allied units. Whole-skill re-author via replaceSkill. Each fanned hit is credited to its real dealer via from:'it' (the ally for part 1, the enemy for part 2), so damager-identity reactions (e.g. Fury) see the true source.",
    "patches": [
     {
      "op": "replaceSkill",
@@ -3109,7 +3109,8 @@
           "dtype": "normal",
           "to": {
            "faction": "enemies"
-          }
+          },
+          "from": "it"
          }
         ]
        },
@@ -3125,7 +3126,8 @@
           "dtype": "piercing",
           "to": {
            "faction": "allies"
-          }
+          },
+          "from": "it"
          }
         ]
        }

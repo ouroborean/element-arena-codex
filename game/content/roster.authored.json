@@ -6085,7 +6085,7 @@
       "specific": 1
      },
      "cooldown": 1,
-     "note": "forEach enemy re-deals 5 Piercing to Dennis, one hit per enemy (so Pain Tolerance stacks per enemy). The engine attributes those hits to the caster (Dennis); there is no primitive to source damage from each enemy, so Fury's 'unit that damages him' cannot see the enemies here.",
+     "note": "forEach enemy re-deals 5 Piercing to Dennis, one hit per enemy (so Pain Tolerance stacks per enemy), each credited to its enemy via from:'it' — so Fury's 'unit that damages him' correctly taunts each attacking enemy, not Dennis himself.",
      "effects": [
       {
        "op": "damage",
@@ -6105,7 +6105,8 @@
          "op": "damage",
          "amount": 5,
          "dtype": "piercing",
-         "to": "caster"
+         "to": "caster",
+         "from": "it"
         }
        ]
       }

@@ -115,7 +115,7 @@ export interface StatusSpec {
 //  Effects — executed for their side effects on MatchState.
 // --------------------------------------------------------------------------- //
 export type Effect =
-  | { op: "damage"; amount: Value; dtype?: DamageType; to?: Selector; id?: NodeId }
+  | { op: "damage"; amount: Value; dtype?: DamageType; to?: Selector; from?: Selector; id?: NodeId } // from = the credited dealer (default: the caster); lets a fanned self-hit attribute each share to its real source (dennis4)
   | { op: "heal"; amount: Value; to?: Selector; overheal?: boolean; id?: NodeId }
   | { op: "healthLoss"; amount: Value; to?: Selector; id?: NodeId }
   | { op: "grantShield"; amount: Value; to?: Selector; duration?: number | null; id?: NodeId }
