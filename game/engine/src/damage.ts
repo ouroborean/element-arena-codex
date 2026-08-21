@@ -174,8 +174,12 @@ export function outgoingDtypeOverride(u: Unit): DamageType | undefined {
 /** Does the attacker's damage Bypass (ignore DR + Shield) against this target (conditional_bypass)? */
 export function bypassesAgainst(attacker: Unit, target: Unit): boolean {
   return attacker.statuses.some(
-    (s) => s.kind === "conditional_bypass" && s.bypassCond !== undefined &&
-      target.statuses.some((t) => t.kind === s.bypassCond!.kind && (s.bypassCond!.name === undefined || t.name === s.bypassCond!.name)),
+    (s) => s.kind === "conditional_bypass" && (
+      // No bypassCond = UNCONDITIONAL attacker-side Bypass — the holder's damage always ignores DR+Shield
+      // (laria:night Nightwalker: characters with 3+ Deepening Shadows Bypass).
+      s.bypassCond === undefined ||
+      target.statuses.some((t) => t.kind === s.bypassCond!.kind && (s.bypassCond!.name === undefined || t.name === s.bypassCond!.name))
+    ),
   );
 }
 

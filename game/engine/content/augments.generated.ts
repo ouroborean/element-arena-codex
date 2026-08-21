@@ -5452,7 +5452,7 @@ export const AUGMENTS: Augment[] = [
        "op": "applyStatus",
        "to": "eventTarget",
        "status": {
-        "kind": "mark",
+        "kind": "conditional_bypass",
         "name": "Bypass",
         "duration": null
        }
