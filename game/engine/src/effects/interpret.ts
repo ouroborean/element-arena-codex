@@ -336,6 +336,11 @@ export function evalCondition(c: Condition, ctx: Ctx): boolean {
     const e = ctx.event;
     return !!e && "team" in e && e.team === ctx.self.team;
   }
+  if ("eventSourceSummonedBySelf" in c) {
+    // Is the event's source unit a minion THIS trigger owner summoned? (gaia3 scopes to "Gaia's minions".)
+    const src = eventUnits("eventSource", ctx)[0];
+    return !!src && src.summoner === ctx.self.id;
+  }
   if ("eventRedirectedToSelf" in c) {
     // On skillRedirected (a reflect): did the skill get redirected ONTO this unit? (reads the destination `to`.)
     const e = ctx.event;
