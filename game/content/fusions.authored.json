@@ -6616,6 +6616,65 @@
        "note": "At each turn-end, deals 15 Affliction to Jarrik and to every Cinders-marked enemy who is NOT in state.actedThisTurn (did not use a new skill this turn)."
       }
      ]
+    },
+    {
+     "on": "turnEnd",
+     "source": "Chains of Sloth",
+     "effect": [
+      {
+       "op": "forEach",
+       "each": {
+        "filter": {
+         "faction": "enemies"
+        },
+        "with": {
+         "kind": "cost_mod",
+         "name": "Chains of Sloth"
+        }
+       },
+       "do": [
+        {
+         "op": "modifyStatus",
+         "kind": "cost_mod",
+         "name": "Chains of Sloth",
+         "magnitudeDelta": 1,
+         "from": "it"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "on": "skillUsed",
+     "source": "Chains of Sloth",
+     "when": {
+      "and": [
+       {
+        "has": "cost_mod",
+        "name": "Chains of Sloth",
+        "of": "eventSource"
+       },
+       {
+        "cmp": ">",
+        "left": {
+         "ref": "statusMag",
+         "kind": "cost_mod",
+         "name": "Chains of Sloth",
+         "of": "eventSource"
+        },
+        "right": 0
+       }
+      ]
+     },
+     "effect": [
+      {
+       "op": "modifyStatus",
+       "kind": "cost_mod",
+       "name": "Chains of Sloth",
+       "magnitudeDelta": -1,
+       "from": "eventSource"
+      }
+     ]
     }
    ],
    "skill": {
@@ -6640,10 +6699,11 @@
       "to": "target",
       "status": {
        "kind": "cost_mod",
+       "name": "Chains of Sloth",
        "magnitude": 1,
        "duration": 3
       },
-      "note": "'target's skills cost 1 more [generic] for 3 turns' = cost_mod +1 for 3 turns. The 'increasing by 1 each turn' escalation and the '-1 current magnitude each time they use a new skill' decay are dynamic-magnitude behaviours a flat cost_mod can't track — tracked debt."
+      "note": "'target's skills cost 1 more, increasing by 1 each turn; each new skill they use lowers the current magnitude by 1.' A named cost_mod +1 for 3 turns, escalated +1 each turn-end and decayed -1 on the holder's skillUsed (floored at 0), both via the Belphegor's Blade passiveTriggers below."
      }
     ]
    }

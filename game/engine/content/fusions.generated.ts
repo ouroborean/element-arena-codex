@@ -6535,6 +6535,65 @@ export const FUSIONS: FusionForm[] = [
       }
      }
     ]
+   },
+   {
+    "on": "turnEnd",
+    "source": "Chains of Sloth",
+    "effect": [
+     {
+      "op": "forEach",
+      "each": {
+       "filter": {
+        "faction": "enemies"
+       },
+       "with": {
+        "kind": "cost_mod",
+        "name": "Chains of Sloth"
+       }
+      },
+      "do": [
+       {
+        "op": "modifyStatus",
+        "kind": "cost_mod",
+        "name": "Chains of Sloth",
+        "magnitudeDelta": 1,
+        "from": "it"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "on": "skillUsed",
+    "source": "Chains of Sloth",
+    "when": {
+     "and": [
+      {
+       "has": "cost_mod",
+       "name": "Chains of Sloth",
+       "of": "eventSource"
+      },
+      {
+       "cmp": ">",
+       "left": {
+        "ref": "statusMag",
+        "kind": "cost_mod",
+        "name": "Chains of Sloth",
+        "of": "eventSource"
+       },
+       "right": 0
+      }
+     ]
+    },
+    "effect": [
+     {
+      "op": "modifyStatus",
+      "kind": "cost_mod",
+      "name": "Chains of Sloth",
+      "magnitudeDelta": -1,
+      "from": "eventSource"
+     }
+    ]
    }
   ],
   "skill": {
@@ -6559,6 +6618,7 @@ export const FUSIONS: FusionForm[] = [
      "to": "target",
      "status": {
       "kind": "cost_mod",
+      "name": "Chains of Sloth",
       "magnitude": 1,
       "duration": 3
      }
