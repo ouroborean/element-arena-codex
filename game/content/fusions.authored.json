@@ -12015,7 +12015,7 @@
      "source": "Blood in the Water (riverdaughterblood0)",
      "when": {
       "sameUnit": [
-       "eventSource",
+       "eventCounterer",
        "self"
       ]
      },
@@ -12211,7 +12211,7 @@
      "source": "Conducted Emotion (riverdaughtercurrent0)",
      "when": {
       "sameUnit": [
-       "eventSource",
+       "eventCounterer",
        "self"
       ]
      },
@@ -12688,7 +12688,7 @@
      "source": "Triton's Blessing (riverdaughterocean0)",
      "when": {
       "sameUnit": [
-       "eventSource",
+       "eventCounterer",
        "self"
       ]
      },
@@ -12969,7 +12969,7 @@
      "source": "Bubbling Mire (riverdaughterslime0)",
      "when": {
       "sameUnit": [
-       "eventSource",
+       "eventCounterer",
        "self"
       ]
      },

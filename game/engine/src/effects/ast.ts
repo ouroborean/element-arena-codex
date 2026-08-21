@@ -58,6 +58,7 @@ export type Selector =
   | "eventTargets" // in a trigger: ALL of a multi-target skill's targets
   | "eventAffected" // in a skillUsed trigger: every unit the skill actually touched (damaged OR statused)
   | "eventUnit" // in a trigger: the subject of a unit event (e.g. the unit that died)
+  | "eventCounterer" // (counterFired) the unit that fired the counter — for "when I counter…" (eventSource is the countered attacker)
   | "across" // the living enemy hero in the SAME formation slot as self
   | "adjacent" // living allied heroes in a neighbouring formation slot to self
   // alive defaults to true (living units); alive:false selects the DEAD. `template`

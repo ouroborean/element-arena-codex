@@ -4270,7 +4270,7 @@ export const ROSTER: HeroDef[] = [
     "on": "counterFired",
     "when": {
      "sameUnit": [
-      "eventSource",
+      "eventCounterer",
       "self"
      ]
     },
