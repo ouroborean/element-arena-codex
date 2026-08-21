@@ -2802,6 +2802,9 @@ export const FUSIONS: FusionForm[] = [
          "of": "self"
         }
        ]
+      },
+      {
+       "eventHasTag": "Harmful"
       }
      ]
     },
