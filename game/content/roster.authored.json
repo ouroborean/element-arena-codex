@@ -2531,7 +2531,7 @@
     "name": "Well-Used Panic Button",
     "description": "The first time Saya falls below 40 health due to damage, her next Stroke of Genius will detonate all of her inventions, dealing 10 Piercing damage to a random enemy and granting her 10 Shield for each device detonated.",
     "model": "hero trigger on damageDealt that ARMS Stroke of Genius",
-    "note": "Two parts. (1) The damageDealt trigger arms a 'Panic Armed' mark the first time post-damage hp<40 (self-gated by 'Panic Armed'/'Panic Spent' since react-triggers don't honor once). (2) Stroke of Genius (saya5) reads that mark and detonates. Devices = Saya Coils (stack on Saya) + Spider Mines (stack on enemies). deviceCount aggregates coil stacks + the number of mine-bearing enemies (no primitive sums stack magnitudes across units; mines are spread 1/enemy on cast so this matches unless piled). Per-device 10 Piercing is aggregated onto one random enemy (no repeat-N loop); shield is 10*deviceCount."
+    "note": "Two parts. (1) The damageDealt trigger arms a 'Panic Armed' mark the first time post-damage hp<40 (self-gated by 'Panic Armed'/'Panic Spent' since react-triggers don't honor once). (2) Stroke of Genius (saya5) reads that mark and detonates. Devices = Saya Coils (stack on Saya) + Spider Mines (stack on enemies). deviceCount aggregates coil stacks + stackSum of Spider Mine across enemies (total mines, correct even when multiple mines pile on one enemy across casts). Per-device 10 Piercing is aggregated onto one random enemy (frozen 'a random enemy', singular); shield is 10*deviceCount."
    },
    "triggers": [
     {
@@ -3097,15 +3097,10 @@
               "of": "self"
              },
              {
-              "ref": "count",
+              "ref": "stackSum",
+              "name": "Spider Mine",
               "of": {
-               "filter": {
-                "faction": "enemies"
-               },
-               "with": {
-                "kind": "stack",
-                "name": "Spider Mine"
-               }
+               "faction": "enemies"
               }
              }
             ]
@@ -3135,15 +3130,10 @@
               "of": "self"
              },
              {
-              "ref": "count",
+              "ref": "stackSum",
+              "name": "Spider Mine",
               "of": {
-               "filter": {
-                "faction": "enemies"
-               },
-               "with": {
-                "kind": "stack",
-                "name": "Spider Mine"
-               }
+               "faction": "enemies"
               }
              }
             ]
