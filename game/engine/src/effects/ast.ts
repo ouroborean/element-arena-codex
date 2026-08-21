@@ -103,6 +103,8 @@ export interface StatusSpec {
   /** For a cost_mod: per-channel deltas applied to Generic / Specific independently (scratch3 "-1 each"). */
   genericDelta?: number;
   specificDelta?: number;
+  /** For a skillId-scoped status (skill_damage_bonus / cost_mod / cooldown_mod applying to ONE named skill). */
+  skillId?: string;
   /** For an incoming_damage_mod / incoming_damage_mult: scope the bonus/mult to damage from one source id
    *  (a damage node's id, e.g. "ayana1.hit"). Absent = all incoming damage. */
   viaSourceId?: string;

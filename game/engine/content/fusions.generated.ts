@@ -6529,6 +6529,17 @@ export const FUSIONS: FusionForm[] = [
       "name": "Brimsteel Scabbard",
       "duration": null
      }
+    },
+    {
+     "op": "applyStatus",
+     "to": "caster",
+     "status": {
+      "kind": "skill_damage_bonus",
+      "skillId": "jarrik1",
+      "name": "Brimsteel Scabbard",
+      "magnitude": 20,
+      "duration": null
+     }
     }
    ],
    "currentCd": 0

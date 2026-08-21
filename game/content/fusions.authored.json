@@ -6609,7 +6609,19 @@
        "name": "Brimsteel Scabbard",
        "duration": null
       },
-      "note": "Arms a one-shot rider on the next Blade of Ashes (jarrik1): triple damage, uncounterable, and — if it strikes a Cinders-marked enemy — creates a Cinderling. Fusion does not patch the base kit, so jarrik1 reading and consuming this mark is tracked debt; the mark is the observable hook."
+      "note": "Arms a one-shot rider on the next Blade of Ashes (jarrik1): the mark drives jarrik1's uncounterableIf and its consume branch (Cinderling + clear)."
+     },
+     {
+      "op": "applyStatus",
+      "to": "caster",
+      "status": {
+       "kind": "skill_damage_bonus",
+       "skillId": "jarrik1",
+       "name": "Brimsteel Scabbard",
+       "magnitude": 20,
+       "duration": null
+      },
+      "note": "'Triple damage': +20 to each base-10 Blade of Ashes hit (10 -> 30). Cleared by jarrik1's consume branch, so it lasts exactly one Blade of Ashes."
      }
     ]
    }
