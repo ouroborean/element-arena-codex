@@ -251,7 +251,7 @@ test("laria3: gives every enemy 1 Deepening Shadows and deals 5 damage; True dam
 // the granting skill, so it fires on Vanish's OWN skillUsed and strips the DR immediately — Laria never
 // actually gains any Damage Reduction. (roster.authored.json documents the intended exclusion; it is not
 // implemented.)
-test.skip("SUSPECTED BUG: laria4 Vanish grants 15 Damage Reduction for 3 turns", () => {
+test("laria4 Vanish grants 15 Damage Reduction for 3 turns", () => {
   const laria = loadHero(heroById("laria"), "A", "la");
   const enemy = makeUnit({ id: "e1", team: "B" });
   const state = makeState([laria], [enemy]);
@@ -272,7 +272,7 @@ test.skip("SUSPECTED BUG: laria4 Vanish grants 15 Damage Reduction for 3 turns",
 
 // SUSPECTED BUG: same root cause — the granting cast should not count as "a new skill", but the laria4
 // trigger removes the DR on the same cast's skillUsed event.
-test.skip("SUSPECTED BUG: laria4 Vanish survives its own granting cast (not a 'new skill' vs itself)", () => {
+test("laria4 Vanish survives its own granting cast (not a new skill vs itself)", () => {
   const laria = loadHero(heroById("laria"), "A", "la");
   const enemy = makeUnit({ id: "e1", team: "B" });
   const state = makeState([laria], [enemy]);
@@ -286,7 +286,7 @@ test.skip("SUSPECTED BUG: laria4 Vanish survives its own granting cast (not a 'n
 // SUSPECTED BUG: this clause ("or until she uses a new skill") can't even be exercised — the DR is
 // already gone before any subsequent skill, because the granting cast strips it (see above). The precheck
 // asserting Vanish is present before the next skill is what fails.
-test.skip("SUSPECTED BUG: laria4 using a NEW skill removes Vanish", () => {
+test("laria4 using a NEW skill removes Vanish", () => {
   const laria = loadHero(heroById("laria"), "A", "la");
   const enemy = makeUnit({ id: "e1", team: "B", hp: 100 });
   const state = makeState([laria], [enemy]);

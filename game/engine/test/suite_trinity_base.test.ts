@@ -353,9 +353,7 @@ test("Prisma Whirl (self): the first enemy to use a Harmful skill takes 10 Pierc
   assert.equal(e1.hp, e1Hp0, "the effect is spent on the first Harmful use — a later one is not punished");
 });
 
-test("SUSPECTED BUG — Prisma Whirl (self) should punish only a HARMFUL enemy skill, not a non-Harmful one", {
-  skip: "Frozen Prisma Whirl fires on the first 'Harmful skill'; engine punishes ANY enemy skill (10 Piercing on a Strategic self-buff) — the reactor lacks a Harmful-tag gate.",
-}, () => {
+test("Prisma Whirl (self): punishes only a HARMFUL enemy skill, not a non-Harmful one", () => {
   // Frozen: "the first enemy to use a HARMFUL skill will receive 10 Piercing damage." An enemy that uses a
   // NON-Harmful (Strategic) skill must NOT be punished. The engine fires on any enemy skillUsed (no Harmful gate).
   const { state, azure, e } = boot();
