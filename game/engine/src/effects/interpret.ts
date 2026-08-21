@@ -566,7 +566,7 @@ export function exec(effect: Effect, ctx: Ctx): void {
     case "addStack": {
       const amount = effect.amount ? applyRounding(evalValue(effect.amount, ctx)) : 1;
       const duration = effect.duration === undefined ? null : evalDuration(effect.duration, ctx);
-      for (const u of effectTargets(effect.to, ctx))
+      for (const u of effectTargets(effect.to, ctx)) {
         applyStatus(u, {
           kind: "stack",
           name: effect.name,
@@ -579,6 +579,10 @@ export function exec(effect: Effect, ctx: Ctx): void {
           // stacks (saya3 "Spider Mines") must place them Invisibly, not just its applyStatus effects.
           invisible: ctx.invisible || undefined,
         });
+        // A stack IS a status application — announce it so statusApplied reactors (e.g. laria "Nightwalker":
+        // Bypass at 3 Deepening Shadows) fire when a real skill lays a stack, exactly like the applyStatus op.
+        ctx.emit({ type: "statusApplied", unit: u.id, source: ctx.caster.id, kind: "stack", name: effect.name });
+      }
       return;
     }
     case "grantEnergy": {

@@ -328,7 +328,7 @@ test("laria3 Nightblade: the essence-steal clause survives the skill rewrite", (
 // stack-placing skill never grants the Bypass mark. (Probe: after Nightwrap-on-self to 3 stacks,
 // hasBypass=false; manually emitting statusApplied then flips it to true — proving the emission gap is the
 // sole cause. The cov test only ever fires the trigger via a hand-rolled emit(), hiding this.)
-test.skip("SUSPECTED BUG: laria4 Nightwalker — reaching 3+ Deepening Shadows via Nightwrap does NOT grant Bypass (addStack emits no statusApplied)", () => {
+test("laria4 Nightwalker: reaching 3+ Deepening Shadows via Nightwrap grants Bypass (addStack emits statusApplied)", () => {
   const laria = loadHero(heroById("laria"), "A", "la");
   applyAugment(laria, augmentById("laria4")!);
   laria.statuses = [dsStatus(2)]; // 2 stacks -> not yet Bypassing
@@ -383,7 +383,7 @@ test("laria4 Nightwalker: control — a character with only 2 Deepening Shadows 
 // keys on `on: statusApplied`, but Nightwrap uses the `addStack` effect op, which never emits a
 // `statusApplied` event (effects/interpret.ts:566 vs the applyStatus op at 535). So receiving the 3rd
 // Deepening Shadows via a real skill never grants Vanish. (Same root cause as laria4 Nightwalker.)
-test.skip("SUSPECTED BUG: laria5 Vanishing Powder — receiving the 3rd Deepening Shadows via Nightwrap does NOT grant Vanish (addStack emits no statusApplied)", () => {
+test("laria5 Vanishing Powder: receiving the 3rd Deepening Shadows via Nightwrap grants Vanish", () => {
   const laria = loadHero(heroById("laria"), "A", "la");
   applyAugment(laria, augmentById("laria5")!);
   const ally = makeUnit({ id: "a1", team: "A", hp: 100, maxHp: 100, statuses: [dsStatus(2)] });
@@ -409,7 +409,7 @@ test.skip("SUSPECTED BUG: laria5 Vanishing Powder — receiving the 3rd Deepenin
 // SUSPECTED BUG: same root cause as above — Vanishing Powder ("a character receives their 3rd stack")
 // should apply to ANY character, enemies included, but Nightwrap's addStack placement emits no
 // statusApplied event, so the enemy never gains Vanish on its 3rd stack.
-test.skip("SUSPECTED BUG: laria5 Vanishing Powder — an enemy receiving its 3rd Deepening Shadows via Nightwrap does NOT gain Vanish", () => {
+test("laria5 Vanishing Powder: an enemy receiving its 3rd Deepening Shadows via Nightwrap gains Vanish", () => {
   const laria = loadHero(heroById("laria"), "A", "la");
   applyAugment(laria, augmentById("laria5")!);
   const enemy = makeUnit({ id: "e1", team: "B", hp: 100, statuses: [dsStatus(2)] });
