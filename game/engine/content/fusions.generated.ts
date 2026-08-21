@@ -1695,6 +1695,17 @@ export const FUSIONS: FusionForm[] = [
     },
     {
      "op": "applyStatus",
+     "to": "target",
+     "status": {
+      "kind": "incoming_damage_mult",
+      "name": "Prism Sentence",
+      "magnitude": 2,
+      "viaSourceId": "ayana1.hit",
+      "duration": 2
+     }
+    },
+    {
+     "op": "applyStatus",
      "to": "self",
      "status": {
       "kind": "reveal",

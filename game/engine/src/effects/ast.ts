@@ -123,7 +123,7 @@ export interface StatusSpec {
 //  Effects — executed for their side effects on MatchState.
 // --------------------------------------------------------------------------- //
 export type Effect =
-  | { op: "damage"; amount: Value; dtype?: DamageType; to?: Selector; from?: Selector; id?: NodeId } // from = the credited dealer (default: the caster); lets a fanned self-hit attribute each share to its real source (dennis4)
+  | { op: "damage"; amount: Value; dtype?: DamageType; to?: Selector; from?: Selector; bypass?: boolean; id?: NodeId } // from = the credited dealer (default: the caster); bypass:true = this hit ignores DR+Shield regardless of the dealer's status (ayana Prism Sentence's Bypassing spread)
   | { op: "heal"; amount: Value; to?: Selector; overheal?: boolean; id?: NodeId }
   | { op: "healthLoss"; amount: Value; to?: Selector; id?: NodeId }
   | { op: "grantShield"; amount: Value; to?: Selector; duration?: number | null; id?: NodeId }

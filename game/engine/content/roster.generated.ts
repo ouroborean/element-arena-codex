@@ -8956,6 +8956,43 @@ export const ROSTER: HeroDef[] = [
           ]
          }
         }
+       },
+       {
+        "op": "if",
+        "cond": {
+         "has": "mark",
+         "name": "Prism Sentence",
+         "of": "target"
+        },
+        "then": [
+         {
+          "op": "forEach",
+          "each": {
+           "faction": "enemies"
+          },
+          "do": [
+           {
+            "op": "damage",
+            "amount": {
+             "op": "add",
+             "args": [
+              15,
+              {
+               "ref": "statusMag",
+               "kind": "stack",
+               "name": "Divine Ire",
+               "of": "it"
+              }
+             ]
+            },
+            "dtype": "normal",
+            "bypass": true,
+            "to": "it",
+            "id": "ayana1.hit"
+           }
+          ]
+         }
+        ]
        }
       ]
      }
