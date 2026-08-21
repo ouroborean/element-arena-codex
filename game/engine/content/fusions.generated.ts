@@ -11809,6 +11809,27 @@ export const FUSIONS: FusionForm[] = [
     },
     "effect": [
      {
+      "op": "applyStatus",
+      "status": {
+       "kind": "regen",
+       "name": "Healing Tears",
+       "magnitude": 5,
+       "duration": 3
+      },
+      "to": {
+       "faction": "allies",
+       "includeSelf": true
+      }
+     },
+     {
+      "op": "applyStatus",
+      "status": {
+       "kind": "elemental_essence",
+       "duration": null
+      },
+      "to": "self"
+     },
+     {
       "op": "heal",
       "amount": {
        "op": "mul",
@@ -11857,6 +11878,27 @@ export const FUSIONS: FusionForm[] = [
      ]
     },
     "effect": [
+     {
+      "op": "applyStatus",
+      "status": {
+       "kind": "regen",
+       "name": "Healing Tears",
+       "magnitude": 5,
+       "duration": 3
+      },
+      "to": {
+       "faction": "allies",
+       "includeSelf": true
+      }
+     },
+     {
+      "op": "applyStatus",
+      "status": {
+       "kind": "elemental_essence",
+       "duration": null
+      },
+      "to": "self"
+     },
      {
       "op": "heal",
       "amount": {
@@ -12031,14 +12073,21 @@ export const FUSIONS: FusionForm[] = [
     "when": {
      "and": [
       {
+       "eventStatusKind": "elemental_essence"
+      },
+      {
        "sameUnit": [
         "eventUnit",
         "self"
        ]
       },
       {
-       "has": "elemental_essence",
-       "of": "eventUnit"
+       "not": {
+        "sameUnit": [
+         "eventSource",
+         "self"
+        ]
+       }
       }
      ]
     },
