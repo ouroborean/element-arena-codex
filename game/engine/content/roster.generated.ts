@@ -3033,11 +3033,22 @@ export const ROSTER: HeroDef[] = [
        {
         "op": "if",
         "cond": {
-         "not": {
-          "has": "mark",
-          "name": "Dawnbreak Cinders",
-          "of": "it"
-         }
+         "and": [
+          {
+           "not": {
+            "has": "mark",
+            "name": "Dawnbreak Cinders",
+            "of": "it"
+           }
+          },
+          {
+           "not": {
+            "has": "mark",
+            "name": "Drakken",
+            "of": "self"
+           }
+          }
+         ]
         },
         "then": [
          {
@@ -3203,6 +3214,13 @@ export const ROSTER: HeroDef[] = [
        "not": {
         "has": "mark",
         "name": "Cinders Proc Lock",
+        "of": "self"
+       }
+      },
+      {
+       "not": {
+        "has": "mark",
+        "name": "Drakken",
         "of": "self"
        }
       }

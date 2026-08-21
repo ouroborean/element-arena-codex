@@ -491,6 +491,11 @@ export function exec(effect: Effect, ctx: Ctx): void {
       return;
     }
     case "applyStatus": {
+      // jarrik:dragon "Drakken": after casting it, Jarrik can no longer APPLY Cinders — while he holds the
+      // Drakken mark, his Cinders-mark applications are suppressed (the consume/trigger halves are gated in
+      // content). Mirrors the summonMinion Blue-Flame remap: one chokepoint over every base-kit apply site.
+      if (effect.status.kind === "mark" && effect.status.name === "Cinders" &&
+          ctx.caster.statuses.some((s) => s.kind === "mark" && s.name === "Drakken")) return;
       for (const u of effectTargets(effect.to, ctx)) {
         ctx.affected?.add(u.id);
         const st = buildStatus(effect.status, ctx);
