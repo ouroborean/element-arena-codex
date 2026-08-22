@@ -290,7 +290,7 @@ test.skip("SUSPECTED BUG: magnet Magnetize Munitions does not double a Magnetize
 
 // Adversarial: frozen grants ONE stack per Earth-Pillar use. The authored passive installs TWO ungated
 // skillUsed triggers, so any self skill grants two stacks.
-test.skip("SUSPECTED BUG: moon Moonfield grants TWO Stonefield Stalker stacks for one Earth Pillar — frozen grants exactly one", () => {
+test("moon Moonfield: one Earth Pillar use grants exactly ONE Stonefield Stalker stack", () => {
   const r = fuse("moon");
   const e = enemy("e1");
   const st = makeState([r], [e]);
@@ -301,7 +301,7 @@ test.skip("SUSPECTED BUG: moon Moonfield grants TWO Stonefield Stalker stacks fo
 
 // Adversarial: a skill that is neither Earth Pillar nor a Boulder launch grants NO stacks per frozen; the
 // ungated triggers grant two off any self skill.
-test.skip("SUSPECTED BUG: moon Moonfield grants stacks off an unrelated skill (Form Stone) — frozen grants none", () => {
+test("moon Moonfield: an unrelated skill (Form Stone) grants NO Stonefield Stalker stack", () => {
   const r = fuse("moon");
   const st = makeState([r], [enemy("e1")]);
   fund(st);
@@ -324,7 +324,7 @@ test("moon Stonefield Stalker: becomes Mooncursed for 1 + (stacks) turns, readin
 // Adversarial: the active "consumes all stacks of Stonefield Stalker" — the count should be 0 afterwards. It
 // does removeStatus the stacks, but the Moonfield PASSIVE (two ungated skillUsed triggers) fires on the
 // active's OWN cast and re-grants 2 stacks, so the resource is never actually spent.
-test.skip("SUSPECTED BUG: moon Stonefield Stalker does not end with stacks consumed — the Moonfield over-fire re-grants stacks on the active's own cast", () => {
+test("moon Stonefield Stalker: consumes all stacks (the active no longer self-triggers Moonfield)", () => {
   const r = fuse("moon");
   r.statuses.push(status("stack", { name: "Stonefield Stalker", magnitude: 2, duration: null }));
   const st = makeState([r], [enemy("e1")]);

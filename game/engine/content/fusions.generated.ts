@@ -13130,9 +13130,16 @@ export const FUSIONS: FusionForm[] = [
     "on": "skillUsed",
     "source": "Moonfield",
     "when": {
-     "sameUnit": [
-      "eventSource",
-      "self"
+     "and": [
+      {
+       "sameUnit": [
+        "eventSource",
+        "self"
+       ]
+      },
+      {
+       "eventSkillId": "roland2"
+      }
      ]
     },
     "effect": [
@@ -13149,9 +13156,20 @@ export const FUSIONS: FusionForm[] = [
     "on": "skillUsed",
     "source": "Moonfield",
     "when": {
-     "sameUnit": [
-      "eventSource",
-      "self"
+     "and": [
+      {
+       "sameUnit": [
+        "eventSource",
+        "self"
+       ]
+      },
+      {
+       "eventSkillId": "roland1"
+      },
+      {
+       "isNamed": "eventTargets",
+       "name": "Boulder"
+      }
      ]
     },
     "effect": [
