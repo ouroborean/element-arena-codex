@@ -771,9 +771,16 @@ export const FUSIONS: FusionForm[] = [
     "on": "skillUsed",
     "source": "Erratic Programming",
     "when": {
-     "sameUnit": [
-      "eventSource",
-      "self"
+     "and": [
+      {
+       "sameUnit": [
+        "eventSource",
+        "self"
+       ]
+      },
+      {
+       "eventHasTag": "Harmful"
+      }
      ]
     },
     "effect": [
@@ -5316,11 +5323,18 @@ export const FUSIONS: FusionForm[] = [
     "on": "statusApplied",
     "source": "Got a Job To Do",
     "when": {
-     "not": {
-      "has": "dot",
-      "name": "Got a Job To Do",
-      "of": "eventUnit"
-     }
+     "and": [
+      {
+       "eventStatusNameIncludes": "Serum"
+      },
+      {
+       "not": {
+        "has": "dot",
+        "name": "Got a Job To Do",
+        "of": "eventUnit"
+       }
+      }
+     ]
     },
     "effect": [
      {

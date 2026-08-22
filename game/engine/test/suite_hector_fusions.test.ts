@@ -224,7 +224,7 @@ test("assassin Got a Job To Do: being affected by a Serum inflicts 5 Affliction 
 // Adversarial: frozen scopes the punish to "being affected by a SERUM". Applying a non-Serum status
 // should NOT inflict the dot. The passive fires on ANY statusApplied (its `when` gate is only
 // "not already carrying the Got a Job dot"), so a plain enemy status wrongly triggers the Serum punish.
-test.skip("SUSPECTED BUG: assassin Got a Job To Do fires on ANY status, not only Serums — frozen says the 5-Affliction punish comes from 'being affected by a Serum'", () => {
+test("assassin Got a Job To Do: fires only when a Serum is applied", () => {
   const enemy = makeUnit({ id: "e1", team: "B", kind: "hero", hp: 100, maxHp: 100 });
   const { state, hector } = setup("assassin", { enemies: [enemy] });
   // Apply a plain, non-Serum mark to the enemy through the real apply path.
