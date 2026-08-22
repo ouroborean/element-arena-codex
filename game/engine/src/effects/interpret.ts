@@ -419,6 +419,7 @@ function buildStatus(spec: StatusSpec, ctx: Ctx) {
     name: spec.name,
     dtype: spec.dtype,
     dtypes: spec.dtypes,
+    ignoreKinds: spec.ignoreKinds,
     scope: spec.scope,
     genericDelta: spec.genericDelta,
     specificDelta: spec.specificDelta,
@@ -530,7 +531,8 @@ export function exec(effect: Effect, ctx: Ctx): void {
         const st = buildStatus(effect.status, ctx);
         // non_damage_ignore: a unit holding this buff IGNORES an ENEMY-applied harmful non-damage effect
         // (stun/blind/taunt/debuff…) — it does not land. Damage and dots are damage_ignore's domain, not this.
-        if (ctx.caster.team !== u.team && u.statuses.some((s) => s.kind === "non_damage_ignore") && isIgnorableNonDamageEffect(st)) continue;
+        if (ctx.caster.team !== u.team && isIgnorableNonDamageEffect(st) &&
+            u.statuses.some((s) => s.kind === "non_damage_ignore" && (!s.ignoreKinds || s.ignoreKinds.includes(st.kind)))) continue;
         ctx.affected?.add(u.id);
         applyStatus(u, st);
         ctx.emit({ type: "statusApplied", unit: u.id, source: ctx.caster.id, kind: st.kind, name: st.name });

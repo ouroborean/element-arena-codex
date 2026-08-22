@@ -104,6 +104,8 @@ export interface StatusSpec {
   dtype?: DamageType;
   /** For an outgoing_damage_mod: which damage types it boosts (default: normal + piercing). */
   dtypes?: DamageType[];
+  /** For a non_damage_ignore: which harmful non-damage status kinds it wards off (default: ALL). */
+  ignoreKinds?: string[];
   /** For a scoped stun, or a tag-scoped cost_mod (titania Hallucinogenic Spores). */
   scope?: StunScope;
   /** For a cost_mod: per-channel deltas applied to Generic / Specific independently (scratch3 "-1 each"). */
