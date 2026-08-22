@@ -618,7 +618,7 @@ test("ninja/Shadow Clones: a Deepening Shadows creation on a target becomes a Sh
 // SUSPECTED BUG: base-kit Deepening Shadows placements use the `addStack` op, which does not emit a
 // `statusApplied` event — so the Shadow Clones react never fires from real gameplay. Nightwrap places a real DS
 // stack on the target and no Shadow Clone is created.
-test.skip("SUSPECTED BUG: ninja/Shadow Clones — a real DS-placing skill (Nightwrap) creates a Shadow Clone instead of a stack", () => {
+test("ninja/Shadow Clones: a real DS-placing skill (Nightwrap) creates a Shadow Clone instead of a stack", () => {
   const laria = fuse("ninja");
   const e1 = enemy("e1");
   const state = makeState([laria], [e1]);
