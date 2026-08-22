@@ -1677,18 +1677,46 @@ export const AUGMENTS: Augment[] = [
   "owner": "saya",
   "patches": [
    {
-    "op": "appendEffect",
-    "skillId": "saya1",
-    "effect": [
-     {
-      "op": "applyStatus",
-      "to": "caster",
-      "status": {
-       "kind": "elemental_essence",
-       "duration": null
+    "op": "addTrigger",
+    "trigger": {
+     "on": "statusApplied",
+     "source": "Royalties (saya1 augment)",
+     "when": {
+      "and": [
+       {
+        "eventStatusKind": "elemental_essence"
+       },
+       {
+        "sameUnit": [
+         "eventSource",
+         "self"
+        ]
+       },
+       {
+        "isFaction": "eventUnit",
+        "faction": "ally"
+       },
+       {
+        "not": {
+         "sameUnit": [
+          "eventUnit",
+          "self"
+         ]
+        }
+       }
+      ]
+     },
+     "effect": [
+      {
+       "op": "applyStatus",
+       "to": "self",
+       "status": {
+        "kind": "elemental_essence",
+        "duration": null
+       }
       }
-     }
-    ]
+     ]
+    }
    }
   ]
  },

@@ -79,7 +79,7 @@ function setup(augId: string | null, opts: { allies?: number; enemies?: number; 
 // bug reports (Elemental Essence does not stack in this engine, so counts are read as distinct holders).
 // =====================================================================================================
 
-test.skip("SUSPECTED BUG: saya1 Royalties self-grant fires on cast, not coupled to the ally-grant — casting alone must grant nothing", () => {
+test("saya1 Royalties self-grant fires on cast, not coupled to the ally-grant — casting alone must grant nothing", () => {
   // Frozen: Saya gains Essence WHEN she gives an ally Essence. The ally-grant happens only at turn-end
   // (the base conduit grants nothing on cast), so casting the conduit — before any turn-end — must not
   // grant Saya (or anyone) Essence. Engine grants Saya one Essence immediately on cast.
@@ -89,7 +89,7 @@ test.skip("SUSPECTED BUG: saya1 Royalties self-grant fires on cast, not coupled 
   assert.equal(essenceOf(state.units["a1"]!), 0, "no ally grant on cast either (grant is at Saya's turn-end)");
 });
 
-test.skip("SUSPECTED BUG: saya1 Royalties does not co-fire — a turn-end that grants the ally must ALSO grant Saya (two holders)", () => {
+test("saya1 Royalties does not co-fire — a turn-end that grants the ally must ALSO grant Saya (two holders)", () => {
   // Frozen: each turn-end where the conduit gives the ally Essence must leave BOTH the ally and Saya
   // holding Essence. Engine grants exactly one holder per turn-end (the base random pick), never two.
   const { state, saya, allies } = setup("saya1", { allies: 1, enemies: 1 });

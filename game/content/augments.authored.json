@@ -1703,21 +1703,49 @@
    "owner": "saya",
    "name": "Royalties",
    "description": "When Saya gives an ally Elemental Essence with Universal Energy Conduit, she also gains Elemental Essence",
-   "note": "Universal Energy Conduit grants a random ally Elemental Essence at each of Saya's turn-ends; this appends a parallel self-grant so Saya also gains Essence alongside the ally grant. Appended onto the same skill so it shares whatever recurring/turn-end mechanism the base ally-grant uses (co-fires on the same cadence).",
+   "note": "Universal Energy Conduit's turn-end grant applies elemental_essence to a random ally (source = Saya). This couples a self-grant to THAT event (not to Saya1's cast): whenever Saya applies elemental_essence to an ALLY (not herself), she also gains one. Gated eventUnit != self so Saya's own grant does not re-fire (no loop).",
    "patches": [
     {
-     "op": "appendEffect",
-     "skillId": "saya1",
-     "effect": [
-      {
-       "op": "applyStatus",
-       "to": "caster",
-       "status": {
-        "kind": "elemental_essence",
-        "duration": null
+     "op": "addTrigger",
+     "trigger": {
+      "on": "statusApplied",
+      "source": "Royalties (saya1 augment)",
+      "when": {
+       "and": [
+        {
+         "eventStatusKind": "elemental_essence"
+        },
+        {
+         "sameUnit": [
+          "eventSource",
+          "self"
+         ]
+        },
+        {
+         "isFaction": "eventUnit",
+         "faction": "ally"
+        },
+        {
+         "not": {
+          "sameUnit": [
+           "eventUnit",
+           "self"
+          ]
+         }
+        }
+       ]
+      },
+      "effect": [
+       {
+        "op": "applyStatus",
+        "to": "self",
+        "status": {
+         "kind": "elemental_essence",
+         "duration": null
+        }
        }
-      }
-     ]
+      ]
+     }
     }
    ]
   },
