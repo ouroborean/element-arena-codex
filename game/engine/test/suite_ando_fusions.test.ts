@@ -491,7 +491,7 @@ test("Erratic Programming: using a Harmful skill deals 10 Piercing to an additio
 // whenever he uses a HARMFUL skill." The passive's skillUsed trigger carries no class scoping, so it
 // fires on ANY skill Ando uses. Focus Power (ando4) is Strategic, not Harmful, and deals nothing to an
 // unmarked enemy — yet the passive still lands its 10 Piercing.
-test.skip("SUSPECTED BUG: Erratic Programming fires on ANY skill, not only Harmful ones", () => {
+test("Erratic Programming: fires only on a Harmful skill (10 Piercing to a random extra target)", () => {
   const ando = fuse("storm");
   const e1 = enemy("e1"); // unmarked, so Focus Power itself deals nothing
   const state = makeState([ando], [e1]);
