@@ -13358,12 +13358,19 @@
      "on": "skillUsed",
      "source": "Moonfield",
      "when": {
-      "sameUnit": [
-       "eventSource",
-       "self"
+      "and": [
+       {
+        "sameUnit": [
+         "eventSource",
+         "self"
+        ]
+       },
+       {
+        "eventSkillId": "roland2"
+       }
       ]
      },
-     "note": "Intended: only when the skill used is Earth Pillar (roland2).",
+     "note": "Only when Earth Pillar (roland2) is used -> +1 Stonefield Stalker (eventSkillId gate).",
      "effect": [
       {
        "op": "addStack",
@@ -13378,12 +13385,23 @@
      "on": "skillUsed",
      "source": "Moonfield",
      "when": {
-      "sameUnit": [
-       "eventSource",
-       "self"
+      "and": [
+       {
+        "sameUnit": [
+         "eventSource",
+         "self"
+        ]
+       },
+       {
+        "eventSkillId": "roland1"
+       },
+       {
+        "isNamed": "eventTargets",
+        "name": "Boulder"
+       }
       ]
      },
-     "note": "Intended: only when Strength From The Earth (roland1) is used to launch a Boulder.",
+     "note": "Only when Strength From The Earth (roland1) launches a Boulder (target is a Boulder minion) -> +1 Stonefield Stalker.",
      "effect": [
       {
        "op": "addStack",
