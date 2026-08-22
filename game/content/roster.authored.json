@@ -10575,7 +10575,12 @@
          "status": {
           "kind": "outgoing_damage_mod",
           "duration": 1,
-          "magnitude": 5
+          "magnitude": 5,
+          "dtypes": [
+           "normal",
+           "piercing",
+           "true"
+          ]
          }
         }
        ]
@@ -10612,7 +10617,12 @@
          "status": {
           "kind": "outgoing_damage_mod",
           "duration": 1,
-          "magnitude": -5
+          "magnitude": -5,
+          "dtypes": [
+           "normal",
+           "piercing",
+           "true"
+          ]
          }
         }
        ]

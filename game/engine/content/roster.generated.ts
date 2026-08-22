@@ -11722,7 +11722,12 @@ export const ROSTER: HeroDef[] = [
         "status": {
          "kind": "outgoing_damage_mod",
          "duration": 1,
-         "magnitude": 5
+         "magnitude": 5,
+         "dtypes": [
+          "normal",
+          "piercing",
+          "true"
+         ]
         }
        }
       ]
@@ -11759,7 +11764,12 @@ export const ROSTER: HeroDef[] = [
         "status": {
          "kind": "outgoing_damage_mod",
          "duration": 1,
-         "magnitude": -5
+         "magnitude": -5,
+         "dtypes": [
+          "normal",
+          "piercing",
+          "true"
+         ]
         }
        }
       ]

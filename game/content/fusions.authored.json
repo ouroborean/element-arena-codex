@@ -6767,11 +6767,14 @@
        "status": {
         "kind": "outgoing_damage_mod",
         "magnitude": 0,
-        "duration": null
+        "duration": null,
+        "dtypes": [
+         "affliction"
+        ]
        }
       }
      ],
-     "note": "Seeds the permanent damage bonus at 0 so turn-end growth has a status to modify (and resets the per-round accumulation)."
+     "note": "Seeds the permanent AFFLICTION damage bonus at 0 (dtypes:['affliction'] per 'deals 5 more Affliction damage') so turn-end growth has a status to modify (and resets the per-round accumulation)."
     },
     {
      "on": "turnEnd",

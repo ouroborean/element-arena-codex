@@ -376,7 +376,7 @@ test("Drake Transformation: at end of turn Jarrik heals 5 HP", () => {
 // bonus as an unnamed `outgoing_damage_mod`, which damage.ts sums ONLY for normal/piercing
 // ("non-Affliction") damage and NEVER for Affliction — so an Affliction hit gains nothing,
 // the exact opposite of the frozen clause. (Probed: a normal hit here DOES gain +5.)
-test.skip("SUSPECTED BUG: Drake Transformation's permanent bonus should raise AFFLICTION damage but the engine boosts only non-Affliction", () => {
+test("Drake Transformation: the permanent bonus raises AFFLICTION damage (dtypes:affliction)", () => {
   const j = jarrik(); fuse(j, "dragon");
   const st = makeState([j], [enemy("e")]);
   emit(st, { type: "roundStart" }); // seed bonus at 0

@@ -99,6 +99,9 @@ export interface Status {
   name?: string;
   /** For a dot: the damage type it ticks (default affliction). */
   dtype?: DamageType;
+  /** For an outgoing_damage_mod: which damage types it boosts (default: normal + piercing). jarrik:dragon
+   *  "+5 Affliction" -> ["affliction"]; fate:ember "+5 non-Affliction" -> ["normal","piercing","true"]. */
+  dtypes?: DamageType[];
   /** For a scoped Stun: which class tag it keys on (absent = stops all skills). */
   scope?: StunScope;
   /** For a Taunt: the unit the bearer is forced to target. */

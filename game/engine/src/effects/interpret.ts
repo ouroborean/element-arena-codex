@@ -418,6 +418,7 @@ function buildStatus(spec: StatusSpec, ctx: Ctx) {
     magnitude: spec.magnitude === undefined ? undefined : applyRounding(evalValue(spec.magnitude, ctx)),
     name: spec.name,
     dtype: spec.dtype,
+    dtypes: spec.dtypes,
     scope: spec.scope,
     genericDelta: spec.genericDelta,
     specificDelta: spec.specificDelta,

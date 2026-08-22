@@ -6683,7 +6683,10 @@ export const FUSIONS: FusionForm[] = [
       "status": {
        "kind": "outgoing_damage_mod",
        "magnitude": 0,
-       "duration": null
+       "duration": null,
+       "dtypes": [
+        "affliction"
+       ]
       }
      }
     ]
