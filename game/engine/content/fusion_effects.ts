@@ -472,9 +472,13 @@ registerCustom("branchOfWorldTree", (ctx) => {
 registerCustom("dragonsHungerRewrite", (ctx, a) => {
   const s = mutableSkill(ctx, a.skillId as string);
   if (s && once(s, "dragonsHungerRewrite")) {
-    bumpDamage(s, num(a.damageBonus, 5));
     bumpHeal(s, num(a.healBonus, 5));
     s.targeting = "all-enemies";
+    // Feed the Fire now hits EVERY enemy affected by Fan the Flames — replace the single-target has-gate
+    // (which read only the first target) with a direct hit on the Fan-filtered enemy selector.
+    const dotName = (a.dotName as string) ?? "Fan the Flames";
+    const i = s.effects.findIndex((e) => e.op === "if");
+    if (i >= 0) s.effects[i] = { op: "damage", amount: 10 + num(a.damageBonus, 5), dtype: "affliction", to: { filter: { faction: "enemies" }, with: { kind: "dot", name: dotName } } };
   }
 });
 

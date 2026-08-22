@@ -302,7 +302,7 @@ test("Dragon's Hunger: Feed the Fire deals +5 (15) and heals +5 (15), hitting al
   assert.ok(hasEssence(p), "Pyrrha still gains Elemental Essence");
 });
 
-test.skip("SUSPECTED BUG: Dragon's Hunger Feed the Fire should only hit Fan-AFFECTED enemies, not all", () => {
+test("Dragon's Hunger: Feed the Fire hits only Fan-affected enemies", () => {
   const { state, enemies } = fuse("dragon", { enemies: 2 });
   const [e1, e2] = [enemies[0]!, enemies[1]!];
   pushFan(e1); // e1 affected, e2 NOT affected
