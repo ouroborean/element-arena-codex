@@ -14676,7 +14676,8 @@ export const FUSIONS: FusionForm[] = [
        "kind": "outgoing_damage_mod",
        "name": "Reverberation",
        "magnitude": -5,
-       "duration": null
+       "duration": null,
+       "stacks": true
       }
      }
     ]
