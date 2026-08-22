@@ -480,9 +480,16 @@ registerCustom("dragonsHungerRewrite", (ctx, a) => {
 
 // pyrrha:brimstone — Fan the Flames' dot becomes permanent (apply once).
 registerCustom("festeringBurnsRewrite", (ctx, a) => {
+  const dotName = a.dotName as string;
   const s = mutableSkill(ctx, a.skillId as string);
   if (s && once(s, "festeringBurnsRewrite")) {
-    walkNodes(s.effects, (e) => { if (e.op === "applyStatus" && e.status.kind === "dot" && e.status.name === (a.dotName as string)) e.status.duration = null; });
+    // Fan the Flames is now permanent AND stacks: duration:null + stacks:true (each application accumulates).
+    walkNodes(s.effects, (e) => { if (e.op === "applyStatus" && e.status.kind === "dot" && e.status.name === dotName) { e.status.duration = null; e.status.stacks = true; } });
+  }
+  // ...and is no longer affected by Pyrokinesis: neutralize pyrrha3's +N modifyStatus on the burn.
+  const pyro = a.pyrokinesisSkillId ? mutableSkill(ctx, a.pyrokinesisSkillId as string) : null;
+  if (pyro && once(pyro, "festeringBurnsRewrite:pyro")) {
+    walkNodes(pyro.effects, (e) => { if (e.op === "modifyStatus" && e.name === dotName) e.magnitudeDelta = 0; });
   }
 });
 

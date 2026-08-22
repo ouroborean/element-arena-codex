@@ -209,7 +209,7 @@ test("Festering Burns: Fan the Flames' burn is now permanent (duration null)", (
   assert.equal(d!.duration, null, "the burn is permanent");
 });
 
-test.skip("SUSPECTED BUG: Festering Burns says Fan the Flames now STACKS, but re-casting only refreshes", () => {
+test("Festering Burns says Fan the Flames now STACKS, but re-casting only refreshes", () => {
   const { state, enemies } = fuse("brimstone");
   const e = enemies[0]!;
   performAction(state, { unit: "p", skillId: "pyrrha1", targets: ["e1"] });
@@ -219,7 +219,7 @@ test.skip("SUSPECTED BUG: Festering Burns says Fan the Flames now STACKS, but re
   assert.equal(dotTotal(e, FAN), 10, "two applications should stack to 10 burn per turn");
 });
 
-test.skip("SUSPECTED BUG: Festering Burns says Fan the Flames is no longer affected by Pyrokinesis", () => {
+test("Festering Burns says Fan the Flames is no longer affected by Pyrokinesis", () => {
   const { state, enemies } = fuse("brimstone");
   const e = enemies[0]!;
   performAction(state, { unit: "p", skillId: "pyrrha1", targets: ["e1"] });
