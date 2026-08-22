@@ -1070,9 +1070,16 @@ export const FUSIONS: FusionForm[] = [
     "on": "skillUsed",
     "source": "Choir On High",
     "when": {
-     "sameUnit": [
-      "eventSource",
-      "self"
+     "and": [
+      {
+       "sameUnit": [
+        "eventSource",
+        "self"
+       ]
+      },
+      {
+       "eventSkillId": "ayana2"
+      }
      ]
     },
     "effect": [
@@ -1168,9 +1175,23 @@ export const FUSIONS: FusionForm[] = [
     "on": "skillUsed",
     "source": "Maiden of Purity",
     "when": {
-     "sameUnit": [
-      "eventSource",
-      "self"
+     "and": [
+      {
+       "sameUnit": [
+        "eventSource",
+        "self"
+       ]
+      },
+      {
+       "or": [
+        {
+         "eventSkillId": "ayana2"
+        },
+        {
+         "eventSkillId": "ayana5"
+        }
+       ]
+      }
      ]
     },
     "effect": [
@@ -1239,6 +1260,9 @@ export const FUSIONS: FusionForm[] = [
    {
     "on": "turnEnd",
     "source": "Panacea",
+    "when": {
+     "eventTeamIsSelf": true
+    },
     "effect": [
      {
       "op": "addStack",
