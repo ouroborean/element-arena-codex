@@ -4920,7 +4920,8 @@ export const FUSIONS: FusionForm[] = [
         "faction": "enemies"
        },
        "with": {
-        "kind": "outgoing_damage_mod"
+        "kind": "outgoing_damage_mod",
+        "magLt": 0
        }
       },
       "status": {

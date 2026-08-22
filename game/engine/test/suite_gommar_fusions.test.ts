@@ -594,7 +594,7 @@ test("prism Snowy Glare control: gaining a DIFFERENT status (not Frost-Covered) 
 
 // Adversarial: frozen targets enemies "with lowered damage". An enemy whose damage is RAISED (+odm) is not a
 // lowered-damage enemy and must not be Blinded — but the filter keys on has(outgoing_damage_mod) regardless of sign.
-test.skip("SUSPECTED BUG: prism Snowy Glare Blinds an enemy whose damage is RAISED (+odm) — frozen only Blinds enemies with LOWERED damage", () => {
+test("prism Snowy Glare: Blinds only enemies with LOWERED damage (negative odm), not raised", () => {
   const g = fuse("prism");
   const raised = makeUnit({ id: "up", team: "B", kind: "hero", statuses: [{ kind: "outgoing_damage_mod", magnitude: 5, duration: null, appliedBy: "x", appliedTurn: 0 }] });
   const state = makeState([g], [raised]);

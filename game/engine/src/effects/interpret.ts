@@ -173,7 +173,8 @@ export function resolveSelector(sel: Selector, ctx: Ctx, admitUnderstudy = true)
 /** Does a unit hold a status matching a bare kind, or a kind + specific name? */
 function hasStatusMatch(u: Unit, m: StatusMatch): boolean {
   if (typeof m === "string") return u.statuses.some((s) => s.kind === m);
-  return u.statuses.some((s) => s.kind === m.kind && (m.name === undefined || s.name === m.name));
+  return u.statuses.some((s) => s.kind === m.kind && (m.name === undefined || s.name === m.name) &&
+    (m.magLt === undefined || (s.magnitude ?? 0) < m.magLt)); // magLt: e.g. a NEGATIVE (reduced) outgoing_damage_mod
 }
 
 /** Anti-heal: a heal_lock blocks the heal unless the healer is the allowed one. */
