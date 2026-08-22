@@ -474,7 +474,7 @@ test("Ghostblade (under Ethereal Form): becomes PIERCING — ignores Damage Redu
   assert.equal(e.hp, 75, "piercing 25 ignores the 10 DR");
 });
 
-test.skip("SUSPECTED BUG: Ghostblade under Ethereal Form should BYPASS (ignore Shield); engine only makes it piercing so the Shield still absorbs it", () => {
+test("Ghostblade under Ethereal Form bypasses (ignores Shield), and is piercing", () => {
   // Frozen: under Ethereal Form Ghostblade's damage "bypasses AND becomes piercing". 'Bypasses' (keyword)
   // = ignores Shield/Invulnerable. The engine only sets dtype piercing (ignores DR, not Shield), so a
   // shielded enemy soaks the whole hit.
