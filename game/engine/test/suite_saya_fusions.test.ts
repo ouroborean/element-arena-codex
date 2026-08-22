@@ -101,7 +101,7 @@ test("aurora passive: a plain (un-fused) Plasma Shield does NOT shield allies", 
 // SUSPECTED BUG: the prismaticShielding passive explicitly EXCLUDES Saya from the 2-turn version (to avoid
 // double-shielding her 40), leaving her own affliction-ignore at the base 1 turn. So her copy does NOT get
 // the frozen 2-turn extension. Assertions preserved; skipped so the committed suite stays green.
-test.skip("aurora passive: Saya's OWN Plasma Shield affliction-ignore also lasts 2 turns", () => {
+test("aurora passive: Saya's OWN Plasma Shield affliction-ignore also lasts 2 turns", () => {
   const { state, saya } = fuse("aurora", { allies: 1, enemies: 1 });
   performAction(state, { unit: "s", skillId: "saya4", targets: [] });
   const ign = afflIgnore(saya);

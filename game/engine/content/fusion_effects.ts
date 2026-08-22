@@ -1084,10 +1084,10 @@ registerCustom("prismaticShielding", (ctx, a) => {
   const e = ctx.event;
   if (!e || e.type !== "skillUsed" || e.skillId !== (a.skillId as string) || e.caster !== ctx.self.id) return;
   const dur = num(a.afflictionIgnoreTurns, 2);
-  // Exclude Saya herself — the base Plasma Shield already shields the caster (avoid double-shielding).
-  for (const u of resolveSelector((a.to as Selector) ?? { faction: "allies", kind: "hero", includeSelf: false }, ctx)) {
-    if (u.id === ctx.self.id) continue;
-    addShield(u, num(a.shield, 40), dur, ctx.self.id, ctx.state.turn);
+  for (const u of resolveSelector((a.to as Selector) ?? { faction: "allies", kind: "hero" }, ctx)) {
+    // Don't double-shield the caster (the base Plasma Shield already shielded her), but DO give her the same
+    // 2-turn affliction-ignore as every other ally (frozen: "Plasma Shield ... lasts 2 turns" for all).
+    if (u.id !== ctx.self.id) addShield(u, num(a.shield, 40), dur, ctx.self.id, ctx.state.turn);
     applyStatus(u, { kind: "damage_ignore", dtype: "affliction", duration: dur, appliedBy: ctx.self.id, appliedTurn: ctx.state.turn });
   }
 });
