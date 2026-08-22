@@ -17,7 +17,7 @@ import type { Effect, NodeId } from "./effects/ast.ts";
  *  then replayed onto each minion this hero summons — so the upgrade reaches the per-instance minion skill
  *  without mutating the shared template (no cross-team / cross-summon leak). */
 export interface MinionSkillPatch {
-  op: "appendEffect" | "setSkillMeta" | "patchNode";
+  op: "appendEffect" | "prependEffect" | "setSkillMeta" | "patchNode";
   skillId: string;
   effect?: Effect[];
   meta?: Record<string, unknown>;

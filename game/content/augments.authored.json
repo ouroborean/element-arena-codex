@@ -4360,10 +4360,10 @@
    "owner": "ayana",
    "name": "Answered Prayers",
    "description": "Prayer makes its target Invulnerable for 1 turn if used on a target below 20 HP.",
-   "note": "Prayer = ayana3. Appended check on the primary target's HP; grants invulnerable 1 turn if below 20. Because appendEffect runs after Prayer's 10 heal, the HP threshold is read post-heal (an accepted ordering nuance of appending rather than pre-empting the heal).",
+   "note": "Prayer = ayana3. prependEffect so the 'below 20 HP' check reads the target's HP AT USE TIME (before Prayer's +10 heal) and grants invulnerable 1 turn.",
    "patches": [
     {
-     "op": "appendEffect",
+     "op": "prependEffect",
      "skillId": "ayana3",
      "effect": [
       {

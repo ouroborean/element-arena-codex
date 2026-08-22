@@ -261,7 +261,7 @@ test("Answered Prayers: without the augment even a below-20 target gets no invul
 // Adversarial boundary: frozen says "if used ON a target below 20 HP" — the target's HP at the moment
 // Prayer is used. A 15-HP ally is below 20 when Prayer is used, so it must become Invulnerable, even
 // though the +10 heal lifts it to 25.
-test.skip("SUSPECTED BUG: frozen says Prayer grants Invulnerable if used ON a target below 20 HP; a 15-HP ally is below 20 when Prayer is used, so it must become Invulnerable, but the engine reads HP AFTER the +10 heal (25) and grants nothing", () => {
+test("Answered Prayers: Prayer on a target below 20 HP (at use time) grants Invulnerable", () => {
   const { state } = setup("ayana4", ["a1"], ["e"]);
   state.units["a1"]!.hp = 15; // below 20 at time of use; heals to 25
   performAction(state, { unit: "ay", skillId: "ayana3", targets: ["a1"] });

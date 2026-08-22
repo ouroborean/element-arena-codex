@@ -31,6 +31,7 @@ export type Patch =
   | { op: "replaceSkill"; skillId: string; skill: SkillInstance }
   | { op: "setSkillMeta"; skillId: string; meta: SkillMeta }
   | { op: "appendEffect"; skillId: string; effect: Effect[] }
+  | { op: "prependEffect"; skillId: string; effect: Effect[] }
   | { op: "patchNode"; skillId: string; nodeId: NodeId; replace: Effect }
   | { op: "custom"; fn: string; args?: Record<string, unknown> };
 
@@ -104,6 +105,14 @@ export function applyPatch(unit: Unit, patch: Patch): void {
       const s = mutableSkill(unit, patch.skillId);
       if (s) s.effects = [...s.effects, ...clone(patch.effect)];
       else recordMinionPatch(unit, { op: "appendEffect", skillId: patch.skillId, effect: clone(patch.effect) });
+      return;
+    }
+    case "prependEffect": {
+      // Runs the added effects BEFORE the base skill's — for "at use time" reads (ayana Answered Prayers must
+      // check the target's HP before Prayer's +10 heal).
+      const s = mutableSkill(unit, patch.skillId);
+      if (s) s.effects = [...clone(patch.effect), ...s.effects];
+      else recordMinionPatch(unit, { op: "prependEffect", skillId: patch.skillId, effect: clone(patch.effect) });
       return;
     }
     case "patchNode": {
