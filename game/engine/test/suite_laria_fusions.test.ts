@@ -462,7 +462,7 @@ test("moon/Full Moon's Night: casting Nightfall makes a 3+-stack character Moonc
 
 // SUSPECTED BUG: frozen says Full Moon's Night makes Nightfall "no longer make characters invulnerable", but the
 // base laria5 Nightfall is unchanged by the fusion (its invulnerable clause still applies to everyone).
-test.skip("SUSPECTED BUG: moon/Full Moon's Night — Nightfall no longer grants invulnerability", () => {
+test("moon/Full Moon's Night — Nightfall no longer grants invulnerability", () => {
   const laria = fuse("moon");
   laria.statuses = [];
   const e3 = enemy("e3", { statuses: [ds(3)] });
@@ -477,7 +477,7 @@ test.skip("SUSPECTED BUG: moon/Full Moon's Night — Nightfall no longer grants 
 // SUSPECTED BUG: frozen ties Mooncursing to NIGHTFALL specifically ("Nightfall ... causes characters ... to
 // become Mooncursed"), but the passive fires on ANY skill Laria uses (skillUsed cannot gate on skill id), so a
 // non-Nightfall skill Mooncurses a 3+-stack character too.
-test.skip("SUSPECTED BUG: moon/Full Moon's Night — only Nightfall (not other skills) causes Mooncurse", () => {
+test("moon/Full Moon's Night — only Nightfall (not other skills) causes Mooncurse", () => {
   const laria = fuse("moon");
   const e3 = enemy("e3", { statuses: [ds(3)] });
   const state = makeState([laria], [e3]);

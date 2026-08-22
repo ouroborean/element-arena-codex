@@ -8905,12 +8905,26 @@ export const FUSIONS: FusionForm[] = [
     "on": "skillUsed",
     "source": "Full Moon's Night",
     "when": {
-     "sameUnit": [
-      "eventSource",
-      "self"
+     "and": [
+      {
+       "sameUnit": [
+        "eventSource",
+        "self"
+       ]
+      },
+      {
+       "eventSkillId": "laria5"
+      }
      ]
     },
     "effect": [
+     {
+      "op": "removeStatus",
+      "kind": "invulnerable",
+      "from": {
+       "faction": "all"
+      }
+     },
      {
       "op": "forEach",
       "each": {
