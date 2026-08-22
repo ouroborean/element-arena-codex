@@ -656,6 +656,27 @@ export const AUGMENTS: Augment[] = [
       "generic": 2,
       "specific": 0
      },
+     "costMods": [
+      {
+       "magnitude": {
+        "op": "mul",
+        "args": [
+         {
+          "op": "min",
+          "args": [
+           {
+            "ref": "stackCount",
+            "name": "Brittle Ice",
+            "of": "self"
+           },
+           2
+          ]
+         },
+         -1
+        ]
+       }
+      }
+     ],
      "cooldown": 1,
      "effects": [
       {
@@ -735,14 +756,10 @@ export const AUGMENTS: Augment[] = [
        ]
       },
       {
-       "op": "custom",
-       "fn": "scopedCostDiscountOnUse",
-       "args": {
-        "skillId": "gommar1",
-        "element": "generic",
-        "perUse": 1,
-        "max": 2
-       }
+       "op": "removeStatus",
+       "kind": "mark",
+       "name": "Frost-Covered",
+       "from": "caster"
       }
      ],
      "currentCd": 0
