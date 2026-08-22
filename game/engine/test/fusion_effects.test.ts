@@ -195,8 +195,11 @@ test("bumpSkillDamage compounds per trigger; dragonsHungerRewrite applies once (
   const dragon = loadHero(zdef(), "A", "d");
   runOn(dragon, "dragonsHungerRewrite", { skillId: "s2", damageBonus: 5, healBonus: 5 });
   runOn(dragon, "dragonsHungerRewrite", { skillId: "s2", damageBonus: 5, healBonus: 5 });
-  assert.equal(amt(dragon), 30, "two roundStarts → +5 once, not +10");
-  assert.equal(dragon.skills!.find((s) => s.id === "s2")!.targeting, "all-enemies");
+  // dragonsHungerRewrite retargets Feed the Fire to all Fan-affected enemies by REPLACING its Fan-gated `if`
+  // node; s2 here has no such `if`, so damage is untouched. It still sets targeting to all-enemies, idempotently
+  // (once guard). The real Fan-filtered damage is covered in suite_pyrrha_fusions.
+  assert.equal(amt(dragon), 25, "s2 has no Fan-gate to replace, so its damage is unchanged");
+  assert.equal(dragon.skills!.find((s) => s.id === "s2")!.targeting, "all-enemies", "targeting rewritten, once");
 });
 
 test("setSkillDamageType / targeting rewrites / cost escalation edit the skill instance", () => {
