@@ -170,6 +170,9 @@ export interface SkillDef {
   /** Auto-target: while any living enemy bears this mark, this single-target skill is forcibly aimed at it
    *  (zephyrex Ominous Rumble — "marked enemies are automatically targeted by Arcadian Duet and Jolt"). */
   autoTargetMark?: string;
+  /** Revive skills (keeper5 Hero's Return, keeper3 Plot Twist) may select a DEAD ally as their target;
+   *  legalTargets/resolveTargets otherwise filter out non-alive units. */
+  canTargetDead?: boolean;
 }
 
 // Node addressing (findNode / replaceNode / mapNode) lives in ./patch.ts — the single walker

@@ -285,7 +285,7 @@ test("keeper3: solo -> Hero's Return costs one less energy; not solo -> full bas
 // defaults to a living enemy and the revive op no-ops on it. The dead ally stays dead — the Shield is spent
 // for nothing. Root cause is the shared base keeper5 targeting bug (also flagged in suite_keeper_base), which
 // Plot Twist inherits; the frozen augment's promised revive is therefore unreachable through a real cast.
-test.skip("SUSPECTED BUG: keeper3 solo revive is unreachable — the dead ally cannot be targeted, so the 50 Shield is wasted", () => {
+test("keeper3: solo Hero's Return revives the targeted dead ally, consuming 50 Shield", () => {
   const { k, dead, state } = k3solo(50);
   performAction(state, { unit: "k", skillId: "keeper5", targets: ["da"] });
   assert.equal(dead.alive, true, "solo Hero's Return should return the dead ally to life");

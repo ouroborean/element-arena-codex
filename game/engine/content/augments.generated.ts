@@ -849,6 +849,7 @@ export const AUGMENTS: Augment[] = [
      "name": "Hero's Return",
      "element": "ice",
      "targeting": "single",
+     "canTargetDead": true,
      "klass": "ultimate",
      "tags": [
       "Helpful",
