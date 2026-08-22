@@ -565,7 +565,7 @@ test("storm/Lightning Crash: deals 35 Piercing to the target", () => {
   assert.equal(e1.hp, 65, "35 Piercing (100 -> 65)");
 });
 
-test.skip("SUSPECTED BUG storm/Lightning Crash: 'Bypassing' must ignore Shield — engine absorbs it into the Shield", () => {
+test("storm/Lightning Crash: Bypassing damage ignores Shield", () => {
   // Frozen: "Deals 35 Piercing damage to target enemy, Bypassing." Piercing already ignores DR, so
   // 'Bypassing' can only add ignoring Shield. The engine wires the Bypassing class tag to targeting
   // legality only (legalTargets), never to damage mitigation: Lightning Crash's damage op omits

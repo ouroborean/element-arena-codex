@@ -174,7 +174,7 @@ export function runChannels(state: MatchState, id: TeamId): void {
         continue;
       }
       const targets = (s.channelTargets ?? []).map((t) => state.units[t]).filter((t): t is Unit => !!t && t.alive);
-      runEffects(state, skill.effects, { caster: u, self: u, targets, skillId: skill.id });
+      runEffects(state, skill.effects, { caster: u, self: u, targets, skillId: skill.id, bypassing: skill.tags.includes("Bypassing") });
       if (s.magnitude !== undefined) {
         s.magnitude -= 1;
         // Remove only THIS expiring copy (by identity), not every same-named channel — so the other
@@ -621,7 +621,7 @@ export function performAction(state: MatchState, action: Action): ActionResult {
   // blocks N turns.
   skill.currentCd = effectiveCooldown(caster, skill);
   skill.cdSetTurn = state.turn;
-  const affected = runEffects(state, skill.effects, { caster, self: caster, targets: decl.finalTargets, skillId: skill.id, targeting: effectiveTargeting(caster, skill), invisible: skill.isHidden, disguiseAs: skill.disguiseAs });
+  const affected = runEffects(state, skill.effects, { caster, self: caster, targets: decl.finalTargets, skillId: skill.id, targeting: effectiveTargeting(caster, skill), invisible: skill.isHidden, disguiseAs: skill.disguiseAs, bypassing: skill.tags.includes("Bypassing") });
   caster.lastSkillId = skill.id; // the "used a skill" ledger (read by clone/last-skill mechanics)
 
   // A Channel skill installs a sustained channel that re-runs at the caster's turns — unless an

@@ -640,7 +640,7 @@ test("thunder active: Saya Shrieker deals 20 (ignores Damage Reduction); an invu
 // (aurora1). Per the engine's own Bypass mechanic (a Bypass hit "skips DR AND Shield"), a Bypassing hit
 // should ignore Shield. But Saya Shrieker is authored as mere dtype:"piercing" (no bypass flag), so a Shield
 // fully absorbs its 20 and no HP is lost. Assertions preserved; skipped so the committed suite stays green.
-test.skip("thunder active: Saya Shrieker's Bypassing damage ignores Shield", () => {
+test("thunder active: Saya Shrieker's Bypassing damage ignores Shield", () => {
   const { state, enemies } = fuse("thunder", { enemies: 1 });
   addShield(enemies[0]!, 50, null, "e1", 0);
   performAction(state, { unit: "s", skillId: "sayathunder1", targets: ["e1"] });
@@ -685,7 +685,7 @@ test("vengeance active: Orbital Strike deals 20 to Overwatch-marked enemies only
 // SUSPECTED BUG: same "Bypassing"-vs-piercing gap as Saya Shrieker — Orbital Strike ("20 Bypassing damage")
 // is authored as dtype:"piercing" (no bypass flag), so a marked enemy's Shield absorbs it instead of the hit
 // passing through. Assertions preserved; skipped so the committed suite stays green.
-test.skip("vengeance active: Orbital Strike's Bypassing damage ignores a marked enemy's Shield", () => {
+test("vengeance active: Orbital Strike's Bypassing damage ignores a marked enemy's Shield", () => {
   const { state, enemies } = fuse("vengeance", { enemies: 2 });
   const marked = enemies[0]!;
   marked.statuses.push({ kind: "mark", name: "Overwatch", duration: 2, appliedBy: "s", appliedTurn: 0 });
