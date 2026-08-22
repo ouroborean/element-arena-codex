@@ -178,7 +178,7 @@ test("Absolute Power CONTROL: WITHOUT the Deal: Defeat mark, the same attacker I
   assert.equal(defender.hp, 100, "the countered skill deals no damage");
 });
 
-test.skip("SUSPECTED BUG: Absolute Power should grant ONLY stun+counter immunity per frozen, but the engine's non_damage_ignore also wards off Isolate (and every other harmful non-damage effect)", () => {
+test("Absolute Power: grants stun immunity only — Isolate (a non-stun effect) still lands", () => {
   const isolator = makeUnit({
     id: "p", team: "A", kind: "hero",
     skills: [skill("iso", [{ op: "applyStatus", to: "target", status: { kind: "isolated", duration: 1 } }], { targeting: "single", tags: ["Harmful"] })],

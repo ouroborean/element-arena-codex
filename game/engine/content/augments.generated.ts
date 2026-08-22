@@ -6336,7 +6336,10 @@ export const AUGMENTS: Augment[] = [
       "to": "target",
       "status": {
        "kind": "non_damage_ignore",
-       "duration": 1
+       "duration": 1,
+       "ignoreKinds": [
+        "stun"
+       ]
       }
      }
     ]

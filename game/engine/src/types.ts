@@ -102,6 +102,9 @@ export interface Status {
   /** For an outgoing_damage_mod: which damage types it boosts (default: normal + piercing). jarrik:dragon
    *  "+5 Affliction" -> ["affliction"]; fate:ember "+5 non-Affliction" -> ["normal","piercing","true"]. */
   dtypes?: DamageType[];
+  /** For a non_damage_ignore: which harmful non-damage status kinds it wards off (default: ALL). "ignore stuns"
+   *  (hector Mindfog, scratch Deal, gommar:glacier) -> ["stun"]; "ignore non-damage effects" stays unscoped. */
+  ignoreKinds?: string[];
   /** For a scoped Stun: which class tag it keys on (absent = stops all skills). */
   scope?: StunScope;
   /** For a Taunt: the unit the bearer is forced to target. */

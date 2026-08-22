@@ -359,7 +359,7 @@ test("glacier Glacial Advance: when the 2-turn stun expires, Gommar permanently 
 
 // Adversarial: frozen grants "ignores STUN effects" only — a Blind (a non-stun control effect) should still
 // land. The engine models it as the broad non_damage_ignore, which wards off Blind too.
-test.skip("SUSPECTED BUG: glacier's post-stun immunity also wards off non-stun effects (Blind) — frozen only makes him ignore STUN effects", () => {
+test("glacier: post-stun immunity wards STUN only — a Blind still lands", () => {
   const g = fuse("glacier");
   const e = makeUnit({ id: "e", team: "B", kind: "hero", hp: 100, maxHp: 100, skills: [eBlind()] });
   const state = makeState([g], [e]); bag(state, "B");

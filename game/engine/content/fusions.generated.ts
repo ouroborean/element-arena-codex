@@ -4524,7 +4524,10 @@ export const FUSIONS: FusionForm[] = [
          "to": "self",
          "status": {
           "kind": "non_damage_ignore",
-          "duration": null
+          "duration": null,
+          "ignoreKinds": [
+           "stun"
+          ]
          }
         }
        ]
