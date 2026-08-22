@@ -159,7 +159,7 @@ test("angel/Choir On High: Chorus ends only when BOTH Angels are killed (one ali
   assert.ok(!markOf(ay, "Chorus"), "both Angels dead -> Chorus immediately ends");
 });
 
-test.skip("SUSPECTED BUG: Choir On High summons on ANY self skill, but frozen says only 'uses Chorus'", () => {
+test("Choir On High summons on ANY self skill, but frozen says only 'uses Chorus'", () => {
   // Frozen: "Whenever Ayana uses Chorus, she summons two Angel minions." A NON-Chorus self skill
   // (here Voice of Light) must NOT summon Angels. The trigger fires on any self skillUsed, so it does.
   const { state } = scene("angel", [], [enemy("e")]);
@@ -195,7 +195,7 @@ test("anointment/Maiden of Purity: Voice of Glory also heals the most-damaged al
   assert.equal(state.units["a1"]!.hp, 55, "Voice of Glory triggers the 15 heal");
 });
 
-test.skip("SUSPECTED BUG: Maiden of Purity heals on ANY self skill; frozen scopes it to Chorus/Voice of Glory", () => {
+test("Maiden of Purity heals on ANY self skill; frozen scopes it to Chorus/Voice of Glory", () => {
   // Frozen: "Using Chorus or Voice of Glory will heal your most damaged ally for 15 HP."
   // Voice of Light is neither, so it must not heal. The unscoped skillUsed trigger heals anyway.
   const { state } = scene("anointment", [ally("a1", { hp: 40 })], [enemy("e")]);
@@ -266,7 +266,7 @@ test("antidote/Panacea: cleanses enemy debuffs after the 3rd of Ayana's turn-end
   assert.ok(!st(ay, "dot"), "dot cleansed on Ayana's 3rd turn-end");
 });
 
-test.skip("SUSPECTED BUG: Panacea cleanses on ENEMY turn-ends too; frozen scopes it to 'the end of HER turn'", () => {
+test("Panacea cleanses on ENEMY turn-ends too; frozen scopes it to 'the end of HER turn'", () => {
   // Frozen: "…at the end of her turn." A cleanse that fires purely on enemy turn-ends (Ayana never acting)
   // violates that scope. Panacea's turnEnd trigger has no team predicate, so 3 enemy turn-ends cleanse her.
   const { state, ay } = scene("antidote", [], [enemy("e")]);
