@@ -2866,6 +2866,7 @@ export const FUSIONS: FusionForm[] = [
        "op": "damage",
        "amount": 25,
        "dtype": "piercing",
+       "bypass": true,
        "to": "target"
       }
      ],
