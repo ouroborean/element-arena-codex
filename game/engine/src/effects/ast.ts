@@ -102,6 +102,8 @@ export interface StatusSpec {
   name?: string;
   /** For a dot: the damage type it ticks (default affliction). */
   dtype?: DamageType;
+  /** For an outgoing_damage_mod: which damage types it boosts (default: normal + piercing). */
+  dtypes?: DamageType[];
   /** For a scoped stun, or a tag-scoped cost_mod (titania Hallucinogenic Spores). */
   scope?: StunScope;
   /** For a cost_mod: per-channel deltas applied to Generic / Specific independently (scratch3 "-1 each"). */

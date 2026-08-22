@@ -183,7 +183,7 @@ test("fate0/aura is 'non-Affliction': a Fox-Fire ally's Affliction damage is NOT
 // outgoing_damage_mod, which (per DAMAGE_CHANNELS) only touches Normal/Piercing and never True — so a Fox-Fire
 // ally's TRUE damage gets no +5 (enemy took 20, frozen expects 25). The +5 status IS present on the ally; the
 // mitigation layer just refuses to apply it to True. Normal/Piercing (the common case) work; True is the gap.
-test.skip("SUSPECTED BUG: fate0 aura does not boost a Fox-Fire ally's TRUE damage (non-Affliction should include True)", () => {
+test("fate0 aura boosts a Fox-Fire ally's TRUE damage too (non-Affliction includes True)", () => {
   const f = fateWith(100);
   const ally = makeUnit({ id: "al", team: "A", kind: "hero", hp: 100, maxHp: 100, statuses: [foxStatus(4, "f")], skills: [hitSkill("smite", 20, "true")] });
   const enemy = makeUnit({ id: "e", team: "B", kind: "hero", hp: 100, maxHp: 100 });

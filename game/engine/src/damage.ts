@@ -144,7 +144,14 @@ export function shieldAbsorbCap(u: Unit): number {
  * True is never modified — DAMAGE_CHANNELS ruling).
  */
 export function outgoingDamageMod(u: Unit, dtype: DamageType): number {
-  return dtype === "normal" || dtype === "piercing" ? sumMagnitude(u, "outgoing_damage_mod") : 0;
+  let total = 0;
+  for (const s of u.statuses) {
+    if (s.kind !== "outgoing_damage_mod") continue;
+    // A mod may name the damage types it boosts; default is normal + piercing (the historical behavior).
+    const applies = s.dtypes ? s.dtypes.includes(dtype) : dtype === "normal" || dtype === "piercing";
+    if (applies) total += s.magnitude ?? 0;
+  }
+  return total;
 }
 
 /** Product of the defender's incoming multipliers (0.5 = half, 2 = double). `newDamageOnly` mults skip DoTs. */
