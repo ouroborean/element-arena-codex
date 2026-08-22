@@ -13411,6 +13411,42 @@
        "to": "self"
       }
      ]
+    },
+    {
+     "on": "damageDealt",
+     "source": "Mooncursed Rider",
+     "when": {
+      "and": [
+       {
+        "sameUnit": [
+         "eventSource",
+         "self"
+        ]
+       },
+       {
+        "eventSourceId": "roland1.hit"
+       },
+       {
+        "has": "mark",
+        "name": "Mooncursed",
+        "of": "self"
+       },
+       {
+        "has": "mark",
+        "name": "Earth Pillar",
+        "of": "eventTarget"
+       }
+      ]
+     },
+     "note": "While Mooncursed, Strength From The Earth (roland1.hit) deals 15 additional to an Earth-Pillar-marked target. The rider's own damage carries no roland1.hit sourceId, so it does not re-fire.",
+     "effect": [
+      {
+       "op": "damage",
+       "amount": 15,
+       "dtype": "normal",
+       "to": "eventTarget"
+      }
+     ]
     }
    ],
    "skill": {

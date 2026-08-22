@@ -13181,6 +13181,41 @@ export const FUSIONS: FusionForm[] = [
       "to": "self"
      }
     ]
+   },
+   {
+    "on": "damageDealt",
+    "source": "Mooncursed Rider",
+    "when": {
+     "and": [
+      {
+       "sameUnit": [
+        "eventSource",
+        "self"
+       ]
+      },
+      {
+       "eventSourceId": "roland1.hit"
+      },
+      {
+       "has": "mark",
+       "name": "Mooncursed",
+       "of": "self"
+      },
+      {
+       "has": "mark",
+       "name": "Earth Pillar",
+       "of": "eventTarget"
+      }
+     ]
+    },
+    "effect": [
+     {
+      "op": "damage",
+      "amount": 15,
+      "dtype": "normal",
+      "to": "eventTarget"
+     }
+    ]
    }
   ],
   "skill": {
