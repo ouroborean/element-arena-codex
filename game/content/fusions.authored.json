@@ -14927,11 +14927,12 @@
         "kind": "outgoing_damage_mod",
         "name": "Reverberation",
         "magnitude": -5,
-        "duration": null
+        "duration": null,
+        "stacks": true
        }
       }
      ],
-     "note": "Each time Saya damages a character, they permanently deal 5 less damage; stacks with every hit (named Reverberation so it can be stripped)."
+     "note": "Each time Saya damages a character, they permanently deal 5 less damage; stacks:true accumulates -5 per hit (named Reverberation so it can be stripped when the target becomes invulnerable)."
     },
     {
      "on": "statusApplied",

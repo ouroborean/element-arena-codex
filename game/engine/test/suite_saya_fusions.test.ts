@@ -592,7 +592,7 @@ test("thunder passive: when Saya damages a character it deals 5 reduced damage (
 // SUSPECTED BUG: frozen says the -5 reduction is "permanently, STACKING" — each Saya hit should add another
 // -5 (two hits -> -10). The engine keeps a single Reverberation status at magnitude -5 no matter how many
 // times Saya hits (named outgoing_damage_mod refreshes rather than stacks). Assertions preserved; skipped.
-test.skip("thunder passive: Reverberation STACKS — two Saya hits reduce the character's damage by 10", () => {
+test("thunder passive: Reverberation stacks — two Saya hits reduce the target damage by 10", () => {
   const { state, saya, enemies } = fuse("thunder", { enemies: 1 });
   const foe = enemies[0]!;
   runEffects(state, [{ op: "damage", amount: 10, to: "target" }], { caster: saya, targets: [foe] });
