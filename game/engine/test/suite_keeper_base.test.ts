@@ -290,7 +290,7 @@ test("keeper4: goes on its 4-turn cooldown after casting", () => {
 // and silently defaults to the first living ENEMY, on which the revive op no-ops. Diagnostic confirms the
 // cast returns ok:true, pays 2 Ice energy AND consumes all 75 Shield, yet revives nobody — the dead ally
 // stays dead. Hero's Return's revive is unreachable through the real cast path.
-test.skip("SUSPECTED BUG: keeper5 cannot revive a dead ally — 'single' targeting drops the dead target and wastes the 75 Shield", () => {
+test("keeper5 Hero's Return: revives a targeted dead ally at 50 HP, consuming 75 Shield", () => {
   const k = loadHero(heroById("keeper"), "A", "k");
   const dead = makeUnit({ id: "da", team: "A", kind: "hero", hp: 0, maxHp: 100, alive: false });
   const state = makeState([k, dead], [makeUnit({ id: "e", team: "B" })]);
