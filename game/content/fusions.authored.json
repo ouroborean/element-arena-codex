@@ -4739,7 +4739,19 @@
      "specific": 1
     },
     "cooldown": 4,
-    "note": "'Cannot be used if Bjorn, True King has been killed' is a usability precondition (no requires primitive in the DSL); the effects are also inert if Bjorn is absent because the applyStatus/useSkill selectors resolve empty.",
+    "requires": {
+     "cmp": ">=",
+     "left": {
+      "ref": "count",
+      "of": {
+       "faction": "allies",
+       "kind": "minion",
+       "template": "Bjorn, True King"
+      }
+     },
+     "right": 1
+    },
+    "note": "'Cannot be used if Bjorn, True King has been killed' -> requires a LIVING Bjorn (count of the allied Bjorn minion >= 1; faction selectors are alive-filtered). If Bjorn is dead/absent the skill is rejected.",
     "effects": [
      {
       "op": "applyStatus",

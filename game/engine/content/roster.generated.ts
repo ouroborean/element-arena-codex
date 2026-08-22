@@ -11343,14 +11343,7 @@ export const ROSTER: HeroDef[] = [
      "specific": 3
     },
     "cooldown": 3,
-    "requires": {
-     "not": {
-      "sameUnit": [
-       "target",
-       "caster"
-      ]
-     }
-    },
+    "cannotTargetSelf": true,
     "effects": [
      {
       "op": "applyStatus",

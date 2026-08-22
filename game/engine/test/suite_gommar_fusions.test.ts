@@ -501,7 +501,7 @@ test("myth King's Saddle control: WITHOUT Frost-Covered, Bjorn does NOT cast Sov
 });
 
 // Adversarial: frozen: "Cannot be used if Bjorn, True King has been killed." No usability gate is enforced.
-test.skip("SUSPECTED BUG: myth King's Saddle is castable even when Bjorn is dead — frozen says it 'Cannot be used if Bjorn, True King has been killed'", () => {
+test("myth King's Saddle: rejected when Bjorn, True King is dead (requires a living Bjorn)", () => {
   const g = fuse("myth");
   const state = makeState([g], [makeUnit({ id: "e", team: "B", kind: "hero" })]); bag(state);
   emit(state, { type: "roundStart" });
