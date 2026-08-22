@@ -42,5 +42,5 @@ export interface SkillInstance extends SkillDef {
   /** Per-cast conditional cost deltas, evaluated live at each cast (keeper3 "Plot Twist": -1 while solo).
    *  `magnitude` may be a Value, so the delta can scale with live state (zevkir5: -1 per Call Tides stack).
    *  Distinct from cost_mod statuses (which the round-wipe clears) — this rides on the skill, which persists. */
-  costMods?: Array<{ magnitude: number | Value; when?: Condition }>;
+  costMods?: Array<{ magnitude?: number | Value; genericDelta?: number | Value; specificDelta?: number | Value; when?: Condition }>;
 }

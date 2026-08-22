@@ -14485,6 +14485,52 @@ export const FUSIONS: FusionForm[] = [
     "generic": 3,
     "specific": 3
    },
+   "costMods": [
+    {
+     "specificDelta": {
+      "op": "mul",
+      "args": [
+       {
+        "ref": "count",
+        "of": {
+         "faction": "allies",
+         "kind": "hero",
+         "alive": false
+        }
+       },
+       -1
+      ]
+     }
+    },
+    {
+     "genericDelta": {
+      "op": "mul",
+      "args": [
+       {
+        "ref": "count",
+        "of": {
+         "faction": "enemies",
+         "kind": "hero",
+         "alive": false
+        }
+       },
+       -1
+      ]
+     }
+    }
+   ],
+   "requires": {
+    "cmp": "==",
+    "left": {
+     "ref": "count",
+     "of": {
+      "faction": "allies",
+      "kind": "minion",
+      "template": "Saya-Brand Monstrosity"
+     }
+    },
+    "right": 0
+   },
    "cooldown": 0,
    "effects": [
     {
