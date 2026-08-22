@@ -335,7 +335,7 @@ test("moon Stonefield Stalker: consumes all stacks (the active no longer self-tr
 
 // Adversarial: frozen says "during this time Strength from the Earth deals 15 additional damage to targets
 // affected by Earth Pillar." SFtE (roland1) has no Mooncursed reader, so the +15 rider never applies.
-test.skip("SUSPECTED BUG: moon Mooncursed rider is missing — SFtE deals no +15 to an Earth-Pillar target while Mooncursed", () => {
+test("moon Mooncursed: SFtE deals +15 to an Earth-Pillar-marked target while Mooncursed", () => {
   const r = fuse("moon");
   r.statuses.push(status("mark", { name: "Mooncursed", duration: 3 }));
   const e = enemy("e1");
