@@ -175,7 +175,7 @@ test("Rotten Vitality: a dead Seedling returns to the battlefield 1 Gaia-turn la
   assert.equal(minions(st, "A", "Seedling").length, 1, "a fresh Seedling returns exactly one Gaia-turn after death");
 });
 
-test.skip("SUSPECTED BUG: Rotten Vitality over-fires — a dead Worldsprout (not a Seedling) also returns a Seedling; frozen scopes the return to 'Seedling Minions'", () => {
+test("grave Rotten Vitality: only a dead Seedling returns — a dead Worldsprout does not", () => {
   const { g, st } = fuse("grave");
   const ws = mkMinion("ws", "Worldsprout", "A");
   st.units["ws"] = ws; st.teams.A.units.push("ws");
