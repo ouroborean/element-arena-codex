@@ -8405,9 +8405,10 @@
          "name": "Tale of a Distant Future",
          "magnitude": 5,
          "dtype": "affliction",
-         "duration": null
+         "duration": null,
+         "stacks": true
         },
-        "note": "'deals 5 Affliction to every character for the rest of the game' = permanent (duration null) 5-Affliction DoT; round-scoped in practice. Repeated casts stack additional instances."
+        "note": "'deals 5 Affliction to every character for the rest of the game' = permanent (duration null) 5-Affliction DoT; round-scoped in practice. 'This effect stacks' -> stacks:true (a repeated cast accumulates +5/turn instead of refreshing)."
        }
       ]
      }

@@ -108,6 +108,10 @@ export interface Status {
   /** For a damage_ignore: ignore only PERIODIC (dot-tick) damage, not new/direct hits (gommar:lich Icy Blood
    *  "ignores periodic Affliction damage"). */
   periodicOnly?: boolean;
+  /** Re-applying this status ACCUMULATES its magnitude (and refreshes duration) instead of the default refresh
+   *  — for named dots/effects whose frozen text says "This effect stacks" (keeper Tale of a Distant Future,
+   *  pyrrha Festering Burns' Fan the Flames). */
+  stacks?: boolean;
   /** For a scoped Stun: which class tag it keys on (absent = stops all skills). */
   scope?: StunScope;
   /** For a Taunt: the unit the bearer is forced to target. */

@@ -425,6 +425,7 @@ function buildStatus(spec: StatusSpec, ctx: Ctx) {
     dtypes: spec.dtypes,
     ignoreKinds: spec.ignoreKinds,
     periodicOnly: spec.periodicOnly,
+    stacks: spec.stacks,
     scope: spec.scope,
     genericDelta: spec.genericDelta,
     specificDelta: spec.specificDelta,

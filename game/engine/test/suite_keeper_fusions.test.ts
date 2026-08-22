@@ -656,7 +656,7 @@ test("stasis1: consume 35 Shield -> a permanent 5-Affliction-per-turn tick lands
   assert.equal(k.hp, 95, "even Keeper takes 5 (every character)");
 });
 
-test.skip("SUSPECTED BUG stasis1: frozen says 'This effect stacks', but the DoT is a single named slot ('Tale of a Distant Future'), so a second cast REFRESHES rather than stacks — tick stays 5/turn instead of 10", () => {
+test("stasis1: Tale of a Distant Future stacks — a second cast accumulates to 10/turn", () => {
   const k = fusedKeeper("k", "stasis");
   const e1 = enemy("e1");
   const state = makeState([k], [e1]);

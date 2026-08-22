@@ -44,6 +44,16 @@ export function applyStatus(unit: Unit, status: Status): void {
     existing.appliedTurn = status.appliedTurn;
     return;
   }
+  if (status.stacks) {
+    // "This effect stacks": a re-applied named dot/effect ACCUMULATES magnitude (and refreshes duration/source)
+    // instead of the default refresh.
+    existing.magnitude = (existing.magnitude ?? 0) + (status.magnitude ?? 0);
+    existing.duration = status.duration;
+    existing.appliedBy = status.appliedBy;
+    existing.appliedTurn = status.appliedTurn;
+    existing.sourceId = status.sourceId;
+    return;
+  }
   // Refresh.
   existing.duration = status.duration;
   if (status.magnitude !== undefined) existing.magnitude = status.magnitude;
