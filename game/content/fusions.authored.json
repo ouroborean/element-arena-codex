@@ -9043,12 +9043,27 @@
      "on": "skillUsed",
      "source": "Full Moon's Night",
      "when": {
-      "sameUnit": [
-       "eventSource",
-       "self"
+      "and": [
+       {
+        "sameUnit": [
+         "eventSource",
+         "self"
+        ]
+       },
+       {
+        "eventSkillId": "laria5"
+       }
       ]
      },
      "effect": [
+      {
+       "op": "removeStatus",
+       "kind": "invulnerable",
+       "from": {
+        "faction": "all"
+       },
+       "note": "Full Moon's Night: 'Nightfall no longer makes characters invulnerable.' Nightfall (laria5) applies invulnerable to all as it resolves; this post-resolution trigger strips it, so the net effect is no invulnerability."
+      },
       {
        "op": "forEach",
        "each": {
