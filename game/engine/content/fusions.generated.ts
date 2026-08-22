@@ -8280,7 +8280,8 @@ export const FUSIONS: FusionForm[] = [
         "name": "Tale of a Distant Future",
         "magnitude": 5,
         "dtype": "affliction",
-        "duration": null
+        "duration": null,
+        "stacks": true
        }
       }
      ]

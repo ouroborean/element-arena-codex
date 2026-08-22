@@ -108,6 +108,9 @@ export interface StatusSpec {
   ignoreKinds?: string[];
   /** For a damage_ignore: ignore only PERIODIC (dot-tick) damage, not new/direct hits. */
   periodicOnly?: boolean;
+  /** Re-applying this status ACCUMULATES magnitude (+refreshes duration) instead of the default refresh
+   *  ("This effect stacks" named dots/effects). */
+  stacks?: boolean;
   /** For a scoped stun, or a tag-scoped cost_mod (titania Hallucinogenic Spores). */
   scope?: StunScope;
   /** For a cost_mod: per-channel deltas applied to Generic / Specific independently (scratch3 "-1 each"). */
