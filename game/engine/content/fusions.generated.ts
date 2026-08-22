@@ -4700,6 +4700,18 @@ export const FUSIONS: FusionForm[] = [
     "specific": 1
    },
    "cooldown": 4,
+   "requires": {
+    "cmp": ">=",
+    "left": {
+     "ref": "count",
+     "of": {
+      "faction": "allies",
+      "kind": "minion",
+      "template": "Bjorn, True King"
+     }
+    },
+    "right": 1
+   },
    "effects": [
     {
      "op": "applyStatus",

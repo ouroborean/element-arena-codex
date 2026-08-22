@@ -179,6 +179,9 @@ export interface SkillDef {
   /** Revive skills (keeper5 Hero's Return, keeper3 Plot Twist) may select a DEAD ally as their target;
    *  legalTargets/resolveTargets otherwise filter out non-alive units. */
   canTargetDead?: boolean;
+  /** The caster may not target themselves (xyris5 Echoes of Desire — "Cannot target Xyris"). A target-legality
+   *  rule; requires-conditions can't express it because the target isn't bound at the requires check. */
+  cannotTargetSelf?: boolean;
 }
 
 // Node addressing (findNode / replaceNode / mapNode) lives in ./patch.ts — the single walker

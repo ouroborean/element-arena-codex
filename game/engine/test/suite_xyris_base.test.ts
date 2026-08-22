@@ -362,7 +362,7 @@ test("Echoes of Desire: control — an unmarked ally's skill occurs once", () =>
 // Observed: performAction(xyris5, targets:["x"]) -> {ok:true}, the "Echoes of Desire" mark lands on
 // Xyris, and cost + cooldown are spent. Xyris even gains Elemental Essence (Dream Body), confirming
 // he was accepted as the sole target. Frozen forbids this cast outright.
-test.skip("SUSPECTED BUG: Echoes of Desire can be cast on Xyris (frozen: 'Cannot target Xyris')", () => {
+test("Echoes of Desire: cannot target Xyris himself (cannotTargetSelf)", () => {
   const xyris = loadHero(heroById("xyris"), "A", "x");
   const ally = makeUnit({ id: "a", team: "A", kind: "hero" });
   const enemy = makeUnit({ id: "e", team: "B", kind: "hero" });

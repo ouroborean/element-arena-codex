@@ -491,6 +491,7 @@ export function legalTargets(state: MatchState, caster: Unit, skill: SkillInstan
     u.statuses.some((s) => s.kind === "mark" && s.name === "Bramblelash");
   const isLegal = (u: Unit): boolean =>
     (u.alive || !!skill.canTargetDead) && // revives (keeper5/keeper3) may select a dead ally
+    !(skill.cannotTargetSelf && u.id === caster.id) && // xyris5 "cannot target Xyris"
     reanimatedOk(u) &&
     (!skill.targetKind || u.kind === skill.targetKind) && // e.g. Feed may only target a minion (the Eagle)
     !(u.id !== caster.id && hasStatus(u, "untargetable")) && // others can't target it; self can
@@ -567,7 +568,11 @@ export function performAction(state: MatchState, action: Action): ActionResult {
   const rng = Rng.fromState(state.rngState);
   const targets = legalTargets(state, caster, skill, resolveTargets(state, caster, skill, action.targets), rng);
   state.rngState = rng.state;
-  const needsTarget = effectiveTargeting(caster, skill) === "single" && (skill.tags.includes("Harmful") || skill.tags.includes("Helpful"));
+  // A single-target skill needs a legal target when it is Harmful/Helpful, OR when the player explicitly chose
+  // one that turned out illegal (e.g. xyris5's own-self choice under cannotTargetSelf) — rather than silently
+  // redirecting or (Strategic) landing on the caster via the effect's `target` fallback.
+  const choseTarget = (action.targets?.length ?? 0) > 0;
+  const needsTarget = effectiveTargeting(caster, skill) === "single" && (skill.tags.includes("Harmful") || skill.tags.includes("Helpful") || choseTarget);
   if (needsTarget && targets.length === 0) return { ok: false, reason: "no-legal-target" };
 
   const pool = team(state, caster.team).energy;
