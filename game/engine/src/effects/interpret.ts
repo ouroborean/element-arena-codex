@@ -420,6 +420,7 @@ function buildStatus(spec: StatusSpec, ctx: Ctx) {
     dtype: spec.dtype,
     dtypes: spec.dtypes,
     ignoreKinds: spec.ignoreKinds,
+    periodicOnly: spec.periodicOnly,
     scope: spec.scope,
     genericDelta: spec.genericDelta,
     specificDelta: spec.specificDelta,
