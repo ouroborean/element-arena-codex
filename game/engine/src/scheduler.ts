@@ -610,9 +610,13 @@ export function performAction(state: MatchState, action: Action): ActionResult {
     else removeStatus(caster, "channeling");
   }
 
-  const affected = runEffects(state, skill.effects, { caster, self: caster, targets: decl.finalTargets, skillId: skill.id, targeting: effectiveTargeting(caster, skill), invisible: skill.isHidden, disguiseAs: skill.disguiseAs });
+  // Set the cooldown BEFORE running effects, so a skill that reduces its OWN cooldown mid-cast (xyris3 "set
+  // to 1", sera2 "-1 per marked enemy") adjusts the just-set value via modifyCooldown instead of having it
+  // clobbered by this assignment afterwards. cdSetTurn = birth turn — advanceCooldowns skips it, so cooldown N
+  // blocks N turns.
   skill.currentCd = effectiveCooldown(caster, skill);
-  skill.cdSetTurn = state.turn; // birth turn — advanceCooldowns skips it (see below), so cooldown N blocks N turns
+  skill.cdSetTurn = state.turn;
+  const affected = runEffects(state, skill.effects, { caster, self: caster, targets: decl.finalTargets, skillId: skill.id, targeting: effectiveTargeting(caster, skill), invisible: skill.isHidden, disguiseAs: skill.disguiseAs });
   caster.lastSkillId = skill.id; // the "used a skill" ledger (read by clone/last-skill mechanics)
 
   // A Channel skill installs a sustained channel that re-runs at the caster's turns — unless an

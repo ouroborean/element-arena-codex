@@ -200,7 +200,7 @@ const dreamscapeCd = (u: Unit): number => u.skills!.find((s) => s.id === "xyris2
 // and effectiveCooldown folds in ONLY `cooldown_mod` statuses (scheduler.ts:398-402) — it does NOT fold
 // the pending self-cd delta. So the mid-cast reduction is clobbered and currentCd resolves to 3+0 = 3.
 // This is exactly the Sera "Eyes of Vengeance" precedent the authored note flagged. Observed: currentCd == 3.
-test.skip("SUSPECTED BUG: Return to the Dream — with Elemental Essence, Enter the Dreamscape's cooldown is set to 1", () => {
+test("Return to the Dream: with Elemental Essence, Enter the Dreamscape's cooldown is set to 1", () => {
   const xyris = loadHero(heroById("xyris"), "A", "x");
   applyAugment(xyris, augmentById("xyris3")!);
   const enemy = makeUnit({ id: "e", team: "B", kind: "hero", hp: 100, maxHp: 100 });

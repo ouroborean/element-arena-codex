@@ -185,7 +185,7 @@ test("sera2 control (no marked enemies): full 15 Piercing AoE, cooldown stays at
 // modifyCooldown(-N) is clobbered because performAction assigns currentCd = effectiveCooldown AFTER the
 // effects run (scheduler ~L601), so a skill reducing its OWN cooldown mid-cast has the reduction discarded.
 // Engine leaves currentCd at the full 4 regardless of marks consumed. Kept as an executable bug report.
-test.skip("sera2: consuming N marked enemies reduces THIS skill's cooldown by N (2 marked -> cd 4-2 = 2)", () => {
+test("sera2: consuming N marked enemies reduces THIS skill's cooldown by N (2 marked -> cd 4-2 = 2)", () => {
   const sera = loadHero(heroById("sera"), "A", "s");
   const e1 = makeUnit({ id: "e1", team: "B", hp: 100 });
   const e2 = makeUnit({ id: "e2", team: "B", hp: 100 });
