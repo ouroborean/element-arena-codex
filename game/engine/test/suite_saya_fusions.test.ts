@@ -486,7 +486,7 @@ test("reanimation active: Saya-Brand Monstrosity creates a Monstrosity minion", 
 // SUSPECTED BUG: frozen says the skill "costs one less [60] for each dead allied Hero, and one fewer [65]
 // for each dead enemy Hero." The engine treats cost as fixed skill metadata (no death-count reduction), so
 // effectiveCost stays {generic:3, specific:3} regardless of dead heroes. Assertions preserved; skipped.
-test.skip("reanimation active: cost drops one Reanimation per dead allied Hero and one generic per dead enemy Hero", () => {
+test("reanimation active: cost drops one Reanimation per dead allied Hero and one generic per dead enemy Hero", () => {
   const saya = loadHero(heroById("saya"), "A", "s");
   applyFusion(saya, fusionForm("saya", "reanimation")!);
   const deadAlly = makeUnit({ id: "a1", team: "A", name: "DeadAlly", kind: "hero", alive: false, hp: 0 });
@@ -500,7 +500,7 @@ test.skip("reanimation active: cost drops one Reanimation per dead allied Hero a
 
 // SUSPECTED BUG: frozen says "Limit 1" — only one Saya-Brand Monstrosity may exist per match. The engine has
 // no once-per-match summon guard, so a second cast creates a second Monstrosity. Assertions preserved; skipped.
-test.skip("reanimation active: Limit 1 — a second Saya-Brand Monstrosity cannot be created", () => {
+test("reanimation active: Limit 1 — a second Saya-Brand Monstrosity cannot be created", () => {
   const { state, sk } = fuse("reanimation", { enemies: 1 });
   const first = performAction(state, { unit: "s", skillId: "sayareanimation1", targets: [] });
   assert.equal(first.ok, true, "the first Monstrosity is created");

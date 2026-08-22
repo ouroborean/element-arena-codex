@@ -16,6 +16,7 @@
  */
 import type { EnergyPool, MatchState, TeamId, Unit } from "./types.ts";
 import type { SkillInstance } from "./skill.ts";
+import type { Value } from "./effects/ast.ts";
 import { emit, evalConditionReadOnly, evalSkillCondition, evalValueReadOnly, resolveDeclaration, runEffects } from "./effects/interpret.ts";
 import { applyDamage, applyHeal, outgoingDtypeOverride, tickShieldsForTeam } from "./damage.ts";
 import { Rng } from "./rng.ts";
@@ -372,9 +373,12 @@ export function effectiveCost(caster: Unit, skill: SkillInstance, state?: MatchS
   }
   // Per-cast conditional cost mods carried on the skill, re-evaluated live at each cast.
   if (state && skill.costMods) {
+    const val = (v: number | Value): number => (typeof v === "number" ? v : evalValueReadOnly(state, caster, v));
     for (const m of skill.costMods) {
       if (m.when && !evalConditionReadOnly(state, caster, m.when)) continue;
-      delta += typeof m.magnitude === "number" ? m.magnitude : evalValueReadOnly(state, caster, m.magnitude);
+      if (m.magnitude !== undefined) delta += val(m.magnitude); // scalar (spills generic->specific)
+      if (m.genericDelta !== undefined) genDelta += val(m.genericDelta); // per-channel, independent, floored, no spill
+      if (m.specificDelta !== undefined) specDelta += val(m.specificDelta);
     }
   }
   const remap = caster.statuses.some((s) => s.kind === "cost_currency_remap" && (!s.skillId || s.skillId === skill.id));

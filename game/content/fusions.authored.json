@@ -14734,13 +14734,59 @@
      "generic": 3,
      "specific": 3
     },
+    "costMods": [
+     {
+      "specificDelta": {
+       "op": "mul",
+       "args": [
+        {
+         "ref": "count",
+         "of": {
+          "faction": "allies",
+          "kind": "hero",
+          "alive": false
+         }
+        },
+        -1
+       ]
+      }
+     },
+     {
+      "genericDelta": {
+       "op": "mul",
+       "args": [
+        {
+         "ref": "count",
+         "of": {
+          "faction": "enemies",
+          "kind": "hero",
+          "alive": false
+         }
+        },
+        -1
+       ]
+      }
+     }
+    ],
+    "requires": {
+     "cmp": "==",
+     "left": {
+      "ref": "count",
+      "of": {
+       "faction": "allies",
+       "kind": "minion",
+       "template": "Saya-Brand Monstrosity"
+      }
+     },
+     "right": 0
+    },
     "cooldown": 0,
     "effects": [
      {
       "op": "summon",
       "template": "Saya-Brand Monstrosity",
       "count": 1,
-      "note": "Creates a Monstrosity minion. 'Limit 1' and the dynamic cost reduction (one less [60]/reanimation per dead allied Hero, one fewer [65]/generic per dead enemy Hero) are cost/limit mechanics — cost is fixed skill metadata and cannot be reduced at effect time, and there is no once-per-match summon guard primitive; documented here."
+      "note": "Creates a Monstrosity. Cost drops 1 Reanimation ([60], specificDelta) per dead allied Hero and 1 generic ([65], genericDelta) per dead enemy Hero. 'Limit 1' = requires no living Saya-Brand Monstrosity already on the field."
      }
     ]
    }
