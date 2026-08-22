@@ -4287,7 +4287,7 @@ export const AUGMENTS: Augment[] = [
   "owner": "ayana",
   "patches": [
    {
-    "op": "appendEffect",
+    "op": "prependEffect",
     "skillId": "ayana3",
     "effect": [
      {

@@ -36,6 +36,7 @@ PATCH_KEYS = {
     "replaceSkill": {"op", "skillId", "skill"},
     "setSkillMeta": {"op", "skillId", "meta"},
     "appendEffect": {"op", "skillId", "effect"},
+    "prependEffect": {"op", "skillId", "effect"},
     "patchNode": {"op", "skillId", "nodeId", "replace"},
     "custom": {"op", "fn", "args"},
 }

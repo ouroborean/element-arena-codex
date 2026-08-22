@@ -752,6 +752,7 @@ function applyMinionSkillPatches(minion: Unit, summoner: Unit): void {
     // Clone the hero-stored payload too: each summoned minion must own its effect/meta/replace nodes, never
     // share them across summons or with the hero's minionSkillPatches record (clone-before-mutate discipline).
     if (p.op === "appendEffect" && p.effect) s.effects = [...s.effects, ...(JSON.parse(JSON.stringify(p.effect)) as Effect[])];
+    else if (p.op === "prependEffect" && p.effect) s.effects = [...(JSON.parse(JSON.stringify(p.effect)) as Effect[]), ...s.effects];
     else if (p.op === "setSkillMeta" && p.meta) Object.assign(s, JSON.parse(JSON.stringify(p.meta)));
     else if (p.op === "patchNode" && p.nodeId && p.replace) replaceNode(s.effects, p.nodeId, JSON.parse(JSON.stringify(p.replace)) as Effect);
   }

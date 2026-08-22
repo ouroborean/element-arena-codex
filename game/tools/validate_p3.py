@@ -21,7 +21,7 @@ FUSIONS = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "..", "conten
 AUGMENTS = sys.argv[2] if len(sys.argv) > 2 else os.path.join(HERE, "..", "content", "augments.authored.json")
 
 PATCH_OPS = {"addTrigger", "removeTrigger", "addSkill", "replaceSkill", "setSkillMeta",
-             "appendEffect", "patchNode", "custom"}
+             "appendEffect", "prependEffect", "patchNode", "custom"}
 SKILL_META_FIELDS = {"name", "cost", "cooldown", "tags", "targeting", "element", "klass",
                      "requires", "uncounterableIf", "channelTurns", "doesNotInterrupt", "isHidden"}
 
@@ -72,9 +72,9 @@ def v_patch(p, path):
                 vc.v_condition(meta["requires"], path + ".meta.requires")
             if "uncounterableIf" in meta:
                 vc.v_condition(meta["uncounterableIf"], path + ".meta.uncounterableIf")
-    elif op == "appendEffect":
+    elif op in ("appendEffect", "prependEffect"):
         if "skillId" not in p:
-            vc.err(path, "appendEffect missing 'skillId'")
+            vc.err(path, op + " missing 'skillId'")
         vc.v_effects(p.get("effect", []), path + ".effect")
     elif op == "patchNode":
         for f in ("skillId", "nodeId", "replace"):
