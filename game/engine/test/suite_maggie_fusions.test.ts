@@ -375,7 +375,7 @@ test("ghost/Ghostlash: 25 to an unmarked enemy, 35 to a Bramblelash-marked enemy
   }
 });
 
-test.skip("SUSPECTED BUG ghost/Ghostlash is 'Bypassing' but its damage does not ignore Shield — the Bypassing tag never sets the damage op's bypass flag", () => {
+test("ghost/Ghostlash: Bypassing damage ignores Shield", () => {
   // Frozen: "... Bypassing" => the hit should ignore Shield (and Damage Reduction), landing full on HP.
   const maggie = fuse("ghost");
   const e = makeUnit({ id: "e", team: "B", shield: 40 });

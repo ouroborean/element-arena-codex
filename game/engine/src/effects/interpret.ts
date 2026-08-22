@@ -42,6 +42,9 @@ export interface Ctx {
   /** Display-disguise context: statuses applied here are stamped to display as skill `disguiseAs` in the
    *  opponent's view (redactState). Seeded from the casting skill's disguiseAs. */
   disguiseAs?: string;
+  /** The executing skill carries the "Bypassing" class tag: its damage ignores DR + Shield regardless of the
+   *  dealer's Bypass status. Seeded from skill.tags at the cast/channel; propagates via { ...ctx }. */
+  bypassing?: boolean;
   /** Set of unit ids this skill's effects touched (damaged/statused) — for "affected N targets" reads. */
   affected?: Set<string>;
   /** Present inside a trigger: the event that fired it. */
@@ -456,7 +459,7 @@ export function exec(effect: Effect, ctx: Ctx): void {
       const land = (u: Unit, amt: number, src: string): void => {
         ctx.affected?.add(u.id);
         const wasAlive = u.alive;
-        const r = applyDamage(u, { amount: amt, type: dtype, isNew: true, sourceId: effect.id, bypass: effect.bypass || bypassesAgainst(dealer, u) });
+        const r = applyDamage(u, { amount: amt, type: dtype, isNew: true, sourceId: effect.id, bypass: effect.bypass || ctx.bypassing || bypassesAgainst(dealer, u) });
         if (r.shieldAbsorbed > 0) ctx.emit({ type: "shieldDamaged", unit: u.id, source: src, amount: r.shieldAbsorbed });
         if (r.shieldBroke) ctx.emit({ type: "shieldBroken", unit: u.id, source: src });
         // The event's sourceId identifies what dealt the damage for reactions (eventSourceId): a damage node's
@@ -970,7 +973,7 @@ export function resolveDeclaration(state: MatchState, caster: Unit, skill: Skill
 export function runEffects(
   state: MatchState,
   effects: Effect[],
-  opts: { caster: Unit; self?: Unit; targets?: Unit[]; skillId?: string; targeting?: string; invisible?: boolean; disguiseAs?: string },
+  opts: { caster: Unit; self?: Unit; targets?: Unit[]; skillId?: string; targeting?: string; invisible?: boolean; disguiseAs?: string; bypassing?: boolean },
 ): string[] {
   const rng = Rng.fromState(state.rngState);
   const bus = createBus(state, rng);
@@ -986,6 +989,7 @@ export function runEffects(
     targeting: opts.targeting,
     invisible: opts.invisible,
     disguiseAs: opts.disguiseAs,
+    bypassing: opts.bypassing,
     affected,
     emit: bus.emit,
   };
