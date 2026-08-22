@@ -369,7 +369,7 @@ test("gommar5 self-clause: while Frost-Covered, Gommar keeps his STRATEGIC skill
     "Frost-Covered -> Gommar's Strategic Ice Body is NOT stunned");
 });
 
-test.skip("SUSPECTED BUG: gommar5's 'if not Frost-Covered, he is also stunned' clause is swallowed — the unscoped full stun refreshes the existing except-Strategic stun WITHOUT clearing its scope, so Gommar's Strategic Ice Body stays castable instead of being fully stunned", () => {
+test("gommar5: when not Frost-Covered, the full stun fully stuns Gommar (his Strategic Ice Body is stunned too)", () => {
   const g = loadHero(heroById("gommar"), "A", "g");
   assert.equal(hasFrost(g), false, "precondition: not Frost-Covered");
   const enemy = makeUnit({ id: "en", team: "B", kind: "hero", hp: 100, maxHp: 100 });
