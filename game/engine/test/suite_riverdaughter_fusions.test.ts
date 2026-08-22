@@ -550,7 +550,7 @@ test("Serum/Toxic Waste: overheal by River Daughter is dealt to a random enemy a
 // only suppresses Elemental Essence income (see types.ts) — it never blocks skill casting (isStunnedFor
 // checks `stun`, not `silence`). Frozen says the target's Strategic skills are STUNNED (uncastable) for a
 // turn; the engine still lets the target cast Strategic skills freely.
-test.skip("SUSPECTED BUG: Serum/Chemical Bath should block the target's Strategic skills (silence does not stop casting)", () => {
+test("Serum/Chemical Bath: stuns the target Strategic skills (scoped stun, 1 turn / 2 from Dive)", () => {
   const { state } = setup("serum", { enemies: 1 });
   const enemy = state.units["e1"]!;
   enemy.skills = [strategicSelf("estrat"), attack(10, "eatk")];

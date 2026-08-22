@@ -12745,7 +12745,7 @@ export const FUSIONS: FusionForm[] = [
        "op": "applyStatus",
        "to": "target",
        "status": {
-        "kind": "silence",
+        "kind": "stun",
         "name": "Chemical Bath",
         "duration": 2,
         "scope": {
@@ -12760,7 +12760,7 @@ export const FUSIONS: FusionForm[] = [
        "op": "applyStatus",
        "to": "target",
        "status": {
-        "kind": "silence",
+        "kind": "stun",
         "name": "Chemical Bath",
         "duration": 1,
         "scope": {
