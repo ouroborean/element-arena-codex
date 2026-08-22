@@ -106,6 +106,8 @@ export interface StatusSpec {
   dtypes?: DamageType[];
   /** For a non_damage_ignore: which harmful non-damage status kinds it wards off (default: ALL). */
   ignoreKinds?: string[];
+  /** For a damage_ignore: ignore only PERIODIC (dot-tick) damage, not new/direct hits. */
+  periodicOnly?: boolean;
   /** For a scoped stun, or a tag-scoped cost_mod (titania Hallucinogenic Spores). */
   scope?: StunScope;
   /** For a cost_mod: per-channel deltas applied to Generic / Specific independently (scratch3 "-1 each"). */

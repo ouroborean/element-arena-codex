@@ -105,6 +105,9 @@ export interface Status {
   /** For a non_damage_ignore: which harmful non-damage status kinds it wards off (default: ALL). "ignore stuns"
    *  (hector Mindfog, scratch Deal, gommar:glacier) -> ["stun"]; "ignore non-damage effects" stays unscoped. */
   ignoreKinds?: string[];
+  /** For a damage_ignore: ignore only PERIODIC (dot-tick) damage, not new/direct hits (gommar:lich Icy Blood
+   *  "ignores periodic Affliction damage"). */
+  periodicOnly?: boolean;
   /** For a scoped Stun: which class tag it keys on (absent = stops all skills). */
   scope?: StunScope;
   /** For a Taunt: the unit the bearer is forced to target. */

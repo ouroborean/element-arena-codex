@@ -4583,7 +4583,8 @@ export const FUSIONS: FusionForm[] = [
       "status": {
        "kind": "damage_ignore",
        "dtype": "affliction",
-       "duration": null
+       "duration": null,
+       "periodicOnly": true
       }
      }
     ]

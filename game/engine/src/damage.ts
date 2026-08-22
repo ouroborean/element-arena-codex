@@ -98,7 +98,8 @@ function ignoresDamage(target: Unit, dmg: DamageInstance): boolean {
     (s) =>
       s.kind === "damage_ignore" &&
       (s.dtype === undefined || s.dtype === dmg.type) &&
-      (s.name === undefined || s.name === dmg.sourceId),
+      (s.name === undefined || s.name === dmg.sourceId) &&
+      (!s.periodicOnly || !dmg.isNew), // periodic-only: ignore dot ticks (isNew falsy), not new/direct hits
   );
 }
 

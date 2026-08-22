@@ -406,7 +406,7 @@ test("lich Icy Blood control: normal SKILL damage still lands", () => {
 
 // Adversarial: frozen scopes the ignore to "periodic Affliction damage" — a NEW/direct Affliction hit should
 // land. The engine ignores all Affliction damage regardless of periodicity.
-test.skip("SUSPECTED BUG: lich Icy Blood also ignores a NEW/direct Affliction hit — frozen only ignores PERIODIC Affliction damage", () => {
+test("lich Icy Blood: ignores PERIODIC Affliction only — a new/direct Affliction hit still lands", () => {
   const g = fuse("lich");
   const e = makeUnit({ id: "e", team: "B", kind: "hero", skills: [skill("aff", [{ op: "damage", amount: 15, dtype: "affliction", to: "target" }], { tags: ["Harmful", "Instant"], targeting: "single" })] });
   const state = makeState([g], [e]); bag(state, "B");
