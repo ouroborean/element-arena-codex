@@ -3354,6 +3354,10 @@
        {
         "isFaction": "eventUnit",
         "faction": "ally"
+       },
+       {
+        "isNamed": "eventUnit",
+        "name": "Seedling"
        }
       ]
      },
@@ -13072,8 +13076,24 @@
      "on": "unitDied",
      "source": "Cairnstones",
      "when": {
-      "isFaction": "eventUnit",
-      "faction": "ally"
+      "and": [
+       {
+        "isFaction": "eventUnit",
+        "faction": "ally"
+       },
+       {
+        "not": {
+         "isNamed": "eventUnit",
+         "name": "Boulder"
+        }
+       },
+       {
+        "not": {
+         "isNamed": "eventUnit",
+         "name": "Zombie"
+        }
+       }
+      ]
      },
      "effect": [
       {

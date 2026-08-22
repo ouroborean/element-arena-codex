@@ -143,7 +143,7 @@ test("grave Cairnstones control: an ENEMY death does NOT create a Boulder (gated
 // Adversarial: frozen excludes Boulder/Zombie deaths ("a non-Boulder, non-Zombie ally") precisely to avoid a
 // spawn loop off the stones this form makes. The authored trigger gates ONLY on `isFaction ally`, so a Boulder
 // dying is itself an ally death and re-spawns a Boulder.
-test.skip("SUSPECTED BUG: grave Cairnstones re-spawns a Boulder off a BOULDER's death — frozen excludes non-Boulder/Zombie only, but the trigger has no template exclusion", () => {
+test("grave Cairnstones: a Boulder death does NOT re-spawn a Boulder (non-Boulder/Zombie only)", () => {
   const r = fuse("grave");
   const st = makeState([r], [enemy("e1")]);
   fund(st);

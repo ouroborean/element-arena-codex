@@ -3322,6 +3322,10 @@ export const FUSIONS: FusionForm[] = [
       {
        "isFaction": "eventUnit",
        "faction": "ally"
+      },
+      {
+       "isNamed": "eventUnit",
+       "name": "Seedling"
       }
      ]
     },
@@ -12848,8 +12852,24 @@ export const FUSIONS: FusionForm[] = [
     "on": "unitDied",
     "source": "Cairnstones",
     "when": {
-     "isFaction": "eventUnit",
-     "faction": "ally"
+     "and": [
+      {
+       "isFaction": "eventUnit",
+       "faction": "ally"
+      },
+      {
+       "not": {
+        "isNamed": "eventUnit",
+        "name": "Boulder"
+       }
+      },
+      {
+       "not": {
+        "isNamed": "eventUnit",
+        "name": "Zombie"
+       }
+      }
+     ]
     },
     "effect": [
      {
