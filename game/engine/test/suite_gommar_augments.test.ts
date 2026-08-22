@@ -305,7 +305,7 @@ test("gommar5: Iceblood Hammer deals 5 less damage each use, stacking up to twic
   assert.equal(recast(), 10, "4th use: floored at 10 (stacks cap at twice / -10)");
 });
 
-test.skip("SUSPECTED BUG: gommar5 'costs one fewer r each time it is used' never reduces the cost — it stays at 2 (the in-skill custom node gates on a skillUsed event that is not present during effect execution)", () => {
+test("gommar5: Iceblood Hammer costs one fewer generic per use (via Brittle Ice), capped at 2", () => {
   const g = loadHero(heroById("gommar"), "A", "g");
   applyAugment(g, augmentById("gommar5")!);
   const e = makeUnit({ id: "e", team: "B", kind: "hero", hp: 400, maxHp: 400 });
@@ -323,7 +323,7 @@ test.skip("SUSPECTED BUG: gommar5 'costs one fewer r each time it is used' never
   assert.equal(effectiveCost(g, s, state).generic, 0, "and stay floored at 0 (stacking up to twice)");
 });
 
-test.skip("SUSPECTED BUG: gommar5 re-authored Iceblood Hammer no longer CONSUMES Frost-Covered — canon says Gommar's actives consume it (gommar4 frozen: 'After Gommar consumes Frost-Covered')", () => {
+test("gommar5: the re-authored Iceblood Hammer still consumes Frost-Covered", () => {
   const g = loadHero(heroById("gommar"), "A", "g");
   applyAugment(g, augmentById("gommar5")!);
   frost(g);

@@ -668,6 +668,27 @@
        "generic": 2,
        "specific": 0
       },
+      "costMods": [
+       {
+        "magnitude": {
+         "op": "mul",
+         "args": [
+          {
+           "op": "min",
+           "args": [
+            {
+             "ref": "stackCount",
+             "name": "Brittle Ice",
+             "of": "self"
+            },
+            2
+           ]
+          },
+          -1
+         ]
+        }
+       }
+      ],
       "cooldown": 1,
       "effects": [
        {
@@ -747,15 +768,11 @@
         ]
        },
        {
-        "op": "custom",
-        "fn": "scopedCostDiscountOnUse",
-        "args": {
-         "skillId": "gommar1",
-         "element": "generic",
-         "perUse": 1,
-         "max": 2
-        },
-        "note": "Deepen a gommar1-scoped cost_mod by 1 generic per use, floored at -2 (skillId-scoped cost_mod is not in the declarative StatusSpec; native, per custom_effects.decaySkillCost)."
+        "op": "removeStatus",
+        "kind": "mark",
+        "name": "Frost-Covered",
+        "from": "caster",
+        "note": "Consume the Frost-Covered enhance charge (base Iceblood Hammer behavior the replaceSkill had dropped). The 'costs one fewer per use' discount is the declarative costMods above (-1 generic per Brittle Ice stack, capped 2), read at cast time before this cast adds its stack."
        }
       ]
      }
