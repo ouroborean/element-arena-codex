@@ -3647,8 +3647,13 @@ export const ROSTER: HeroDef[] = [
        ]
       },
       {
-       "has": "outgoing_damage_mod",
-       "of": "eventTarget"
+       "cmp": "<",
+       "left": {
+        "ref": "statusMag",
+        "kind": "outgoing_damage_mod",
+        "of": "eventTarget"
+       },
+       "right": 0
       }
      ]
     },

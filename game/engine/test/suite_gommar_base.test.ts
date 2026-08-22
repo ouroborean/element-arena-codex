@@ -97,7 +97,7 @@ test("passive clause 2 control: damaging an enemy WITHOUT reduced damage grants 
 // Adversarial: \"reduced damage\" means the enemy's damage is LOWERED. An enemy whose damage is
 // INCREASED (a positive outgoing_damage_mod) is NOT a reduced-damage enemy, so hitting it must
 // NOT grant Essence.
-test.skip("SUSPECTED BUG: gommar0 grants Essence when hitting an enemy with INCREASED damage — frozen requires 'reduced damage' (negative only), but the trigger keys on has(outgoing_damage_mod) regardless of sign", () => {
+test("gommar0: Essence only when the damaged enemy has REDUCED (negative) damage, not increased", () => {
   const g = loadHero(heroById("gommar"), "A", "g");
   const buffed = makeUnit({ id: "e", team: "B", kind: "hero", hp: 100, maxHp: 100,
     statuses: [{ kind: "outgoing_damage_mod", magnitude: 5, duration: null, appliedBy: "x", appliedTurn: 0 }] });

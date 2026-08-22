@@ -45,7 +45,7 @@ export type Value =
 export type Faction = "allies" | "enemies" | "all";
 
 /** A status match: a bare kind, or a kind + a specific name (for marks/stacks/dots). */
-export type StatusMatch = StatusKind | { kind: StatusKind; name?: string };
+export type StatusMatch = StatusKind | { kind: StatusKind; name?: string; magLt?: number };
 
 export type Selector =
   | "self" // the acting unit (caster, or the minion for a minion skill)
