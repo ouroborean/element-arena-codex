@@ -51,6 +51,10 @@ export function applyStatus(unit: Unit, status: Status): void {
   existing.appliedTurn = status.appliedTurn;
   existing.sourceId = status.sourceId;
   existing.invisible = status.invisible; // a re-application under a (non-)invisible context updates concealment
+  // Merge scope: the BROADER stun/invulnerable wins — an unscoped (full) status must not be narrowed by a
+  // scoped refresh, and a scoped status IS broadened to unscoped when a full one lands (gommar5: the "also
+  // stunned" full stun over the AoE except-Strategic stun must fully stun him, not leave Ice Body castable).
+  existing.scope = existing.scope === undefined || status.scope === undefined ? undefined : status.scope;
 
 }
 
