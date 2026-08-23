@@ -203,6 +203,9 @@ registerCustom("soulstealWindow", (ctx, a) => {
   markUnits(ctx, (a.to as Selector) ?? "target", "Soulsteal", turns);
   installWatch(ctx, {
     on: "turnEnd", source: "Soulsteal",
+    // "at the end of each of THEIR turns" — the marked target is an enemy, so fire only at the enemy team's
+    // turn-end, NOT at Zephyrex's own team's turn-end. eventTeamIsSelf is true on the owner's (Zephyrex's) team.
+    when: { not: { eventTeamIsSelf: true } },
     effect: [{ op: "forEach", each: { filter: { faction: "all" }, with: { kind: "mark", name: "Soulsteal" } }, do: [{ op: "applyStatus", to: "it", status: { kind: "invulnerable", duration: num(a.invulnerableDuration, 1) } }] }],
   }, turns);
 });
