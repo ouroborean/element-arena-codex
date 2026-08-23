@@ -7504,6 +7504,7 @@
             "of": "target"
            },
            "dtype": "normal",
+           "from": "target",
            "to": {
             "pick": "random",
             "from": {
@@ -7528,6 +7529,7 @@
             "of": "target"
            },
            "dtype": "normal",
+           "from": "target",
            "to": {
             "pick": "random",
             "from": {

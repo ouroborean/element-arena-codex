@@ -8731,6 +8731,7 @@ export const ROSTER: HeroDef[] = [
            "of": "target"
           },
           "dtype": "normal",
+          "from": "target",
           "to": {
            "pick": "random",
            "from": {
@@ -8755,6 +8756,7 @@ export const ROSTER: HeroDef[] = [
            "of": "target"
           },
           "dtype": "normal",
+          "from": "target",
           "to": {
            "pick": "random",
            "from": {

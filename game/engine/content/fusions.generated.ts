@@ -13197,9 +13197,12 @@ export const FUSIONS: FusionForm[] = [
    "effects": [
     {
      "op": "applyStatus",
-     "to": "target",
+     "to": {
+      "faction": "enemies"
+     },
      "status": {
       "kind": "taunt",
+      "unitRef": "target",
       "duration": 1
      }
     },
@@ -13675,6 +13678,11 @@ export const FUSIONS: FusionForm[] = [
    "cooldown": 3,
    "effects": [
     {
+     "op": "summon",
+     "template": "Slimeball",
+     "count": 1
+    },
+    {
      "op": "forEach",
      "each": {
       "faction": "allies",
@@ -13693,11 +13701,6 @@ export const FUSIONS: FusionForm[] = [
      ]
     },
     {
-     "op": "summon",
-     "template": "Slimeball",
-     "count": 1
-    },
-    {
      "op": "schedule",
      "delayTurns": 1,
      "effect": [
@@ -13705,6 +13708,24 @@ export const FUSIONS: FusionForm[] = [
        "op": "summon",
        "template": "Slimeball",
        "count": 1
+      },
+      {
+       "op": "forEach",
+       "each": {
+        "faction": "allies",
+        "kind": "minion",
+        "template": "Slimeball"
+       },
+       "do": [
+        {
+         "op": "applyStatus",
+         "to": "it",
+         "status": {
+          "kind": "damage_ignore",
+          "duration": 1
+         }
+        }
+       ]
       }
      ]
     }
