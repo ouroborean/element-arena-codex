@@ -302,7 +302,7 @@ test("Current/Catalytic Nova: used again on the FOLLOWING turn grants Elemental 
 // SUSPECTED BUG: Catalytic Nova adds a "Catalytic Nova" bonus stack, but base Ripple (riverdaughter1)
 // deals a FLAT 10 and never reads that stack — so the "next Ripple +10" bonus is unwired. Frozen expects
 // the primed Ripple to deal 20; the engine deals only 10.
-test.skip("SUSPECTED BUG: Current/Catalytic Nova should increase the next Ripple's damage by 10 (base Ripple ignores the bonus stack)", () => {
+test("Current/Catalytic Nova increases the next Ripple's damage by 10 (stacking)", () => {
   const { state, enemies } = setup("current", { enemies: 1 });
   performAction(state, { unit: "rd", skillId: "riverdaughtercurrent1", targets: [] }); // Nova: -10 (100 -> 90), arms +10 Ripple
   const before = enemies[0]!.hp;
@@ -328,7 +328,7 @@ test("Glacier/Winter Flow: Soothe heals 5 immediately (the first turn's heal)", 
 // SUSPECTED BUG: the glacier form ADDS the escalating heal on top of Soothe's base 10/2 regen instead of
 // replacing it (the base skill's regen is never suppressed). Frozen says Soothe "now heals 5/10/15", i.e.
 // a redefinition — so the ally should NOT also carry the base 10/2 regen (which would double the healing).
-test.skip("SUSPECTED BUG: Glacier/Winter Flow escalation should REPLACE Soothe's base 10/2 regen (engine keeps both)", () => {
+test("Glacier/Winter Flow escalation REPLACES Soothe's base 10/2 regen with 5/10/15", () => {
   const { state, ally } = setup("glacier", { enemies: 1, allies: 1 });
   ally.hp = 50;
   performAction(state, { unit: "rd", skillId: "riverdaughter4", targets: ["a2"] });

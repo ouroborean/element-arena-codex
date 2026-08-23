@@ -3998,11 +3998,27 @@ export const ROSTER: HeroDef[] = [
     "effects": [
      {
       "op": "damage",
-      "amount": 10,
+      "amount": {
+       "op": "add",
+       "args": [
+        10,
+        {
+         "ref": "stackCount",
+         "name": "Catalytic Nova",
+         "of": "self"
+        }
+       ]
+      },
       "dtype": "normal",
       "to": {
        "faction": "enemies"
       }
+     },
+     {
+      "op": "removeStatus",
+      "kind": "stack",
+      "name": "Catalytic Nova",
+      "from": "self"
      },
      {
       "op": "applyStatus",
