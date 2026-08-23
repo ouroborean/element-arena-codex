@@ -12587,22 +12587,6 @@
        },
        "then": [
         {
-         "op": "applyStatus",
-         "to": "self",
-         "status": {
-          "kind": "elemental_essence",
-          "duration": null
-         }
-        },
-        {
-         "op": "damage",
-         "amount": 15,
-         "dtype": "affliction",
-         "to": {
-          "faction": "enemies"
-         }
-        },
-        {
          "op": "custom",
          "fn": "spendStack",
          "args": {
@@ -12610,10 +12594,10 @@
           "amount": 50,
           "of": "self"
          },
-         "note": "Consume 50 from the tally, keeping any remainder."
+         "note": "spendStack LOOPS per 50 stored: each iteration spends 50, grants Elemental Essence, and deals 15 Affliction to all enemies. So it handles the essence + damage itself (do NOT also apply them here, or they double) and correctly fires twice at 100, once at 50."
         }
        ],
-       "note": "Each time the stored enemy-healing reaches 50, River Daughter gains Elemental Essence and deals 15 Affliction to all enemies, spending 50."
+       "note": "Each time the stored enemy-healing reaches 50, River Daughter gains Elemental Essence and deals 15 Affliction to all enemies, spending 50 (all via spendStack)."
       }
      ]
     }

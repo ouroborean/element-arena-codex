@@ -358,7 +358,7 @@ test("Glacier/Spring Thaw: 20 shield now, then +10 shield the following turn; a 
 // `damage 15 affliction` AND then calls `spendStack`, whose while-loop ALSO deals 15 affliction to every
 // enemy for each 50 consumed. Frozen says "deals 15 Affliction damage to all enemies" (once per 50) — the
 // engine deals 30. (Essence is deduped to one, so only the damage over-fires.)
-test.skip("SUSPECTED BUG: Mirror/Reflection of Kindness deals 15 Affliction once per 50 (engine deals it twice = 30)", () => {
+test("Mirror/Reflection of Kindness deals 15 Affliction to all enemies once per 50 stored", () => {
   const { state, rd, enemies } = setup("mirror", { enemies: 2 });
   emit(state, { type: "healReceived", unit: "e1", source: "e2", amount: 30, overheal: 0 }); // tally 30 — not yet
   assert.equal(hasEssence(rd), false, "under 50 accumulated: no Essence yet");
