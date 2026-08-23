@@ -114,9 +114,8 @@ registerCustom("addCurseStackIfMaggieDidNotAct", (ctx, a) => {
   const e = ctx.event;
   if (!e || e.type !== "turnEnd" || e.team !== ctx.self.team) return;
   if (ctx.state.actedThisTurn.includes(ctx.self.id)) return;
-  for (const u of resolveSelector({ faction: "enemies" }, ctx)) {
-    applyStatus(u, { kind: "stack", name: a.name as string, magnitude: num(a.amount, 1), duration: null, appliedBy: ctx.self.id, appliedTurn: ctx.state.turn });
-  }
+  // "She receives 1 stack if she does not act on her turn" — the stack goes to MAGGIE herself, not enemies.
+  applyStatus(ctx.self, { kind: "stack", name: a.name as string, magnitude: num(a.amount, 1), duration: null, appliedBy: ctx.self.id, appliedTurn: ctx.state.turn });
 });
 
 // ── Cluster 2 — "watch windows": temporary reactive triggers installed by an active skill ──────── //

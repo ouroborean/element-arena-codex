@@ -10816,12 +10816,12 @@
       {
        "op": "addStack",
        "name": "Curse of Thorns",
-       "amount": 1,
+       "amount": 2,
        "duration": null,
        "to": "self"
       }
      ],
-     "note": "'Receives an additional stack of Curse of Thorns when she uses a skill.' Modeled as +1 Curse of Thorns stack per self skill use. 'Additional' is relative to the base Curse of Thorns (+1/skill) that the fusion passive replaces; this trigger carries the per-skill stacking forward (net +1 authored here; raise the amount to 2 if the base +1 is intended to persist alongside)."
+     "note": "'Receives an ADDITIONAL stack of Curse of Thorns when she uses a skill' = base +1 (the fusion replaces the base Curse-on-skill trigger) PLUS the additional +1 = 2 per skill. Authored as +2 here rather than making the base trigger innate, which would wrongly persist into the devil/grave forms that replace the Curse behavior."
     },
     {
      "on": "turnEnd",

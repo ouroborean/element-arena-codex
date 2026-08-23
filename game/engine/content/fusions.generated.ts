@@ -10651,7 +10651,7 @@ export const FUSIONS: FusionForm[] = [
      {
       "op": "addStack",
       "name": "Curse of Thorns",
-      "amount": 1,
+      "amount": 2,
       "duration": null,
       "to": "self"
      }
