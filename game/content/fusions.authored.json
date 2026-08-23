@@ -12477,12 +12477,26 @@
      "on": "skillUsed",
      "source": "Winter Flow (riverdaughterglacier0)",
      "when": {
-      "sameUnit": [
-       "eventSource",
-       "self"
+      "and": [
+       {
+        "sameUnit": [
+         "eventSource",
+         "self"
+        ]
+       },
+       {
+        "eventSkillId": "riverdaughter4"
+       }
       ]
      },
      "effect": [
+      {
+       "op": "removeStatus",
+       "kind": "regen",
+       "name": "Soothe",
+       "from": "eventTargets",
+       "note": "Winter Flow REPLACES Soothe's base 10/2 regen with the 5/10/15 escalation: strip the just-applied base Soothe regen from the target, then schedule the escalating heals."
+      },
       {
        "op": "custom",
        "fn": "escalatingHeal",

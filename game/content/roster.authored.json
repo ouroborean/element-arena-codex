@@ -1770,11 +1770,28 @@
      "effects": [
       {
        "op": "damage",
-       "amount": 10,
+       "amount": {
+        "op": "add",
+        "args": [
+         10,
+         {
+          "ref": "stackCount",
+          "name": "Catalytic Nova",
+          "of": "self"
+         }
+        ]
+       },
        "dtype": "normal",
        "to": {
         "faction": "enemies"
-       }
+       },
+       "note": "Base 10 AoE + any Catalytic Nova bonus (riverdaughter:current adds +10 per cast, stacking); the stack is consumed below. Non-current forms never hold it, so this is +0 for them."
+      },
+      {
+       "op": "removeStatus",
+       "kind": "stack",
+       "name": "Catalytic Nova",
+       "from": "self"
       },
       {
        "op": "applyStatus",

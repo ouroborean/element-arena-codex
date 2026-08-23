@@ -12267,12 +12267,25 @@ export const FUSIONS: FusionForm[] = [
     "on": "skillUsed",
     "source": "Winter Flow (riverdaughterglacier0)",
     "when": {
-     "sameUnit": [
-      "eventSource",
-      "self"
+     "and": [
+      {
+       "sameUnit": [
+        "eventSource",
+        "self"
+       ]
+      },
+      {
+       "eventSkillId": "riverdaughter4"
+      }
      ]
     },
     "effect": [
+     {
+      "op": "removeStatus",
+      "kind": "regen",
+      "name": "Soothe",
+      "from": "eventTargets"
+     },
      {
       "op": "custom",
       "fn": "escalatingHeal",
