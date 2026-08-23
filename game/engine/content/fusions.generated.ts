@@ -3970,17 +3970,19 @@ export const FUSIONS: FusionForm[] = [
   },
   "passiveTriggers": [
    {
-    "on": "skillUsed",
+    "on": "statusApplied",
     "source": "Nutrient Sludge",
     "when": {
      "and": [
       {
-       "isKind": "eventSource",
-       "kind": "minion"
+       "eventStatusKind": "stack",
+       "name": "Channel Earth"
       },
       {
-       "isFaction": "eventSource",
-       "faction": "ally"
+       "sameUnit": [
+        "eventUnit",
+        "self"
+       ]
       }
      ]
     },
@@ -3995,15 +3997,12 @@ export const FUSIONS: FusionForm[] = [
        {
         "op": "if",
         "cond": {
-         "cmp": ">=",
+         "cmp": "==",
          "left": {
-          "ref": "currentHp",
+          "ref": "missingHp",
           "of": "it"
          },
-         "right": {
-          "ref": "count",
-          "of": "it"
-         }
+         "right": 0
         },
         "then": [
          {

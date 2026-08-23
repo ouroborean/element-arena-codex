@@ -537,7 +537,7 @@ test("Nutrient Sludge: a below-max minion is HEALED 5 by a Channel Earth gain", 
   assert.equal(seed.hp, 20, "the below-max minion is healed 5 (15 -> 20)");
 });
 
-test.skip("SUSPECTED BUG: Nutrient Sludge raises a BELOW-max minion's max HP too — frozen heals (max HP unchanged) only when NOT at max", () => {
+test("Nutrient Sludge heals a below-max minion (max HP unchanged); +5 max HP only at max", () => {
   const { g, st } = fuse("slime");
   performAction(st, { unit: GAIA, skillId: "gaia1", targets: [] });
   const seed = minions(st, "A", "Seedling")[0]!;
@@ -547,7 +547,7 @@ test.skip("SUSPECTED BUG: Nutrient Sludge raises a BELOW-max minion's max HP too
   assert.equal(seed.maxHp, 25, "a below-max minion's MAX HP must stay 25 (only a plain heal applies)");
 });
 
-test.skip("SUSPECTED BUG: Nutrient Sludge over-fires — it triggers on ANY ally-minion skill, not only Channel Earth gains", () => {
+test("Nutrient Sludge fires only when Gaia gains a Channel Earth stack", () => {
   const { g, st, enemies } = fuse("slime");
   performAction(st, { unit: GAIA, skillId: "gaia1", targets: [] });
   const seed = minions(st, "A", "Seedling")[0]!;
