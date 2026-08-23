@@ -8877,6 +8877,48 @@
         "name": "In Between CD",
         "duration": 2
        }
+      },
+      {
+       "op": "if",
+       "cond": {
+        "has": "mark",
+        "name": "Spirit Away",
+        "of": "self"
+       },
+       "then": [
+        {
+         "op": "damage",
+         "amount": 25,
+         "dtype": "true",
+         "to": {
+          "filter": {
+           "faction": "enemies"
+          },
+          "with": {
+           "kind": "mark",
+           "name": "Spirit Away Target"
+          }
+         }
+        },
+        {
+         "op": "applyStatus",
+         "to": {
+          "filter": {
+           "faction": "all"
+          },
+          "with": {
+           "kind": "mark",
+           "name": "Spirit Away Target"
+          }
+         },
+         "status": {
+          "kind": "non_damage_ignore",
+          "name": "In Between",
+          "duration": 1
+         }
+        }
+       ],
+       "note": "Spirit Away window: In Between also applies its effect to the linked hero. The 25 true damage lands only if that hero is an enemy (enemies-filtered with-selector); the shared In Between ignore lands on the linked hero whether ally or enemy (all-faction with-selector)."
       }
      ]
     }
@@ -8906,9 +8948,18 @@
        "duration": 2,
        "unitRef": "target"
       }
+     },
+     {
+      "op": "applyStatus",
+      "to": "target",
+      "status": {
+       "kind": "mark",
+       "name": "Spirit Away Target",
+       "duration": 2
+      }
      }
     ],
-    "note": "'For her next two turns, if Laria triggers In Between she also applies its effects to target hero; if that hero is an enemy they first take 25 true damage.' Modeled as a 2-turn self mark linked to the chosen hero (unitRef target). The linked payload (25 true to an enemy + shared non_damage_ignore) fires from the In Between trigger while Spirit Away is up, so it is not in this one-shot effects array."
+    "note": "'For her next two turns, if Laria triggers In Between she also applies its effects to target hero; if that hero is an enemy they first take 25 true damage.' A 2-turn self 'Spirit Away' mark flags the active window; a 'Spirit Away Target' mark on the chosen hero is the readable link (a with-selector resolves it — the unitRef alone is unreadable by authored effects). The linked payload (25 true if the hero is an enemy + shared In Between non_damage_ignore) fires from the In Between passiveTrigger while Spirit Away is up."
    }
   },
   {
@@ -9091,6 +9142,33 @@
       }
      ],
      "note": "'another Hero' -> eventUnit is a hero and not Laria; assumes statusApplied fires on Deepening Shadows stack gains with the recipient as eventUnit."
+    },
+    {
+     "on": "skillDeclared",
+     "kind": "reflect",
+     "redirectTo": "eventSource",
+     "source": "Shadow Rebound",
+     "when": {
+      "and": [
+       {
+        "has": "mark",
+        "name": "Shadow Rebound",
+        "of": "eventTargets"
+       },
+       {
+        "eventHasTag": "Harmful"
+       }
+      ]
+     },
+     "effect": [
+      {
+       "op": "removeStatus",
+       "kind": "mark",
+       "name": "Shadow Rebound",
+       "from": "eventTargets"
+      }
+     ],
+     "note": "'the first harmful skill used on target ally is reflected back to its user': a Harmful skill declared on a Shadow-Rebound-warded ally reflects to its caster (redirectTo eventSource). removeStatus consumes the ward so only the FIRST harmful skill reflects; the mark's 1-turn duration bounds the window."
     }
    ],
    "skill": {
@@ -9607,6 +9685,51 @@
       }
      ],
      "note": "'each stack of Deepening Shadows on the field' = summed stacks across all units. At 50+ the whole Ritual is consumed (all Ritual Power removed)."
+    },
+    {
+     "on": "skillUsed",
+     "source": "Nightcloak Candle",
+     "when": {
+      "and": [
+       {
+        "eventHasTag": "Harmful"
+       },
+       {
+        "isFaction": "eventSource",
+        "faction": "enemy"
+       },
+       {
+        "has": "mark",
+        "name": "Nightcloak Candle",
+        "of": "eventTargets"
+       }
+      ]
+     },
+     "effect": [
+      {
+       "op": "damage",
+       "amount": 5,
+       "dtype": "affliction",
+       "to": "eventSource"
+      },
+      {
+       "op": "applyStatus",
+       "to": "eventSource",
+       "status": {
+        "kind": "mark",
+        "name": "Nightcloak Candle",
+        "duration": 1
+       }
+      },
+      {
+       "op": "addStack",
+       "name": "Ritual Power",
+       "amount": 5,
+       "duration": null,
+       "to": "self"
+      }
+     ],
+     "note": "'any enemy who uses a harmful skill on [a Nightcloak-marked ally] takes 5 Affliction, is marked 1 turn, and generates 5 Ritual Power.' skillUsed carries tags+targets: eventHasTag Harmful + enemy eventSource + a Nightcloak-marked eventTargets identifies the retaliation. The 5 Ritual Power lands on Laria (self, the trigger owner). No recursion (the retaliation is a damage op, sourced from Laria)."
     }
    ],
    "skill": {

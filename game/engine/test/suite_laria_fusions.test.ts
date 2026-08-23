@@ -292,7 +292,7 @@ test("dimension/Spirit Away: casting it installs the 2-turn Spirit Away link on 
 // target hero; if an enemy, they first receive 25 true damage") is never applied. The In Between trigger only
 // touches Laria (self non_damage_ignore + CD); no wiring reads the Spirit Away link, so the enemy takes 0 and
 // gains nothing when In Between fires while Spirit Away is up.
-test.skip("SUSPECTED BUG: dimension/Spirit Away — triggering In Between deals 25 true to the linked enemy and shares In Between's effect", () => {
+test("dimension/Spirit Away: triggering In Between deals 25 true to the linked enemy and shares In Between's effect", () => {
   const laria = fuse("dimension");
   const e1 = enemy("e1", { hp: 100 });
   const state = makeState([laria], [e1]);
@@ -424,7 +424,7 @@ test("mirror/Shadow Rebound: casting it lays the Shadow Rebound ward on the targ
 // SUSPECTED BUG: the active only lays an inert "Shadow Rebound" mark — no reflect trigger is installed for it
 // (cf. ando:magnet "Opposites Attract", which installs a skillDeclared/reflect watch). So the first Harmful
 // skill on the warded ally lands normally instead of reflecting back to its user.
-test.skip("SUSPECTED BUG: mirror/Shadow Rebound — the first harmful skill on the warded ally reflects to its user", () => {
+test("mirror/Shadow Rebound: the first harmful skill on the warded ally reflects to its user", () => {
   const laria = fuse("mirror");
   const a1 = ally("a1", { hp: 100 });
   const e1 = enemy("e1", { hp: 100 });
@@ -733,7 +733,7 @@ test("ritual/Nightcloak Candle: does not stack (a second cast adds nothing)", ()
 // SUSPECTED BUG: the retaliation clause ("any enemy who uses a harmful skill on them will take 5 Affliction and
 // be marked by Nightcloak Candle for 1 turn. Receiving damage this way generates 5 Ritual Power") is not wired —
 // the mark carries no standing reaction, so a harmful enemy skill on the marked ally provokes nothing.
-test.skip("SUSPECTED BUG: ritual/Nightcloak Candle — an enemy who strikes the marked ally takes 5 Affliction, is marked, and gives Laria 5 Ritual Power", () => {
+test("ritual/Nightcloak Candle: an enemy who strikes the marked ally takes 5 Affliction, is marked, and gives Laria 5 Ritual Power", () => {
   const laria = fuse("ritual");
   const a1 = ally("a1", { hp: 100 });
   const e1 = enemy("e1", { hp: 100 });
@@ -843,7 +843,7 @@ test("vigilante/Midnight Justice: against an Evencoin holder it deals 10 more da
 // SUSPECTED BUG: "If they have an Evencoin, Midnight Justice ... has no Cooldown." The skill's own effect zeroes
 // its cooldown mid-cast, but the scheduler sets currentCd = effectiveCooldown AFTER the effects run, clobbering
 // the reset — so the cooldown is still 1 after hitting an Evencoin holder.
-test.skip("SUSPECTED BUG: vigilante/Midnight Justice — hitting an Evencoin holder leaves it off cooldown", () => {
+test("vigilante/Midnight Justice: hitting an Evencoin holder leaves it off cooldown", () => {
   const laria = fuse("vigilante");
   const e1 = enemy("e1", { hp: 100, statuses: [evencoin()] });
   const state = makeState([laria], [e1]);

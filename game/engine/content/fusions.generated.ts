@@ -8745,6 +8745,47 @@ export const FUSIONS: FusionForm[] = [
        "name": "In Between CD",
        "duration": 2
       }
+     },
+     {
+      "op": "if",
+      "cond": {
+       "has": "mark",
+       "name": "Spirit Away",
+       "of": "self"
+      },
+      "then": [
+       {
+        "op": "damage",
+        "amount": 25,
+        "dtype": "true",
+        "to": {
+         "filter": {
+          "faction": "enemies"
+         },
+         "with": {
+          "kind": "mark",
+          "name": "Spirit Away Target"
+         }
+        }
+       },
+       {
+        "op": "applyStatus",
+        "to": {
+         "filter": {
+          "faction": "all"
+         },
+         "with": {
+          "kind": "mark",
+          "name": "Spirit Away Target"
+         }
+        },
+        "status": {
+         "kind": "non_damage_ignore",
+         "name": "In Between",
+         "duration": 1
+        }
+       }
+      ]
      }
     ]
    }
@@ -8773,6 +8814,15 @@ export const FUSIONS: FusionForm[] = [
       "name": "Spirit Away",
       "duration": 2,
       "unitRef": "target"
+     }
+    },
+    {
+     "op": "applyStatus",
+     "to": "target",
+     "status": {
+      "kind": "mark",
+      "name": "Spirit Away Target",
+      "duration": 2
      }
     }
    ],
@@ -8952,6 +9002,32 @@ export const FUSIONS: FusionForm[] = [
        "a": "self",
        "b": "eventUnit"
       }
+     }
+    ]
+   },
+   {
+    "on": "skillDeclared",
+    "kind": "reflect",
+    "redirectTo": "eventSource",
+    "source": "Shadow Rebound",
+    "when": {
+     "and": [
+      {
+       "has": "mark",
+       "name": "Shadow Rebound",
+       "of": "eventTargets"
+      },
+      {
+       "eventHasTag": "Harmful"
+      }
+     ]
+    },
+    "effect": [
+     {
+      "op": "removeStatus",
+      "kind": "mark",
+      "name": "Shadow Rebound",
+      "from": "eventTargets"
      }
     ]
    }
@@ -9459,6 +9535,50 @@ export const FUSIONS: FusionForm[] = [
         }
        }
       ]
+     }
+    ]
+   },
+   {
+    "on": "skillUsed",
+    "source": "Nightcloak Candle",
+    "when": {
+     "and": [
+      {
+       "eventHasTag": "Harmful"
+      },
+      {
+       "isFaction": "eventSource",
+       "faction": "enemy"
+      },
+      {
+       "has": "mark",
+       "name": "Nightcloak Candle",
+       "of": "eventTargets"
+      }
+     ]
+    },
+    "effect": [
+     {
+      "op": "damage",
+      "amount": 5,
+      "dtype": "affliction",
+      "to": "eventSource"
+     },
+     {
+      "op": "applyStatus",
+      "to": "eventSource",
+      "status": {
+       "kind": "mark",
+       "name": "Nightcloak Candle",
+       "duration": 1
+      }
+     },
+     {
+      "op": "addStack",
+      "name": "Ritual Power",
+      "amount": 5,
+      "duration": null,
+      "to": "self"
      }
     ]
    }
