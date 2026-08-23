@@ -175,7 +175,7 @@ export function runChannels(state: MatchState, id: TeamId): void {
         continue;
       }
       const targets = (s.channelTargets ?? []).map((t) => state.units[t]).filter((t): t is Unit => !!t && t.alive);
-      runEffects(state, skill.effects, { caster: u, self: u, targets, skillId: skill.id, bypassing: skill.tags.includes("Bypassing") });
+      runEffects(state, skill.effects, { caster: u, self: u, targets, skillId: skill.id, bypassing: skillBypasses(state, u, skill) });
       if (s.magnitude !== undefined) {
         s.magnitude -= 1;
         // Remove only THIS expiring copy (by identity), not every same-named channel — so the other
@@ -342,6 +342,13 @@ function invulnerableBlocks(unit: Unit, skill: SkillInstance): boolean {
   });
 }
 
+/** Whether a skill Bypasses (ignores Invulnerability + DR + Shield): the static Bypassing tag, OR a live
+ *  `bypassingIf` condition (gommar:night Midnight Mountain Bypasses while Stealthed). */
+function skillBypasses(state: MatchState, caster: Unit, skill: SkillInstance): boolean {
+  return skill.tags.includes("Bypassing") ||
+    (skill.bypassingIf != null && evalConditionReadOnly(state, caster, skill.bypassingIf));
+}
+
 /** Total energy in a pool. */
 function poolTotal(pool: EnergyPool): number {
   let t = 0;
@@ -485,7 +492,7 @@ function hasStatus(u: Unit, kind: string): boolean {
 export function legalTargets(state: MatchState, caster: Unit, skill: SkillInstance, chosen: Unit[], rng: Rng): Unit[] {
   const harmful = skill.tags.includes("Harmful");
   const helpful = skill.tags.includes("Helpful");
-  const bypass = skill.tags.includes("Bypassing");
+  const bypass = skillBypasses(state, caster, skill);
   // Reanimation (maggie:reanimation): while marked, the reanimated ally may only target Maggie
   // (the mark's applier) or enemies affected by Bramblelash.
   const reanimated = caster.statuses.find((s) => s.kind === "mark" && s.name === "Reanimated");
@@ -625,7 +632,7 @@ export function performAction(state: MatchState, action: Action): ActionResult {
   // blocks N turns.
   skill.currentCd = effectiveCooldown(caster, skill);
   skill.cdSetTurn = state.turn;
-  const affected = runEffects(state, skill.effects, { caster, self: caster, targets: decl.finalTargets, skillId: skill.id, targeting: effectiveTargeting(caster, skill), invisible: skill.isHidden, disguiseAs: skill.disguiseAs, bypassing: skill.tags.includes("Bypassing") });
+  const affected = runEffects(state, skill.effects, { caster, self: caster, targets: decl.finalTargets, skillId: skill.id, targeting: effectiveTargeting(caster, skill), invisible: skill.isHidden, disguiseAs: skill.disguiseAs, bypassing: skillBypasses(state, caster, skill) });
   caster.lastSkillId = skill.id; // the "used a skill" ledger (read by clone/last-skill mechanics)
 
   // A Channel skill installs a sustained channel that re-runs at the caster's turns — unless an

@@ -147,7 +147,7 @@ test("apocalypse passive control: NOT Frost-Covered -> no ward, enemy non-damage
 // Adversarial: frozen is unconditional — "While Frost-Covered, he ignores non-damage effects." The FIRST
 // enemy effect applied while Frost-Covered ought to be ignored too. The engine grants the ward reactively
 // (on statusApplied), so the very first effect lands before the ward exists.
-test.skip("SUSPECTED BUG: apocalypse passive lets the FIRST enemy non-damage effect land while Frost-Covered — frozen says he ignores non-damage effects, but the ward is granted reactively AFTER the first one applies", () => {
+test("apocalypse passive: while Frost-Covered, even the FIRST enemy non-damage effect is ignored (ward pre-armed on skillDeclared)", () => {
   const g = fuse("apocalypse");
   frost(g);
   const e = makeUnit({ id: "e", team: "B", kind: "hero", hp: 100, maxHp: 100, skills: [eStun()] });
@@ -558,7 +558,7 @@ test("night Midnight Mountain control: NOT Frost-Covered -> 45 damage but no dam
 
 // Adversarial: frozen: "If Gommar is Stealthed, this skill Bypasses" (ignores Invulnerability). Unmodeled — a
 // Stealthed Gommar cannot hit an invulnerable target.
-test.skip("SUSPECTED BUG: night Midnight Mountain does not Bypass while Stealthed — frozen says a Stealthed cast Bypasses (ignores Invulnerability)", () => {
+test("night Midnight Mountain Bypasses while Stealthed (ignores Invulnerability)", () => {
   const g = fuse("night");
   g.statuses.push({ kind: "stealth", duration: null, appliedBy: "g", appliedTurn: 0 });
   const e = makeUnit({ id: "e", team: "B", kind: "hero", hp: 200, maxHp: 200, statuses: [{ kind: "invulnerable", duration: null, appliedBy: "x", appliedTurn: 0 }] });
@@ -737,7 +737,7 @@ test("winter Howling Gale: 35 damage; a target ALREADY affected by Hypothermia i
 // Adversarial: frozen gates the stun on the target being "ALREADY affected by Hypothermia" (before this cast).
 // Howling Gale's own 35 damage procs the passive synchronously, so the same-cast check sees Hypothermia and
 // stuns a FRESH target that was not previously afflicted.
-test.skip("SUSPECTED BUG: winter Howling Gale stuns a FRESH target on the first cast — frozen requires the target be ALREADY affected by Hypothermia, but its own damage applies Hypothermia before the check", () => {
+test("winter Howling Gale does NOT stun a FRESH target on the first cast (Hypothermia checked before its own damage)", () => {
   const g = fuse("winter");
   const e = makeUnit({ id: "e", team: "B", kind: "hero", hp: 200, maxHp: 200 });
   const state = makeState([g], [e]); bag(state);
