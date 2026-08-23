@@ -1309,7 +1309,7 @@
    "owner": "zevkir",
    "name": "Airless Prison",
    "description": "If Zev'kir has 2 or more stacks of Call Tides, Bubble Prison increases affected enemy skill costs by 1 [65]. If he has 4 or more stacks, they are increased by 1 Energy of the target's Element instead.",
-   "note": "Appends to Bubble Prison (zevkir3). At >=2 Call Tides stacks, apply a cost_mod +1 to the affected enemy/enemies (raising all their skill costs); the affected set mirrors Bubble Prison's target rule (Oceans Gather makes it all-enemies at >=3 stacks, else the single target). Duration matches the imprisonment: 1 + Call Tides stacks turns (same expression as the base DoT). ENGINE GAP: cost_mod carries a flat magnitude with no element dimension, so the >=4 tier ('1 Energy of the target's Element' instead of 1 Generic [65]) collapses to the same +1 as the >=2 tier -- the element denomination cannot be expressed; documented and flagged.",
+   "note": "Appends to Bubble Prison (zevkir3). At >=2 Call Tides stacks, apply a cost_mod to the affected enemy/enemies; the affected set mirrors Bubble Prison's target rule (Oceans Gather makes it all-enemies at >=3 stacks, else the single target). Tiers: ==2 single target +1 Generic; ==3 all enemies +1 Generic; >=4 all enemies +1 of the target's own Element (specificDelta, replacing the Generic bump). Duration matches the imprisonment: 1 + Call Tides stacks turns (same expression as the base DoT).",
    "patches": [
     {
      "op": "appendEffect",
@@ -1340,26 +1340,64 @@
          },
          "then": [
           {
-           "op": "applyStatus",
-           "to": {
-            "faction": "enemies"
+           "op": "if",
+           "cond": {
+            "cmp": ">=",
+            "left": {
+             "ref": "stackCount",
+             "name": "Call Tides",
+             "of": "self"
+            },
+            "right": 4
            },
-           "status": {
-            "kind": "cost_mod",
-            "magnitude": 1,
-            "duration": {
-             "op": "add",
-             "args": [
-              1,
-              {
-               "ref": "stackCount",
-               "name": "Call Tides",
-               "of": "self"
+           "then": [
+            {
+             "op": "applyStatus",
+             "to": {
+              "faction": "enemies"
+             },
+             "status": {
+              "kind": "cost_mod",
+              "specificDelta": 1,
+              "duration": {
+               "op": "add",
+               "args": [
+                1,
+                {
+                 "ref": "stackCount",
+                 "name": "Call Tides",
+                 "of": "self"
+                }
+               ]
               }
-             ]
+             },
+             "note": ">=4 stacks (all enemies via Oceans Gather): +1 to each target's own Element cost INSTEAD of Generic. Specific cost is always paid in the caster's own element, so specificDelta:1 == '+1 Energy of the target's Element'."
             }
-           },
-           "note": ">=4 stacks: this +1 should be 1 Energy of each target's own Element, not Generic -- not expressible on cost_mod (element-agnostic)."
+           ],
+           "else": [
+            {
+             "op": "applyStatus",
+             "to": {
+              "faction": "enemies"
+             },
+             "status": {
+              "kind": "cost_mod",
+              "magnitude": 1,
+              "duration": {
+               "op": "add",
+               "args": [
+                1,
+                {
+                 "ref": "stackCount",
+                 "name": "Call Tides",
+                 "of": "self"
+                }
+               ]
+              }
+             },
+             "note": "3 stacks (all enemies via Oceans Gather): +1 Generic [65] to every affected enemy's skill costs."
+            }
+           ]
           }
          ],
          "else": [
@@ -1609,8 +1647,23 @@
        "generic": 0,
        "specific": 3
       },
+      "costMods": [
+       {
+        "magnitude": {
+         "op": "mul",
+         "args": [
+          {
+           "ref": "stackCount",
+           "name": "Call Tides",
+           "of": "self"
+          },
+          -1
+         ]
+        }
+       }
+      ],
       "cooldown": 1,
-      "note": "Storm Surge: 25 piercing (was 45); base Specific cost reduced by 2 (5 -> 3). Specific cost still reduced by 1 per Call Tides stack at cast (min 0), which the effect tree cannot express -- documented as in the base skill. Oceans Gather: >=2 stacks stun primary 1 turn; >=3 stacks hit all enemies.",
+      "note": "Storm Surge: 25 piercing (was 45); base Specific cost reduced by 2 (5 -> 3). Per-stack Specific reduction (-1 per Call Tides stack, min 0) preserved via costMods, matching the base skill. Oceans Gather: >=2 stacks stun primary 1 turn; >=3 stacks hit all enemies.",
       "effects": [
        {
         "op": "if",

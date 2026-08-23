@@ -165,7 +165,7 @@ test("Airless Prison: at 2-3 Call Tides stacks, Bubble Prison raises the impriso
 // no element dimension, which lands on Generic (0 -> 1) and leaves the element cost at 1 — so the enemy pays
 // (Generic 1, Specific 1) instead of the intended (Generic 0, Specific 2). The >=4 tier is thus behaviorally
 // identical to the >=2 tier (+1 Generic); the element denomination cannot be expressed.
-test.skip("SUSPECTED BUG: Airless Prison >=4 should raise the target's-ELEMENT cost by 1, but the engine raises Generic instead", () => {
+test("Airless Prison >=4 raises the target's-ELEMENT (Specific) cost by 1, not Generic", () => {
   // Frozen: '...increased by 1 Energy of the target's Element instead.' The enemy's skill is priced in its
   // own element (Water here), so the +1 must fall on the SPECIFIC (element) cost, leaving Generic untouched.
   const { enemies, state } = arena("zevkir2", 4, 1);
@@ -238,7 +238,7 @@ test("Storm Surge: Tidal Wave's base Specific cost is reduced by 2 (5 -> 3)", ()
 // "costs 1 less Water per Call Tides stack" (base frozen text) is unmentioned and should persist. The
 // augment is applied via a wholesale replaceSkill whose replacement omits the base skill's `costMods`, so
 // the per-stack reduction is dropped entirely: the cost stays a flat 3 regardless of Call Tides stacks.
-test.skip("SUSPECTED BUG: Storm Surge drops Tidal Wave's per-stack Specific reduction (cost stays 3 at 2/3 stacks instead of 1/0)", () => {
+test("Storm Surge keeps Tidal Wave's per-stack Specific reduction (cost 1/0 at 2/3 stacks)", () => {
   // Frozen changes only the BASE cost by -2; Tidal Wave's own '1 less Specific per Call Tides stack' is
   // unchanged, so at 2 stacks the cost is 3 - 2 = 1, and at 3 stacks it is 0.
   {
@@ -286,7 +286,7 @@ test("Arcane Barrier: the barrier does not fire on the OPPONENT's turn start", (
 // to 15 each turn (a refresh, capped at 15) — not a fresh 15 added on top of the old one. The custom
 // `replenishShieldWhileSkillReady` calls addShield each turn without first removing the prior Arcane Barrier
 // shield, so the (duration-null, never-expiring) barrier accumulates: 15 -> 30 -> 45 ... over successive turns.
-test.skip("SUSPECTED BUG: Arcane Barrier stacks each turn (15 -> 30) instead of replenishing to a capped 15", () => {
+test("Arcane Barrier replenishes to a capped 15 each turn (does not stack to 30)", () => {
   // 'gains 15 Shield that replenishes' — each turn tops the barrier back to 15; it must not stack to 30, 45...
   const { zev, state } = arena("zevkir5", 0, 1);
   zev.skills!.find((s) => s.id === "zevkir4")!.currentCd = 0;
