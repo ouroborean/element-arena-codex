@@ -579,6 +579,7 @@ export const FUSIONS: FusionForm[] = [
        "op": "damage",
        "amount": 35,
        "dtype": "piercing",
+       "bypass": true,
        "to": "target"
       },
       {
@@ -592,6 +593,7 @@ export const FUSIONS: FusionForm[] = [
          "op": "damage",
          "amount": 10,
          "dtype": "piercing",
+         "bypass": true,
          "to": "target"
         }
        ]
@@ -915,7 +917,8 @@ export const FUSIONS: FusionForm[] = [
       "status": {
        "kind": "outgoing_damage_mod",
        "magnitude": 5,
-       "duration": null
+       "duration": null,
+       "stacks": true
       }
      }
     ]

@@ -385,7 +385,7 @@ test("Burning Crescent vs Electroblade-marked: ignores DR (Bypass semantics on t
 // "Bypasses" is a defined term meaning ignore Damage Reduction AND Shield. The engine implements the
 // Electroblade branch as dtype Piercing (authored fusions), which ignores DR but NOT Shield — so against
 // a shielded Electroblade target the shield still absorbs the hit instead of being bypassed.
-test.skip("SUSPECTED BUG: Burning Crescent 'Bypasses' should ignore Shield on Electroblade targets, not just DR", () => {
+test("Burning Crescent Bypasses (ignores DR AND Shield) on Electroblade targets", () => {
   const ando = fuse("plasma");
   // Electroblade-marked target holding a Shield: a true Bypass ignores the shield entirely.
   const e1 = enemy("e1", { shield: 20, statuses: [status("mark", { name: "Electroblade" }), dr(10)] });
@@ -547,7 +547,7 @@ test("God of Thunder: using a skill while Supercharged permanently adds +5 outgo
 // abilities whenever he uses a Supercharged skill." Each Supercharged skill use should add another +5
 // (cumulative). The passive applies a nameless outgoing_damage_mod via plain applyStatus, which REFRESHES
 // the single slot to +5 rather than accumulating — so repeated Supercharged uses stay at +5, not +10/+15.
-test.skip("SUSPECTED BUG: God of Thunder does not STACK across multiple Supercharged skill uses", () => {
+test("God of Thunder STACKS +5 across multiple Supercharged skill uses", () => {
   const ando = fuse("thunder");
   const e1 = enemy("e1");
   const state = makeState([ando], [e1]);
@@ -555,6 +555,7 @@ test.skip("SUSPECTED BUG: God of Thunder does not STACK across multiple Supercha
   ando.statuses.push(status("mark", { name: "Supercharged", duration: 3, appliedBy: "ando", appliedTurn: 1 }));
 
   performAction(state, { unit: "ando", skillId: "andothunder1", targets: [] });
+  ando.skills!.find((s) => s.id === "andothunder1")!.currentCd = 0; // allow a SECOND Supercharged use (frozen: "whenever")
   performAction(state, { unit: "ando", skillId: "andothunder1", targets: [] });
   assert.equal(omod(ando), 10, "two Supercharged skill uses -> +10 (cumulative)");
 });
