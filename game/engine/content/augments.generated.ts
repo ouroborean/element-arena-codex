@@ -1318,25 +1318,62 @@ export const AUGMENTS: Augment[] = [
         },
         "then": [
          {
-          "op": "applyStatus",
-          "to": {
-           "faction": "enemies"
+          "op": "if",
+          "cond": {
+           "cmp": ">=",
+           "left": {
+            "ref": "stackCount",
+            "name": "Call Tides",
+            "of": "self"
+           },
+           "right": 4
           },
-          "status": {
-           "kind": "cost_mod",
-           "magnitude": 1,
-           "duration": {
-            "op": "add",
-            "args": [
-             1,
-             {
-              "ref": "stackCount",
-              "name": "Call Tides",
-              "of": "self"
+          "then": [
+           {
+            "op": "applyStatus",
+            "to": {
+             "faction": "enemies"
+            },
+            "status": {
+             "kind": "cost_mod",
+             "specificDelta": 1,
+             "duration": {
+              "op": "add",
+              "args": [
+               1,
+               {
+                "ref": "stackCount",
+                "name": "Call Tides",
+                "of": "self"
+               }
+              ]
              }
-            ]
+            }
            }
-          }
+          ],
+          "else": [
+           {
+            "op": "applyStatus",
+            "to": {
+             "faction": "enemies"
+            },
+            "status": {
+             "kind": "cost_mod",
+             "magnitude": 1,
+             "duration": {
+              "op": "add",
+              "args": [
+               1,
+               {
+                "ref": "stackCount",
+                "name": "Call Tides",
+                "of": "self"
+               }
+              ]
+             }
+            }
+           }
+          ]
          }
         ],
         "else": [
@@ -1583,6 +1620,21 @@ export const AUGMENTS: Augment[] = [
       "generic": 0,
       "specific": 3
      },
+     "costMods": [
+      {
+       "magnitude": {
+        "op": "mul",
+        "args": [
+         {
+          "ref": "stackCount",
+          "name": "Call Tides",
+          "of": "self"
+         },
+         -1
+        ]
+       }
+      }
+     ],
      "cooldown": 1,
      "effects": [
       {

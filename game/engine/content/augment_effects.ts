@@ -130,12 +130,16 @@ registerCustom("regainFrostCoveredNextTurn", (ctx, a) => {
 });
 
 // replenishShieldWhileSkillReady — at own turn-start, if the named skill is ready, refresh a shield.
+// "gains 15 Shield that replenishes at the start of his turn" — it tops back up to a fixed cap, it does
+// NOT stack turn over turn. So drop any prior shield of the same name before granting the fresh amount.
 registerCustom("replenishShieldWhileSkillReady", (ctx, a) => {
   const e = ctx.event;
   if (e && e.type === "turnStart" && e.team !== ctx.self.team) return;
   const skill = (ctx.self.skills ?? []).find((s) => s.id === (a.skillId as string));
   if (!skill || skill.currentCd > 0) return;
-  addShield(ctx.self, num(a.amount), null, ctx.self.id, ctx.state.turn, a.shieldName as string | undefined);
+  const name = a.shieldName as string | undefined;
+  if (name !== undefined) ctx.self.shields = ctx.self.shields.filter((sh) => sh.id !== name);
+  addShield(ctx.self, num(a.amount), null, ctx.self.id, ctx.state.turn, name);
 });
 
 // applyRandomSkill — cast a random skill from a set (by `by`, at `on`), running its effects inline.
