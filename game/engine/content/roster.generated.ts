@@ -6398,13 +6398,30 @@ export const ROSTER: HeroDef[] = [
     "channelTurns": 1,
     "effects": [
      {
-      "op": "damage",
-      "amount": 25,
-      "dtype": "piercing",
-      "to": {
-       "faction": "enemies",
-       "kind": "hero"
-      }
+      "op": "if",
+      "cond": {
+       "or": [
+        {
+         "has": "channeling",
+         "name": "zephyrex2"
+        },
+        {
+         "has": "instant_cast",
+         "of": "caster"
+        }
+       ]
+      },
+      "then": [
+       {
+        "op": "damage",
+        "amount": 25,
+        "dtype": "piercing",
+        "to": {
+         "faction": "enemies",
+         "kind": "hero"
+        }
+       }
+      ]
      }
     ],
     "currentCd": 0

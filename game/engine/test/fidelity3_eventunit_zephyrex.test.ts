@@ -35,8 +35,18 @@ import { makeState, makeUnit } from "./helpers.ts";
 const hp = (state: { units: Record<string, { hp: number }> }, id: string) => state.units[id]!.hp;
 const sweepDamage = (u: { skills?: { id: string; effects: unknown[] }[] }) => {
   const sweep = (u.skills ?? []).find((s) => s.id === "zephyrex2")!;
-  const dmg = (sweep.effects as { op: string; amount?: number }[]).find((e) => e.op === "damage")!;
-  return dmg.amount;
+  // Elegant Sweep's damage node is nested inside a deferral `if` (fires only on the channel tick / instant
+  // cast), so find it recursively through then/else branches rather than at the top level.
+  type Node = { op: string; amount?: number; then?: Node[]; else?: Node[] };
+  const findDmg = (effs: Node[]): Node | undefined => {
+    for (const e of effs) {
+      if (e.op === "damage") return e;
+      const nested = findDmg([...(e.then ?? []), ...(e.else ?? [])]);
+      if (nested) return nested;
+    }
+    return undefined;
+  };
+  return findDmg(sweep.effects as Node[])!.amount;
 };
 
 test("Biting Wind (base): enemy becoming invulnerable takes 15 piercing; ally / non-invuln status do not", () => {

@@ -194,7 +194,7 @@ test("Elegant Sweep: on the FOLLOWING turn the channel lands 25 piercing on enem
   assert.ok(!zeph.statuses.some((s) => s.kind === "channeling"), "a channelTurns:1 channel ends after it fires");
 });
 
-test.skip("SUSPECTED BUG: Elegant Sweep also deals its 25 on the CAST turn; frozen says only on the following turn", () => {
+test("Elegant Sweep deals its 25 only on the following turn, not the cast turn", () => {
   const zeph = loadHero(heroById("zephyrex"), "A", "zx");
   const e1 = makeUnit({ id: "e1", team: "B", hp: 100, maxHp: 100 });
   const e2 = makeUnit({ id: "e2", team: "B", hp: 100, maxHp: 100 });

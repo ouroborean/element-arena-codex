@@ -361,7 +361,7 @@ test("ghost/Soulsteal: over the next 3 turns the target becomes Invulnerable at 
 // The engine's Soulsteal watch fires on EVERY turn-end (no team gate), so the target also turns
 // Invulnerable at the end of ZEPHYREX's turns. (Debug: after endTurn(A) right after the cast, e1 is
 // already Invulnerable.)
-test.skip("SUSPECTED BUG: Soulsteal makes the target Invulnerable at the end of ZEPHYREX's turns too", () => {
+test("Soulsteal makes the target Invulnerable only at the end of the enemy team's turns", () => {
   const zeph = loadHero(heroById("zephyrex"), "A", "zx");
   const e1 = makeUnit({ id: "e1", team: "B", hp: 100, maxHp: 100 });
   const state = makeState([zeph], [e1]);
@@ -468,7 +468,7 @@ test("mist/Wingless Wanderer: Zephyrex can no longer be Stunned during Elegant S
 // to the `skillGranted` event AND gates it on `eventHasTag: "Harmful"` — but skillGranted events carry no
 // tags at all, so the gate can never pass. Result: the clause is dead — it fires for NEITHER an enemy's
 // harmful skillUsed NOR a skillGranted. (Confirmed by driving both events: essence stays absent, lock stays.)
-test.skip("SUSPECTED BUG: Wingless Wanderer never grants Essence / resets Perfect Execution on a received harmful skill", () => {
+test("Wingless Wanderer grants Essence + resets Perfect Execution on a received enemy harmful skill", () => {
   const zeph = loadHero(heroById("zephyrex"), "A", "zx");
   const e1 = makeUnit({ id: "e1", team: "B", hp: 100, maxHp: 100 });
   const state = makeState([zeph], [e1]);

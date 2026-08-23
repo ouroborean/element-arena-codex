@@ -19623,15 +19623,16 @@
      ]
     },
     {
-     "on": "skillGranted",
+     "on": "skillUsed",
      "source": "Wingless Wanderer",
      "when": {
       "and": [
        {
-        "sameUnit": [
-         "eventUnit",
-         "self"
-        ]
+        "declaredTargetsSelf": true
+       },
+       {
+        "isFaction": "eventSource",
+        "faction": "enemy"
        },
        {
         "has": "channeling",
@@ -19659,7 +19660,7 @@
        "from": "self"
       }
      ],
-     "note": "If Zephyrex is granted a new Harmful skill while preparing (channeling Elegant Sweep), he gains Elemental Essence and his use of Perfect Execution is reset - modeled by clearing the 'Perfection Locked' mark that otherwise disables Perfect Execution (zephyrex5) for the round. The Harmful gate on skillGranted is best-effort (eventHasTag)."
+     "note": "'If he receives a new harmful skill while preparing' = an ENEMY uses a Harmful skill targeting Zephyrex (skillUsed with him in targets: declaredTargetsSelf) while he is channeling Elegant Sweep (zephyrex2). He then gains Elemental Essence and resets Perfect Execution by clearing the 'Perfection Locked' mark (which otherwise disables zephyrex5 for the round). skillUsed carries tags, so eventHasTag Harmful matches (skillGranted carried none and never fired)."
     }
    ],
    "skill": {

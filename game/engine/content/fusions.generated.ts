@@ -19268,15 +19268,16 @@ export const FUSIONS: FusionForm[] = [
     ]
    },
    {
-    "on": "skillGranted",
+    "on": "skillUsed",
     "source": "Wingless Wanderer",
     "when": {
      "and": [
       {
-       "sameUnit": [
-        "eventUnit",
-        "self"
-       ]
+       "declaredTargetsSelf": true
+      },
+      {
+       "isFaction": "eventSource",
+       "faction": "enemy"
       },
       {
        "has": "channeling",

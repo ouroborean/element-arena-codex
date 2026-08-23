@@ -4244,16 +4244,33 @@
      },
      "cooldown": 1,
      "channelTurns": 1,
-     "note": "Channeled: the payload lands on the following turn (channelTurns:1). Interruptible - being stunned or using a new skill cancels it (Channel class; doesNotInterrupt intentionally absent).",
+     "note": "Channeled DEFERRED payload: the 25 piercing lands ONLY on the following turn, not on cast. The engine runs a channelTurns:1 skill's effects on cast AND on the following-turn channel tick, so ONLY the damage is gated (other on-cast effects an augment appends -- e.g. Polite Denial's Wind Step DR grant -- still fire on cast). The gate fires the 25 when Zephyrex is channeling zephyrex2 (the following-turn tick, since the channeling status is applied AFTER the cast-turn runEffects) OR when an instant_cast override for this skill is active (angel Light of Raphael, which suppresses the channel and lands the hit immediately on cast). Interruptible - being stunned or using a new skill cancels it (Channel class; doesNotInterrupt intentionally absent).",
      "effects": [
       {
-       "op": "damage",
-       "amount": 25,
-       "dtype": "piercing",
-       "to": {
-        "faction": "enemies",
-        "kind": "hero"
-       }
+       "op": "if",
+       "cond": {
+        "or": [
+         {
+          "has": "channeling",
+          "name": "zephyrex2"
+         },
+         {
+          "has": "instant_cast",
+          "of": "caster"
+         }
+        ]
+       },
+       "then": [
+        {
+         "op": "damage",
+         "amount": 25,
+         "dtype": "piercing",
+         "to": {
+          "faction": "enemies",
+          "kind": "hero"
+         }
+        }
+       ]
       }
      ]
     },
