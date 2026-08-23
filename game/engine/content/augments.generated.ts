@@ -1949,7 +1949,11 @@ export const AUGMENTS: Augment[] = [
         "to": "self",
         "status": {
          "kind": "invulnerable",
-         "duration": 1
+         "duration": 1,
+         "scope": {
+          "tag": "Strategic",
+          "mode": "except"
+         }
         }
        }
       ]
@@ -2022,7 +2026,13 @@ export const AUGMENTS: Augment[] = [
       "to": {
        "pick": "random",
        "from": {
-        "faction": "enemies"
+        "filter": {
+         "faction": "enemies"
+        },
+        "without": {
+         "kind": "mark",
+         "name": "Electroblade"
+        }
        },
        "count": 1
       },
@@ -2089,7 +2099,7 @@ export const AUGMENTS: Augment[] = [
    {
     "op": "addTrigger",
     "trigger": {
-     "on": "skillUsed",
+     "on": "skillDeclared",
      "source": "On the Clock",
      "when": {
       "and": [

@@ -1984,7 +1984,11 @@
          "to": "self",
          "status": {
           "kind": "invulnerable",
-          "duration": 1
+          "duration": 1,
+          "scope": {
+           "tag": "Strategic",
+           "mode": "except"
+          }
          }
         }
        ]
@@ -2059,7 +2063,13 @@
        "to": {
         "pick": "random",
         "from": {
-         "faction": "enemies"
+         "filter": {
+          "faction": "enemies"
+         },
+         "without": {
+          "kind": "mark",
+          "name": "Electroblade"
+         }
         },
         "count": 1
        },
@@ -2127,7 +2137,7 @@
     {
      "op": "addTrigger",
      "trigger": {
-      "on": "skillUsed",
+      "on": "skillDeclared",
       "source": "On the Clock",
       "when": {
        "and": [

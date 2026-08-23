@@ -150,7 +150,7 @@ test("Afterimage (behavioral): while invulnerable, an incoming NON-Strategic Har
 // invulnerable (applyStatus {kind:"invulnerable", duration:1} with no {tag:"Strategic",
 // mode:"except"} scope), so invulnerableBlocks() blocks EVERY Harmful skill — Strategic ones
 // included. The engine blocks the Strategic hit that the frozen text says must land.
-test.skip("SUSPECTED BUG: Afterimage invulnerability is only vs non-Strategic; a Strategic Harmful skill must still hit", () => {
+test("Afterimage invulnerability is scoped to non-Strategic; a Strategic Harmful skill still hits", () => {
   const ando = mkAndo();
   applyAugment(ando, augmentById("ando1")!);
   const e1 = enemy("e1", { skills: [harmfulSkill("strat", 20, true)] });
@@ -242,7 +242,7 @@ test("Pulse Blade: Expel Energy marks its target with Electroblade", () => {
 // exclusion of the Electroblade mark it just applied). So the "random" pick can (and here, with the
 // default seed and exactly one other enemy, does) land back on the target, leaving the second enemy
 // unmarked: only ONE enemy ends marked instead of the frozen's two distinct targets.
-test.skip("SUSPECTED BUG: Pulse Blade's 'another random target' must be a distinct 2nd enemy (target + another = 2 marked)", () => {
+test("Pulse Blade marks the target plus a DISTINCT second random enemy (2 marked)", () => {
   const ando = mkAndo();
   applyAugment(ando, augmentById("ando3")!);
   const e1 = enemy("e1"); // the declared target
@@ -349,7 +349,7 @@ test("On the Clock (clause 2): NO self-damage when the ability is used while Unc
 // AOE) — using it merely ADVANCES Ando to Supercharged. Frozen therefore should NOT charge the 15 here.
 // But the added trigger checks `has Supercharged` at skillUsed time, which fires AFTER the passive has
 // already advanced Charged -> Supercharged, so the engine wrongly applies 15 to a Charged ability use.
-test.skip("SUSPECTED BUG: a CHARGED ability use (which advances to Supercharged) must NOT incur the 15 Affliction", () => {
+test("a CHARGED ability use (advancing to Supercharged) does NOT incur the 15 Affliction", () => {
   const ando = mkAndo();
   applyAugment(ando, augmentById("ando4")!);
   ando.statuses.push(charged());

@@ -584,6 +584,7 @@
         "op": "damage",
         "amount": 35,
         "dtype": "piercing",
+        "bypass": true,
         "to": "target"
        },
        {
@@ -597,6 +598,7 @@
           "op": "damage",
           "amount": 10,
           "dtype": "piercing",
+          "bypass": true,
           "to": "target"
          }
         ]
@@ -623,7 +625,7 @@
         ]
        }
       ],
-      "note": "Bypasses (piercing) vs Electroblade-marked targets; +10 damage vs Shattered enemies."
+      "note": "Bypasses (dtype piercing + bypass:true = ignores DR AND Shield) vs Electroblade-marked targets; +10 damage vs Shattered enemies. Damage mods still apply (only DR+Shield are bypassed)."
      }
     ]
    }
@@ -922,11 +924,12 @@
        "status": {
         "kind": "outgoing_damage_mod",
         "magnitude": 5,
-        "duration": null
+        "duration": null,
+        "stacks": true
        }
       }
      ],
-     "note": "Each time Ando uses a skill while Supercharged, permanently +5 outgoing damage (stacks)."
+     "note": "Each time Ando uses a skill while Supercharged, permanently +5 outgoing damage. stacks:true ACCUMULATES the magnitude (+5 -> +10 -> +15) across uses instead of refreshing back to +5."
     }
    ],
    "skill": {
