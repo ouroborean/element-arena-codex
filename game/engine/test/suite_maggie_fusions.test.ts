@@ -680,7 +680,7 @@ test("zealot/Thousand Lashes: 30 damage + 5 per Curse of Thorns stack on Maggie"
   }
 });
 
-test.skip("SUSPECTED BUG zealot/Sanguine Craving: using a skill should grant an ADDITIONAL Curse stack (base +1 and Sanguine +1 = 2), but the fusion replaces the base trigger so only +1 lands", () => {
+test("zealot Sanguine Craving: using a skill grants an ADDITIONAL Curse stack (base +1 + Sanguine +1 = 2)", () => {
   // Frozen: "Maggie now receives an ADDITIONAL stack of Curse of Thorns when she uses a skill." The base
   // Curse of Thorns already grants 1/skill; 'additional' => 2 per skill use.
   const maggie = fuse("zealot");
@@ -692,7 +692,7 @@ test.skip("SUSPECTED BUG zealot/Sanguine Craving: using a skill should grant an 
   assert.equal(curse(maggie), 2, "one skill use grants 2 Curse stacks (base 1 + additional 1)");
 });
 
-test.skip("SUSPECTED BUG zealot/Sanguine Craving: not acting on her turn should give MAGGIE 1 Curse stack, but the engine gives the stack to enemies instead", () => {
+test("zealot Sanguine Craving: not acting on her turn gives MAGGIE 1 Curse stack", () => {
   // Frozen: "... and [Maggie] will receive 1 stack if she does not act on her turn."
   const maggie = fuse("zealot");
   const e = makeUnit({ id: "e", team: "B" });
