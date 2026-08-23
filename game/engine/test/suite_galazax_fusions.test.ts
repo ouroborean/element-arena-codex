@@ -194,7 +194,14 @@ test("galazax0 clause A CONTROL: a NON-damaging skill applies no Storm Builds st
   assert.equal(e.hp, 100, "and the enemy took no damage");
 });
 
-test.skip("SUSPECTED BUG: galazax0 passive is unconditional ('Galazax's damaging skills apply a stack') yet galazax3's 5 Piercing applies NO stack to the target it damages (every other damaging skill does)", () => {
+// DISPUTED INTERPRETATION (kept skipped): the unconditional passive ("Galazax's damaging skills apply a
+// stack") argues galazax3's own 5 Piercing should leave the target with 1 fresh stack. But galazax3 also
+// says it "moves ALL stacks... from target enemy to himself", and THREE base-kit tests
+// (suite_galazax_base: lines 282, 320, 334) plus suite_galazax_fusions:387 assert the target ends emptied
+// (0) even when the Piercing fires — i.e. the "moves all" wipe is intended to be final, clearing the
+// fresh passive stack too. This bug-report is the minority reading and conflicts with those spec-derived
+// tests, so it stays skipped pending a design ruling rather than flipping four passing tests.
+test.skip("galazax3's 5 Piercing applies a fresh Storm Builds stack to the target (passive is unconditional)", () => {
   // Frozen passive is unconditional: "Galazax's damaging skills apply a stack of The Storm Builds."
   // galazax3 first MOVES the target's stacks to Galazax, then (>=2 removed) deals 5 Piercing to the
   // target. That 5 Piercing IS a damaging hit by one of Galazax's skills, so — exactly as with
@@ -250,7 +257,7 @@ test("galazax0 clause B end-to-end: a REAL channel from The Sky Darkens grants E
   assert.equal(hasEssence(g), true, "a skill used during the live channel grants Elemental Essence");
 });
 
-test.skip("SUSPECTED BUG: galazax0 passive grants Essence 'if he uses a skill while Channeling' — but a channel-BREAKING skill (used WHILE channeling) grants none; the engine checks channel state AFTER the interrupt instead of at use", () => {
+test("galazax0 grants Essence when a channel-BREAKING skill is used WHILE channeling (state read at declaration)", () => {
   // "Galazax gains Elemental Essence if he uses a skill while Channeling." At the instant Lightning
   // Strikes is used, Galazax IS channeling, so the Essence should be granted even though the same
   // skill then interrupts the channel.

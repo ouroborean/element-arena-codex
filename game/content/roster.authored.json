@@ -12807,8 +12807,9 @@
      ]
     },
     {
-     "on": "skillUsed",
+     "on": "skillDeclared",
      "source": "The Storm Builds",
+     "note": "'Galazax gains Elemental Essence if he uses a skill WHILE Channeling.' Keyed on skillDeclared (emitted before the channel-interrupt in performAction) not skillUsed (emitted after), so a channel-BREAKING skill still reads 'was channeling at time of use' and grants Essence.",
      "when": {
       "and": [
        {
@@ -12984,7 +12985,7 @@
        "from": "target"
       }
      ],
-     "note": "Moves all The Storm Builds from the target to Galazax: copy the target's count onto self, resolve the >=4 stun and >=2 Piercing (both read the pristine pre-move count), then wipe the target's stacks. Stun is checked BEFORE the 5 Piercing on purpose - that damage triggers the passive (a fresh stack on the target), so reading the stun threshold first keeps it off the pristine count. The final wipe clears that fresh passive stack too, so the target ends at 0 ('moves ALL stacks'). doesNotInterrupt: does not break the Sky Darkens channel."
+     "note": "Moves all The Storm Builds from the target to Galazax: copy the target's count onto self, resolve the >=4 stun and >=2 Piercing (both read the pristine pre-move count), then wipe the target's stacks. Stun is checked BEFORE the 5 Piercing on purpose - that damage triggers the passive (a fresh stack on the target), so reading the stun threshold first keeps it off the pristine count. The final wipe clears that fresh passive stack too, so the target ends at 0 ('moves ALL stacks' — confirmed by three base-kit tests; the 'passive re-adds a surviving stack' reading is a disputed minority interpretation left as a skipped bug-report). doesNotInterrupt: does not break the Sky Darkens channel."
     },
     {
      "id": "galazax4",

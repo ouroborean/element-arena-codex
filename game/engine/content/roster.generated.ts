@@ -14085,7 +14085,7 @@ export const ROSTER: HeroDef[] = [
     ]
    },
    {
-    "on": "skillUsed",
+    "on": "skillDeclared",
     "source": "The Storm Builds",
     "when": {
      "and": [
