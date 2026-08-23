@@ -3197,6 +3197,7 @@
     "name": "Reanimate",
     "element": "reanimation",
     "targeting": "single",
+    "canTargetDead": true,
     "klass": "fusion",
     "tags": [
      "Strategic",
@@ -3301,6 +3302,9 @@
     {
      "on": "turnEnd",
      "source": "Hunger for Battle",
+     "when": {
+      "eventTeamIsSelf": true
+     },
      "effect": [
       {
        "op": "if",
@@ -3742,6 +3746,24 @@
      "generic": 0,
      "specific": 4
     },
+    "costMods": [
+     {
+      "specificDelta": {
+       "op": "mul",
+       "args": [
+        {
+         "ref": "count",
+         "of": {
+          "faction": "allies",
+          "kind": "minion",
+          "template": "Seedling"
+         }
+        },
+        -1
+       ]
+      }
+     }
+    ],
     "cooldown": 5,
     "effects": [
      {

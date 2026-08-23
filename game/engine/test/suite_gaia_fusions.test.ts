@@ -381,7 +381,7 @@ test("Yggdrasil: summons a World Tree minion (base cost 4 myth)", () => {
   assert.equal(my0 - st.teams.A.energy.myth!, 4, "with 0 Seedlings the full 4 myth is paid");
 });
 
-test.skip("SUSPECTED BUG: Yggdrasil ignores the '[39] less per Seedling' discount — 2 Seedlings should drop its cost to 2 myth, engine still charges 4", () => {
+test("Yggdrasil costs [39] less per Seedling — 2 Seedlings drop its cost to 2 myth", () => {
   const { g, st } = fuse("myth");
   performAction(st, { unit: GAIA, skillId: "gaia1", targets: [] });
   performAction(st, { unit: GAIA, skillId: "gaia1", targets: [] });

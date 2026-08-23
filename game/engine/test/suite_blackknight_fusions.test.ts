@@ -653,7 +653,7 @@ test("Reanimate (effect tree): revives a dead ally at 50 HP, marks it Reanimated
   assert.equal(performAction(state, { unit: "al", skillId: "basic" }).ok, true, "a non-Strategic skill still works");
 });
 
-test.skip("SUSPECTED BUG: Reanimate cannot target a dead ally through the real cast path — single-target resolution drops dead units, so nobody is revived", () => {
+test("Reanimate revives a targeted dead ally (canTargetDead)", () => {
   // Frozen: "Reanimates one dead ally, reviving them with 50 HP". But resolveTargets filters to LIVING
   // units for 'single' targeting, so the chosen dead ally is dropped and the cast defaults elsewhere;
   // the revive op no-ops on a living unit. (Same class of bug as keeper5 'Hero's Return'.)
@@ -717,7 +717,7 @@ test("Hunger for Battle: ending his own turn WITHOUT dealing damage removes the 
   assert.equal(find(k, "outgoing_damage_mod", "Hunger for Battle"), undefined, "buff removed after a damage-less turn");
 });
 
-test.skip("SUSPECTED BUG: Hunger for Battle is wiped on the OPPONENT's turn-end even though the Black Knight dealt damage on his own turn", () => {
+test("Hunger for Battle survives the opponent turn-end when the Black Knight dealt damage on his own turn", () => {
   // Frozen: removed only if HE "ends a turn without dealing damage". The turnEnd trigger is not team-scoped,
   // so after he deals damage (turn A) it clears the 'Fed' flag on A's end and then strips the whole buff on
   // B's end — a premature wipe that violates the frozen condition.

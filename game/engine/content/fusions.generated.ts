@@ -3167,6 +3167,7 @@ export const FUSIONS: FusionForm[] = [
    "name": "Reanimate",
    "element": "reanimation",
    "targeting": "single",
+   "canTargetDead": true,
    "klass": "fusion",
    "tags": [
     "Strategic",
@@ -3270,6 +3271,9 @@ export const FUSIONS: FusionForm[] = [
    {
     "on": "turnEnd",
     "source": "Hunger for Battle",
+    "when": {
+     "eventTeamIsSelf": true
+    },
     "effect": [
      {
       "op": "if",
@@ -3714,6 +3718,24 @@ export const FUSIONS: FusionForm[] = [
     "generic": 0,
     "specific": 4
    },
+   "costMods": [
+    {
+     "specificDelta": {
+      "op": "mul",
+      "args": [
+       {
+        "ref": "count",
+        "of": {
+         "faction": "allies",
+         "kind": "minion",
+         "template": "Seedling"
+        }
+       },
+       -1
+      ]
+     }
+    }
+   ],
    "cooldown": 5,
    "effects": [
     {
