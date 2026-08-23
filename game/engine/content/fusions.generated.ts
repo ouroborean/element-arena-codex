@@ -12375,22 +12375,6 @@ export const FUSIONS: FusionForm[] = [
       },
       "then": [
        {
-        "op": "applyStatus",
-        "to": "self",
-        "status": {
-         "kind": "elemental_essence",
-         "duration": null
-        }
-       },
-       {
-        "op": "damage",
-        "amount": 15,
-        "dtype": "affliction",
-        "to": {
-         "faction": "enemies"
-        }
-       },
-       {
         "op": "custom",
         "fn": "spendStack",
         "args": {
