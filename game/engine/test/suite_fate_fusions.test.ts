@@ -231,7 +231,7 @@ test("fate0 passive/aura HP<50: a Fox-Fire ENEMY deals -5; a Fox-Fire ally is un
 // SUSPECTED BUG (independently derived): "non-Affliction damage" covers Normal, Piercing AND True.
 // The aura is modelled as an outgoing_damage_mod, which per DAMAGE_CHANNELS never touches True, so a
 // Fox-Fire ally's TRUE damage gets no +5. Frozen expects 20 -> 25.
-test.skip("SUSPECTED BUG: fate0 aura does not boost a Fox-Fire ally's TRUE damage (True is non-Affliction)", () => {
+test("fate0 aura boosts a Fox-Fire ally's TRUE damage (True is non-Affliction)", () => {
   const f = fate(100);
   const ally = makeUnit({ id: "al", team: "A", kind: "hero", hp: 100, maxHp: 100, statuses: [foxMark()], skills: [hitSkill("smite", 20, "true")] });
   const enemy = makeUnit({ id: "e", team: "B", kind: "hero", hp: 100, maxHp: 100 });
@@ -427,7 +427,7 @@ test("fate2 CONTROL: with no Will-o'-wisp active, an enemy Harmful skill is not 
 // SUSPECTED BUG (independently derived): frozen scopes the retaliation to an enemy Harmful skill used
 // "on Fate or his allies". The trigger never checks the skill's TARGET side, so an enemy Harmful aimed
 // at its OWN team still fires the 10 Affliction. Frozen expects no punish here.
-test.skip("SUSPECTED BUG: fate2 punishes an enemy Harmful skill NOT aimed at Fate's team (target clause ignored)", () => {
+test("fate2 does NOT punish an enemy Harmful skill aimed at its own team (target clause honored)", () => {
   const f = fate(100);
   const e1 = makeUnit({ id: "e1", team: "B", kind: "hero", hp: 100, maxHp: 100 });
   const e2 = makeUnit({ id: "e2", team: "B", kind: "hero", hp: 100, maxHp: 100 });

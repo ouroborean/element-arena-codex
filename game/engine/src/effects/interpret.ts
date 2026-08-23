@@ -329,6 +329,17 @@ export function evalCondition(c: Condition, ctx: Ctx): boolean {
     const e = ctx.event;
     return !!e && "targets" in e && e.targets.includes(ctx.self.id);
   }
+  if ("eventTargetsFaction" in c) {
+    // Does ANY declared target of the event's skill lie on self's team ("allies", incl. self) or the opposing
+    // team ("enemies")? Encodes "a Harmful skill used on Fate OR his allies" without index-0 fragility.
+    const e = ctx.event;
+    if (!e || !("targets" in e)) return false;
+    const wantAlly = c.eventTargetsFaction === "allies";
+    return e.targets.some((id) => {
+      const u = ctx.state.units[id];
+      return !!u && (u.team === ctx.self.team) === wantAlly;
+    });
+  }
   if ("eventHasTag" in c) {
     const e = ctx.event;
     return !!e && "tags" in e && !!e.tags && e.tags.includes(c.eventHasTag);

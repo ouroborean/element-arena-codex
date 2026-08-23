@@ -79,6 +79,7 @@ export type Condition =
   | { isNamed: Selector; name: string } // the selected unit's display name equals this (e.g. a specific minion template, "Stonecap Mushroom")
   | { skillOnCooldown: string } // the caster's own skill (by id) is currently on cooldown (zephyrex3 requires Wind Step down)
   | { declaredTargetsSelf: true } // (skillDeclared) the trigger owner is among the declared targets
+  | { eventTargetsFaction: "allies" | "enemies" } // (skillUsed/Declared) any declared target is on self's team / the opposing team
   | { eventHasTag: string } // (skillDeclared/skillUsed) the skill carries this class tag
   | { eventSkillId: string } // (skillUsed/skillDeclared/skillGranted/skillRedirected/counterFired) the event's skillId matches — scopes a skill-reaction to ONE skill
   | { eventStatusKind: string; name?: string } // (statusApplied/statusExpired) the event's status kind (+name) matches

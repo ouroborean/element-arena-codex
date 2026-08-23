@@ -11503,7 +11503,7 @@ export const ROSTER: HeroDef[] = [
   "passive": {
    "name": "Dwindling Flame",
    "description": "Fate can only be healed by his own skills and effects. While his HP is at or above 50, allies affected by Fox Fire deal 5 more non-Affliction damage. While his HP is below 50, enemies affected by Fox Fire deal 5 less non-Affliction damage.",
-   "pending": "Split into three hero triggers (source 'Dwindling Flame'): (1) roundStart applies heal_lock(only-healer=self) — 'healed only by his own skills'. (2)+(3) are the static conditional aura, refreshed each turnStart as outgoing_damage_mod on Fox-Fire-marked units gated on Fate's live HP vs 50. outgoing_damage_mod is normal/piercing-only, a close read of 'non-Affliction' (which also includes true damage); the 1-turn refresh keeps it synced to Fate's HP."
+   "pending": "Split into three hero triggers (source 'Dwindling Flame'): (1) roundStart applies heal_lock(only-healer=self) — 'healed only by his own skills'. (2)+(3) are the static conditional aura, refreshed each turnStart as outgoing_damage_mod on Fox-Fire-marked units gated on Fate's live HP vs 50. The aura status carries dtypes:['normal','piercing','true'] so it boosts every non-Affliction type ('non-Affliction' includes True); the 1-turn refresh keeps it synced to Fate's HP."
   },
   "skills": [
    {
@@ -12029,6 +12029,9 @@ export const ROSTER: HeroDef[] = [
        "has": "mark",
        "name": "Will-o'-wisp",
        "of": "self"
+      },
+      {
+       "eventTargetsFaction": "allies"
       }
      ]
     },
