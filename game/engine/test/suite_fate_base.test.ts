@@ -385,7 +385,7 @@ test("fate2: 'once per skill' — one Harmful skill hitting multiple team member
 // Will-o'-wisp mark} and never checks the skill's TARGET side, so an enemy Harmful skill aimed at its own team
 // (e1 -> e2) still fires the 10 Affliction (e1 dropped to 90, expected 100). Real casts always aim Harmful
 // skills at the opposing team so this rarely surfaces, but the target-side clause is unenforced.
-test.skip("SUSPECTED BUG: fate2 retaliates on an enemy Harmful skill NOT used on Fate's team (target clause ignored)", () => {
+test("fate2 does NOT retaliate on an enemy Harmful skill aimed at its own team (target clause honored)", () => {
   const f = fateWith(100);
   const e1 = makeUnit({ id: "e1", team: "B", kind: "hero", hp: 100, maxHp: 100 });
   const e2 = makeUnit({ id: "e2", team: "B", kind: "hero", hp: 100, maxHp: 100 });
