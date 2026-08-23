@@ -82,11 +82,12 @@ test("addCurseStackIfMaggieDidNotAct adds a stack only when Maggie did not act t
 
   state.actedThisTurn = ["m"]; // Maggie acted
   emit(state, { type: "turnEnd", team: "A" });
-  assert.equal(stackCount(foe, "Curse of Thorns"), 0, "acted → no spread");
+  assert.equal(stackCount(maggie, "Curse of Thorns"), 0, "acted → no stack");
 
   state.actedThisTurn = []; // Maggie idled
   emit(state, { type: "turnEnd", team: "A" });
-  assert.equal(stackCount(foe, "Curse of Thorns"), 1, "idled → +1 Curse stack on the enemy");
+  assert.equal(stackCount(maggie, "Curse of Thorns"), 1, "idled → +1 Curse stack on MAGGIE herself");
+  assert.equal(stackCount(foe, "Curse of Thorns"), 0, "the enemy gets nothing");
 });
 
 // Cluster 2 — watch windows (dynamic triggers). The active installs a temporary trigger; we emit the
