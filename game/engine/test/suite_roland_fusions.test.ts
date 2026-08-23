@@ -256,7 +256,7 @@ test("magnet Mag-Lev Pillars control: a NON-Earth-Pillar status on an enemy does
 // Adversarial: "Target Boulder taunts all enemies for 1 turn" means enemies are FORCED onto that Boulder. The
 // authored active applies a `taunt` status to the Boulder itself (no unitRef pointing enemies at it), so the
 // engine's taunt-redirect (which reads the ATTACKER's taunt+unitRef) never forces anyone.
-test.skip("SUSPECTED BUG: magnet Magnetize Munitions does not taunt enemies onto the Boulder — frozen forces the enemy's Harmful skill onto it, but the taunt is placed on the Boulder with no unitRef", () => {
+test("magnet Magnetize Munitions taunts all enemies onto the target Boulder", () => {
   const r = fuse("magnet");
   const e = enemy("e1");
   const st = makeState([r], [e]);
@@ -449,7 +449,7 @@ test("nomad Mark the Path: an enemy damaged by an allied Boulder minion is perma
 // Adversarial: the canonical way a Boulder damages an enemy is being LAUNCHED by SFtE — and frozen says such
 // an enemy is marked. But SFtE credits the launch's damage to ROLAND (no `from` on its launch node), so the
 // event's source is the hero, not the Boulder, and the minion-gated Mark the Path passive never fires.
-test.skip("SUSPECTED BUG: a Boulder LAUNCHED by SFtE does not mark its victim — the launch damage is credited to Roland (hero), not the Boulder", () => {
+test("a Boulder LAUNCHED by SFtE marks its victim (launch damage is credited to the Boulder)", () => {
   const r = fuse("nomad");
   const e = enemy("e1");
   const st = makeState([r], [e]);
@@ -588,7 +588,7 @@ test("slime Call to the Mire: existing Slimeballs become immune to damage and a 
 
 // Adversarial: "Slimeball minions are immune to damage" — ALL of them for the window, including the one created
 // this turn. The active only applies damage_ignore to Slimeballs that existed BEFORE the summon.
-test.skip("SUSPECTED BUG: slime Call to the Mire leaves the freshly-created Slimeball vulnerable — frozen makes all Slimeballs immune for 2 turns", () => {
+test("slime Call to the Mire makes the freshly-created Slimeball immune for 2 turns", () => {
   const r = fuse("slime");
   const st = makeState([r], [enemy("e1")]);
   fund(st);

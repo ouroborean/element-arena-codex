@@ -13426,11 +13426,15 @@
     "effects": [
      {
       "op": "applyStatus",
-      "to": "target",
+      "to": {
+       "faction": "enemies"
+      },
       "status": {
        "kind": "taunt",
+       "unitRef": "target",
        "duration": 1
-      }
+      },
+      "note": "'Target Boulder taunts all enemies for 1 turn' — put a taunt on every enemy whose unitRef points at the target Boulder, so legalTargets forces their single-target Harmful skills onto it. (A bare taunt on the Boulder would never redirect, since the redirect reads the ATTACKER's own taunt.unitRef.)"
      },
      {
       "op": "schedule",
@@ -13910,8 +13914,13 @@
      "specific": 0
     },
     "cooldown": 3,
-    "note": "'For 2 turns, Slimeballs are immune to damage and one is created each turn': existing Slimeballs get 2-turn damage_ignore; one Slimeball is created now and one scheduled next turn to cover the two-turn window. Each per-turn spawn should likewise be created damage-immune while Call to the Mire is active (engine reapplies).",
+    "note": "'For 2 turns, Slimeballs are immune to damage and one is created each turn': the immediate Slimeball is summoned FIRST, then a forEach grants every allied Slimeball (the fresh one included) 2-turn damage_ignore — so the newly-created Slimeball is immune too. One more Slimeball is scheduled next turn (also made immune for the window's remainder).",
     "effects": [
+     {
+      "op": "summon",
+      "template": "Slimeball",
+      "count": 1
+     },
      {
       "op": "forEach",
       "each": {
@@ -13931,11 +13940,6 @@
       ]
      },
      {
-      "op": "summon",
-      "template": "Slimeball",
-      "count": 1
-     },
-     {
       "op": "schedule",
       "delayTurns": 1,
       "effect": [
@@ -13943,6 +13947,24 @@
         "op": "summon",
         "template": "Slimeball",
         "count": 1
+       },
+       {
+        "op": "forEach",
+        "each": {
+         "faction": "allies",
+         "kind": "minion",
+         "template": "Slimeball"
+        },
+        "do": [
+         {
+          "op": "applyStatus",
+          "to": "it",
+          "status": {
+           "kind": "damage_ignore",
+           "duration": 1
+          }
+         }
+        ]
        }
       ]
      }
