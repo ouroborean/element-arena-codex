@@ -4245,6 +4245,25 @@ export const FUSIONS: FusionForm[] = [
   },
   "passiveTriggers": [
    {
+    "on": "skillDeclared",
+    "source": "Forced Adaptation",
+    "when": {
+     "has": "mark",
+     "name": "Frost-Covered",
+     "of": "self"
+    },
+    "effect": [
+     {
+      "op": "applyStatus",
+      "to": "self",
+      "status": {
+       "kind": "non_damage_ignore",
+       "duration": null
+      }
+     }
+    ]
+   },
+   {
     "on": "statusApplied",
     "source": "Forced Adaptation",
     "when": {
@@ -4909,6 +4928,10 @@ export const FUSIONS: FusionForm[] = [
     "specific": 2
    },
    "cooldown": 1,
+   "bypassingIf": {
+    "has": "stealth",
+    "of": "caster"
+   },
    "effects": [
     {
      "op": "damage",
@@ -5209,12 +5232,6 @@ export const FUSIONS: FusionForm[] = [
    "cooldown": 2,
    "effects": [
     {
-     "op": "damage",
-     "amount": 35,
-     "dtype": "normal",
-     "to": "target"
-    },
-    {
      "op": "if",
      "cond": {
       "has": "incoming_damage_mod",
@@ -5222,6 +5239,12 @@ export const FUSIONS: FusionForm[] = [
       "of": "target"
      },
      "then": [
+      {
+       "op": "damage",
+       "amount": 35,
+       "dtype": "normal",
+       "to": "target"
+      },
       {
        "op": "if",
        "cond": {
@@ -5249,6 +5272,14 @@ export const FUSIONS: FusionForm[] = [
          }
         }
        ]
+      }
+     ],
+     "else": [
+      {
+       "op": "damage",
+       "amount": 35,
+       "dtype": "normal",
+       "to": "target"
       }
      ]
     }

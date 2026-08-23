@@ -39,6 +39,10 @@ export interface SkillInstance extends SkillDef {
   requires?: Condition;
   /** If this holds at declaration, the skill cannot be countered/reflected (conditional Uncounterable). */
   uncounterableIf?: Condition;
+  /** If this holds at declaration, the skill is treated as Bypassing (ignores Invulnerability when targeting,
+   *  and its damage ignores DR + Shield) — conditional Bypass. gommar:night Midnight Mountain: "If Gommar is
+   *  Stealthed, this skill Bypasses." Evaluated live against the caster (like uncounterableIf). */
+  bypassingIf?: Condition;
   /** Per-cast conditional cost deltas, evaluated live at each cast (keeper3 "Plot Twist": -1 while solo).
    *  `magnitude` may be a Value, so the delta can scale with live state (zevkir5: -1 per Call Tides stack).
    *  Distinct from cost_mod statuses (which the round-wipe clears) — this rides on the skill, which persists. */

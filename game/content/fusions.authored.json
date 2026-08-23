@@ -4271,9 +4271,28 @@
    "passive": {
     "name": "Forced Adaptation",
     "description": "While Gommar is Frost-Covered, he ignores non-damage effects.",
-    "note": "'While Frost-Covered' is a dynamic conditional; the engine has no continuous-conditional status primitive and no event-status-kind condition, so it is modeled as a gain/loss pair: on any status applied to Gommar while he holds Frost-Covered, grant non_damage_ignore (permanent); on any status expiring on him while he no longer holds Frost-Covered, strip it. Over/under-fires at the edges (e.g. a mark consumed via removeStatus emits no statusExpired)."
+    "note": "'While Frost-Covered' is a dynamic conditional; the engine has no continuous-conditional status primitive, so it is modeled as a gain/loss pair over the non_damage_ignore ward. The ward is armed EAGERLY on skillDeclared (which fires pre-resolution, before the declared skill's effects apply -- so even the FIRST enemy non-damage effect while Frost-Covered is warded), and also on any status applied to Gommar while Frost-Covered (mid-turn gains). It is stripped on any status expiring on him while he no longer holds Frost-Covered."
    },
    "passiveTriggers": [
+    {
+     "on": "skillDeclared",
+     "source": "Forced Adaptation",
+     "when": {
+      "has": "mark",
+      "name": "Frost-Covered",
+      "of": "self"
+     },
+     "effect": [
+      {
+       "op": "applyStatus",
+       "to": "self",
+       "status": {
+        "kind": "non_damage_ignore",
+        "duration": null
+       }
+      }
+     ]
+    },
     {
      "on": "statusApplied",
      "source": "Forced Adaptation",
@@ -4952,7 +4971,11 @@
      "specific": 2
     },
     "cooldown": 1,
-    "note": "'If Gommar is Stealthed, this skill Bypasses' (Bypassing = ignores Invulnerability, a skill-declaration property) cannot be gated on Stealth from within the effect tree and is left unmodeled here; the base damage stays normal.",
+    "bypassingIf": {
+     "has": "stealth",
+     "of": "caster"
+    },
+    "note": "'If Gommar is Stealthed, this skill Bypasses' = bypassingIf {has stealth of caster}: at declaration the skill is treated as Bypassing (ignores Invulnerability when targeting; its damage ignores DR+Shield) exactly while Gommar holds the Stealth status (Black Ice grants it while Frost-Covered).",
     "effects": [
      {
       "op": "damage",
@@ -5255,14 +5278,8 @@
      "specific": 1
     },
     "cooldown": 2,
-    "note": "'If the target was already affected by Hypothermia' checked as the target carrying the 'Hypothermia' incoming_damage_mod; because this skill's own 35 damage also procs the Hypothermia passive, the check assumes the active's effect tree resolves before the queued passive reaction applies/refreshes the marker.",
+    "note": "'If the target was already affected by Hypothermia' = the target carrying the 'Hypothermia' incoming_damage_mod. The Hypothermia passive fires synchronously on this skill's own damageDealt, so the 'already affected' test MUST be evaluated BEFORE the 35 damage lands -- otherwise the skill would stun a fresh target off its own freshly-applied Hypothermia. So the if-Hypothermia wraps the damage: both branches deal 35, the stun rides only the branch where the target was ALREADY affected.",
     "effects": [
-     {
-      "op": "damage",
-      "amount": 35,
-      "dtype": "normal",
-      "to": "target"
-     },
      {
       "op": "if",
       "cond": {
@@ -5271,6 +5288,12 @@
        "of": "target"
       },
       "then": [
+       {
+        "op": "damage",
+        "amount": 35,
+        "dtype": "normal",
+        "to": "target"
+       },
        {
         "op": "if",
         "cond": {
@@ -5298,6 +5321,14 @@
           }
          }
         ]
+       }
+      ],
+      "else": [
+       {
+        "op": "damage",
+        "amount": 35,
+        "dtype": "normal",
+        "to": "target"
        }
       ]
      }
