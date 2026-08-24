@@ -12572,6 +12572,13 @@ export const FUSIONS: FusionForm[] = [
       }
      },
      {
+      "op": "custom",
+      "fn": "recordHealingByRound",
+      "args": {
+       "to": "eventUnit"
+      }
+     },
+     {
       "op": "if",
       "cond": {
        "cmp": ">=",
@@ -12613,6 +12620,13 @@ export const FUSIONS: FusionForm[] = [
    },
    "cooldown": 1,
    "effects": [
+    {
+     "op": "custom",
+     "fn": "loadHealingLastRound",
+     "args": {
+      "of": "target"
+     }
+    },
     {
      "op": "damage",
      "amount": 20,

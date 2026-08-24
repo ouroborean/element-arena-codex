@@ -12790,6 +12790,14 @@
        "note": "Adds the healing an enemy just received (ctx.event.amount) to the 'Reflection of Kindness' tally on self. No ref exposes an event's heal amount, hence custom."
       },
       {
+       "op": "custom",
+       "fn": "recordHealingByRound",
+       "args": {
+        "to": "eventUnit"
+       },
+       "note": "Also record the healing on the healed enemy itself, tagged by the current round, so Party Crasher can read 'healing received LAST round'."
+      },
+      {
        "op": "if",
        "cond": {
         "cmp": ">=",
@@ -12834,6 +12842,14 @@
     "cooldown": 1,
     "effects": [
      {
+      "op": "custom",
+      "fn": "loadHealingLastRound",
+      "args": {
+       "of": "target"
+      },
+      "note": "Sum the target's HealingReceived stack from the PREVIOUS round into ctx.vars.healingReceivedLastRound, which the bonus-damage op below reads (same ctx.vars)."
+     },
+     {
       "op": "damage",
       "amount": 20,
       "to": "target"
@@ -12845,7 +12861,7 @@
        "name": "healingReceivedLastRound"
       },
       "to": "target",
-      "note": "Bonus damage equal to the healing the target received last round. Requires the engine to track per-unit healing received during the previous round; no ref exposes it, so this reads a tracked var 'healingReceivedLastRound' on the target."
+      "note": "Bonus damage equal to the healing the target received last round (loadHealingLastRound populated the var from the previous round's HealingReceived stack on the target)."
      }
     ]
    }
