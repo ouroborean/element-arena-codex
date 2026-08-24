@@ -390,7 +390,7 @@ test("Drake Transformation: the permanent bonus raises AFFLICTION damage (dtypes
 // FROZEN: "At the end of each turn AND whenever he consumes a mark from Cinders, Jarrik
 // heals 5 HP...". The dragon passive only installs roundStart (seed) + turnEnd (heal+grow)
 // triggers — there is NO consume hook — so consuming a Cinders mark heals nothing.
-test.skip("SUSPECTED BUG: Drake Transformation should heal 5 when Jarrik consumes a Cinders mark, but no consume trigger is wired", () => {
+test("Drake Transformation heals 5 when Jarrik consumes a Cinders mark", () => {
   const j = jarrik(); fuse(j, "dragon");
   j.hp = 50;
   const marked = enemy("e", [cinders()]);

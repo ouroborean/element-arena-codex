@@ -7185,7 +7185,7 @@ export const AUGMENTS: Augment[] = [
       "generic": 0,
       "specific": 1
      },
-     "cooldown": 4,
+     "cooldown": 5,
      "effects": [
       {
        "op": "damage",

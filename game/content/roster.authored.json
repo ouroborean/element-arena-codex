@@ -57,11 +57,14 @@
        "amount": 10,
        "dtype": "affliction",
        "to": {
-        "faction": "enemies"
+        "filter": {
+         "faction": "enemies"
+        },
+        "without": "untargetable"
        }
       }
      ],
-     "note": "'When Pyrrha dies, she deals 10 Affliction damage to all targetable enemies.' Reference authors 'all targetable enemies' as {faction:'enemies'} (living enemy team)."
+     "note": "'When Pyrrha dies, she deals 10 Affliction damage to all TARGETABLE enemies.' The death burst bypasses legalTargets, so 'targetable' is enforced here by excluding enemies holding the 'untargetable' status (without-filter), matching Maggie's targetable pulse."
     }
    ],
    "skills": [
@@ -1927,6 +1930,17 @@
       "generic": 0,
       "specific": 1
      },
+     "costMods": [
+      {
+       "when": {
+        "has": "mark",
+        "name": "Dive River Clone",
+        "of": "self"
+       },
+       "specificDelta": -1,
+       "genericDelta": 1
+      }
+     ],
      "cooldown": 1,
      "effects": [
       {
@@ -1945,7 +1959,7 @@
        "from": "self"
       }
      ],
-     "note": "Invisible. Marks an enemy; the River Clone counter trigger negates that enemy's first Harmful skill (firing Healing Tears via counterFired). Under Dive (Dive River Clone mark) this skill's cost is re-denominated to 1 generic ([65]) instead of 1 water ([2]); the mark is consumed on use. Cost re-denomination is metadata, not an effect node, so it is documented here."
+     "note": "Invisible. Marks an enemy; the River Clone counter trigger negates that enemy's first Harmful skill (firing Healing Tears via counterFired). Under Dive (Dive River Clone mark) this skill's cost is re-denominated to 1 Generic ([65]) instead of 1 Water: a costMods entry gated on the Dive mark applies specificDelta -1 + genericDelta +1 (base {0,1} -> {1,0}), evaluated live at cast BEFORE the mark is consumed. The mark is consumed on use, so later casts revert to 1 Water."
     },
     {
      "id": "riverdaughter4",

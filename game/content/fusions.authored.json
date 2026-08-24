@@ -6908,6 +6908,28 @@
       }
      ],
      "note": "Heals 5 and grows the permanent bonus by 5 each turn-end (both teams)."
+    },
+    {
+     "on": "statusLost",
+     "source": "Drake Transformation",
+     "when": {
+      "eventStatusKind": "mark",
+      "name": "Cinders"
+     },
+     "effect": [
+      {
+       "op": "heal",
+       "amount": 5,
+       "to": "self"
+      },
+      {
+       "op": "modifyStatus",
+       "kind": "outgoing_damage_mod",
+       "magnitudeDelta": 5,
+       "from": "self"
+      }
+     ],
+     "note": "'and whenever he consumes a mark from Cinders, Jarrik heals 5 HP and permanently deals 5 more Affliction damage.' Cinders removal is Jarrik-exclusive and emits statusLost (natural lapse emits statusExpired instead), so the mark-name gate faithfully means 'Jarrik consumed a Cinders'. Mirrors the turnEnd effect (same clone as the Blazer Board consume trigger)."
     }
    ],
    "skill": {

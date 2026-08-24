@@ -7296,7 +7296,7 @@
    "owner": "sera",
    "name": "Unto Others",
    "description": "Proactivity Protocol now deals 15 normal Damage and heals for 25, but gains an additional 1 turn cooldown.",
-   "note": "Re-authors Proactivity Protocol (sera5): the self-hit becomes 15 normal (was 20 True), the ally heal 20->25, cooldown 3->4. The 20 Shield to self is unmentioned in the prose and preserved.",
+   "note": "Re-authors Proactivity Protocol (sera5): the self-hit becomes 15 normal (was 20 True), the ally heal 20->25, cooldown 4->5 ('additional 1 turn cooldown' on the frozen base of 4). The 20 Shield to self is unmentioned in the prose and preserved.",
    "patches": [
     {
      "op": "replaceSkill",
@@ -7315,7 +7315,7 @@
        "generic": 0,
        "specific": 1
       },
-      "cooldown": 4,
+      "cooldown": 5,
       "effects": [
        {
         "op": "damage",

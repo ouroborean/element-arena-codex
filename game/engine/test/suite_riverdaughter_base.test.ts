@@ -376,7 +376,7 @@ test("Control: base River Clone requires Water — Generic-only energy cannot pa
 // SUSPECTED BUG: Dive is supposed to change River Clone's cost to one Generic ([65]) on the following turn,
 // so it becomes payable by any color. The engine never re-prices River Clone, so a Generic-only pool still
 // fails to pay it after Dive.
-test.skip("SUSPECTED BUG: after Dive, River Clone should cost one Generic ([65]) and be castable from a Generic-only pool", () => {
+test("after Dive, River Clone costs one Generic and is castable from a Generic-only pool", () => {
   const { state } = setup({ enemies: 1 });
   performAction(state, { unit: "rd", skillId: "riverdaughter5", targets: ["rd"] }); // Dive (turn 1)
   advance(state, 2); // River Daughter's following turn
