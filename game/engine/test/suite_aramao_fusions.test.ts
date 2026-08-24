@@ -153,7 +153,7 @@ test("aramao0 CONTROL: a NON-across enemy takes no +5 and grants no Essence", ()
 // models elemental_essence as a single non-stacking flag (verified: 3 real hits -> exactly
 // one elemental_essence status, no magnitude), so the second gain is silently dropped and
 // essenceCount stays 1. Under-delivers Aramao's essence economy vs the frozen prose.
-test.skip("SUSPECTED BUG: aramao0 grants Essence per hit (whenever) but engine caps essence at 1 (non-stacking status)", () => {
+test("aramao0 grants Essence per hit (essence is a countable resource)", () => {
   const aramao = loadHero(heroById("aramao"), "A", "ar");            // slot 0
   const e0 = makeUnit({ id: "e0", team: "B", hp: 200, maxHp: 200 }); // slot 0 = across, fat enough to survive twice
   const state = makeState([aramao], [e0], 1);

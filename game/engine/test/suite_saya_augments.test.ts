@@ -266,7 +266,7 @@ test("saya5 Hair Trigger: 'below 60' is a strict threshold — a drop that leave
   assert.equal(armed(saya), false, "no arm while Saya remains above the 60 threshold");
 });
 
-test.skip("SUSPECTED BUG: saya5 Hair Trigger leaks — retunePassiveThreshold mutates a shared trigger, so an un-augmented Saya also gets the 60 threshold", () => {
+test("saya5 Hair Trigger: the 60 threshold is confined to THIS Saya (no shared-trigger leak)", () => {
   // Frozen: Hair Trigger retunes THIS Saya's passive to 60. An un-augmented Saya must keep the base 40
   // threshold (a drop to 55 must NOT arm — verified out-of-process). Engine (probed): applying Hair
   // Trigger to one Saya instance mutates the shared passive-trigger object, so a DIFFERENT, un-augmented

@@ -182,6 +182,10 @@ registerAugmentCustom("retunePassiveThreshold", (unit, a) => {
   const threshold = num(a.threshold);
   for (const t of unit.triggers ?? []) {
     if (t.source !== (a.source as string)) continue;
+    // loadHero shallow-copies each trigger but SHARES the nested `when` Condition with the module-level
+    // ROSTER HeroDef. Mutating it in place would retune EVERY future load of this hero. Detach a private
+    // copy first so the retune is confined to this unit (same idiom as fusion_effects.ts).
+    t.when = t.when === undefined ? undefined : JSON.parse(JSON.stringify(t.when));
     const setCmp = (c: Condition | undefined): void => {
       if (!c || typeof c !== "object") return;
       if ("cmp" in c && typeof c.right === "number") (c as { right: number }).right = threshold;

@@ -701,6 +701,9 @@ registerCustom("pickTheBonesDamage", (ctx, a) => {
   if (a.doubleVsPile && target.name === (a.pileTemplate as string)) dmg *= 2;
   const wasAlive = target.alive;
   dealAndEmit(ctx, target, dmg);
+  // Kill -> Syl's team (allied heroes, self included) gains one Elemental Essence. This is the SOLE
+  // kill-essence grant for Pick the Bones (sylnomad1's authored effect no longer duplicates it — the
+  // double-grant was masked only while essence collapsed into one slot).
   if (wasAlive && !target.alive) {
     for (const ally of resolveSelector({ faction: "allies", kind: "hero" }, ctx)) applyStatus(ally, { kind: "elemental_essence", duration: null, appliedBy: ctx.self.id, appliedTurn: ctx.state.turn });
   }

@@ -118,11 +118,16 @@ registerCustom("exileActingAlone", (ctx, args) => {
   if (!e || e.type !== "turnEnd" || e.team !== ctx.self.team) return; // only my own team's turn-end
   const mark = (args.mark as string) ?? "Exile";
   const markDuration = (args.markDuration as number) ?? 1;
+  // The Onyx Legion (blackknight:curse): allies bearing this mark "never count as acting" when deciding
+  // if the Black Knight is alone. Absent (base kit) -> no allies are excluded (identical behavior).
+  const excludeMark = args.excludeMark as string | undefined;
   const acted = ctx.state.actedThisTurn;
   const iActed = acted.includes(ctx.self.id);
   const otherAllyActed = ctx.state.teams[ctx.self.team].units.some((id) => {
     const u = ctx.state.units[id];
-    return !!u && u.kind === "hero" && u.id !== ctx.self.id && acted.includes(u.id);
+    if (!u || u.kind !== "hero" || u.id === ctx.self.id || !acted.includes(u.id)) return false;
+    if (excludeMark && u.statuses.some((s) => s.kind === "mark" && s.name === excludeMark)) return false;
+    return true;
   });
   if (iActed && !otherAllyActed) {
     applyStatus(ctx.self, {

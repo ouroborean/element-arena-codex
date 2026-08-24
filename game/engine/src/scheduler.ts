@@ -132,7 +132,10 @@ export function grantIncome(state: MatchState, id: TeamId): void {
   for (const hero of livingHeroes(state, id)) {
     if (hasEssenceIncome(hero)) {
       pool[hero.currentElement] = (pool[hero.currentElement] ?? 0) + 1;
-      removeStatus(hero, "elemental_essence"); // consume the one-shot charge (a no-op for the middle-slot source)
+      // Consume exactly ONE charge (essence is countable): N banked charges convert over N turns. A no-op
+      // for the middle-slot source (no elemental_essence status present).
+      const idx = hero.statuses.findIndex((s) => s.kind === "elemental_essence");
+      if (idx >= 0) hero.statuses.splice(idx, 1);
       emit(state, { type: "energyFromEssence", unit: hero.id, element: hero.currentElement });
     } else {
       pool.generic = (pool.generic ?? 0) + GENERIC_PER_LIVING_HERO;
