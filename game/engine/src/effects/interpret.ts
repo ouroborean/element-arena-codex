@@ -766,6 +766,7 @@ function applyMinionSkillPatches(minion: Unit, summoner: Unit): void {
     else if (p.op === "prependEffect" && p.effect) s.effects = [...(JSON.parse(JSON.stringify(p.effect)) as Effect[]), ...s.effects];
     else if (p.op === "setSkillMeta" && p.meta) Object.assign(s, JSON.parse(JSON.stringify(p.meta)));
     else if (p.op === "patchNode" && p.nodeId && p.replace) replaceNode(s.effects, p.nodeId, JSON.parse(JSON.stringify(p.replace)) as Effect);
+    else if (p.op === "replaceSkill" && p.skill) minion.skills[i] = { ...(JSON.parse(JSON.stringify(p.skill)) as SkillInstance), currentCd: 0 };
   }
 }
 

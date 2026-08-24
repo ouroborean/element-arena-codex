@@ -147,7 +147,7 @@ test("trinity1: Crimson Crash deals 40 MORE only when Crimson holds ALL THREE So
 // (applyMinionSkillPatches) handles only appendEffect/setSkillMeta/patchNode — never replaceSkill. So the
 // summoned Azure keeps BASE Prisma Whirl: casting it deals 0 immediate damage and applies no Sonata Azure /
 // Strategic-stun. Frozen expects 10 Piercing + Strategic-stun; engine deals 0 and never stuns.
-test.skip("SUSPECTED BUG: trinity2 Grand Sonata — Prisma Whirl should apply Sonata Azure (10 Piercing + Strategic-stun) but the replaceSkill never reaches the Azure minion (engine deals 0)", () => {
+test("trinity2 Grand Sonata: Prisma Whirl applies Sonata Azure (10 Piercing + Strategic-stun)", () => {
   const { state, azure, e } = boot(["trinity2"]);
   // Piercing ignores Damage Reduction: with DR 6 the full 10 still lands.
   e.statuses = [status("damage_reduction", { magnitude: 6 })];
@@ -186,7 +186,7 @@ test("trinity2: control — WITHOUT the augment, base Prisma Whirl deals no imme
 // nor parked as a minionSkillPatch, so the summoned Saffron keeps BASE Saffron Beam (targeting "single",
 // effects [damage, taunt]). Frozen expects the Beam to hit ALL enemies for 10 and to Shatter Prisma Saffron
 // for 1 turn; engine hits only the single aimed enemy (the other enemy takes 0) and never Shatters Saffron.
-test.skip("SUSPECTED BUG: trinity3 Golden Fantasia — Saffron Beam should hit ALL enemies + Shatter Saffron, but the replaceSkill never reaches the Saffron minion (stays single-target, no Shatter)", () => {
+test("trinity3 Golden Fantasia: Saffron Beam hits ALL enemies and Shatters Prisma Saffron", () => {
   const { state, saffron, es } = boot(["trinity3"], 2);
   const [e0, e1] = [es[0]!, es[1]!];
   assert.ok(!hasKind(saffron, "shatter"), "Saffron is not Shattered before using the Beam");

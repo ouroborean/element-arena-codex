@@ -17,12 +17,15 @@ import type { Effect, NodeId } from "./effects/ast.ts";
  *  then replayed onto each minion this hero summons — so the upgrade reaches the per-instance minion skill
  *  without mutating the shared template (no cross-team / cross-summon leak). */
 export interface MinionSkillPatch {
-  op: "appendEffect" | "prependEffect" | "setSkillMeta" | "patchNode";
+  op: "appendEffect" | "prependEffect" | "setSkillMeta" | "patchNode" | "replaceSkill";
   skillId: string;
   effect?: Effect[];
   meta?: Record<string, unknown>;
   nodeId?: NodeId;
   replace?: Effect;
+  /** Whole-skill replacement (op "replaceSkill") — parked when an augment replaceSkill names a MINION skill
+   *  the hero doesn't own (trinity Grand Sonata / Golden Fantasia patch the Azure/Saffron minion skills). */
+  skill?: SkillInstance;
 }
 
 export type TeamId = "A" | "B";
