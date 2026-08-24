@@ -14,7 +14,7 @@ import { applyStatus, removeStatus, rawStackCount, stackCount } from "../src/sta
 import { applyDamage, applyHeal, addShield, totalShield } from "../src/damage.ts";
 import { legalTargets } from "../src/scheduler.ts";
 import { skillIsInvisible } from "../src/visibility.ts";
-import type { Effect, Selector } from "../src/effects/ast.ts";
+import type { Condition, Effect, Selector } from "../src/effects/ast.ts";
 import type { TriggeredEffect } from "../src/events.ts";
 import type { SkillInstance } from "../src/skill.ts";
 import type { DamageType, Status, Unit } from "../src/types.ts";
@@ -1727,19 +1727,29 @@ function wrapStunnedAllyBranch(s: SkillInstance, fn: string, then: Effect[]): vo
     then, else: s.effects,
   }];
 }
+// "Feed can now target any stunned ally. Swoop can now be used to make a stunned ally invulnerable." Feed's
+// targetKind:minion (the Eagle) is kept; a targetFilter OR-extends the legal set to stunned allies exactly
+// (not all allies / enemies — the fidelity-preserving alternative to clearing targetKind outright).
+const STUNNED_ALLY: Condition = { and: [{ isFaction: "target", faction: "ally" }, { has: "stun", of: "target" }] };
 registerCustom("mountainRescueTeam", (ctx, a) => {
   const invuln = num(a.invulnDuration, 1);
   // Feed: heal the targeted stunned ally 20 (+ Essence to Syl if that ally ends at max HP, mirroring base).
   const feed = mutableSkill(ctx, a.feedSkillId as string);
-  if (feed) wrapStunnedAllyBranch(feed, "mountainRescueTeam", [
-    { op: "heal", amount: 20, to: "target" },
-    { op: "if", cond: { cmp: "==", left: { ref: "missingHp", of: "target" }, right: 0 }, then: [{ op: "applyStatus", to: "self", status: { kind: "elemental_essence", duration: null } }] },
-  ]);
+  if (feed) {
+    feed.targetFilter = STUNNED_ALLY;
+    wrapStunnedAllyBranch(feed, "mountainRescueTeam", [
+      { op: "heal", amount: 20, to: "target" },
+      { op: "if", cond: { cmp: "==", left: { ref: "missingHp", of: "target" }, right: 0 }, then: [{ op: "applyStatus", to: "self", status: { kind: "elemental_essence", duration: null } }] },
+    ]);
+  }
   // Swoop: the Eagle's skill — make a targeted stunned ally invulnerable.
   for (const eagle of resolveSelector({ faction: "allies", kind: "minion" }, ctx)) {
     if (!(eagle.name in EAGLE_STAGE)) continue;
     const s = (eagle.skills ?? []).find((x) => x.id === (a.swoopSkillId as string));
-    if (s) wrapStunnedAllyBranch(s, "mountainRescueTeam", [{ op: "applyStatus", to: "target", status: { kind: "invulnerable", duration: invuln } }]);
+    if (s) {
+      s.targetFilter = STUNNED_ALLY;
+      wrapStunnedAllyBranch(s, "mountainRescueTeam", [{ op: "applyStatus", to: "target", status: { kind: "invulnerable", duration: invuln } }]);
+    }
   }
 });
 

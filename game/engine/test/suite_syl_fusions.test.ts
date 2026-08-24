@@ -168,7 +168,7 @@ test("cloud/Sky Drop: +10 damage and +1 stun-turn per stage evolved this round",
   assert.equal(stuns(e1), 1, "a real 1-turn stun is applied after one evolution");
 });
 
-test.skip("SUSPECTED BUG cloud/Sky Drop: 'stuns for 0 turns' at base must NOT stop the target — engine applies a functional duration-0 stun", () => {
+test("cloud/Sky Drop: 'stuns for 0 turns' at base does NOT stop the target", () => {
   // Frozen: base stun is "0 turns" (+1 per stage). 0 turns == no effective stun, so the target
   // should still be able to act on its turn. The engine applies a stun with duration 0 that
   // nonetheless blocks the enemy's next action (isStunnedFor keys on presence, not duration>0).
@@ -614,7 +614,7 @@ test("winter/Mountain Rescue Team: Swoop can make a stunned ally invulnerable fo
   assert.equal(inv!.duration, 1, "for 1 turn");
 });
 
-test.skip("SUSPECTED BUG winter/Mountain Rescue Team: Feed cannot target a stunned HERO ally — engine keeps Feed's targetKind:minion", () => {
+test("winter/Mountain Rescue Team: Feed can target a stunned HERO ally (heals 20)", () => {
   // Frozen: "Feed can now target any stunned ally." A stunned hero teammate is the canonical case
   // (and the sister clause, Swoop-on-a-stunned-hero-ally, works — see the passing test above). The
   // passive rewrites Feed's EFFECTS but never lifts its targetKind:minion, so a stunned hero ally is

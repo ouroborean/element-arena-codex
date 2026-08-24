@@ -15206,14 +15206,6 @@ export const FUSIONS: FusionForm[] = [
      "to": "target"
     },
     {
-     "op": "applyStatus",
-     "to": "target",
-     "status": {
-      "kind": "stun",
-      "duration": 0
-     }
-    },
-    {
      "op": "custom",
      "fn": "skyDropEagleStageBonus",
      "args": {
