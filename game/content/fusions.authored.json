@@ -18005,9 +18005,20 @@
        "amount": 15,
        "dtype": "affliction",
        "to": "eventTargets"
+      },
+      {
+       "op": "applyStatus",
+       "to": "eventSource",
+       "status": {
+        "kind": "dot",
+        "name": "Laughing Powder",
+        "magnitude": 5,
+        "dtype": "affliction",
+        "duration": 2
+       }
       }
      ],
-     "note": "'When it transfers to a new target, the current target receives 15 Affliction.' Mirrors base Laughing Powder's spread condition (a non-Titania unit uses a skill on the current holder, so the DoT jumps to that actor): the current holder (eventTargets) takes 15 Affliction as it transfers."
+     "note": "'When it transfers to a new target, the current target receives 15 Affliction.' The transfer itself (base Laughing Powder: a non-Titania unit using a skill on the holder is afflicted) is restored here because 'replace'-mode fusion filters out the origin-less base spread trigger — so this trigger both re-applies the Laughing Powder DoT to the acting unit (eventSource, the new target) AND deals 15 Affliction to the former holder (eventTargets). The doubleLaughingPowder trigger then doubles the transferred DoT (Titania is the applier)."
     }
    ],
    "skill": {

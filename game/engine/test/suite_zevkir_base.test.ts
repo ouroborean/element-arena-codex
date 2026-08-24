@@ -398,7 +398,7 @@ test("Repulse + Oceans Gather clause 3: at >=3 stacks Repulse marks all allies",
 // never installs a channeling marker, so Zev'kir does not actually BEGIN CHANNELING — the frozen text's
 // ongoing channel (a stack each subsequent turn, and the reaching-1-stack Essence) never starts.
 // --------------------------------------------------------------------------------------------------- //
-test.skip("SUSPECTED BUG: a Repulse counter should make Zev'kir BEGIN CHANNELING Call Tides (a channel, not one stack)", () => {
+test("a Repulse counter makes Zev'kir BEGIN CHANNELING Call Tides", () => {
   const { zev, state } = repulseArena();
   assert.equal(isChanneling(zev), false, "not channeling before the counter");
   performAction(state, { unit: "zev", skillId: "zevkir4", targets: ["ally"] });

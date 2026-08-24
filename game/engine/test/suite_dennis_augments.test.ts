@@ -163,7 +163,7 @@ test("dennis2 control: Dennis's OWN death does not trigger Rage Response (an ALL
 // Hector's Unit.name is "Hector the Injector" (templateAlias undefined), so the selector never matches
 // and the engine falls through to the ELSE branch (Fury Serum). Observed: Hector dies -> Fury mark set,
 // Dennis HP unchanged (no End-of-Shift self-damage), no HS-46 flag, no HS-88 regen.
-test.skip("dennis2 SUSPECTED BUG: a dying Hector the Injector should route Dennis to End of Shift, not Fury Serum", () => {
+test("dennis2: a dying Hector the Injector routes Dennis to End of Shift, not Fury Serum", () => {
   const dennis = D();
   applyAugment(dennis, augmentById("dennis2")!);
   const hector = loadHero(heroById("hector"), "A", "hec");

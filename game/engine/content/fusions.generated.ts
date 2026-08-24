@@ -17680,6 +17680,17 @@ export const FUSIONS: FusionForm[] = [
       "amount": 15,
       "dtype": "affliction",
       "to": "eventTargets"
+     },
+     {
+      "op": "applyStatus",
+      "to": "eventSource",
+      "status": {
+       "kind": "dot",
+       "name": "Laughing Powder",
+       "magnitude": 5,
+       "dtype": "affliction",
+       "duration": 2
+      }
      }
     ]
    }

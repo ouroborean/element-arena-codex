@@ -4916,6 +4916,15 @@ export const ROSTER: HeroDef[] = [
       "op": "useSkill",
       "skillId": "zevkir1",
       "by": "self"
+     },
+     {
+      "op": "applyStatus",
+      "to": "self",
+      "status": {
+       "kind": "channeling",
+       "name": "zevkir1",
+       "duration": null
+      }
      }
     ],
     "source": "Repulse (zevkir4)"

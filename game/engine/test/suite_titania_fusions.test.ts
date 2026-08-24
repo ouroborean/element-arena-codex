@@ -582,7 +582,7 @@ test("Weaponized Mirth: when a non-Titania unit uses a skill on the powdered tar
 // Under fusion the engine keeps the 15-Affliction pulse but the DoT no longer transfers — the acting ally is
 // never afflicted — so Weaponized Mirth's "15 on transfer" fires though no transfer occurs. (Root cause: the
 // fusion machinery drops Titania's base-kit reactive triggers, so the Laughing Powder spread is gone.)
-test.skip("SUSPECTED BUG: serum — Laughing Powder no longer TRANSFERS (frozen 'when it transfers to a new target'); the spread is dropped on fusion", () => {
+test("serum Weaponized Mirth: Laughing Powder transfers to the actor AND the former holder takes 15 Affliction", () => {
   const ally = makeUnit({ id: "a", team: "A", skills: [dmgSkill("ahit", 5)] });
   const e = makeUnit({ id: "e", team: "B", hp: 100 });
   const { st } = fuse("serum", { allies: [ally], enemies: [e] });
