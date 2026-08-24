@@ -41,6 +41,9 @@ export interface SkillInstance extends SkillDef {
    *  targetKind OR passes this filter (evaluated with the candidate bound as `target`). syl:winter Feed
    *  "can now target any stunned ally" — keeps targetKind:minion and admits stunned allies too. */
   targetFilter?: Condition;
+  /** Set by hector5 "Emergency Clinic": lifts targetMustBeName once no living unit of that name remains on
+   *  the caster's team ("Hector may use his Serums on targets other than Dennis once Dennis has died"). */
+  targetNameRelaxIfNamedDead?: boolean;
   /** If this holds at declaration, the skill cannot be countered/reflected (conditional Uncounterable). */
   uncounterableIf?: Condition;
   /** If this holds at declaration, the skill is treated as Bypassing (ignores Invulnerability when targeting,

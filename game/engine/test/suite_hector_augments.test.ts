@@ -258,7 +258,7 @@ test("hector5 Emergency Clinic: once Dennis is dead, Hector may inject a Serum i
 // targeting (antidote -> allies, assassin -> enemies, evolution -> self) and would all need coordinated
 // per-form targeting overrides. Needs a design ruling on how the base restriction composes with those forms,
 // not a single primitive. Frozen assertions preserved below.
-test.skip("hector5 Emergency Clinic: while Dennis is ALIVE a Serum on a non-Dennis target is rejected", () => {
+test("hector5 Emergency Clinic: while Dennis is ALIVE a Serum on a non-Dennis target is rejected", () => {
   const { state, enemy, dennis } = setup("hector5");
   assert.ok(dennis.alive, "precondition: Dennis is alive");
   const r = performAction(state, { unit: "h", skillId: "hector1", targets: [enemy.id] });
