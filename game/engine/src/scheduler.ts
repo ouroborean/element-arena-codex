@@ -514,6 +514,8 @@ export function legalTargets(state: MatchState, caster: Unit, skill: SkillInstan
     // a per-candidate predicate (syl:winter Feed also admits "any stunned ally").
     (!skill.targetKind || u.kind === skill.targetKind ||
       (skill.targetFilter != null && evalTargetPredicate(state, caster, u, skill.targetFilter))) &&
+    // scratch Bump Those Numbers: a Deal can't affect a unit that already bears the round-scoped lock mark.
+    !(skill.excludeMarkedTargets != null && u.statuses.some((s) => s.kind === "mark" && s.name === skill.excludeMarkedTargets)) &&
     !(u.id !== caster.id && hasStatus(u, "untargetable")) && // others can't target it; self can
     !(harmful && !bypass && invulnerableBlocks(u, skill)) &&
     !(helpful && !bypass && hasStatus(u, "isolated"));

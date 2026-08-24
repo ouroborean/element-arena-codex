@@ -6908,35 +6908,99 @@
    "owner": "scratch",
    "name": "Bump Those Numbers",
    "description": "Scratch's Deal skills no longer have a cooldown, but can only affect each Hero once per round.",
-   "note": "'Deal skills' read as every skill named 'Deal:' -> scratch1 (already cd 0), scratch2, scratch3, and the ultimate scratch6; setSkillMeta zeroes their cooldown. The second clause, 'can only affect each Hero once per round', is a target-legality rule (like Disarming Pitch's Marked ruling): legal-target filtering lives in the scheduler, not the effect DSL, and cannot be expressed as a patch, so it is recorded here as a note/ruling.",
+   "note": "'Deal skills' read as every skill named 'Deal:' -> scratch1, scratch2, scratch3, and the ultimate scratch6; setSkillMeta zeroes their cooldown AND sets excludeMarkedTargets:'Deal-Locked'. The second clause ('can only affect each Hero once per round') is implemented: each Deal appends a stamp of the round-permanent 'Deal-Locked' mark on its target, and legalTargets excludes any unit already bearing it. The mark is duration:null (round-permanent) and wiped at startRound, giving automatic per-round reset. The lock is SHARED across all Deals ('each Hero once per round' collectively).",
    "patches": [
     {
      "op": "setSkillMeta",
      "skillId": "scratch1",
      "meta": {
-      "cooldown": 0
+      "cooldown": 0,
+      "excludeMarkedTargets": "Deal-Locked"
      }
+    },
+    {
+     "op": "appendEffect",
+     "skillId": "scratch1",
+     "effect": [
+      {
+       "op": "applyStatus",
+       "to": "target",
+       "status": {
+        "kind": "mark",
+        "name": "Deal-Locked",
+        "duration": null
+       }
+      }
+     ]
     },
     {
      "op": "setSkillMeta",
      "skillId": "scratch2",
      "meta": {
-      "cooldown": 0
+      "cooldown": 0,
+      "excludeMarkedTargets": "Deal-Locked"
      }
+    },
+    {
+     "op": "appendEffect",
+     "skillId": "scratch2",
+     "effect": [
+      {
+       "op": "applyStatus",
+       "to": "target",
+       "status": {
+        "kind": "mark",
+        "name": "Deal-Locked",
+        "duration": null
+       }
+      }
+     ]
     },
     {
      "op": "setSkillMeta",
      "skillId": "scratch3",
      "meta": {
-      "cooldown": 0
+      "cooldown": 0,
+      "excludeMarkedTargets": "Deal-Locked"
      }
+    },
+    {
+     "op": "appendEffect",
+     "skillId": "scratch3",
+     "effect": [
+      {
+       "op": "applyStatus",
+       "to": "target",
+       "status": {
+        "kind": "mark",
+        "name": "Deal-Locked",
+        "duration": null
+       }
+      }
+     ]
     },
     {
      "op": "setSkillMeta",
      "skillId": "scratch6",
      "meta": {
-      "cooldown": 0
+      "cooldown": 0,
+      "excludeMarkedTargets": "Deal-Locked"
      }
+    },
+    {
+     "op": "appendEffect",
+     "skillId": "scratch6",
+     "effect": [
+      {
+       "op": "applyStatus",
+       "to": "target",
+       "status": {
+        "kind": "mark",
+        "name": "Deal-Locked",
+        "duration": null
+       }
+      }
+     ]
     }
    ]
   },

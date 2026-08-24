@@ -210,9 +210,11 @@ registerAugmentCustom("scaleCoilDamage", (unit, a) => {
   }];
 });
 
-// relaxSerumTargeting — FAITHFUL no-op: the "only Dennis" restriction the augment relaxes was never
-// encoded in this engine (the serums already target `single`), so there is nothing to lift.
-registerAugmentCustom("relaxSerumTargeting", () => { /* nothing to relax */ });
+// relaxSerumTargeting — hector5 "Emergency Clinic" (SUSPECTED BUG left skipped): the base "Serums only target
+// Dennis" restriction can't be a simple base-skill flag, because 4+ hector fusion forms (antidote -> allies,
+// assassin -> enemies, evolution -> self) each REDEFINE Serum targeting and would all need coordinated
+// per-form overrides. Deferred as a design ruling; kept a no-op so no restriction exists to relax.
+registerAugmentCustom("relaxSerumTargeting", () => { /* nothing to relax — see note */ });
 
 // capShieldAbsorbPerHit — "Good Pacing": Keeper's Shield can only absorb up to `max` from a single hit
 // (overflow falls through to HP). A `shield_absorb_cap` status the damage pipeline reads (damage.ts). The

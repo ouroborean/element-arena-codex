@@ -23,7 +23,8 @@ AUGMENTS = sys.argv[2] if len(sys.argv) > 2 else os.path.join(HERE, "..", "conte
 PATCH_OPS = {"addTrigger", "removeTrigger", "addSkill", "replaceSkill", "setSkillMeta",
              "appendEffect", "prependEffect", "patchNode", "custom"}
 SKILL_META_FIELDS = {"name", "cost", "cooldown", "tags", "targeting", "element", "klass",
-                     "requires", "uncounterableIf", "channelTurns", "doesNotInterrupt", "isHidden"}
+                     "requires", "uncounterableIf", "channelTurns", "doesNotInterrupt", "isHidden",
+                     "excludeMarkedTargets"}
 
 
 def v_fusion(form, path):
