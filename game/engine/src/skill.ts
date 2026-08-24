@@ -37,6 +37,10 @@ export interface SkillInstance extends SkillDef {
   doesNotBreakVeil?: boolean;
   /** A hard castability precondition (unselectable if false) — distinct from in-effect if/else. */
   requires?: Condition;
+  /** A per-candidate targeting predicate that OR-EXTENDS targetKind: a unit is a legal target if it matches
+   *  targetKind OR passes this filter (evaluated with the candidate bound as `target`). syl:winter Feed
+   *  "can now target any stunned ally" — keeps targetKind:minion and admits stunned allies too. */
+  targetFilter?: Condition;
   /** If this holds at declaration, the skill cannot be countered/reflected (conditional Uncounterable). */
   uncounterableIf?: Condition;
   /** If this holds at declaration, the skill is treated as Bypassing (ignores Invulnerability when targeting,

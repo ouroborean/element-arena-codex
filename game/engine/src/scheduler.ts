@@ -17,7 +17,7 @@
 import type { EnergyPool, MatchState, TeamId, Unit } from "./types.ts";
 import type { SkillInstance } from "./skill.ts";
 import type { Value } from "./effects/ast.ts";
-import { emit, evalConditionReadOnly, evalSkillCondition, evalValueReadOnly, resolveDeclaration, runEffects } from "./effects/interpret.ts";
+import { emit, evalConditionReadOnly, evalSkillCondition, evalTargetPredicate, evalValueReadOnly, resolveDeclaration, runEffects } from "./effects/interpret.ts";
 import { applyDamage, applyHeal, outgoingDtypeOverride, tickShieldsForTeam } from "./damage.ts";
 import { Rng } from "./rng.ts";
 import { applyStatus, clearRoundStatuses, removeStatus, tickDurationsForTeam } from "./status.ts";
@@ -504,7 +504,10 @@ export function legalTargets(state: MatchState, caster: Unit, skill: SkillInstan
     (u.alive || !!skill.canTargetDead) && // revives (keeper5/keeper3) may select a dead ally
     !(skill.cannotTargetSelf && u.id === caster.id) && // xyris5 "cannot target Xyris"
     reanimatedOk(u) &&
-    (!skill.targetKind || u.kind === skill.targetKind) && // e.g. Feed may only target a minion (the Eagle)
+    // targetKind restricts by unit kind (e.g. Feed -> a minion, the Eagle); targetFilter OR-extends it with
+    // a per-candidate predicate (syl:winter Feed also admits "any stunned ally").
+    (!skill.targetKind || u.kind === skill.targetKind ||
+      (skill.targetFilter != null && evalTargetPredicate(state, caster, u, skill.targetFilter))) &&
     !(u.id !== caster.id && hasStatus(u, "untargetable")) && // others can't target it; self can
     !(harmful && !bypass && invulnerableBlocks(u, skill)) &&
     !(helpful && !bypass && hasStatus(u, "isolated"));

@@ -15470,15 +15470,6 @@
       "to": "target"
      },
      {
-      "op": "applyStatus",
-      "to": "target",
-      "status": {
-       "kind": "stun",
-       "duration": 0
-      },
-      "note": "Base stun 'for 0 turns' = duration 0 (lapses at end of turn)."
-     },
-     {
       "op": "custom",
       "fn": "skyDropEagleStageBonus",
       "args": {

@@ -866,6 +866,16 @@ export function evalConditionReadOnly(state: MatchState, caster: Unit, cond: Con
   return evalCondition(cond, ctx); // rng intentionally not written back
 }
 
+/** Evaluate a per-candidate target predicate (SkillInstance.targetFilter) with `candidate` bound as the
+ *  `target`/`it` selector — used by legalTargets to admit extra candidates a targetKind alone can't express
+ *  (syl:winter Mountain Rescue Team: Feed "can now target any stunned ally"). Read-only: rng not written back. */
+export function evalTargetPredicate(state: MatchState, caster: Unit, candidate: Unit, cond: Condition): boolean {
+  const rng = Rng.fromState(state.rngState);
+  const bus = createBus(state, rng);
+  const ctx: Ctx = { state, rng, caster, self: caster, targets: [candidate], it: candidate, vars: {}, emit: bus.emit };
+  return evalCondition(cond, ctx);
+}
+
 /** Evaluate a Value WITHOUT persisting the rng — a read-only cost preview (see evalConditionReadOnly).
  *  Lets a per-cast cost mod scale live with a stack count (e.g. "1 less per Call Tides stack"). */
 export function evalValueReadOnly(state: MatchState, caster: Unit, value: Value): number {
