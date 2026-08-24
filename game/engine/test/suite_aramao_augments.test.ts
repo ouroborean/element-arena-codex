@@ -301,7 +301,7 @@ test("aramao5: Trial of the Sands now lasts 4 turns instead of 3", () => {
   assert.equal(markOf(ar, "Trial of the Sands")!.duration, 4, "Dune Step: the Trial window lasts 4 turns");
 });
 
-test.skip("SUSPECTED BUG: Dune Step frozen says every enemy counts as 'across' while Trial is active (+5/Essence), but the engine's `across` selector is purely slot-geometric — the non-across enemy takes only base 10 and grants no Essence", () => {
+test("Dune Step: while Trial is active every enemy counts as 'across' (Dune Stalker +5 + Essence apply)", () => {
   const ar = augmentedAramao("aramao5");                              // A slot 0 (alone -> shuffle no-op)
   const e0 = makeUnit({ id: "e0", team: "B", hp: 100, maxHp: 100 });  // B slot 0 (truly across)
   const e1 = makeUnit({ id: "e1", team: "B", hp: 100, maxHp: 100 });  // B slot 1 (NOT across by geometry)
@@ -319,7 +319,7 @@ test.skip("SUSPECTED BUG: Dune Step frozen says every enemy counts as 'across' w
   assert.equal(essenceCount(ar) >= 1, true, "damaging an enemy that now counts as across grants Essence");
 });
 
-test.skip("SUSPECTED BUG: Dune Step frozen says every ally counts as 'adjacent' while Trial is active (Heart of the Desert heals the whole team), but the engine's `adjacent` selector is purely slot-geometric — the far ally is not healed", () => {
+test("Dune Step: while Trial is active every ally counts as 'adjacent' (Heart of the Desert heals the whole team)", () => {
   const ar = augmentedAramao("aramao5");                                // slot 0
   const adj = makeUnit({ id: "adj", team: "A", hp: 50, maxHp: 100 });   // slot 1 (geometrically adjacent)
   const far = makeUnit({ id: "far", team: "A", hp: 50, maxHp: 100 });   // slot 2 (geometrically NOT adjacent)

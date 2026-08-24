@@ -12891,7 +12891,7 @@ export const ROSTER: HeroDef[] = [
       "op": "if",
       "cond": {
        "not": {
-        "sameUnit": [
+        "unitIn": [
          "target",
          "across"
         ]
@@ -12967,7 +12967,7 @@ export const ROSTER: HeroDef[] = [
      {
       "op": "if",
       "cond": {
-       "sameUnit": [
+       "unitIn": [
         "target",
         "across"
        ]
@@ -13169,7 +13169,7 @@ export const ROSTER: HeroDef[] = [
        ]
       },
       {
-       "sameUnit": [
+       "unitIn": [
         "eventTarget",
         "across"
        ]

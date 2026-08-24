@@ -74,6 +74,7 @@ export type Condition =
   | { has: StatusKind; name?: string; of?: Selector }
   | { cmp: ">" | ">=" | "<" | "<=" | "==" | "!="; left: Value; right: Value }
   | { sameUnit: [Selector, Selector] } // identity equality of the first unit each resolves to
+  | { unitIn: [Selector, Selector] } // membership: the first selector's unit is among the second selector's set
   | { isFaction: Selector; faction: "ally" | "enemy" } // relative to the acting unit's team
   | { isKind: Selector; kind: "hero" | "minion" } // is the selected unit a hero or a minion?
   | { isNamed: Selector; name: string } // the selected unit's display name equals this (e.g. a specific minion template, "Stonecap Mushroom")

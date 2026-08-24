@@ -127,6 +127,9 @@ def v_condition(c, path):
     elif "sameUnit" in c:
         for i, sel in enumerate(c["sameUnit"]):
             v_selector(sel, f"{path}.sameUnit[{i}]")
+    elif "unitIn" in c:
+        for i, sel in enumerate(c["unitIn"]):
+            v_selector(sel, f"{path}.unitIn[{i}]")
     elif "isFaction" in c:
         v_selector(c["isFaction"], path + ".isFaction")
         if c.get("faction") not in {"ally", "enemy"}:
