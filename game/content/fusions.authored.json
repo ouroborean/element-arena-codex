@@ -19473,10 +19473,11 @@
       "then": [
        {
         "op": "applyStatus",
-        "to": "target",
+        "to": "self",
         "status": {
-         "kind": "outgoing_damage_mod",
+         "kind": "incoming_damage_mod",
          "magnitude": 10,
+         "onlyFromUnitRef": "target",
          "duration": 1
         }
        },
@@ -19490,7 +19491,7 @@
         }
        }
       ],
-      "note": "Increases the damage of the target's next skill used on Zephyrex by 10, non-stacking (the 'Prod' mark guards against re-application). outgoing_damage_mod raises the DEALER's next damage; it is not Zephyrex-scoped, so it is the closest status to 'their next skill on Zephyrex'."
+      "note": "'Increases the damage of the target's next skill used ON ZEPHYREX by 10' -> an incoming_damage_mod +10 on Zephyrex (self), scoped via onlyFromUnitRef:target so ONLY the prodded enemy's hits on Zephyrex are boosted (a hit on one of Zephyrex's allies, or from a different enemy, is unaffected). Non-stacking via the 'Prod' mark on the target."
      }
     ]
    }

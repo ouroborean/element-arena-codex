@@ -125,6 +125,9 @@ export interface StatusSpec {
   viaSourceId?: string;
   /** Multiplies REFLECTED incoming hits only (zevkir Lens of the Deep mark: x2 from reflected skills). */
   reflectedDamageMult?: number;
+  /** For an incoming_damage_mod: scope the bonus to damage dealt by ONE unit (resolved from a selector at apply
+   *  time) — zephyrex Prod boosts only the prodded enemy's hits on Zephyrex. */
+  onlyFromUnitRef?: Selector;
   /** For a taunt: the unit to force the bearer to target (resolved at apply time). */
   unitRef?: Selector;
   /** Effects to run when this status expires naturally (duration lapse). */

@@ -114,11 +114,12 @@ export function damageReduction(u: Unit): number {
 }
 
 /** Net defender-side incoming modifier; +N means the unit takes N MORE damage. */
-export function incomingDamageMod(u: Unit, sourceId?: string): number {
+export function incomingDamageMod(u: Unit, sourceId?: string, from?: string): number {
   let total = 0;
   for (const s of u.statuses) {
     if (s.kind !== "incoming_damage_mod") continue;
     if (s.viaSourceId !== undefined && s.viaSourceId !== sourceId) continue; // scoped to one source skill
+    if (s.fromUnit !== undefined && s.fromUnit !== from) continue; // scoped to one dealer (zephyrex Prod: +10 only from the prodded enemy)
     total += s.magnitude ?? 0;
   }
   return total;
@@ -211,6 +212,8 @@ export interface DamageInstance {
   bypass?: boolean;
   /** This hit was bounced onto the target by a Reflect — triggers any reflectedDamageMult the target holds. */
   reflected?: boolean;
+  /** The credited dealer's id — lets a defender's incoming_damage_mod scope to one attacker (zephyrex Prod). */
+  from?: string;
 }
 
 export interface DamageResult {
@@ -246,7 +249,7 @@ export function applyDamage(target: Unit, dmg: DamageInstance): DamageResult {
 
   // 2. Incoming damage-mods (a channel distinct from Damage Reduction): additive, then multiplicative.
   if (!cap.mods) {
-    amount = Math.max(0, amount + incomingDamageMod(target, dmg.sourceId));
+    amount = Math.max(0, amount + incomingDamageMod(target, dmg.sourceId, dmg.from));
     amount = Math.max(0, applyRounding(amount * incomingDamageMult(target, dmg.isNew, dmg.sourceId, dmg.reflected)));
   }
 

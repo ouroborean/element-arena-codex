@@ -291,7 +291,7 @@ test("faerie/Prod: deals 20 Piercing and boosts the enemy's next skill used ON Z
 // Frozen scopes the boost to "the next skill they use ON ZEPHYREX". The engine models it as an unscoped
 // `outgoing_damage_mod` on the enemy (any normal/piercing hit gets +10), so an attack on one of Zephyrex's
 // allies is boosted too. (Confirmed: the Prod'd enemy hit the ally for 30, not 20.)
-test.skip("SUSPECTED BUG: Prod's +10 boosts the enemy's attack on ANY target, not only skills 'on Zephyrex'", () => {
+test("Prod's +10 boosts the enemy's attack only on Zephyrex, not on an ally", () => {
   const zeph = loadHero(heroById("zephyrex"), "A", "zx");
   const ally = makeUnit({ id: "a2", team: "A", hp: 100, maxHp: 100 });
   const atk = skill("e-atk", [{ op: "damage", amount: 20, dtype: "normal", to: "target" }], {

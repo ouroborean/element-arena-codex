@@ -466,6 +466,7 @@ function buildStatus(spec: StatusSpec, ctx: Ctx) {
     skillId: spec.skillId,
     viaSourceId: spec.viaSourceId,
     reflectedDamageMult: spec.reflectedDamageMult,
+    fromUnit: spec.onlyFromUnitRef ? resolveSelector(spec.onlyFromUnitRef, ctx)[0]?.id : undefined,
     unitRef: spec.unitRef ? resolveSelector(spec.unitRef, ctx)[0]?.id : undefined,
     onExpire: spec.onExpire,
     duration: extendedDuration(evalDuration(spec.duration, ctx), ctx),
@@ -495,7 +496,7 @@ export function exec(effect: Effect, ctx: Ctx): void {
       const land = (u: Unit, amt: number, src: string): void => {
         ctx.affected?.add(u.id);
         const wasAlive = u.alive;
-        const r = applyDamage(u, { amount: amt, type: dtype, isNew: true, sourceId: effect.id, bypass: effect.bypass || ctx.bypassing || bypassesAgainst(dealer, u), reflected: ctx.reflected });
+        const r = applyDamage(u, { amount: amt, type: dtype, isNew: true, sourceId: effect.id, bypass: effect.bypass || ctx.bypassing || bypassesAgainst(dealer, u), reflected: ctx.reflected, from: src });
         if (r.shieldAbsorbed > 0) ctx.emit({ type: "shieldDamaged", unit: u.id, source: src, amount: r.shieldAbsorbed });
         if (r.shieldBroke) ctx.emit({ type: "shieldBroken", unit: u.id, source: src });
         // The event's sourceId identifies what dealt the damage for reactions (eventSourceId): a damage node's
