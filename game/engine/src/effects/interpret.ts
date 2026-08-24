@@ -45,6 +45,9 @@ export interface Ctx {
   /** The executing skill carries the "Bypassing" class tag: its damage ignores DR + Shield regardless of the
    *  dealer's Bypass status. Seeded from skill.tags at the cast/channel; propagates via { ...ctx }. */
   bypassing?: boolean;
+  /** This skill was bounced onto its target by a Reflect: its damage is "reflected" (a Lens-marked defender
+   *  takes reflectedDamageMult× from it). Seeded from the DeclarationResult; propagates via { ...ctx }. */
+  reflected?: boolean;
   /** Set of unit ids this skill's effects touched (damaged/statused) — for "affected N targets" reads. */
   affected?: Set<string>;
   /** Present inside a trigger: the event that fired it. */
@@ -462,6 +465,7 @@ function buildStatus(spec: StatusSpec, ctx: Ctx) {
     specificDelta: spec.specificDelta,
     skillId: spec.skillId,
     viaSourceId: spec.viaSourceId,
+    reflectedDamageMult: spec.reflectedDamageMult,
     unitRef: spec.unitRef ? resolveSelector(spec.unitRef, ctx)[0]?.id : undefined,
     onExpire: spec.onExpire,
     duration: extendedDuration(evalDuration(spec.duration, ctx), ctx),
@@ -491,7 +495,7 @@ export function exec(effect: Effect, ctx: Ctx): void {
       const land = (u: Unit, amt: number, src: string): void => {
         ctx.affected?.add(u.id);
         const wasAlive = u.alive;
-        const r = applyDamage(u, { amount: amt, type: dtype, isNew: true, sourceId: effect.id, bypass: effect.bypass || ctx.bypassing || bypassesAgainst(dealer, u) });
+        const r = applyDamage(u, { amount: amt, type: dtype, isNew: true, sourceId: effect.id, bypass: effect.bypass || ctx.bypassing || bypassesAgainst(dealer, u), reflected: ctx.reflected });
         if (r.shieldAbsorbed > 0) ctx.emit({ type: "shieldDamaged", unit: u.id, source: src, amount: r.shieldAbsorbed });
         if (r.shieldBroke) ctx.emit({ type: "shieldBroken", unit: u.id, source: src });
         // The event's sourceId identifies what dealt the damage for reactions (eventSourceId): a damage node's
@@ -924,6 +928,9 @@ export interface DeclarationResult {
   /** The targets the skill should resolve against (redirected by any Reflect). */
   finalTargets: Unit[];
   countererId?: string;
+  /** True if a Reflect bounced this skill onto a new target — the ensuing damage is "reflected" (zevkir Lens
+   *  of the Deep: a Lens-marked enemy takes double damage from reflected skills). */
+  reflected?: boolean;
 }
 
 /** First applicable "replace" trigger for a declared skill (The Whimsy Engine), in unit order. */
@@ -990,26 +997,27 @@ export function resolveDeclaration(state: MatchState, caster: Unit, skill: Skill
     if (skill.tags.includes("Uncounterable") || caster.statuses.some((s) => s.kind === "uncounterable") || condUncounterable) {
       return { cancelled: false, finalTargets: current };
     }
+    let reflected = false;
     for (let bounce = 0; bounce < MAX_TRIGGER_DEPTH; bounce++) {
       const event: GameEvent = { type: "skillDeclared", caster: caster.id, skillId: skill.id, tags: skill.tags, targets: current.map((t) => t.id), hidden: skillIsInvisible(caster, skill) };
       const hit = findInterrupt(state, rng, bus, event);
-      if (!hit) return { cancelled: false, finalTargets: current };
+      if (!hit) return { cancelled: false, finalTargets: current, reflected };
       const { owner, trig } = hit;
       const tctx: Ctx = { state, rng, caster: owner, self: owner, targets: [], it: null, vars: {}, skillId: trig.sourceSkillId ?? ownerPassiveId(owner), event, emit: bus.emit };
       runAll(trig.effect, tctx);
       if (trig.once) owner.triggers = (owner.triggers ?? []).filter((t) => t !== trig);
       if ((trig.kind ?? "react") === "counter") {
         bus.emit({ type: "counterFired", counterer: owner.id, caster: caster.id, skillId: skill.id });
-        return { cancelled: true, finalTargets: current, countererId: owner.id };
+        return { cancelled: true, finalTargets: current, countererId: owner.id, reflected };
       }
       const from = current[0]?.id;
       const dest = trig.redirectToId ? state.units[trig.redirectToId]
         : trig.redirectTo ? resolveSelector(trig.redirectTo, tctx)[0] : owner;
-      if (dest && from) bus.emit({ type: "skillRedirected", caster: caster.id, skillId: skill.id, from, to: dest.id });
+      if (dest && from) { bus.emit({ type: "skillRedirected", caster: caster.id, skillId: skill.id, from, to: dest.id }); reflected = true; }
       current = dest ? [dest] : [];
     }
     state.log.push("reflect bounce cap hit");
-    return { cancelled: false, finalTargets: current };
+    return { cancelled: false, finalTargets: current, reflected };
   } finally {
     state.rngState = rng.state;
   }
@@ -1019,7 +1027,7 @@ export function resolveDeclaration(state: MatchState, caster: Unit, skill: Skill
 export function runEffects(
   state: MatchState,
   effects: Effect[],
-  opts: { caster: Unit; self?: Unit; targets?: Unit[]; skillId?: string; targeting?: string; invisible?: boolean; disguiseAs?: string; bypassing?: boolean },
+  opts: { caster: Unit; self?: Unit; targets?: Unit[]; skillId?: string; targeting?: string; invisible?: boolean; disguiseAs?: string; bypassing?: boolean; reflected?: boolean },
 ): string[] {
   const rng = Rng.fromState(state.rngState);
   const bus = createBus(state, rng);
@@ -1036,6 +1044,7 @@ export function runEffects(
     invisible: opts.invisible,
     disguiseAs: opts.disguiseAs,
     bypassing: opts.bypassing,
+    reflected: opts.reflected,
     affected,
     emit: bus.emit,
   };

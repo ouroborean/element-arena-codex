@@ -20362,7 +20362,8 @@ export const FUSIONS: FusionForm[] = [
      "status": {
       "kind": "mark",
       "name": "Lens of the Deep",
-      "duration": 2
+      "duration": 2,
+      "reflectedDamageMult": 2
      }
     }
    ],

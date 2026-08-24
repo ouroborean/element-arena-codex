@@ -20740,9 +20740,10 @@
       "status": {
        "kind": "mark",
        "name": "Lens of the Deep",
-       "duration": 2
+       "duration": 2,
+       "reflectedDamageMult": 2
       },
-      "note": "For its next two turns the marked enemy takes double damage from reflected skills. No status expresses 'double damage from reflected sources only', so it is carried as a named mark the reflection path reads."
+      "note": "For its next two turns the marked enemy takes double damage from REFLECTED skills: the mark carries reflectedDamageMult:2, which incomingDamageMult applies only when the hit was bounced by a Reflect (the DeclarationResult.reflected flag threaded through to the DamageInstance)."
      }
     ]
    }

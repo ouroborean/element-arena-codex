@@ -636,7 +636,7 @@ export function performAction(state: MatchState, action: Action): ActionResult {
   // blocks N turns.
   skill.currentCd = effectiveCooldown(caster, skill);
   skill.cdSetTurn = state.turn;
-  const affected = runEffects(state, skill.effects, { caster, self: caster, targets: decl.finalTargets, skillId: skill.id, targeting: effectiveTargeting(caster, skill), invisible: skill.isHidden, disguiseAs: skill.disguiseAs, bypassing: skillBypasses(state, caster, skill) });
+  const affected = runEffects(state, skill.effects, { caster, self: caster, targets: decl.finalTargets, skillId: skill.id, targeting: effectiveTargeting(caster, skill), invisible: skill.isHidden, disguiseAs: skill.disguiseAs, bypassing: skillBypasses(state, caster, skill), reflected: decl.reflected });
   caster.lastSkillId = skill.id; // the "used a skill" ledger (read by clone/last-skill mechanics)
 
   // Using a new skill cancels active channels — unless it opts out, or it is another copy of a multi-copy

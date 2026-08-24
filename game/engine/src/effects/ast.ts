@@ -123,6 +123,8 @@ export interface StatusSpec {
   /** For an incoming_damage_mod / incoming_damage_mult: scope the bonus/mult to damage from one source id
    *  (a damage node's id, e.g. "ayana1.hit"). Absent = all incoming damage. */
   viaSourceId?: string;
+  /** Multiplies REFLECTED incoming hits only (zevkir Lens of the Deep mark: x2 from reflected skills). */
+  reflectedDamageMult?: number;
   /** For a taunt: the unit to force the bearer to target (resolved at apply time). */
   unitRef?: Selector;
   /** Effects to run when this status expires naturally (duration lapse). */
