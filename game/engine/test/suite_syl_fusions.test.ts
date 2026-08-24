@@ -180,11 +180,12 @@ test("cloud/Sky Drop: 'stuns for 0 turns' at base does NOT stop the target", () 
   assert.equal(r.ok, true, "a 0-turn stun does not prevent the target from acting");
 });
 
-test.skip("SUSPECTED BUG cloud/Great Roc: eagle skills should last exactly +1 turn — engine double-applies (+2)", () => {
-  // Frozen: the Eagle's skills "last 1 additional turn". Swoop's base Shatter is 'until the end of
-  // the turn' (stored duration 0 — proven by a non-Great-Roc form below), so under Great Roc it must
-  // last 1 turn. The engine's extendEagleSkillDurations fires twice on the post-evolution Swoop,
-  // yielding a 2-turn Shatter.
+// DESIGN RULING (resolved): an "until the end of the turn" effect (stored duration 0), when Great Roc adds
+// +1 turn, should last until the end of the USER'S NEXT turn — i.e. one REAL turn longer than baseline. The
+// engine treats stored durations 0 and 1 as the same lifetime (both expire at the next turn-end), so a base-0
+// effect must store 2 to gain a real extra turn. The Math.max(...,1) floor in extendEagleSkillDurations does
+// exactly that (0 -> 2); a plain +1 (0 -> 1) would be lifetime-identical to baseline and grant no real turn.
+test("cloud/Great Roc: a base-0 ('until end of turn') Eagle-skill effect lasts one REAL turn longer (stored 2)", () => {
   const baseline = (() => {
     const { syl, state } = fuse("angel", [foe("b1")]); // a form WITHOUT Great Roc — untouched baseline
     performAction(state, { unit: syl.id, skillId: "syl5", targets: [] });
@@ -192,14 +193,14 @@ test.skip("SUSPECTED BUG cloud/Great Roc: eagle skills should last exactly +1 tu
     performAction(state, { unit: eg.id, skillId: "sylminion2", targets: [state.units["b1"]!.id] });
     return state.units["b1"]!.statuses.find((s) => s.kind === "shatter")!.duration;
   })();
-  assert.equal(baseline, 0, "baseline Swoop Shatter lasts 'until end of turn' (duration 0)");
+  assert.equal(baseline, 0, "baseline Swoop Shatter lasts 'until end of turn' (stored duration 0)");
 
   const { syl, state } = fuse("cloud", [foe("e1")]);
   performAction(state, { unit: syl.id, skillId: "syl5", targets: [] });
   const eagle = eagleOf(state);
   performAction(state, { unit: eagle.id, skillId: "sylminion2", targets: [state.units["e1"]!.id] });
   const dur = state.units["e1"]!.statuses.find((s) => s.kind === "shatter")!.duration;
-  assert.equal(dur, baseline + 1, "Great Roc adds exactly 1 turn to the Eagle's applied effects");
+  assert.equal(dur, 2, "Great Roc's +1 real turn on a base-0 effect stores 2 (until end of the user's next turn)");
 });
 
 // =====================================================================================

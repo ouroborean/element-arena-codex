@@ -194,18 +194,11 @@ test("galazax0 clause A CONTROL: a NON-damaging skill applies no Storm Builds st
   assert.equal(e.hp, 100, "and the enemy took no damage");
 });
 
-// DISPUTED INTERPRETATION (kept skipped): the unconditional passive ("Galazax's damaging skills apply a
-// stack") argues galazax3's own 5 Piercing should leave the target with 1 fresh stack. But galazax3 also
-// says it "moves ALL stacks... from target enemy to himself", and THREE base-kit tests
-// (suite_galazax_base: lines 282, 320, 334) plus suite_galazax_fusions:387 assert the target ends emptied
-// (0) even when the Piercing fires — i.e. the "moves all" wipe is intended to be final, clearing the
-// fresh passive stack too. This bug-report is the minority reading and conflicts with those spec-derived
-// tests, so it stays skipped pending a design ruling rather than flipping four passing tests.
-test.skip("galazax3's 5 Piercing applies a fresh Storm Builds stack to the target (passive is unconditional)", () => {
-  // Frozen passive is unconditional: "Galazax's damaging skills apply a stack of The Storm Builds."
-  // galazax3 first MOVES the target's stacks to Galazax, then (>=2 removed) deals 5 Piercing to the
-  // target. That 5 Piercing IS a damaging hit by one of Galazax's skills, so — exactly as with
-  // galazax1/2/4/6 — the damaged target should end with one fresh Storm Builds stack from the passive.
+// DESIGN RULING (resolved): galazax3 "moves ALL stacks" is FINAL — the target ends emptied (0), even though
+// its own 5 Piercing fires the unconditional "damaging skills apply a stack" passive. The move's wipe is
+// ordered after the passive stack, so it clears that fresh stack too. Consistent with the four base/fusion
+// tests that assert the target ends at 0.
+test("galazax3's Piercing does NOT leave a Storm Builds stack — 'moves ALL stacks' empties the target (0)", () => {
   const g = loadHero(heroById("galazax"), "A", "g");
   const e = makeUnit({ id: "e", team: "B", kind: "hero", hp: 100, maxHp: 100 });
   seedStorm(e, 3); // 3 >= 2 -> the 5 Piercing branch fires
@@ -215,7 +208,7 @@ test.skip("galazax3's 5 Piercing applies a fresh Storm Builds stack to the targe
   performAction(state, { unit: "g", skillId: "galazax3", targets: ["e"] });
   assert.equal(e.hp, 95, "3 (>=2) stacks removed -> 5 Piercing landed on the target");
   assert.equal(stormStacks(g), 3, "the 3 moved stacks are now on Galazax");
-  assert.equal(stormStacks(e), 1, "the passive stacks Storm Builds on the enemy that Galazax's Piercing damaged");
+  assert.equal(stormStacks(e), 0, "'moves ALL stacks' is final: the target is emptied, clearing even the fresh passive stack");
 });
 
 test("galazax0 clause B: using a skill WHILE Channeling grants Elemental Essence", () => {
