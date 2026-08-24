@@ -1,0 +1,13 @@
+{
+  "name": "@arena/scripts",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Local dev/test scripts — a headless bot client and a one-command local PvP smoke test.",
+  "scripts": {
+    "web": "node local-pvp-web.ts",
+    "pvp": "node local-pvp.ts",
+    "bot": "node bot-client.ts",
+    "typecheck": "cd ../engine && npx tsc --noEmit -p ../scripts/tsconfig.json"
+  }
+}
