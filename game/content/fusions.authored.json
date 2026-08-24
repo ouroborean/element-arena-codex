@@ -5803,10 +5803,10 @@
        "op": "applyStatus",
        "to": "self",
        "status": {
-        "kind": "silence",
+        "kind": "income_suppressed",
         "duration": null
        },
-       "note": "Closest primitive for 'he no longer generates an Energy each turn' - silence suppresses Elemental Essence income."
+       "note": "'He no longer generates an Energy each turn' = income_suppressed: grantIncome yields Hector NOTHING (not even the fallback 1 Generic). (Silence only redirects essence->generic, so it still granted 1 Generic.)"
       }
      ]
     },
@@ -7555,15 +7555,15 @@
    "passive": {
     "name": "Stellar Story",
     "description": "Whenever Keeper successfully consumes Shield from Tales to Tell, he gains Elemental Essence.",
-    "note": "'successfully consumes Shield' has no event primitive: consumeShield (the custom that spends Tales to Tell) emits nothing, so there is no shieldConsumed event to react to. The trigger below is the closest reactive hook."
+    "note": "Keyed on the shieldConsumed event (emitted by the consumeShield custom only when real Shield and/or Chronicle Fragments were actually spent), so Essence is granted exactly on a SUCCESSFUL consume -- not on a guard-failed Page-turner or a Shield-ADDING skill."
    },
    "passiveTriggers": [
     {
-     "on": "skillUsed",
+     "on": "shieldConsumed",
      "source": "Stellar Story",
      "when": {
       "sameUnit": [
-       "eventSource",
+       "eventUnit",
        "self"
       ]
      },
@@ -7576,8 +7576,7 @@
         "duration": null
        }
       }
-     ],
-     "note": "Best-effort: grant Elemental Essence on any self skill use. Over-fires relative to the oracle ('successfully consumes Shield') because skillUsed cannot see whether a consumeShield ran or its guard passed, so it also fires on Keeper's non-consuming and Shield-ADDING skills."
+     ]
     }
    ],
    "skill": {
@@ -8499,9 +8498,34 @@
    "passive": {
     "name": "Crackling Hearth",
     "description": "Whenever Shield is added to Tales to Tell, Keeper of Fables heals a random allied hero for 10 health.",
-    "note": "This passive cannot be transcribed as a reactive HeroTrigger: grantShield emits no event and Tales to Tell is a real Shield pool (not a status), so there is no 'Shield added' event to hook. Faithful modeling would require every grantShield-to-Keeper site to also heal a random ally 10 -- a change to the grant primitive, documented here. The single trigger below belongs to the fusion ACTIVE, not this passive."
+    "note": "Keyed on the shieldGranted event (emitted by the grantShield op): when Shield is added to Keeper (Tales to Tell is his Shield pool), heal a random allied hero (excluding Keeper) 10."
    },
    "passiveTriggers": [
+    {
+     "on": "shieldGranted",
+     "source": "Crackling Hearth",
+     "when": {
+      "sameUnit": [
+       "eventUnit",
+       "self"
+      ]
+     },
+     "effect": [
+      {
+       "op": "heal",
+       "amount": 10,
+       "to": {
+        "pick": "random",
+        "from": {
+         "faction": "allies",
+         "kind": "hero",
+         "includeSelf": false
+        },
+        "count": 1
+       }
+      }
+     ]
+    },
     {
      "on": "skillUsed",
      "source": "A Tale of Joy and Wonder (keeperwinter1)",

@@ -159,7 +159,7 @@ test("aurora0: consuming Shield from Tales to Tell grants Keeper Elemental Essen
   assert.equal(hasEssence(k), true, "successful consume -> Elemental Essence");
 });
 
-test.skip("SUSPECTED BUG aurora0: frozen grants Essence only on a SUCCESSFUL Shield consume, but the trigger fires on ANY skill Keeper uses (skillUsed, ungated on consumption) — Page-turner with <25 Shield consumes nothing yet still grants Essence", () => {
+test("aurora0 Stellar Story: Essence is granted only on a SUCCESSFUL Shield consume", () => {
   // Page-turner with < 25 Shield: the skill is used but its consume guard fails, so no Shield is spent.
   // The frozen trigger is "whenever Keeper SUCCESSFULLY CONSUMES Shield" — a no-consume cast must not grant.
   const k = fusedKeeper("k", "aurora");
@@ -678,7 +678,7 @@ test("stasis1: Tale of a Distant Future stacks — a second cast accumulates to 
 // # winter — "Crackling Hearth" (passive) + "A Tale of Joy and Wonder" (active)
 // ###########################################################################
 
-test.skip("SUSPECTED BUG winter0 (Crackling Hearth): frozen heals a random allied hero 10 whenever Shield is added to Tales to Tell, but this passive is UNIMPLEMENTED — the winter form's only trigger implements winter1's Essence window, and there is no 'shield added' event/hook at all, so no heal fires", () => {
+test("winter0 Crackling Hearth: adding Shield to Tales to Tell heals a random allied hero 10", () => {
   const k = fusedKeeper("k", "winter");
   const a1 = ally("a1", { hp: 90 });
   const state = makeState([k, a1], [enemy("e")]);

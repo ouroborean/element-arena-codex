@@ -163,12 +163,16 @@ registerCustom("consumeShield", (ctx, args) => {
   for (const u of resolveSelector((args.of as Selector) ?? "caster", ctx)) {
     const spent = spendShield(u, amount);
     const shortfall = amount - spent;
+    let fromFragments = 0;
     if (shortfall > 0) {
       // keeper:crystal — Chronicle Fragments count as 10 Shield each; cover the shortfall with WHOLE stacks
       // (a Fragment can't be split). Non-Keeper callers hold 0 Fragments, so this is a no-op for them.
       const need = Math.min(stackCount(u, "Chronicle Fragments"), Math.ceil(shortfall / 10));
-      if (need > 0) applyStatus(u, { kind: "stack", name: "Chronicle Fragments", magnitude: -need, duration: null, appliedBy: u.id, appliedTurn: ctx.state.turn });
+      if (need > 0) { applyStatus(u, { kind: "stack", name: "Chronicle Fragments", magnitude: -need, duration: null, appliedBy: u.id, appliedTurn: ctx.state.turn }); fromFragments = need * 10; }
     }
+    // Announce a SUCCESSFUL consume (real Shield spent and/or Fragments cashed) so keeper:aurora Stellar Story
+    // grants Essence only on an actual consume, not on every skill cast.
+    if (spent > 0 || fromFragments > 0) ctx.emit({ type: "shieldConsumed", unit: u.id, amount: spent + fromFragments });
   }
 });
 

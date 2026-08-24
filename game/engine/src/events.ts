@@ -16,6 +16,8 @@ export type GameEvent =
   | { type: "damageDealt"; source: UnitId | null; target: UnitId; amount: number; dtype: DamageType; sourceId?: string; isNew?: boolean }
   | { type: "shieldDamaged"; unit: UnitId; source: UnitId | null; amount: number }
   | { type: "shieldBroken"; unit: UnitId; source: UnitId | null }
+  | { type: "shieldGranted"; unit: UnitId; source: UnitId | null; amount: number } // Shield banked (keeper:winter Crackling Hearth)
+  | { type: "shieldConsumed"; unit: UnitId; amount: number } // Shield actually spent from a pool (keeper:aurora Stellar Story)
   | { type: "unitDied"; unit: UnitId; killer: UnitId | null }
   | { type: "skillUsed"; caster: UnitId; skillId: string; targets: UnitId[]; tags?: string[]; affected?: UnitId[]; hidden?: boolean }
   // A unit was granted a new skill (a fusion/augment-era mechanic; no base-kit emitter yet).

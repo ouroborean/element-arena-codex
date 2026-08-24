@@ -5743,7 +5743,7 @@ export const FUSIONS: FusionForm[] = [
       "op": "applyStatus",
       "to": "self",
       "status": {
-       "kind": "silence",
+       "kind": "income_suppressed",
        "duration": null
       }
      }
@@ -7460,11 +7460,11 @@ export const FUSIONS: FusionForm[] = [
   },
   "passiveTriggers": [
    {
-    "on": "skillUsed",
+    "on": "shieldConsumed",
     "source": "Stellar Story",
     "when": {
      "sameUnit": [
-      "eventSource",
+      "eventUnit",
       "self"
      ]
     },
@@ -8375,6 +8375,31 @@ export const FUSIONS: FusionForm[] = [
    "description": "Whenever Shield is added to Tales to Tell, Keeper of Fables heals a random allied hero for 10 health."
   },
   "passiveTriggers": [
+   {
+    "on": "shieldGranted",
+    "source": "Crackling Hearth",
+    "when": {
+     "sameUnit": [
+      "eventUnit",
+      "self"
+     ]
+    },
+    "effect": [
+     {
+      "op": "heal",
+      "amount": 10,
+      "to": {
+       "pick": "random",
+       "from": {
+        "faction": "allies",
+        "kind": "hero",
+        "includeSelf": false
+       },
+       "count": 1
+      }
+     }
+    ]
+   },
    {
     "on": "skillUsed",
     "source": "A Tale of Joy and Wonder (keeperwinter1)",

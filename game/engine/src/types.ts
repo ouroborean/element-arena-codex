@@ -69,6 +69,7 @@ export type StatusKind =
   | "cost_currency_remap" // skillId-scoped: the named skill's remaining Specific cost is payable as Generic (any color)
   | "cooldown_mod" // magnitude: delta added to the cooldown the holder's skills go on when used
   | "silence" // suppresses Elemental Essence income
+  | "income_suppressed" // yields NO income of any kind (not even the fallback 1 Generic) — hector:brimstone Dennisyphus
   | "paralysis" // cooldowns do not advance
   | "stealth" // does not trigger enemy effects
   | "veiled" // concealed until the veiled unit uses a Harmful skill (removed then, unless doesNotBreakVeil); the concealment itself is server-side redaction

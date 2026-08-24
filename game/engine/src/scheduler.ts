@@ -130,6 +130,9 @@ export function hasEssenceIncome(hero: Unit): boolean {
 export function grantIncome(state: MatchState, id: TeamId): void {
   const pool = team(state, id).energy;
   for (const hero of livingHeroes(state, id)) {
+    // A hero under income_suppressed (hector:brimstone Dennisyphus "no longer generates an Energy each turn")
+    // yields nothing — not even the fallback Generic.
+    if (hero.statuses.some((s) => s.kind === "income_suppressed")) continue;
     if (hasEssenceIncome(hero)) {
       pool[hero.currentElement] = (pool[hero.currentElement] ?? 0) + 1;
       // Consume exactly ONE charge (essence is countable): N banked charges convert over N turns. A no-op
