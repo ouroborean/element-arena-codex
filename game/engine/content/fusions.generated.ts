@@ -13395,8 +13395,9 @@ export const FUSIONS: FusionForm[] = [
        "op": "applyStatus",
        "to": "target",
        "status": {
-        "kind": "mark",
+        "kind": "outgoing_damage_mult",
         "name": "Magnetized",
+        "magnitude": 2,
         "duration": 1
        }
       }

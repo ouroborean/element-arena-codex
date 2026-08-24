@@ -272,13 +272,13 @@ test("magnet Magnetize Munitions taunts all enemies onto the target Boulder", ()
 // Adversarial: "On the following turn, that Boulder will deal double damage to any enemy it damages." With the
 // Magnetized mark up, a launched Boulder should deal DOUBLE its remaining-health hit; nothing in the engine
 // reads the Magnetized mark to double outgoing damage.
-test.skip("SUSPECTED BUG: magnet Magnetize Munitions does not double a Magnetized Boulder's damage — frozen doubles it, the engine has no Magnetized damage reader", () => {
+test("magnet Magnetize Munitions doubles a Magnetized Boulder's launch damage", () => {
   const r = fuse("magnet");
   const e = enemy("e1");
   const st = makeState([r], [e]);
   fund(st);
   const b = addMinion(st, "Boulder", "b1", 50);
-  b.statuses.push(status("mark", { name: "Magnetized", duration: 1 })); // "the following turn"
+  b.statuses.push(status("outgoing_damage_mult", { name: "Magnetized", magnitude: 2, duration: 1 })); // "the following turn" the Boulder deals double
 
   performAction(st, { unit: "a1", skillId: "roland1", targets: ["b1"] }); // launch: 50 -15 = 35 remaining
   assert.equal(e.hp, 100 - 70, "a Magnetized Boulder's 35 launch is doubled to 70");

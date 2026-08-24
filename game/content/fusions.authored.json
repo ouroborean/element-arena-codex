@@ -13626,14 +13626,15 @@
       "op": "schedule",
       "delayTurns": 1,
       "to": "target",
-      "note": "'On the following turn that Boulder deals double damage to any enemy it damages' - damage-doubling is not expressible as a status magnitude, so next turn the target Boulder is tagged with the 'Magnetized' mark the engine reads to double its outgoing damage that turn.",
+      "note": "'On the following turn that Boulder deals double damage to any enemy it damages' - next turn the target Boulder gains an outgoing_damage_mult x2 (named 'Magnetized') for 1 turn, which the damage pipeline reads to double every hit the Boulder deals (including its SFtE launch, whose damage is credited to the Boulder via from:target).",
       "effect": [
        {
         "op": "applyStatus",
         "to": "target",
         "status": {
-         "kind": "mark",
+         "kind": "outgoing_damage_mult",
          "name": "Magnetized",
+         "magnitude": 2,
          "duration": 1
         }
        }
