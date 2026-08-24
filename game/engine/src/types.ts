@@ -163,6 +163,9 @@ export interface Status {
   viaSourceId?: string;
   /** For a conditional_bypass: the target must hold this status (kind + optional name) for the bypass to apply. */
   bypassCond?: { kind: StatusKind; name?: string };
+  /** Any status carrying this multiplies REFLECTED incoming hits only (zevkir Lens of the Deep mark: x2 from
+   *  reflected skills). Read by incomingDamageMult when the hit was bounced by a Reflect. */
+  reflectedDamageMult?: number;
   /** For a stack_read_mod: how it adjusts the effective stack read. mult = actual x magnitude; floorZero =
    *  if actual is 0, read magnitude; missingHp = actual + floor(missingHp / magnitude). */
   mode?: "mult" | "floorZero" | "missingHp";

@@ -464,7 +464,7 @@ test("Lens of the Deep: deals 15 PIERCING and marks the enemy for 2 turns", () =
   assert.equal(mark!.duration, 2, "the mark lasts 2 turns");
 });
 
-test.skip("SUSPECTED BUG: a Lens-marked enemy should take DOUBLE damage from reflected skills (frozen), but the reflection path does not read the mark — it deals single", () => {
+test("a Lens-marked enemy takes DOUBLE damage from reflected skills", () => {
   // Frozen: "...for their next two turns that enemy will receive double damage from reflected skills."
   // Setup: mark e1 with Lens, begin Channeling, then let e1 strike Zev'kir. Patient Predation reflects the
   // 30-damage strike back onto e1. Since e1 carries the Lens mark, the reflected hit should be DOUBLED (60).

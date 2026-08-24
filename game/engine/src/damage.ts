@@ -155,10 +155,12 @@ export function outgoingDamageMod(u: Unit, dtype: DamageType): number {
   return total;
 }
 
-/** Product of the defender's incoming multipliers (0.5 = half, 2 = double). `newDamageOnly` mults skip DoTs. */
-function incomingDamageMult(u: Unit, isNew: boolean | undefined, sourceId?: string): number {
+/** Product of the defender's incoming multipliers (0.5 = half, 2 = double). `newDamageOnly` mults skip DoTs.
+ *  A status carrying `reflectedDamageMult` multiplies only REFLECTED hits (zevkir Lens of the Deep). */
+function incomingDamageMult(u: Unit, isNew: boolean | undefined, sourceId?: string, reflected?: boolean): number {
   let f = 1;
   for (const s of u.statuses) {
+    if (reflected && s.reflectedDamageMult !== undefined) f *= s.reflectedDamageMult;
     if (s.kind !== "incoming_damage_mult") continue;
     if (s.newDamageOnly && !isNew) continue;
     if (s.viaSourceId !== undefined && s.viaSourceId !== sourceId) continue; // scoped to one source skill
@@ -207,6 +209,8 @@ export interface DamageInstance {
   sourceId?: string;
   /** This hit Bypasses — ignores Damage Reduction AND Shield (conditional_bypass resolved at cast). */
   bypass?: boolean;
+  /** This hit was bounced onto the target by a Reflect — triggers any reflectedDamageMult the target holds. */
+  reflected?: boolean;
 }
 
 export interface DamageResult {
@@ -243,7 +247,7 @@ export function applyDamage(target: Unit, dmg: DamageInstance): DamageResult {
   // 2. Incoming damage-mods (a channel distinct from Damage Reduction): additive, then multiplicative.
   if (!cap.mods) {
     amount = Math.max(0, amount + incomingDamageMod(target, dmg.sourceId));
-    amount = Math.max(0, applyRounding(amount * incomingDamageMult(target, dmg.isNew, dmg.sourceId)));
+    amount = Math.max(0, applyRounding(amount * incomingDamageMult(target, dmg.isNew, dmg.sourceId, dmg.reflected)));
   }
 
   const shattered = has(target, "shatter");
