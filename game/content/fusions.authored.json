@@ -19250,6 +19250,34 @@
       }
      ],
      "note": "Wind Step's self damage_reduction lasts one turn longer (1->2). Zephyrex's only DR source is Wind Step (zephyrex4), so reacting to his gaining DR and extending it by 1 is faithful. modifyStatus adjusts the existing status in place (no remove+re-apply), so it does not re-emit statusApplied."
+    },
+    {
+     "on": "turnStart",
+     "source": "Cloud Step",
+     "when": {
+      "and": [
+       {
+        "eventTeamIsSelf": true
+       },
+       {
+        "has": "mark",
+        "name": "Wind Step Window",
+        "of": "self"
+       }
+      ]
+     },
+     "effect": [
+      {
+       "op": "applyStatus",
+       "to": "self",
+       "status": {
+        "kind": "mark",
+        "name": "Wind Step Armed",
+        "duration": 1
+       }
+      }
+     ],
+     "note": "'If Wind Step triggered LAST turn' — promote the Wind Step Window mark to a 'Wind Step Armed' mark at Zephyrex's turnStart. Wind Step is cast AFTER turnStart, so the Window mark is absent at the cast turn's turnStart and 'Armed' only appears on turns AFTER the cast; Waft reads 'Armed' so its 10 Piercing fires next turn but NOT the same turn Wind Step triggered."
     }
    ],
    "skill": {
@@ -19285,7 +19313,7 @@
       "op": "if",
       "cond": {
        "has": "mark",
-       "name": "Wind Step Window",
+       "name": "Wind Step Armed",
        "of": "self"
       },
       "then": [
@@ -19299,7 +19327,7 @@
         "note": "Bypassing per prose: this 10 should land even on Invulnerable enemies. The brief's tag list is [Strategic,Instant] verbatim (no Bypassing tag); piercing already ignores DR."
        }
       ],
-      "note": "'If Wind Step triggered last turn' is read as Zephyrex still carrying the 1-turn 'Wind Step Window' mark that Wind Step (zephyrex4) sets when it resolves."
+      "note": "'If Wind Step triggered LAST turn' -> reads the 'Wind Step Armed' mark, which the Cloud Step turnStart trigger promotes from the Wind Step Window mark only on turns AFTER Wind Step's cast (so same-turn Waft deals 0)."
      }
     ]
    }

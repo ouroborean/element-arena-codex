@@ -174,7 +174,7 @@ test("Guarded Meditation: without the augment Prayer grants no shield (control)"
 // Light), Voice of Light is automatically recast on it, ignoring invulnerability and counters.
 // =====================================================================================================
 
-test.skip("SUSPECTED BUG: frozen says a Voice-of-Light-marked enemy that deals damage gets Voice of Light automatically recast (+15), but the recast never lands — the base Voice-of-Light trigger fires first and consumes the mark, so Stern Reminder's guard fails (essence still granted, mark gone, no extra damage)", () => {
+test("Stern Reminder: a Voice-of-Light-marked enemy that deals damage gets Voice of Light recast on it (+15)", () => {
   // Control: WITHOUT the augment the marked enemy takes no extra damage when it deals damage.
   {
     const { state } = setup(null, [], ["e"]);
@@ -207,7 +207,7 @@ test("Stern Reminder: does NOT fire when an UNMARKED enemy deals damage (guard c
   assert.equal(state.units["e2"]!.hp, 100, "e2 unaffected");
 });
 
-test.skip("SUSPECTED BUG: frozen says the recast ignores invulnerability, but the recast never fires at all (same root cause: the base Voice-of-Light trigger consumes the mark before Stern Reminder can recast), so the invulnerable enemy takes no recast damage", () => {
+test("Stern Reminder: the recast lands even on an invulnerable enemy (ignores invulnerability)", () => {
   // Establish the baseline: a normal Voice of Light cast against an invulnerable enemy is blocked.
   {
     const { state } = setup("ayana3", [], ["e"]);

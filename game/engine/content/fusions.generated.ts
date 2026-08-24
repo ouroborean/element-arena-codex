@@ -18904,6 +18904,33 @@ export const FUSIONS: FusionForm[] = [
       "durationDelta": 1
      }
     ]
+   },
+   {
+    "on": "turnStart",
+    "source": "Cloud Step",
+    "when": {
+     "and": [
+      {
+       "eventTeamIsSelf": true
+      },
+      {
+       "has": "mark",
+       "name": "Wind Step Window",
+       "of": "self"
+      }
+     ]
+    },
+    "effect": [
+     {
+      "op": "applyStatus",
+      "to": "self",
+      "status": {
+       "kind": "mark",
+       "name": "Wind Step Armed",
+       "duration": 1
+      }
+     }
+    ]
    }
   ],
   "skill": {
@@ -18938,7 +18965,7 @@ export const FUSIONS: FusionForm[] = [
      "op": "if",
      "cond": {
       "has": "mark",
-      "name": "Wind Step Window",
+      "name": "Wind Step Armed",
       "of": "self"
      },
      "then": [
