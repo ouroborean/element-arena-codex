@@ -192,6 +192,10 @@ export interface SkillDef {
   /** A single-target skill may not legally target a unit bearing a mark of this name (scratch Bump Those
    *  Numbers: a Deal can only affect each hero once per round — the round-scoped "Deal-Locked" mark). */
   excludeMarkedTargets?: string;
+  /** This skill may only target a unit with this NAME (hector's Serums only target "Dennis the Apprentice"),
+   *  unless targetNameRelaxIfNamedDead lifts it once no living unit of that name remains on the caster's team.
+   *  Set by the hector5 augment at apply time, not authored on the base skill. */
+  targetMustBeName?: string;
   /** The caster may not target themselves (xyris5 Echoes of Desire — "Cannot target Xyris"). A target-legality
    *  rule; requires-conditions can't express it because the target isn't bound at the requires check. */
   cannotTargetSelf?: boolean;

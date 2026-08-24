@@ -516,6 +516,10 @@ export function legalTargets(state: MatchState, caster: Unit, skill: SkillInstan
       (skill.targetFilter != null && evalTargetPredicate(state, caster, u, skill.targetFilter))) &&
     // scratch Bump Those Numbers: a Deal can't affect a unit that already bears the round-scoped lock mark.
     !(skill.excludeMarkedTargets != null && u.statuses.some((s) => s.kind === "mark" && s.name === skill.excludeMarkedTargets)) &&
+    // hector5 Emergency Clinic: a Serum may only target Dennis by name — unless he has died (no living unit of
+    // that name remains on Hector's team), which lifts the restriction ("may use Serums on others once dead").
+    (!skill.targetMustBeName || u.name === skill.targetMustBeName ||
+      (!!skill.targetNameRelaxIfNamedDead && !team(state, caster.team).units.some((id) => { const x = state.units[id]; return !!x && x.alive && x.name === skill.targetMustBeName; }))) &&
     !(u.id !== caster.id && hasStatus(u, "untargetable")) && // others can't target it; self can
     !(harmful && !bypass && invulnerableBlocks(u, skill)) &&
     !(helpful && !bypass && hasStatus(u, "isolated"));

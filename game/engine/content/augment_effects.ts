@@ -210,11 +210,21 @@ registerAugmentCustom("scaleCoilDamage", (unit, a) => {
   }];
 });
 
-// relaxSerumTargeting — hector5 "Emergency Clinic" (SUSPECTED BUG left skipped): the base "Serums only target
-// Dennis" restriction can't be a simple base-skill flag, because 4+ hector fusion forms (antidote -> allies,
-// assassin -> enemies, evolution -> self) each REDEFINE Serum targeting and would all need coordinated
-// per-form overrides. Deferred as a design ruling; kept a no-op so no restriction exists to relax.
-registerAugmentCustom("relaxSerumTargeting", () => { /* nothing to relax — see note */ });
+// relaxSerumTargeting — hector5 "Emergency Clinic": Hector's Serums may target non-Dennis units ONCE Dennis
+// has died. The restriction is carried by the AUGMENT (not the base skill), so the fusion forms that redefine
+// Serum targeting are unaffected: the augment stamps targetMustBeName="Dennis the Apprentice" +
+// targetNameRelaxIfNamedDead on each named Serum, and legalTargets lifts the name gate the moment no living
+// Dennis remains on Hector's team. (Per the design ruling: this "may" gate applies in the base+augment kit;
+// a fusion form's own "only" targeting would govern instead, but that combo is out of scope here.)
+registerAugmentCustom("relaxSerumTargeting", (unit, a) => {
+  const dennisName = (a.whenDead as { template?: string } | undefined)?.template ?? "Dennis the Apprentice";
+  const ids = new Set((a.skillIds as string[] | undefined) ?? []);
+  for (const sk of unit.skills ?? []) {
+    if (!ids.has(sk.id)) continue;
+    sk.targetMustBeName = dennisName;
+    sk.targetNameRelaxIfNamedDead = true;
+  }
+});
 
 // capShieldAbsorbPerHit — "Good Pacing": Keeper's Shield can only absorb up to `max` from a single hit
 // (overflow falls through to HP). A `shield_absorb_cap` status the damage pipeline reads (damage.ts). The
