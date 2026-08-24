@@ -281,7 +281,7 @@ test("sera4 augment: the self-hit is now NORMAL (mitigable by a pre-existing shi
 // cooldown (skills.json sera5) is 4, so the augmented skill must go on cooldown 4 + 1 = 5. The authored
 // replaceSkill ships cooldown 4 (its note assumed a base of 3), so the "+1" is never applied — a real cast
 // puts Proactivity on cd 4 instead of the frozen-derived 5. Kept as an executable bug report.
-test.skip("SUSPECTED BUG: frozen 'additional 1 turn cooldown' -> base 4 + 1 = 5, but the augmented Proactivity Protocol goes on cd 4 (the +1 is never applied)", () => {
+test("Unto Others: augmented Proactivity Protocol gains +1 cooldown (4 -> 5)", () => {
   const sera = loadHero(heroById("sera"), "A", "s");
   applyAugment(sera, augmentById("sera4")!);
   const ally = makeUnit({ id: "a", team: "A", hp: 50, maxHp: 100 });

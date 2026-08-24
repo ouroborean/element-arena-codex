@@ -321,7 +321,7 @@ test("Burning Up: when Pyrrha dies, she deals 10 Affliction to all enemies", () 
   assert.equal(e2.hp, 90, "hits every enemy");
 });
 
-test.skip("SUSPECTED BUG: Burning Up death burst hits an UNtargetable enemy (frozen says 'all targetable enemies')", () => {
+test("Burning Up death burst spares an UNtargetable enemy (all TARGETABLE enemies)", () => {
   const p = loadHero(heroById("pyrrha"), "A", "p");
   const e1 = makeUnit({
     id: "e1", team: "B", hp: 100,

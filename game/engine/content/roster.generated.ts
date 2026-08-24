@@ -2837,7 +2837,10 @@ export const ROSTER: HeroDef[] = [
       "amount": 10,
       "dtype": "affliction",
       "to": {
-       "faction": "enemies"
+       "filter": {
+        "faction": "enemies"
+       },
+       "without": "untargetable"
       }
      }
     ]
@@ -4154,6 +4157,17 @@ export const ROSTER: HeroDef[] = [
      "generic": 0,
      "specific": 1
     },
+    "costMods": [
+     {
+      "when": {
+       "has": "mark",
+       "name": "Dive River Clone",
+       "of": "self"
+      },
+      "specificDelta": -1,
+      "genericDelta": 1
+     }
+    ],
     "cooldown": 1,
     "effects": [
      {

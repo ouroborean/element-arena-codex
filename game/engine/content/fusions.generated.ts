@@ -6822,6 +6822,27 @@ export const FUSIONS: FusionForm[] = [
       "from": "self"
      }
     ]
+   },
+   {
+    "on": "statusLost",
+    "source": "Drake Transformation",
+    "when": {
+     "eventStatusKind": "mark",
+     "name": "Cinders"
+    },
+    "effect": [
+     {
+      "op": "heal",
+      "amount": 5,
+      "to": "self"
+     },
+     {
+      "op": "modifyStatus",
+      "kind": "outgoing_damage_mod",
+      "magnitudeDelta": 5,
+      "from": "self"
+     }
+    ]
    }
   ],
   "skill": {
