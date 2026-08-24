@@ -22,7 +22,7 @@ import type { HeroTrigger } from "./hero.ts";
  *  "invisible until triggered"): it flows through the normal isHidden path (redaction + the unified hidden
  *  event flag), so the skill's cast and every effect it applies become concealed. */
 type SkillMeta = Partial<Pick<SkillInstance,
-  "name" | "cost" | "cooldown" | "tags" | "targeting" | "element" | "klass" | "requires" | "uncounterableIf" | "channelTurns" | "doesNotInterrupt" | "isHidden">>;
+  "name" | "cost" | "cooldown" | "tags" | "targeting" | "element" | "klass" | "requires" | "uncounterableIf" | "channelTurns" | "doesNotInterrupt" | "isHidden" | "excludeMarkedTargets">>;
 
 export type Patch =
   | { op: "addTrigger"; trigger: HeroTrigger }

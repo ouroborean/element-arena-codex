@@ -253,10 +253,12 @@ test("hector5 Emergency Clinic: once Dennis is dead, Hector may inject a Serum i
 });
 
 // The augment's grant is CONDITIONAL: "once Dennis has died". Its discriminating half is therefore that
-// while Dennis is ALIVE a Serum may NOT be aimed at another unit. The engine registers `relaxSerumTargeting`
-// as a no-op (the base "only Dennis" restriction was never encoded), so a Serum lands on any target whether
-// Dennis is alive or dead — the death gate is absent. Frozen assertions preserved below.
-test.skip("SUSPECTED BUG: hector5 — while Dennis is ALIVE a Serum on a non-Dennis target should be rejected ('once Dennis has died'), but the engine allows it", () => {
+// while Dennis is ALIVE a Serum may NOT be aimed at another unit. DEFERRED (kept skipped): the base "only
+// Dennis" restriction cannot be a simple base-skill flag, because 4+ hector fusion forms each REDEFINE Serum
+// targeting (antidote -> allies, assassin -> enemies, evolution -> self) and would all need coordinated
+// per-form targeting overrides. Needs a design ruling on how the base restriction composes with those forms,
+// not a single primitive. Frozen assertions preserved below.
+test.skip("hector5 Emergency Clinic: while Dennis is ALIVE a Serum on a non-Dennis target is rejected", () => {
   const { state, enemy, dennis } = setup("hector5");
   assert.ok(dennis.alive, "precondition: Dennis is alive");
   const r = performAction(state, { unit: "h", skillId: "hector1", targets: [enemy.id] });

@@ -184,6 +184,9 @@ export interface SkillDef {
   /** Revive skills (keeper5 Hero's Return, keeper3 Plot Twist) may select a DEAD ally as their target;
    *  legalTargets/resolveTargets otherwise filter out non-alive units. */
   canTargetDead?: boolean;
+  /** A single-target skill may not legally target a unit bearing a mark of this name (scratch Bump Those
+   *  Numbers: a Deal can only affect each hero once per round — the round-scoped "Deal-Locked" mark). */
+  excludeMarkedTargets?: string;
   /** The caster may not target themselves (xyris5 Echoes of Desire — "Cannot target Xyris"). A target-legality
    *  rule; requires-conditions can't express it because the target isn't bound at the requires check. */
   cannotTargetSelf?: boolean;

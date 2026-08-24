@@ -6795,29 +6795,93 @@ export const AUGMENTS: Augment[] = [
     "op": "setSkillMeta",
     "skillId": "scratch1",
     "meta": {
-     "cooldown": 0
+     "cooldown": 0,
+     "excludeMarkedTargets": "Deal-Locked"
     }
+   },
+   {
+    "op": "appendEffect",
+    "skillId": "scratch1",
+    "effect": [
+     {
+      "op": "applyStatus",
+      "to": "target",
+      "status": {
+       "kind": "mark",
+       "name": "Deal-Locked",
+       "duration": null
+      }
+     }
+    ]
    },
    {
     "op": "setSkillMeta",
     "skillId": "scratch2",
     "meta": {
-     "cooldown": 0
+     "cooldown": 0,
+     "excludeMarkedTargets": "Deal-Locked"
     }
+   },
+   {
+    "op": "appendEffect",
+    "skillId": "scratch2",
+    "effect": [
+     {
+      "op": "applyStatus",
+      "to": "target",
+      "status": {
+       "kind": "mark",
+       "name": "Deal-Locked",
+       "duration": null
+      }
+     }
+    ]
    },
    {
     "op": "setSkillMeta",
     "skillId": "scratch3",
     "meta": {
-     "cooldown": 0
+     "cooldown": 0,
+     "excludeMarkedTargets": "Deal-Locked"
     }
+   },
+   {
+    "op": "appendEffect",
+    "skillId": "scratch3",
+    "effect": [
+     {
+      "op": "applyStatus",
+      "to": "target",
+      "status": {
+       "kind": "mark",
+       "name": "Deal-Locked",
+       "duration": null
+      }
+     }
+    ]
    },
    {
     "op": "setSkillMeta",
     "skillId": "scratch6",
     "meta": {
-     "cooldown": 0
+     "cooldown": 0,
+     "excludeMarkedTargets": "Deal-Locked"
     }
+   },
+   {
+    "op": "appendEffect",
+    "skillId": "scratch6",
+    "effect": [
+     {
+      "op": "applyStatus",
+      "to": "target",
+      "status": {
+       "kind": "mark",
+       "name": "Deal-Locked",
+       "duration": null
+      }
+     }
+    ]
    }
   ]
  },

@@ -296,7 +296,7 @@ test("Bump Those Numbers: with no cooldown, Deal: Save can be recast the same tu
   assert.equal(r.reason, "on-cooldown");
 });
 
-test.skip("SUSPECTED BUG: Bump Those Numbers says Deals 'can only affect each Hero once per round', but the engine does NOT enforce the once-per-round target rule — a second Deal on the same Hero still lands", () => {
+test("Bump Those Numbers: a Deal can only affect each Hero once per round", () => {
   const enemy = makeUnit({ id: "e", team: "B", kind: "hero" });
   const { state } = setup("scratch4", [enemy]);
 
