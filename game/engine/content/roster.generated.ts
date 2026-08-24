@@ -10809,6 +10809,45 @@ export const ROSTER: HeroDef[] = [
      }
     ],
     "source": "maggie2"
+   },
+   {
+    "on": "damageDealt",
+    "source": "maggie1",
+    "when": {
+     "and": [
+      {
+       "has": "mark",
+       "name": "Bramblelash",
+       "of": "eventTarget"
+      },
+      {
+       "not": {
+        "has": "mark",
+        "name": "Bramblelash Spent",
+        "of": "eventTarget"
+       }
+      }
+     ]
+    },
+    "effect": [
+     {
+      "op": "applyStatus",
+      "to": "self",
+      "status": {
+       "kind": "elemental_essence",
+       "duration": null
+      }
+     },
+     {
+      "op": "applyStatus",
+      "to": "eventTarget",
+      "status": {
+       "kind": "mark",
+       "name": "Bramblelash Spent",
+       "duration": 2
+      }
+     }
+    ]
    }
   ]
  },

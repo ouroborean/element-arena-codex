@@ -9496,6 +9496,46 @@
      ],
      "source": "maggie2",
      "note": "Grasping Vines is cancelled if Maggie is stunned; removing the mark disarms both the mark-guarded scheduled damage and the stun rider."
+    },
+    {
+     "on": "damageDealt",
+     "source": "maggie1",
+     "when": {
+      "and": [
+       {
+        "has": "mark",
+        "name": "Bramblelash",
+        "of": "eventTarget"
+       },
+       {
+        "not": {
+         "has": "mark",
+         "name": "Bramblelash Spent",
+         "of": "eventTarget"
+        }
+       }
+      ]
+     },
+     "effect": [
+      {
+       "op": "applyStatus",
+       "to": "self",
+       "status": {
+        "kind": "elemental_essence",
+        "duration": null
+       }
+      },
+      {
+       "op": "applyStatus",
+       "to": "eventTarget",
+       "status": {
+        "kind": "mark",
+        "name": "Bramblelash Spent",
+        "duration": 2
+       }
+      }
+     ],
+     "note": "Bramblelash (maggie1): 'until the end of Maggie's next turn, if that target receives new damage, she gains Elemental Essence.' The mark is applied AFTER Bramblelash's own 15 damage, so the strike doesn't self-trigger; the first new damage to the marked target grants Maggie one Essence. Fires once per cast via a separate 'Bramblelash Spent' flag rather than consuming the Bramblelash mark itself, because maggie5 Scornful Thorns still reads Bramblelash for its +10 (the mark must persist until its own duration-2 expiry)."
     }
    ],
    "skills": [

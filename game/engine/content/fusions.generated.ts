@@ -9914,7 +9914,7 @@ export const FUSIONS: FusionForm[] = [
      "status": {
       "kind": "mark",
       "name": "Bog Witch's Bargain",
-      "duration": 1
+      "duration": 2
      }
     },
     {

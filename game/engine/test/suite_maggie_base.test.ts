@@ -108,7 +108,7 @@ test("maggie1: deals 15 to the targeted enemy only", () => {
   assert.equal(e2.hp, 100, "the other enemy is untouched (single target)");
 });
 
-test.skip("SUSPECTED BUG maggie1: new damage to the Bramblelash target should grant Maggie Elemental Essence, but the base kit never does (no essence-granting trigger exists)", () => {
+test("maggie1: new damage to the Bramblelash-marked target grants Maggie Elemental Essence", () => {
   // Frozen: "Until the end of Maggie's next turn, if that target receives new damage, she will gain
   // Elemental Essence." Drive: mark e1 with Bramblelash, then deal it fresh damage — Maggie should gain Essence.
   const maggie = loadHero(heroById("maggie"), "A", "maggie");
