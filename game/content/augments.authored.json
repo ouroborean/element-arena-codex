@@ -1824,7 +1824,7 @@
    "owner": "saya",
    "name": "What's Mine is Yours",
    "description": "Spider Mines now affects a single enemy, but only lasts for one turn.",
-   "note": "Whole-skill re-author (base nodes have no ids). Targeting changes from self (two/three random enemy heroes) to a single chosen enemy, and the mine now expires after 1 turn (duration 1). The detonation ('if that enemy uses a new skill, deal 15 damage') is the base Spider Mines hero trigger reading the mine mark, so it is left intact; the base's random two-mine placement and the 'While Enhanced, three Spider Mines' clause are superseded. Exact base mine mark name governs the detonation trigger.",
+   "note": "Whole-skill re-author (base nodes have no ids). Targeting changes from self (two/three random enemy heroes) to a single chosen enemy, and the mine now expires after 1 turn (duration 1). The mine is laid via addStack (kind 'stack', name 'Spider Mine') exactly like the base skill, so the base Spider Mines detonation hero trigger (which reads stackCount 'Spider Mine' of eventSource and consumes it) fires end-to-end; a plain mark would be invisible to stackCount. The base's random two-mine placement and the 'While Enhanced, three Spider Mines' clause are superseded.",
    "patches": [
     {
      "op": "replaceSkill",
@@ -1847,13 +1847,11 @@
       "currentCd": 0,
       "effects": [
        {
-        "op": "applyStatus",
+        "op": "addStack",
         "to": "target",
-        "status": {
-         "kind": "mark",
-         "name": "Spider Mine",
-         "duration": 1
-        }
+        "name": "Spider Mine",
+        "amount": 1,
+        "duration": 1
        }
       ]
      }
@@ -3063,14 +3061,8 @@
        {
         "op": "if",
         "cond": {
-         "sameUnit": [
-          "eventUnit",
-          {
-           "faction": "allies",
-           "kind": "hero",
-           "template": "hector"
-          }
-         ]
+         "isNamed": "eventUnit",
+         "name": "Hector the Injector"
         },
         "then": [
          {
@@ -4307,6 +4299,152 @@
        ]
       },
       "effect": [
+       {
+        "op": "if",
+        "cond": {
+         "has": "mark",
+         "name": "Cloister",
+         "of": "self"
+        },
+        "then": [
+         {
+          "op": "applyStatus",
+          "to": "self",
+          "status": {
+           "kind": "damage_reduction",
+           "magnitude": {
+            "op": "mul",
+            "args": [
+             20,
+             {
+              "ref": "count",
+              "of": {
+               "faction": "allies",
+               "kind": "hero",
+               "includeSelf": false
+              }
+             }
+            ]
+           },
+           "duration": null
+          }
+         }
+        ],
+        "else": [
+         {
+          "op": "applyStatus",
+          "to": "self",
+          "status": {
+           "kind": "damage_reduction",
+           "magnitude": {
+            "op": "mul",
+            "args": [
+             10,
+             {
+              "ref": "count",
+              "of": {
+               "faction": "allies",
+               "kind": "hero",
+               "includeSelf": false
+              }
+             }
+            ]
+           },
+           "duration": null
+          }
+         }
+        ]
+       }
+      ]
+     }
+    },
+    {
+     "op": "replaceSkill",
+     "skillId": "ayana4",
+     "skill": {
+      "id": "ayana4",
+      "name": "Cloister",
+      "element": "holy",
+      "targeting": "self",
+      "klass": "defensive",
+      "tags": [
+       "Strategic",
+       "Instant"
+      ],
+      "cost": {
+       "generic": 0,
+       "specific": 0
+      },
+      "cooldown": 1,
+      "note": "Honor Guard override of Cloister (ayana4): Revered Daughter base DR is now 10/ally, so Cloister recomputes to DOUBLED 20/ally (else 10/ally without the Cloister mark) in BOTH the immediate recompute AND the onExpire block. Same structure as base ayana4 with the mul constants doubled (5->10, 10->20).",
+      "effects": [
+       {
+        "op": "applyStatus",
+        "to": "self",
+        "status": {
+         "kind": "mark",
+         "name": "Cloister",
+         "duration": 1,
+         "onExpire": [
+          {
+           "op": "if",
+           "cond": {
+            "has": "mark",
+            "name": "Cloister",
+            "of": "self"
+           },
+           "then": [
+            {
+             "op": "applyStatus",
+             "to": "self",
+             "status": {
+              "kind": "damage_reduction",
+              "magnitude": {
+               "op": "mul",
+               "args": [
+                20,
+                {
+                 "ref": "count",
+                 "of": {
+                  "faction": "allies",
+                  "kind": "hero",
+                  "includeSelf": false
+                 }
+                }
+               ]
+              },
+              "duration": null
+             }
+            }
+           ],
+           "else": [
+            {
+             "op": "applyStatus",
+             "to": "self",
+             "status": {
+              "kind": "damage_reduction",
+              "magnitude": {
+               "op": "mul",
+               "args": [
+                10,
+                {
+                 "ref": "count",
+                 "of": {
+                  "faction": "allies",
+                  "kind": "hero",
+                  "includeSelf": false
+                 }
+                }
+               ]
+              },
+              "duration": null
+             }
+            }
+           ]
+          }
+         ]
+        }
+       },
        {
         "op": "if",
         "cond": {

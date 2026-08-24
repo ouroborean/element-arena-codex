@@ -1814,13 +1814,11 @@ export const AUGMENTS: Augment[] = [
      "cooldown": 1,
      "effects": [
       {
-       "op": "applyStatus",
+       "op": "addStack",
        "to": "target",
-       "status": {
-        "kind": "mark",
-        "name": "Spider Mine",
-        "duration": 1
-       }
+       "name": "Spider Mine",
+       "amount": 1,
+       "duration": 1
       }
      ],
      "currentCd": 0
@@ -3002,14 +3000,8 @@ export const AUGMENTS: Augment[] = [
       {
        "op": "if",
        "cond": {
-        "sameUnit": [
-         "eventUnit",
-         {
-          "faction": "allies",
-          "kind": "hero",
-          "template": "hector"
-         }
-        ]
+        "isNamed": "eventUnit",
+        "name": "Hector the Injector"
        },
        "then": [
         {
@@ -4290,6 +4282,152 @@ export const AUGMENTS: Augment[] = [
        ]
       }
      ]
+    }
+   },
+   {
+    "op": "replaceSkill",
+    "skillId": "ayana4",
+    "skill": {
+     "id": "ayana4",
+     "name": "Cloister",
+     "element": "holy",
+     "targeting": "self",
+     "klass": "defensive",
+     "tags": [
+      "Strategic",
+      "Instant"
+     ],
+     "cost": {
+      "generic": 0,
+      "specific": 0
+     },
+     "cooldown": 1,
+     "effects": [
+      {
+       "op": "applyStatus",
+       "to": "self",
+       "status": {
+        "kind": "mark",
+        "name": "Cloister",
+        "duration": 1,
+        "onExpire": [
+         {
+          "op": "if",
+          "cond": {
+           "has": "mark",
+           "name": "Cloister",
+           "of": "self"
+          },
+          "then": [
+           {
+            "op": "applyStatus",
+            "to": "self",
+            "status": {
+             "kind": "damage_reduction",
+             "magnitude": {
+              "op": "mul",
+              "args": [
+               20,
+               {
+                "ref": "count",
+                "of": {
+                 "faction": "allies",
+                 "kind": "hero",
+                 "includeSelf": false
+                }
+               }
+              ]
+             },
+             "duration": null
+            }
+           }
+          ],
+          "else": [
+           {
+            "op": "applyStatus",
+            "to": "self",
+            "status": {
+             "kind": "damage_reduction",
+             "magnitude": {
+              "op": "mul",
+              "args": [
+               10,
+               {
+                "ref": "count",
+                "of": {
+                 "faction": "allies",
+                 "kind": "hero",
+                 "includeSelf": false
+                }
+               }
+              ]
+             },
+             "duration": null
+            }
+           }
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "op": "if",
+       "cond": {
+        "has": "mark",
+        "name": "Cloister",
+        "of": "self"
+       },
+       "then": [
+        {
+         "op": "applyStatus",
+         "to": "self",
+         "status": {
+          "kind": "damage_reduction",
+          "magnitude": {
+           "op": "mul",
+           "args": [
+            20,
+            {
+             "ref": "count",
+             "of": {
+              "faction": "allies",
+              "kind": "hero",
+              "includeSelf": false
+             }
+            }
+           ]
+          },
+          "duration": null
+         }
+        }
+       ],
+       "else": [
+        {
+         "op": "applyStatus",
+         "to": "self",
+         "status": {
+          "kind": "damage_reduction",
+          "magnitude": {
+           "op": "mul",
+           "args": [
+            10,
+            {
+             "ref": "count",
+             "of": {
+              "faction": "allies",
+              "kind": "hero",
+              "includeSelf": false
+             }
+            }
+           ]
+          },
+          "duration": null
+         }
+        }
+       ]
+      }
+     ],
+     "currentCd": 0
     }
    }
   ]

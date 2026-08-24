@@ -178,7 +178,7 @@ test("saya3 What's Mine is Yours: the single mine expires after one of Saya's tu
   assert.equal(hasMine(enemies[0]!), false, "the mine expires after one turn (duration 1)");
 });
 
-test.skip("SUSPECTED BUG: saya3 What's Mine is Yours — the augmented mine never detonates (applied as a mark, detonation reads a stack)", () => {
+test("saya3 What's Mine is Yours: the augmented single-target mine detonates for 15 on a new skill", () => {
   // Frozen: the augment changes only targeting (single) and duration (1 turn); the base detonation
   // clause is preserved — "If those enemies use a new skill, their spider mine detonates, dealing 15
   // damage." Engine (probed): the base detonation trigger fires only for a `stack` named "Spider Mine";

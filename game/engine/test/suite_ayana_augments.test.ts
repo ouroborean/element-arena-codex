@@ -129,7 +129,7 @@ test("Honor Guard + Cloister: Revered Daughter's 10/ally is doubled to 20/ally u
 // base. Frozen: Revered Daughter now grants 10/ally (Honor Guard); Cloister doubles that DR -> for 2
 // allies 10*2 doubled = 40. If Cloister's recompute still uses the un-augmented 5/ally constant it
 // yields 20, contradicting the composed frozen behavior.
-test.skip("SUSPECTED BUG: Honor Guard makes Revered Daughter 10/ally, so Cloister should double to 40 for 2 allies (frozen), but casting Cloister leaves DR at 20 — Cloister's own recompute still uses the stale 5/ally constant", () => {
+test("Honor Guard: Cloister doubles the 10/ally DR to 40 for 2 allies", () => {
   const { state } = setup("ayana1", ["a1", "a2"], ["e"]);
   emit(state, { type: "roundStart" });
   assert.equal(drOf(state.units["ay"]!), 20, "pre-Cloister: Honor Guard 10*2 = 20");
