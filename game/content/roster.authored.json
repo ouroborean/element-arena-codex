@@ -8872,7 +8872,8 @@
          "status": {
           "kind": "mark",
           "name": "Stalwart Shield",
-          "duration": null
+          "duration": null,
+          "invisible": true
          }
         }
        ]
@@ -8894,7 +8895,7 @@
        ]
       }
      ],
-     "note": "'May target Taryn or an ally. Grants Taryn 20 Shield, and if used on an ally, reflects all harmful skills from the target to himself. This skill's target is invisible.' Shield has no stated duration -> round-permanent (null). The ally reflect is realized via the 'Stalwart Shield' mark (applied only when target != self) that keys the standing 'Stalwart Shield' reflect trigger; its duration is unspecified in the oracle so modeled round-permanent (null). 'target is invisible' is a hidden-target presentation flag (isHidden), not a mechanic. The trailing if is Radiant Glory's augment ('using Stalwart Shield will also use Refrain on the target')."
+     "note": "'May target Taryn or an ally. Grants Taryn 20 Shield, and if used on an ally, reflects all harmful skills from the target to himself. This skill's target is invisible.' Shield has no stated duration -> round-permanent (null). The ally reflect is realized via the 'Stalwart Shield' mark (applied only when target != self) that keys the standing 'Stalwart Shield' reflect trigger; its duration is unspecified in the oracle so modeled round-permanent (null). 'target is invisible' = the 'Stalwart Shield' mark on the protected ally carries invisible:true, so the opponent's redacted view cannot see whom Taryn protected (his own team still sees it via the owner short-circuit); the cast itself stays visible (hidden:false / hidden_targets:true). The trailing if is Radiant Glory's augment ('using Stalwart Shield will also use Refrain on the target')."
     },
     {
      "id": "taryn5",

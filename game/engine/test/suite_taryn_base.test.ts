@@ -240,7 +240,7 @@ test("Stalwart Shield on SELF does NOT reflect an ally's incoming harm (control 
 // protected). For the target to be invisible, the opponent's redacted view must not reveal it —
 // yet Taryn's own side must still see it. The engine never stamps taryn4 or its mark as Invisible
 // (no isHidden / no invisible:true), so the opponent reads the mark and learns the target.
-test.skip("SUSPECTED BUG: Stalwart Shield's target is NOT invisible — opponent's view still shows the target-revealing mark", () => {
+test("Stalwart Shield's target mark is invisible to the opponent (own team still sees it)", () => {
   const { state } = board();
   performAction(state, { unit: "taryn", skillId: "taryn4", targets: ["a2"] });
   const marksIn = (viewer: "A" | "B") =>

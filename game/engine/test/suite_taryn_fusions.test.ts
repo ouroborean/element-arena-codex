@@ -704,7 +704,7 @@ test("Flag of Inquisition: a reflect onto Taryn grants +10 damage (NOT DR) + Ess
 // applies a nameless outgoing_damage_mod via plain applyStatus, which REFRESHES the single slot to +10
 // rather than accumulating (sameSlot() has no per-instance key for outgoing_damage_mod) — so repeated
 // reflects stay at +10, not +20/+30. Same systemic limitation the ando suite flags on God of Thunder.
-test.skip("SUSPECTED BUG: Flag of Inquisition's +10 damage does not STACK across reflects", () => {
+test("Flag of Inquisition's +10 damage STACKS across reflects (+10 -> +20)", () => {
   const t = fuseTaryn("zealot");
   const state = makeState([t], [enemy("e")]);
   fund(state);
