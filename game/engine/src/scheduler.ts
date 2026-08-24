@@ -625,13 +625,6 @@ export function performAction(state: MatchState, action: Action): ActionResult {
   // or switching to a different channel, is. Teardown emits fire after the action fully resolves (below).
   const channelsBefore = caster.statuses.filter((s) => s.kind === "channeling").map((s) => ({ name: s.name, instanceId: s.instanceId }));
 
-  // Using a new skill cancels active channels — unless it opts out, or it is another copy of a multi-copy
-  // channel (galazax1 Twin Storms), in which case it preserves its sibling copies and cancels only other channels.
-  if (!skill.doesNotInterrupt) {
-    if ((skill.channelCopies ?? 1) > 1) caster.statuses = caster.statuses.filter((s) => !(s.kind === "channeling" && s.name !== skill.id));
-    else removeStatus(caster, "channeling");
-  }
-
   // Set the cooldown BEFORE running effects, so a skill that reduces its OWN cooldown mid-cast (xyris3 "set
   // to 1", sera2 "-1 per marked enemy") adjusts the just-set value via modifyCooldown instead of having it
   // clobbered by this assignment afterwards. cdSetTurn = birth turn — advanceCooldowns skips it, so cooldown N
@@ -640,6 +633,16 @@ export function performAction(state: MatchState, action: Action): ActionResult {
   skill.cdSetTurn = state.turn;
   const affected = runEffects(state, skill.effects, { caster, self: caster, targets: decl.finalTargets, skillId: skill.id, targeting: effectiveTargeting(caster, skill), invisible: skill.isHidden, disguiseAs: skill.disguiseAs, bypassing: skillBypasses(state, caster, skill) });
   caster.lastSkillId = skill.id; // the "used a skill" ledger (read by clone/last-skill mechanics)
+
+  // Using a new skill cancels active channels — unless it opts out, or it is another copy of a multi-copy
+  // channel (galazax1 Twin Storms), in which case it preserves its sibling copies and cancels only other
+  // channels. The interrupt runs AFTER the skill's own effects so a skill used DURING a channel can still read
+  // `has(channeling)` — zevkir Leyline Bolt / Abyssal Grasp deal Piercing "during Call Tides". The new channel
+  // (if this skill is itself a Channel) is installed just below, so a same-channel recast still removes-then-reinstalls.
+  if (!skill.doesNotInterrupt) {
+    if ((skill.channelCopies ?? 1) > 1) caster.statuses = caster.statuses.filter((s) => !(s.kind === "channeling" && s.name !== skill.id));
+    else removeStatus(caster, "channeling");
+  }
 
   // A Channel skill installs a sustained channel that re-runs at the caster's turns — unless an
   // instant_cast status for this skill suppresses the channel (it resolved entirely on cast above).

@@ -159,7 +159,7 @@ test("Leyline Bolt: with NO Call Tides channel it deals 25 (normal) damage to th
   assert.equal(500 - e1.hp, 15, "25 normal damage, reduced by 10 DR to 15 (non-channel branch is normal-typed)");
 });
 
-test.skip("SUSPECTED BUG: Leyline Bolt used DURING Call Tides must hit the target for 25 PIERCING (frozen), but the channel is torn down before effects so it deals NORMAL", () => {
+test("Leyline Bolt used DURING Call Tides hits the target for 25 PIERCING", () => {
   // Frozen: "If used during Call Tides, it affects target enemy instead, and deals Piercing damage."
   // performAction cancels the channel (removeStatus 'channeling') BEFORE runEffects, so the skill's
   // `if has(channeling,self)` reads FALSE and falls to the else branch (normal). With 10 DR on the
@@ -585,7 +585,7 @@ test("Abyssal Grasp: deals 30 to the target; if the enemy is Chains-marked it is
   }
 });
 
-test.skip("SUSPECTED BUG: Abyssal Grasp during Call Tides must deal PIERCING (frozen), but the channel is torn down before effects so it deals NORMAL", () => {
+test("Abyssal Grasp during Call Tides deals PIERCING", () => {
   // Frozen: "If Zev'kir is Channeling Call Tides, this damage becomes Piercing."
   // As with Leyline Bolt, performAction removes the channeling status BEFORE runEffects, so the skill's
   // `if has(channeling,self)` reads FALSE and the damage stays normal. Through 10 DR: piercing = 30, normal = 20.
