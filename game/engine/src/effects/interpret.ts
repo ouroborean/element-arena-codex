@@ -534,8 +534,10 @@ export function exec(effect: Effect, ctx: Ctx): void {
     }
     case "grantShield": {
       const amount = applyRounding(evalValue(effect.amount, ctx));
-      for (const u of effectTargets(effect.to, ctx))
+      for (const u of effectTargets(effect.to, ctx)) {
         addShield(u, amount, effect.duration ?? null, ctx.caster.id, ctx.state.turn, effect.id);
+        if (amount > 0) ctx.emit({ type: "shieldGranted", unit: u.id, source: ctx.caster.id, amount });
+      }
       return;
     }
     case "applyStatus": {

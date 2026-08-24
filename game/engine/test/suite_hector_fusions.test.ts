@@ -412,7 +412,7 @@ test("brimstone Dennisyphus: Dennis uses Lumbering Smash on a random enemy every
 // Adversarial: frozen says under Dennisyphus Hector "no longer generates an Energy each turn." The
 // passive models this as a permanent Silence, but a Silenced hero still yields 1 GENERIC energy per
 // income step (grantIncome) — so Hector keeps generating energy, contrary to the frozen text.
-test.skip("SUSPECTED BUG: brimstone Dennisyphus still lets Hector generate 1 Generic energy each turn — frozen says he generates NO energy", () => {
+test("brimstone Dennisyphus: Hector generates NO energy each turn", () => {
   const { state, hector } = setup("brimstone");
   emit(state, { type: "roundStart" }); // apply Dennisyphus's income-suppressing silence
   state.teams.A.energy = {};
