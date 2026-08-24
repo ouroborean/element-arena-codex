@@ -91,8 +91,14 @@ export function applyPatch(unit: Unit, patch: Patch): void {
     case "replaceSkill": {
       const skills = unit.skills ?? [];
       const i = skills.findIndex((s) => s.id === patch.skillId);
-      if (i >= 0) skills[i] = { ...clone(patch.skill), currentCd: 0 };
-      unit.skills = skills;
+      if (i >= 0) {
+        skills[i] = { ...clone(patch.skill), currentCd: 0 };
+        unit.skills = skills;
+      } else {
+        // The named skill belongs to a MINION this hero summons, not the hero — park the replacement so it is
+        // replayed onto each summoned minion (trinity Grand Sonata / Golden Fantasia replace Azure/Saffron skills).
+        recordMinionPatch(unit, { op: "replaceSkill", skillId: patch.skillId, skill: clone(patch.skill) });
+      }
       return;
     }
     case "setSkillMeta": {
