@@ -19120,10 +19120,11 @@ export const FUSIONS: FusionForm[] = [
      "then": [
       {
        "op": "applyStatus",
-       "to": "target",
+       "to": "self",
        "status": {
-        "kind": "outgoing_damage_mod",
+        "kind": "incoming_damage_mod",
         "magnitude": 10,
+        "onlyFromUnitRef": "target",
         "duration": 1
        }
       },

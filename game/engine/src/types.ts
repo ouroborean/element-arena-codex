@@ -166,6 +166,9 @@ export interface Status {
   /** Any status carrying this multiplies REFLECTED incoming hits only (zevkir Lens of the Deep mark: x2 from
    *  reflected skills). Read by incomingDamageMult when the hit was bounced by a Reflect. */
   reflectedDamageMult?: number;
+  /** For an incoming_damage_mod: apply ONLY to damage dealt BY this unit id (zephyrex Prod: +10 only from the
+   *  prodded enemy). Absent = all dealers. */
+  fromUnit?: string;
   /** For a stack_read_mod: how it adjusts the effective stack read. mult = actual x magnitude; floorZero =
    *  if actual is 0, read magnitude; missingHp = actual + floor(missingHp / magnitude). */
   mode?: "mult" | "floorZero" | "missingHp";
