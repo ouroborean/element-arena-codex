@@ -4459,6 +4459,10 @@ export const AUGMENTS: Augment[] = [
   "owner": "ayana",
   "patches": [
    {
+    "op": "removeTrigger",
+    "source": "Voice of Light"
+   },
+   {
     "op": "addTrigger",
     "trigger": {
      "on": "damageDealt",
@@ -4474,6 +4478,34 @@ export const AUGMENTS: Augment[] = [
        "skillId": "ayana1",
        "by": "self",
        "on": "eventSource"
+      }
+     ]
+    }
+   },
+   {
+    "op": "addTrigger",
+    "trigger": {
+     "on": "damageDealt",
+     "source": "Voice of Light",
+     "when": {
+      "has": "mark",
+      "name": "Voice of Light",
+      "of": "eventSource"
+     },
+     "effect": [
+      {
+       "op": "applyStatus",
+       "to": "self",
+       "status": {
+        "kind": "elemental_essence",
+        "duration": null
+       }
+      },
+      {
+       "op": "removeStatus",
+       "kind": "mark",
+       "name": "Voice of Light",
+       "from": "eventSource"
       }
      ]
     }

@@ -4532,8 +4532,12 @@
    "owner": "ayana",
    "name": "Stern Reminder",
    "description": "If an enemy triggers Voice of Light, it is automatically recast on them, ignoring invulnerability and counters",
-   "note": "Voice of Light = ayana1. 'An enemy triggers Voice of Light' = a 'Voice of Light'-marked enemy deals new damage, firing the base 'Voice of Light' hero trigger (damageDealt, eventSource has that mark). This augment co-fires on the same event and recasts Voice of Light on that enemy via inline useSkill. Inline useSkill runs the skill's effects directly without emitting skillDeclared, so it is inherently uncounterable and bypasses invulnerable targeting-legality checks, satisfying 'ignoring invulnerability and counters'. Assumes it fires before the base trigger consumes the mark (order-dependent, same guard).",
+   "note": "Voice of Light = ayana1. 'An enemy triggers Voice of Light' = a 'Voice of Light'-marked enemy deals new damage, firing the base 'Voice of Light' hero trigger (damageDealt, eventSource has that mark). Stern Reminder must recast BEFORE the base trigger consumes the mark, so it REMOVES the base Voice of Light trigger and re-adds it AFTER the recast trigger: array order becomes [Stern Reminder recast, Voice of Light essence]. The recast (inline useSkill ayana1 on eventSource) deals 15 and re-applies the mark, then the re-authored essence trigger grants Essence and removes the mark. Inline useSkill runs effects directly without skillDeclared, so it is inherently uncounterable and bypasses invulnerable targeting-legality ('ignoring invulnerability and counters'). No recursion: the recast's damage has eventSource=Ayana, so neither trigger's 'has mark of eventSource' guard matches.",
    "patches": [
+    {
+     "op": "removeTrigger",
+     "source": "Voice of Light"
+    },
     {
      "op": "addTrigger",
      "trigger": {
@@ -4550,6 +4554,34 @@
         "skillId": "ayana1",
         "by": "self",
         "on": "eventSource"
+       }
+      ]
+     }
+    },
+    {
+     "op": "addTrigger",
+     "trigger": {
+      "on": "damageDealt",
+      "source": "Voice of Light",
+      "when": {
+       "has": "mark",
+       "name": "Voice of Light",
+       "of": "eventSource"
+      },
+      "effect": [
+       {
+        "op": "applyStatus",
+        "to": "self",
+        "status": {
+         "kind": "elemental_essence",
+         "duration": null
+        }
+       },
+       {
+        "op": "removeStatus",
+        "kind": "mark",
+        "name": "Voice of Light",
+        "from": "eventSource"
        }
       ]
      }

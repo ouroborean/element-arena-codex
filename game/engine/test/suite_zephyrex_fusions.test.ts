@@ -219,7 +219,7 @@ test("cloud/Waft: when Wind Step triggered LAST turn, deals 10 Piercing (Bypassi
 // Step was used is not "last turn", so it should deal NO bypass damage. The engine keys the branch on the
 // mere presence of the "Wind Step Window" mark, which is live on the cast turn too — so it fires the 10
 // same-turn as well, ignoring the temporal condition. (Confirmed: same-turn Waft dropped both enemies to 90.)
-test.skip("SUSPECTED BUG: Waft deals its 10 Piercing even when Wind Step triggered THIS turn (not last)", () => {
+test("Waft deals its 10 Piercing only when Wind Step triggered LAST turn, not this turn", () => {
   const zeph = loadHero(heroById("zephyrex"), "A", "zx");
   const e1 = makeUnit({ id: "e1", team: "B", hp: 100, maxHp: 100 });
   const e2 = makeUnit({ id: "e2", team: "B", hp: 100, maxHp: 100 });
