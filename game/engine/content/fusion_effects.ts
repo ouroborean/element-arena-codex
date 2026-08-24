@@ -74,6 +74,24 @@ registerCustom("storeHealing", (ctx, a) => {
   }
 });
 
+// riverdaughter:mirror Party Crasher — track per-unit healing received, tagged by the round it happened, so
+// "the healing the target received LAST round" can be read back. recordHealingByRound accumulates a round-named
+// stack on the healed unit; loadHealingLastRound sums the previous round's tag into ctx.vars for the damage op.
+registerCustom("recordHealingByRound", (ctx, a) => {
+  const e = ctx.event;
+  if (!e || e.type !== "healReceived" || e.amount <= 0) return;
+  const name = `HealingReceived:R${ctx.state.round}`;
+  for (const u of resolveSelector((a.to as Selector) ?? "eventUnit", ctx)) {
+    applyStatus(u, { kind: "stack", name, magnitude: e.amount, duration: null, appliedBy: ctx.self.id, appliedTurn: ctx.state.turn });
+  }
+});
+registerCustom("loadHealingLastRound", (ctx, a) => {
+  const name = `HealingReceived:R${ctx.state.round - 1}`;
+  let sum = 0;
+  for (const u of resolveSelector((a.of as Selector) ?? "target", ctx)) sum += stackOf(u, name)?.magnitude ?? 0;
+  ctx.vars.healingReceivedLastRound = sum;
+});
+
 // jarrik:ritual — accrue the hp lost in a damage instance into "Ritual Power", capped at `max`.
 registerCustom("gainRitualPower", (ctx, a) => {
   const e = ctx.event;

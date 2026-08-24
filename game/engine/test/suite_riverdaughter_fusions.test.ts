@@ -390,7 +390,7 @@ test("Mirror/Party Crasher: deals 20 to the target enemy", () => {
 // SUSPECTED BUG: the bonus reads a `var healingReceivedLastRound`, but nothing in the engine ever tracks or
 // writes per-unit healing-received-last-round — `ctx.vars` is always a fresh {} — so the bonus is always 0.
 // Frozen expects 20 + (healing last round); the engine deals only the flat 20.
-test.skip("SUSPECTED BUG: Mirror/Party Crasher should add the target's last-round healing (var never tracked, bonus is always 0)", () => {
+test("Mirror/Party Crasher adds the target's last-round healing as bonus damage", () => {
   const { state, enemies } = setup("mirror", { enemies: 1 });
   // e1 received 30 healing "last round".
   emit(state, { type: "healReceived", unit: "e1", source: "e1", amount: 30, overheal: 0 });
