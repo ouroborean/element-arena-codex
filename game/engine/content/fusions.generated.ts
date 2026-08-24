@@ -15739,31 +15739,6 @@ export const FUSIONS: FusionForm[] = [
       "pileTemplate": "sylnomadminion",
       "doubleVsPile": true
      }
-    },
-    {
-     "op": "if",
-     "cond": {
-      "cmp": "==",
-      "left": {
-       "ref": "currentHp",
-       "of": "target"
-      },
-      "right": 0
-     },
-     "then": [
-      {
-       "op": "applyStatus",
-       "to": {
-        "faction": "allies",
-        "kind": "hero",
-        "includeSelf": true
-       },
-       "status": {
-        "kind": "elemental_essence",
-        "duration": null
-       }
-      }
-     ]
     }
    ],
    "currentCd": 0

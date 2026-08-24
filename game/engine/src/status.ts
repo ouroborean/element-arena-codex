@@ -24,6 +24,10 @@ function sameSlot(a: Status, b: Status): boolean {
     || a.kind === "skill_damage_bonus" || a.kind === "skill_targeting_override") return a.skillId === b.skillId;
   // Concurrent channels of one skill occupy distinct slots by instanceId (undefined = the single-slot default).
   if (a.kind === "channeling") return a.instanceId === b.instanceId;
+  // Elemental Essence is a COUNTABLE resource ("gains 3 Elemental Essence", "consumes 3 Elemental Essence"):
+  // every grant is its own charge, so it never shares a slot (each applyStatus pushes a distinct charge and
+  // grantIncome consumes exactly one per income tick).
+  if (a.kind === "elemental_essence") return false;
   return true;
 }
 

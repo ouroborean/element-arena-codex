@@ -281,7 +281,7 @@ test("The Onyx Legion control: a NON-cursed ally that acted stops him from being
   assert.equal(has(k, "mark", "Exile"), false, "an ordinary acting ally means he is NOT alone");
 });
 
-test.skip("SUSPECTED BUG: The Onyx Legion — a CURSED ally that acted should NOT count, so the Black Knight is still alone; engine ignores 'excludeMark' and denies Exile", () => {
+test("The Onyx Legion: a CURSED ally that acted does NOT count, so the Black Knight is alone and gains Exile", () => {
   // Frozen: allies affected by Curse of Fealty "never count as acting" for the acts-alone check.
   // So with only a *cursed* ally having acted, the Black Knight is effectively alone -> Exile.
   // Engine: the exileActingAlone custom never reads the authored `excludeMark:"Curse of Fealty"`

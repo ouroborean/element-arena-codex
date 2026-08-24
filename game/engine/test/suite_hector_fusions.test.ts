@@ -454,7 +454,7 @@ test("evolution Perfect Form: at round start, consumes Dennis and grants 50 Shie
 // Adversarial: frozen says "gaining ... 3 Elemental Essence". The passive applies three
 // elemental_essence statuses, but the status system keeps only ONE per kind (sameSlot collapses
 // them), so Hector ends with a single charge — one elemental-energy income, not three.
-test.skip("SUSPECTED BUG: evolution Perfect Form grants only 1 Elemental Essence charge, not 3 — the three applications collapse into one status slot", () => {
+test("evolution Perfect Form grants 3 distinct Elemental Essence charges", () => {
   const { state, hector } = setup("evolution");
   emit(state, { type: "roundStart" });
   assert.equal(essenceCount(hector), 3, "Hector should gain 3 Elemental Essence");

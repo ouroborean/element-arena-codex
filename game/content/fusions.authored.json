@@ -16017,33 +16017,7 @@
        "pileTemplate": "sylnomadminion",
        "doubleVsPile": true
       },
-      "note": "Deals 15 damage to the target; base damage doubles to 30 if the target is a Scavenger's Pile (sylnomadminion). No condition tests a target's template, so the doubling is a custom escape hatch."
-     },
-     {
-      "op": "if",
-      "cond": {
-       "cmp": "==",
-       "left": {
-        "ref": "currentHp",
-        "of": "target"
-       },
-       "right": 0
-      },
-      "then": [
-       {
-        "op": "applyStatus",
-        "to": {
-         "faction": "allies",
-         "kind": "hero",
-         "includeSelf": true
-        },
-        "status": {
-         "kind": "elemental_essence",
-         "duration": null
-        }
-       }
-      ],
-      "note": "If Pick the Bones killed its target (target at 0 HP), Syl's team (all allied heroes) gains Elemental Essence."
+      "note": "Deals 15 damage to the target (doubles to 30 vs a Scavenger's Pile). If the hit kills the target, the same custom grants Syl's team one Elemental Essence — so kill-essence lives in ONE place (a plain authored `if currentHp==0` grant here would double it now that essence is a countable resource)."
      }
     ]
    }
