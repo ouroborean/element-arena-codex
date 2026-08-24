@@ -9875,7 +9875,8 @@ export const ROSTER: HeroDef[] = [
         "status": {
          "kind": "mark",
          "name": "Stalwart Shield",
-         "duration": null
+         "duration": null,
+         "invisible": true
         }
        }
       ]

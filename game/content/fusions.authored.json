@@ -17091,7 +17091,8 @@
        "status": {
         "kind": "outgoing_damage_mod",
         "magnitude": 10,
-        "duration": 1
+        "duration": 1,
+        "stacks": true
        }
       },
       {
@@ -17103,7 +17104,7 @@
        }
       }
      ],
-     "note": "Re-authors Protector of the Song: on an ability reflected to Taryn, gain +10 outgoing damage until the end of his next turn (stacks — each reflect adds another instance, matching Ando's God of Thunder pattern) instead of DR; Essence retained (prose changes only the DR). Gated on eventRedirectedToSelf (the reflect destination == Taryn), exactly like the base passive."
+     "note": "Re-authors Protector of the Song: on an ability reflected to Taryn, gain +10 outgoing damage until the end of his next turn. 'This effect can stack' -> stacks:true ACCUMULATES the magnitude (+10 -> +20 -> ...) across reflects instead of refreshing to +10 (same fix as Ando's God of Thunder). Essence retained (prose changes only the DR). Gated on eventRedirectedToSelf (the reflect destination == Taryn), exactly like the base passive."
     }
    ],
    "skill": {
