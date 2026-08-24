@@ -10070,8 +10070,9 @@
       "status": {
        "kind": "mark",
        "name": "Bog Witch's Bargain",
-       "duration": 1
-      }
+       "duration": 2
+      },
+      "note": "Duration 2 (not 1) so the mark OUTLIVES the duration-tick that coincides with the scheduled timeout: in endTurn, tickDurations runs BEFORE fireScheduled, so a duration-1 mark would be removed the same turn-end the timeout fires, killing its 'did not act -> stun + heal' guard. With 2, the mark is still present when the timeout checks it; the timeout's own removeStatus then clears it. Both resolution paths (punish on act, timeout on no-act) remove the mark explicitly."
      },
      {
       "op": "schedule",

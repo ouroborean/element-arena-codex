@@ -155,7 +155,7 @@ test("blight/Bog Witch's Bargain — punish: the punished enemy then permanently
   assert.equal(hasStun(e2), true, "an un-punished enemy is stunned normally");
 });
 
-test.skip("SUSPECTED BUG blight/Bog Witch's Bargain — timeout: a marked enemy that does NOT act should be stunned 1 turn and heal Maggie 35, but the 1-turn mark expires the same turn-end the timeout fires so neither happens", () => {
+test("blight/Bog Witch's Bargain timeout: a marked enemy that does NOT act is stunned 1 turn and heals Maggie 35", () => {
   // Frozen: "If they do not [use a new skill], they are stunned for 1 turn and Maggie heals 35 HP."
   const maggie = fuse("blight");
   maggie.hp = 50; // so the 35 self-heal is observable
