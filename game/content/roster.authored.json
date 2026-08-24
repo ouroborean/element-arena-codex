@@ -11943,7 +11943,7 @@
         ]
        },
        {
-        "sameUnit": [
+        "unitIn": [
          "eventTarget",
          "across"
         ]
@@ -11955,7 +11955,7 @@
        "op": "healthLoss",
        "amount": 5,
        "to": "eventTarget",
-       "note": "'deals 5 more damage to the across enemy' -- see passive note for why healthLoss."
+       "note": "'deals 5 more damage to the across enemy' -- see passive note for why healthLoss. unitIn (membership) not sameUnit, so it matches ANY across enemy once Dune Step widens the across set to all enemies."
       },
       {
        "op": "applyStatus",
@@ -12107,7 +12107,7 @@
        "op": "if",
        "cond": {
         "not": {
-         "sameUnit": [
+         "unitIn": [
           "target",
           "across"
          ]
@@ -12184,7 +12184,7 @@
       {
        "op": "if",
        "cond": {
-        "sameUnit": [
+        "unitIn": [
          "target",
          "across"
         ]

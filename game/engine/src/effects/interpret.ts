@@ -67,6 +67,12 @@ export function hasCustom(name: string): boolean {
 // --------------------------------------------------------------------------- //
 //  Unit lookup helpers
 // --------------------------------------------------------------------------- //
+/** aramao:Dune Step (augment aramao5) while the "Trial of the Sands" window is active redefines Aramao's
+ *  positional relations: every enemy hero counts as `across`, every allied hero as `adjacent`. */
+function duneStepActive(u: Unit): boolean {
+  return !!u.augments?.includes("aramao5") && u.statuses.some((s) => s.kind === "mark" && s.name === "Trial of the Sands");
+}
+
 function teamUnits(state: MatchState, team: TeamId): Unit[] {
   const t = state.teams[team];
   const out: Unit[] = [];
@@ -103,12 +109,18 @@ export function resolveSelector(sel: Selector, ctx: Ctx, admitUnderstudy = true)
     return s ? [s] : [ctx.self];
   }
   if (sel === "across") {
+    const enemyTeam = ctx.self.team === "A" ? "B" : "A";
+    // aramao:Dune Step ("while Trial is active, ALL enemy Heroes are considered across from him"): widen the
+    // otherwise slot-geometric `across` to every living enemy hero when Aramao's Dune Step window is up.
+    if (duneStepActive(ctx.self)) return teamUnits(ctx.state, enemyTeam).filter((u) => u.alive && u.kind === "hero");
     const slot = ctx.self.slot;
     if (slot === undefined) return [];
-    const enemyTeam = ctx.self.team === "A" ? "B" : "A";
     return teamUnits(ctx.state, enemyTeam).filter((u) => u.alive && u.kind === "hero" && u.slot === slot);
   }
   if (sel === "adjacent") {
+    // aramao:Dune Step ("...and all allied Heroes are considered adjacent to him"): widen `adjacent` to every
+    // living allied hero (excluding Aramao) while the Dune Step window is up.
+    if (duneStepActive(ctx.self)) return teamUnits(ctx.state, ctx.self.team).filter((u) => u.alive && u.kind === "hero" && u.id !== ctx.self.id);
     const slot = ctx.self.slot;
     if (slot === undefined) return [];
     return teamUnits(ctx.state, ctx.self.team).filter(
@@ -310,6 +322,14 @@ export function evalCondition(c: Condition, ctx: Ctx): boolean {
     const a = resolveSelector(c.sameUnit[0], ctx)[0];
     const b = resolveSelector(c.sameUnit[1], ctx)[0];
     return !!a && !!b && a.id === b.id;
+  }
+  if ("unitIn" in c) {
+    // Membership: is the first selector's unit among the (possibly multi-unit) second selector's set? Distinct
+    // from sameUnit (which compares only the first element of each side) — needed for widened positional sets
+    // like aramao Dune Step's `across`/`adjacent`.
+    const a = resolveSelector(c.unitIn[0], ctx)[0];
+    if (!a) return false;
+    return resolveSelector(c.unitIn[1], ctx).some((u) => u.id === a.id);
   }
   if ("isFaction" in c) {
     const u = resolveSelector(c.isFaction, ctx)[0];
