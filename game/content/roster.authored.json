@@ -8758,6 +8758,7 @@
      "name": "Refrain",
      "element": "holy",
      "targeting": "single",
+     "targetsEitherFaction": true,
      "klass": "basic",
      "tags": [
       "Harmful",
@@ -9900,6 +9901,7 @@
      "name": "Nightwrap",
      "element": "shadow",
      "targeting": "single",
+     "targetsEitherFaction": true,
      "klass": "basic",
      "tags": [
       "Harmful",
@@ -11071,6 +11073,7 @@
      "name": "Fox Fire",
      "element": "apocalypse",
      "targeting": "single",
+     "targetsEitherFaction": true,
      "klass": "basic",
      "tags": [
       "Harmful",

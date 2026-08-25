@@ -63,6 +63,12 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .ep-ic { width: 20px; height: 20px; border-radius: 4px; object-fit: cover; flex: 0 0 20px; }
 .ep-el { color: var(--dim); text-transform: capitalize; flex: 1; }
 .ep-n { font-weight: 700; }
+.ep-n.spent { color: var(--acc); } /* a color with energy reserved by queued skills reads as "being spent" */
+.ep-was { font-size: 10.5px; color: var(--dim); opacity: .7; } /* the pre-reservation amount, e.g. "of 3" */
+/* the running "how much can I still spend this turn" number, set off from the per-color rows above it */
+.ep-total { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--line); }
+.ep-total .ep-el { text-transform: none; font-weight: 700; color: var(--ink); }
+.ep-total .ep-n { font-size: 14px; }
 /* skill-cost pips: one energy icon per unit of cost, no numbers/words */
 .cost-ics { display: inline-flex; gap: 3px; vertical-align: middle; }
 .cost-ic { width: 16px; height: 16px; border-radius: 3px; object-fit: cover; }

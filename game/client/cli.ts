@@ -14,10 +14,9 @@ import { stdin, stdout, argv, env, exit } from "node:process";
 import type { MatchState, TeamId, Unit } from "../engine/src/types.ts";
 import type { Action } from "../engine/src/scheduler.ts";
 import type { SkillInstance } from "../engine/src/skill.ts";
-import { legalTargets } from "../engine/src/scheduler.ts";
-import { Rng } from "../engine/src/rng.ts";
 import { buildMatch, defaultPolicy, heroById } from "../engine/content/match.ts";
 import { runMatch, type AsyncProvider } from "./loop.ts";
+import { poolFor } from "./targeting.ts";
 import { availableFusions, availableAugments } from "../engine/content/metagame.ts";
 import { draftableHeroes, hasDraftOptions, applyDraftChoice, autoDraft, type DraftChoice } from "./draft.ts";
 import * as R from "./render.ts";
@@ -38,26 +37,9 @@ export function parseArgs(args: string[]): { A: string[]; B: string[]; seed: num
 export const livingUnits = (state: MatchState, side: TeamId): Unit[] =>
   state.teams[side].units.map((id) => state.units[id]).filter((u): u is Unit => !!u && u.alive);
 
-/** The legal single-target pool for a skill (Harmful→enemies, Helpful→allies, else either), run through
- *  the engine's targeting rules (taunt/blind/invulnerable/isolated). A throwaway rng keeps state pure. */
-export function targetPool(state: MatchState, u: Unit, skill: SkillInstance): Unit[] {
-  const enemyTeam: TeamId = u.team === "A" ? "B" : "A";
-  const harmful = skill.tags.includes("Harmful");
-  const helpful = skill.tags.includes("Helpful");
-  // Fusion targeting expansions (the engine has no faction filter; these only widen the offered pool):
-  //  - Merciless (black knight "evil"): Oathbreaker Strike may target allied Heroes.
-  //  - Mountain Rescue Team (syl "winter"): the Eagle's Swoop may target a stunned ally (for invuln).
-  const merciless = skill.id === "blackknight1" && u.fused === "evil";
-  const swoopRescue = skill.id === "sylminion2" && state.units[u.summoner ?? ""]?.fused === "winter";
-  const pool = merciless
-    ? [...livingUnits(state, enemyTeam), ...livingUnits(state, u.team).filter((x) => x.kind === "hero" && x.id !== u.id)]
-    : swoopRescue
-    ? [...livingUnits(state, enemyTeam), ...livingUnits(state, u.team).filter((x) => x.id !== u.id && x.statuses.some((s) => s.kind === "stun"))]
-    : harmful ? livingUnits(state, enemyTeam)
-    : helpful ? livingUnits(state, u.team)
-    : [...livingUnits(state, u.team), ...livingUnits(state, enemyTeam)];
-  return legalTargets(state, u, skill, pool, Rng.fromState(state.rngState));
-}
+/** The single-target pool a client offers for a skill — the shared logic lives in client/targeting.ts.
+ *  Re-exported here so the terminal client (and swoop_target.test.ts / cli.test.ts) keep importing it from cli.ts. */
+export const targetPool = poolFor;
 
 async function main(): Promise<void> {
   const { A, B, seed, you, demo } = parseArgs(argv.slice(2));

@@ -189,6 +189,13 @@ export interface SkillDef {
   /** Revive skills (keeper5 Hero's Return, keeper3 Plot Twist) may select a DEAD ally as their target;
    *  legalTargets/resolveTargets otherwise filter out non-alive units. */
   canTargetDead?: boolean;
+  /** This single-target skill may be aimed at EITHER faction — an enemy OR an ally (laria1 Nightwrap
+   *  "damage an enemy or heal an ally", fate1 Fox Fire, taryn2 Refrain, …). A CLIENT-targeting hint: the
+   *  engine's legalTargets has no faction filter, but the clients otherwise narrow the offered pool by the
+   *  Harmful/Helpful tags, which is wrong for a cross-faction skill. Tags are NOT a reliable proxy (maggie's
+   *  Bog Witch's Bargain is Harmful+Helpful yet targets only an enemy — its Helpful tag is a self-heal), so
+   *  this is authored explicitly on exactly the skills whose prose says "enemy or ally". */
+  targetsEitherFaction?: boolean;
   /** A single-target skill may not legally target a unit bearing a mark of this name (scratch Bump Those
    *  Numbers: a Deal can only affect each hero once per round — the round-scoped "Deal-Locked" mark). */
   excludeMarkedTargets?: string;
