@@ -527,7 +527,24 @@ export function renderLogin(s: { mode: "login" | "register"; error?: string; bus
   </div></div>`;
 }
 
-export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: string | null; augfuse?: boolean }, player: { name: string; sub: string; avatar: string }): string {
+/** The "claim your guest account" modal: attach a username + password to the current identity so its record
+ *  and progress carry over (shown over character select for a guest who hasn't registered). */
+export function renderClaim(s: { error?: string; busy?: boolean }): string {
+  const dis = s.busy ? "disabled" : "";
+  return `<div class="overlay"><div class="modal login-card claim-modal">
+    <div class="login-title">Save your account</div>
+    <div class="login-sub">Pick a username + password to keep your progress and log in from any device — your current record carries over.</div>
+    <input class="login-input" data-claim-username placeholder="Username" autocomplete="username" maxlength="20" ${dis} />
+    <input class="login-input" data-claim-password type="password" placeholder="Password" autocomplete="new-password" ${dis} />
+    ${s.error ? `<div class="login-error">${esc(s.error)}</div>` : ""}
+    <div class="modal-foot">
+      <button class="login-primary" data-claim-submit="1" ${dis}>${s.busy ? "…" : "Save account"}</button>
+      <button class="mini" data-claim-cancel="1" ${dis}>Cancel</button>
+    </div>
+  </div></div>`;
+}
+
+export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: string | null; augfuse?: boolean }, player: { name: string; sub: string; avatar: string; username?: string }): string {
   const inspectId = setup.inspect ?? ROSTER_ORDER[0]!;
   const def = ROSTER.find((h) => h.id === inspectId)!;
   const on = setup.picked.includes(inspectId);
@@ -567,7 +584,10 @@ export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: 
         <input class="cs-uname" data-name-input maxlength="${MAX_NAME_LEN}" value="${esc(player.name)}" placeholder="Guest" title="Your display name — edit to rename" />
         <span>${esc(player.sub)}</span>
       </div>
-      <button class="cs-logout" data-logout title="Log out">⎋</button>
+      ${player.username
+        ? `<span class="cs-handle" title="Logged in">@${esc(player.username)}</span>`
+        : `<button class="cs-claim" data-claim-open="1" title="Save your account so it works on any device">Save account</button>`}
+      <button class="cs-logout" data-logout="1" title="Log out">⎋</button>
     </div>
 
     <div class="cs-stage">

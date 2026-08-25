@@ -367,7 +367,8 @@ export function startServer(port = Number(process.env.ARENA_PORT) || DEFAULT_POR
     //   /register {username, password, name}         claim a real account -> a fresh {playerId, secret}
     //   /login    {username, password}               log into an account   -> a fresh {playerId, secret}
     //   /save     {playerId, secret, name?, avatar?, progress?}  persist synced profile fields
-    if (req.method === "POST" && ["/profile", "/register", "/login", "/save"].includes(req.url ?? "")) {
+    //   /claim    {playerId, secret, username, password}         attach a login to an existing guest identity
+    if (req.method === "POST" && ["/profile", "/register", "/login", "/save", "/claim"].includes(req.url ?? "")) {
       let body = "";
       req.on("data", (c) => { body += c; if (body.length > 4096) req.destroy(); });
       req.on("end", async () => {
@@ -383,9 +384,12 @@ export function startServer(port = Number(process.env.ARENA_PORT) || DEFAULT_POR
           } else if (req.url === "/login") {
             const r = await store.login(o.username, o.password);
             [status, payload] = r.ok ? [200, { profile: r.profile, playerId: r.playerId, secret: r.secret }] : [401, { error: r.error }];
-          } else { // /save
+          } else if (req.url === "/save") {
             const profile = await store.save(o.playerId ?? "", o.secret ?? "", { name: o.name, avatar: o.avatar, progress: o.progress });
             [status, payload] = profile ? [200, { profile }] : [401, { error: "authentication failed" }];
+          } else { // /claim
+            const r = await store.claim(o.playerId ?? "", o.secret ?? "", o.username, o.password);
+            [status, payload] = r.ok ? [200, { profile: r.profile, playerId: r.playerId, secret: r.secret }] : [400, { error: r.error }];
           }
         } catch { /* keep the 400 bad-request default */ }
         res.writeHead(status, { ...CORS, "content-type": "application/json" });

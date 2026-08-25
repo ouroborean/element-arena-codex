@@ -103,6 +103,11 @@ export const register = (username: string, password: string, name: string): Prom
 /** Log into an existing account (returns a fresh {playerId, secret} identity) or an error message. */
 export const login = (username: string, password: string): Promise<AuthReply> => postAuth("/login", { username, password });
 
+/** Claim the CURRENT (guest) identity: attach a username + password so the existing record/progress carries
+ *  over. Keeps the same {playerId, secret}; returns the now-registered profile or an error message. */
+export const claimAccount = (playerId: string, secret: string, username: string, password: string): Promise<AuthReply> =>
+  postAuth("/claim", { playerId, secret, username, password });
+
 /** Persist synced profile fields (display name / avatar / progress) to the account. Fire-and-forget-safe. */
 export async function saveProfile(playerId: string, secret: string, patch: { name?: string; avatar?: string; progress?: unknown }): Promise<Profile | null> {
   try {

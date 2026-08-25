@@ -215,6 +215,28 @@ export class AccountStore {
     return { ok: true, profile: this.getProfile(r.playerId)!, playerId: r.playerId, secret };
   }
 
+  /** Claim an existing (guest) identity: attach a username + password to the row the caller already holds, so
+   *  its record + progress carry over instead of starting a fresh account. Verifies the session secret, refuses
+   *  a row that already has a login, and keeps the SAME {playerId, secret}. */
+  async claim(playerId: string, secret: string, username: unknown, password: unknown): Promise<AuthResult> {
+    const r = this.row(playerId);
+    if (!r || !(await this.verifySecret(r, secret))) return { ok: false, error: "you're not signed in" };
+    if (r.username) return { ok: false, error: "this account already has a login" };
+    const uname = cleanUsername(username);
+    if (!uname) return { ok: false, error: `username must be ${MIN_USERNAME_LEN}–${MAX_USERNAME_LEN} characters: letters, numbers, underscore` };
+    if (typeof password !== "string" || password.length < MIN_PASS_LEN || password.length > MAX_PASS_LEN) {
+      return { ok: false, error: `password must be at least ${MIN_PASS_LEN} characters` };
+    }
+    const passSalt = randomBytes(16);
+    const passHash = await scryptAsync(password, passSalt, 32);
+    try {
+      this.db.prepare("UPDATE profiles SET username = ?, passSalt = ?, passHash = ?, updated = ? WHERE playerId = ?").run(uname, passSalt, passHash, Date.now(), playerId);
+    } catch {
+      return { ok: false, error: "that username is already taken" }; // unique-index violation
+    }
+    return { ok: true, profile: this.getProfile(playerId)!, playerId, secret }; // identity is unchanged
+  }
+
   /** Persist profile fields (display name, avatar, progress blob) for an authenticated player. Verifies the
    *  session secret; a bad secret or oversized progress leaves the row untouched. Returns the (updated) profile. */
   async save(playerId: string, secret: string, patch: { name?: unknown; avatar?: unknown; progress?: unknown }): Promise<Profile | null> {
