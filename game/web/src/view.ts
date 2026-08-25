@@ -509,6 +509,24 @@ const RIGHT_ROWS = [
 ];
 const ROSTER_ORDER = [...LEFT_ROWS.flat(), ...RIGHT_ROWS.flat()];
 
+/** The pre-character-select login screen: log in / register / continue as guest, over the menu backdrop. */
+export function renderLogin(s: { mode: "login" | "register"; error?: string; busy?: boolean }): string {
+  const reg = s.mode === "register";
+  const dis = s.busy ? "disabled" : "";
+  return `<div class="cs login-scene"><div class="login-card">
+    <div class="login-title">Element Arena</div>
+    <div class="login-sub">${reg ? "Create your account" : "Log in to play"}</div>
+    <input class="login-input" data-username-input placeholder="Username" autocomplete="username" maxlength="20" ${dis} />
+    ${reg ? `<input class="login-input" data-name-input placeholder="Display name (optional)" maxlength="${MAX_NAME_LEN}" ${dis} />` : ""}
+    <input class="login-input" data-password-input type="password" placeholder="Password" autocomplete="${reg ? "new-password" : "current-password"}" ${dis} />
+    ${s.error ? `<div class="login-error">${esc(s.error)}</div>` : ""}
+    <button class="login-primary" ${reg ? "data-register=\"1\"" : "data-login=\"1\""} ${dis}>${s.busy ? "…" : reg ? "Register" : "Log in"}</button>
+    <div class="login-toggle">${reg ? "Already have an account?" : "New here?"} <a data-login-mode="${reg ? "login" : "register"}">${reg ? "Log in" : "Create one"}</a></div>
+    <div class="login-or">or</div>
+    <button class="login-guest" data-guest="1" ${dis}>Continue as guest</button>
+  </div></div>`;
+}
+
 export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: string | null; augfuse?: boolean }, player: { name: string; sub: string; avatar: string }): string {
   const inspectId = setup.inspect ?? ROSTER_ORDER[0]!;
   const def = ROSTER.find((h) => h.id === inspectId)!;
@@ -549,6 +567,7 @@ export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: 
         <input class="cs-uname" data-name-input maxlength="${MAX_NAME_LEN}" value="${esc(player.name)}" placeholder="Guest" title="Your display name — edit to rename" />
         <span>${esc(player.sub)}</span>
       </div>
+      <button class="cs-logout" data-logout title="Log out">⎋</button>
     </div>
 
     <div class="cs-stage">

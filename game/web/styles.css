@@ -348,6 +348,25 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
   background: radial-gradient(ellipse at 50% 38%, transparent 34%, #000000b0 100%); }
 .cs > * { position: relative; z-index: 1; }
 
+/* ── login screen (pre-character-select), over the menu backdrop ──────────── */
+.login-scene { align-items: center; justify-content: center; }
+.login-card { width: min(360px, 92vw); display: flex; flex-direction: column; gap: 10px; padding: 28px 26px;
+  background: color-mix(in srgb, var(--panel) 92%, transparent); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+.login-title { font-size: 26px; font-weight: 800; text-align: center; letter-spacing: .5px; }
+.login-sub { text-align: center; color: var(--dim); font-size: 13px; margin-bottom: 6px; }
+.login-input { padding: 10px 12px; font: inherit; font-size: 14px; color: var(--ink); background: var(--bg2); border: 1px solid var(--line); border-radius: var(--radius); }
+.login-input:focus { outline: none; border-color: var(--acc); }
+.login-error { color: var(--foe); font-size: 12.5px; text-align: center; }
+.login-primary { margin-top: 4px; padding: 11px; font: inherit; font-weight: 800; color: #0b0e1c; background: var(--acc); border: 0; border-radius: var(--radius); cursor: pointer; }
+.login-primary:disabled { opacity: .5; cursor: default; }
+.login-toggle { text-align: center; color: var(--dim); font-size: 12.5px; }
+.login-toggle a { color: var(--acc); cursor: pointer; text-decoration: underline; }
+.login-or { text-align: center; color: var(--dim); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+.login-guest { padding: 9px; font: inherit; font-weight: 600; color: var(--ink); background: var(--panel2); border: 1px solid var(--line); border-radius: var(--radius); cursor: pointer; }
+.login-guest:disabled { opacity: .5; cursor: default; }
+.cs-logout { align-self: center; width: 26px; height: 26px; padding: 0; font-size: 14px; color: var(--dim); background: transparent; border: 1px solid var(--line); border-radius: var(--radius); cursor: pointer; }
+.cs-logout:hover { color: var(--foe); border-color: color-mix(in srgb, var(--foe) 50%, var(--line)); }
+
 /* top-left mini card (currently-inspected hero) */
 .cs-mini { position: absolute; top: 16px; left: 18px; z-index: 3; display: flex; gap: 10px; align-items: center;
   background: color-mix(in srgb, var(--panel) 80%, transparent); border: 1px solid var(--line); border-radius: var(--radius); padding: 7px 14px 7px 7px; box-shadow: var(--shadow); }

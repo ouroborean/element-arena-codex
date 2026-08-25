@@ -83,3 +83,33 @@ export async function fetchProfile(playerId: string, secret: string, name: strin
     return null;
   }
 }
+
+/** A successful register/login: the account profile plus the {playerId, secret} identity to store + reuse. */
+export interface AuthCreds { profile: Profile; playerId: string; secret: string; }
+export type AuthReply = { ok: true; creds: AuthCreds } | { ok: false; error: string };
+
+async function postAuth(path: string, body: object): Promise<AuthReply> {
+  try {
+    const res = await fetch(`${httpBase()}${path}`, { method: "POST", headers: { "content-type": "text/plain" }, body: JSON.stringify(body) });
+    const data = (await res.json().catch(() => ({}))) as { profile?: Profile; playerId?: string; secret?: string; error?: string };
+    if (res.ok && data.profile && data.playerId && data.secret) return { ok: true, creds: { profile: data.profile, playerId: data.playerId, secret: data.secret } };
+    return { ok: false, error: data.error || "request failed" };
+  } catch {
+    return { ok: false, error: "can't reach the server" };
+  }
+}
+/** Register a new account (returns a fresh {playerId, secret} identity) or an error message. */
+export const register = (username: string, password: string, name: string): Promise<AuthReply> => postAuth("/register", { username, password, name });
+/** Log into an existing account (returns a fresh {playerId, secret} identity) or an error message. */
+export const login = (username: string, password: string): Promise<AuthReply> => postAuth("/login", { username, password });
+
+/** Persist synced profile fields (display name / avatar / progress) to the account. Fire-and-forget-safe. */
+export async function saveProfile(playerId: string, secret: string, patch: { name?: string; avatar?: string; progress?: unknown }): Promise<Profile | null> {
+  try {
+    const res = await fetch(`${httpBase()}/save`, { method: "POST", headers: { "content-type": "text/plain" }, body: JSON.stringify({ playerId, secret, ...patch }) });
+    if (!res.ok) return null;
+    return ((await res.json()) as { profile: Profile }).profile ?? null;
+  } catch {
+    return null;
+  }
+}

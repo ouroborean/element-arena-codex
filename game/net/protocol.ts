@@ -36,7 +36,9 @@ export const RECONNECT_GRACE_MS = 45_000;
 /** Why a match ended — a clean best-of-N decision, or one side dropping out. */
 export type EndReason = "decided" | "forfeit" | "opponent-left" | "stalemate";
 
-/** A guest player's public profile: a persistent identity + display name + record (rating anchors Ranked). */
+/** A player's public profile: a persistent identity + display name + record (rating anchors Ranked). For a
+ *  registered account it also carries the login `username`, the synced `avatar`, and an extensible `progress`
+ *  blob; those are absent for anonymous guests. (Additive scalar fields — no PROTOCOL_VERSION bump needed.) */
 export interface Profile {
   playerId: string;
   name: string;
@@ -44,6 +46,12 @@ export interface Profile {
   losses: number;
   draws: number;
   rating: number;
+  /** The login handle of a registered account (absent for a guest). */
+  username?: string;
+  /** The player's chosen avatar filename, synced to a registered account (absent/local for a guest). */
+  avatar?: string;
+  /** An extensible per-account progress blob (unlocks/mastery/currency; `{}` for now). */
+  progress?: unknown;
 }
 
 /** Max display-name length (server-clamped). */

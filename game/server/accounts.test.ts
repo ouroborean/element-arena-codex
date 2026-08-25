@@ -101,3 +101,52 @@ test("cleanName scrubs HTML-dangerous chars, clamps length, keeps spaces, defaul
   assert.equal(cleanName(42 as unknown), "Guest", "non-strings become Guest");
   assert.equal(cleanName("x".repeat(50)).length, 20, "clamped to MAX_NAME_LEN");
 });
+
+// ── registered accounts (username + password) ──────────────────────────────────────────────────────── //
+
+test("register creates an account and returns a working {playerId, secret} identity", async () => {
+  const s = store();
+  const r = await s.register("Ada_Lovelace", "hunter2pw", "Ada");
+  assert.ok(r.ok, "registration succeeds");
+  if (!r.ok) return;
+  assert.equal(r.profile.username, "ada_lovelace", "username is folded to lowercase");
+  assert.equal(r.profile.name, "Ada", "display name is separate from the login handle");
+  assert.deepEqual(r.profile.progress, {}, "starts with an empty progress blob");
+  // the returned identity authenticates exactly like a guest's
+  const p = await s.authenticate(r.playerId, r.secret, "Ada");
+  assert.ok(p, "the minted secret verifies");
+});
+
+test("register rejects a taken username, a short password, and a bad handle", async () => {
+  const s = store();
+  assert.ok((await s.register("dupe", "password1", "A")).ok);
+  assert.equal((await s.register("DUPE", "password2", "B")).ok, false, "case-folded duplicate is refused");
+  assert.equal((await s.register("ok_name", "short", "C")).ok, false, "too-short password refused");
+  assert.equal((await s.register("no spaces!", "password1", "D")).ok, false, "invalid handle refused");
+});
+
+test("login verifies the password and mints a fresh secret (old secret is superseded)", async () => {
+  const s = store();
+  const reg = await s.register("grace", "correcthorse", "Grace");
+  assert.ok(reg.ok); if (!reg.ok) return;
+  assert.equal((await s.login("grace", "wrongpass")).ok, false, "wrong password rejected");
+  const li = await s.login("GRACE", "correcthorse"); // case-insensitive handle
+  assert.ok(li.ok, "correct password logs in"); if (!li.ok) return;
+  assert.equal(li.playerId, reg.playerId, "same account");
+  assert.notEqual(li.secret, reg.secret, "a fresh session secret is issued");
+  assert.equal((await s.authenticate(reg.playerId, reg.secret, "Grace")), null, "the OLD secret no longer verifies");
+  assert.ok(await s.authenticate(li.playerId, li.secret, "Grace"), "the NEW secret verifies");
+});
+
+test("save persists avatar + progress for the authenticated player, and rejects a bad secret", async () => {
+  const s = store();
+  const reg = await s.register(" author", "passphrase", "Author");
+  assert.ok(reg.ok); if (!reg.ok) return;
+  assert.equal(await s.save(reg.playerId, "not-the-secret", { avatar: "bolt.svg" }), null, "bad secret → no write");
+  const p = await s.save(reg.playerId, reg.secret, { avatar: "bolt.svg", progress: { coins: 5 } });
+  assert.ok(p);
+  assert.equal(p!.avatar, "bolt.svg");
+  assert.deepEqual(p!.progress, { coins: 5 });
+  // persisted across a fresh read
+  assert.deepEqual(s.getProfile(reg.playerId)!.progress, { coins: 5 });
+});

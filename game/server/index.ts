@@ -362,21 +362,34 @@ export function startServer(port = Number(process.env.ARENA_PORT) || DEFAULT_POR
   const matchServer = new MatchServer(store);
   const http = createServer((req: IncomingMessage, res: ServerResponse) => {
     if (req.method === "OPTIONS") { res.writeHead(204, CORS); res.end(); return; }
-    // POST /profile {playerId, secret, name} -> the guest profile (create-or-verify). Lets the team-select
-    // screen show a name + record without opening a match socket.
-    if (req.method === "POST" && req.url === "/profile") {
+    // Account endpoints (all POST, JSON body ≤ 4KB, text/plain to dodge a CORS preflight):
+    //   /profile  {playerId, secret, name}          create-or-verify a guest identity (name + record)
+    //   /register {username, password, name}         claim a real account -> a fresh {playerId, secret}
+    //   /login    {username, password}               log into an account   -> a fresh {playerId, secret}
+    //   /save     {playerId, secret, name?, avatar?, progress?}  persist synced profile fields
+    if (req.method === "POST" && ["/profile", "/register", "/login", "/save"].includes(req.url ?? "")) {
       let body = "";
       req.on("data", (c) => { body += c; if (body.length > 4096) req.destroy(); });
       req.on("end", async () => {
+        let status = 400, payload: unknown = { error: "bad request" };
         try {
-          const { playerId, secret, name } = JSON.parse(body) as { playerId?: string; secret?: string; name?: string };
-          const profile = await store.authenticate(playerId ?? "", secret ?? "", name ?? "");
-          res.writeHead(profile ? 200 : 401, { ...CORS, "content-type": "application/json" });
-          res.end(JSON.stringify(profile ? { profile } : { error: "authentication failed" }));
-        } catch {
-          res.writeHead(400, { ...CORS, "content-type": "application/json" });
-          res.end(JSON.stringify({ error: "bad request" }));
-        }
+          const o = JSON.parse(body || "{}") as { playerId?: string; secret?: string; name?: string; username?: string; password?: string; avatar?: string; progress?: unknown };
+          if (req.url === "/profile") {
+            const profile = await store.authenticate(o.playerId ?? "", o.secret ?? "", o.name ?? "");
+            [status, payload] = profile ? [200, { profile }] : [401, { error: "authentication failed" }];
+          } else if (req.url === "/register") {
+            const r = await store.register(o.username, o.password, o.name);
+            [status, payload] = r.ok ? [200, { profile: r.profile, playerId: r.playerId, secret: r.secret }] : [400, { error: r.error }];
+          } else if (req.url === "/login") {
+            const r = await store.login(o.username, o.password);
+            [status, payload] = r.ok ? [200, { profile: r.profile, playerId: r.playerId, secret: r.secret }] : [401, { error: r.error }];
+          } else { // /save
+            const profile = await store.save(o.playerId ?? "", o.secret ?? "", { name: o.name, avatar: o.avatar, progress: o.progress });
+            [status, payload] = profile ? [200, { profile }] : [401, { error: "authentication failed" }];
+          }
+        } catch { /* keep the 400 bad-request default */ }
+        res.writeHead(status, { ...CORS, "content-type": "application/json" });
+        res.end(JSON.stringify(payload));
       });
       return;
     }
