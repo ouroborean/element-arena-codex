@@ -147,8 +147,21 @@ export class Match {
       resolve(msg);
     } else if (msg.t === "surrender") {
       this.abort(from === this.a ? this.b : this.a, "forfeit");
+    } else if (msg.t === "concedeRound") {
+      this.concedeRound(from);
     }
     // Anything else (a stray/out-of-turn message) is ignored.
+  }
+
+  /** Concede the CURRENT round (not the whole match): award it to the opponent, then let the loop fall into
+   *  the between-round draft — or end the match if this decides the best-of-N. A no-op during the draft phase
+   *  (there is no round in progress to concede). The engine's roundWinner honors state.concededRound at the
+   *  next check, and startRound clears it for the next fresh battle. */
+  private concedeRound(from: MatchClient): void {
+    if (this.over || this.aborted) return;
+    if (this.a.pendingDraft || this.b.pendingDraft) return; // between rounds — nothing to concede
+    this.state.concededRound = from.side!;
+    for (const c of [this.a, this.b]) { c.pendingTurn?.(HOLD); c.pendingTurn = undefined; } // advance the loop now
   }
 
   /**

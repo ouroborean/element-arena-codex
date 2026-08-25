@@ -72,6 +72,7 @@ export function buildMatch(draft: Draft): MatchState {
   return {
     round: 0, // startRound increments to 1 for the first fresh battle
     turn: 1,
+    roundStartTurn: 1, // startRound refreshes this each round; the first turn of a round is turn === roundStartTurn
     activeTeam: "A",
     units,
     teams: {

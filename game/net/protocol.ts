@@ -61,6 +61,9 @@ export type ClientMsg =
   | { t: "draftChoice"; choice: DraftChoice }
   /** Concede the match immediately (the opponent wins by forfeit). */
   | { t: "surrender" }
+  /** Concede only the CURRENT round (the opponent takes it); the match continues into the between-round
+   *  draft, or ends normally if this decides the best-of-N. Distinct from `surrender` (whole match). */
+  | { t: "concedeRound" }
   /** Leave the queue before being matched. */
   | { t: "cancelQueue" }
   /** Rejoin an in-progress match after a disconnect (a new socket presenting the seat's rejoin token). */

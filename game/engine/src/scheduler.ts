@@ -68,6 +68,8 @@ export function removeDeadMinions(state: MatchState): void {
 /** Start a fresh-battle round: reset HP, clear statuses + shields, reset cooldowns. */
 export function startRound(state: MatchState, firstTeam: TeamId = "A"): void {
   state.round += 1;
+  state.roundStartTurn = state.turn; // the active team's opening turn of this round (for reduced first-turn income)
+  state.concededRound = undefined; // a concede is round-scoped — never carry it into the fresh battle
   clearRoundStatuses(state);
   state.scheduled = []; // scheduled effects are round-scoped (like statuses/dynamic triggers): they target
   // this round's HP/stacks/statuses, so an unfired one must not carry into the next fresh battle.
@@ -91,6 +93,7 @@ export function startRound(state: MatchState, firstTeam: TeamId = "A"): void {
 
 /** A team has lost the round when it has no living heroes. Returns the winner, or null. */
 export function roundWinner(state: MatchState): TeamId | null {
+  if (state.concededRound) return otherTeam(state.concededRound); // a conceded round goes to the opponent
   const aDead = livingHeroes(state, "A").length === 0;
   const bDead = livingHeroes(state, "B").length === 0;
   if (aDead && bDead) return state.activeTeam; // simultaneous wipe → active team takes it
@@ -146,6 +149,19 @@ export function grantIncome(state: MatchState, id: TeamId): void {
   }
 }
 
+/**
+ * Reduced opening income for the player who goes FIRST in a round (first-move compensation): grant exactly
+ * ONE energy of the CENTER hero's current element — nothing else. Replaces normal income on that one turn.
+ */
+export function grantFirstTurnIncome(state: MatchState, id: TeamId): void {
+  const heroes = livingHeroes(state, id);
+  const center = heroes.find((h) => h.slot === MIDDLE_SLOT) ?? heroes[0];
+  if (!center) return;
+  const pool = team(state, id).energy;
+  pool[center.currentElement] = (pool[center.currentElement] ?? 0) + 1;
+  emit(state, { type: "energyFromEssence", unit: center.id, element: center.currentElement });
+}
+
 /** Advance the active team's cooldowns (gated per-unit by Paralysis). */
 /**
  * Tick a team's skill cooldowns down by one, at the END of that team's turn. A skill used THIS turn is
@@ -198,7 +214,14 @@ export function runChannels(state: MatchState, id: TeamId): void {
 /** Begin the active team's turn: income, cooldowns, channels, then turn-start triggers. */
 export function startTurn(state: MatchState): void {
   state.actedThisTurn = []; // fresh ledger of who acts this turn (drives "acts alone")
-  grantIncome(state, state.activeTeam);
+  // The player who goes FIRST in a round gets reduced opening income (1 of their center hero's element) to
+  // offset the first-move advantage; everyone else gets normal income. Guarded on roundStartTurn so direct-
+  // constructed test states (helpers.makeState, which never sets it) keep the normal income path.
+  if (state.roundStartTurn !== undefined && state.turn === state.roundStartTurn) {
+    grantFirstTurnIncome(state, state.activeTeam);
+  } else {
+    grantIncome(state, state.activeTeam);
+  }
   runChannels(state, state.activeTeam);
   emit(state, { type: "turnStart", team: state.activeTeam });
 }
