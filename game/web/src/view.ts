@@ -153,25 +153,26 @@ function costIcons(cost: { generic: number; specific: number }, element: string)
   return all ? `<span class="cost-ics">${all}</span>` : `<span class="cost-free">Free</span>`;
 }
 
+/** One skill tile. `s` null → a locked/grayed empty slot (a hero's kit shows a fixed set of slots; ones with
+ *  no skill yet are locked). `big` → the larger Ultimate slot. A tile is always clickable — an unusable skill
+ *  opens its detail (examine) rather than entering targeting; a locked slot is inert (no data-* hooks). */
+function skillTile(state: MatchState, u: Unit, ui: UiState, s: SkillInstance | null, big = false): string {
+  const base = big ? "tile tile-ult" : "tile";
+  if (!s) return `<div class="${base} locked" title="${big ? "No ultimate" : "Empty skill slot"}">🔒</div>`;
+  const ok = canUsePlanned(state, u, s, [...ui.planned.values()]);
+  const chosen = ui.plannedSkill.get(u.id) === s.id;
+  const cost = effectiveCost(u, s, state);
+  const costStr = [cost.generic ? `${cost.generic} generic` : "", cost.specific ? `${cost.specific} ${s.element}` : ""].filter(Boolean).join(" + ") || "free";
+  const text = SKILL_TEXT[s.id];
+  const tip = `${text?.n ?? s.name} — ${costStr}${s.currentCd > 0 ? ` — on cooldown (${s.currentCd})` : ""}${text?.d ? `\n${text.d}` : ""}`;
+  const cls = [base, ok ? "" : "off", chosen ? "chosen" : ""].filter(Boolean).join(" ");
+  const ic = iconOf(s.id, u.heroId ?? undefined);
+  return `<button class="${cls}" data-owner="${u.id}" data-skill="${s.id}" title="${esc(tip)}">${ic ? `<img src="${ic}" alt="${esc(s.name)}" ${IMG_FALLBACK} />` : `<span class="tile-abbr">${esc(s.name.slice(0, 3))}</span>`}${s.currentCd > 0 ? `<span class="cdbadge">${s.currentCd}</span>` : ""}</button>`;
+}
+
+/** A flat row of a unit's skill tiles (used for controllable MINIONS, which have only a few basic skills). */
 function skillTiles(state: MatchState, u: Unit, ui: UiState): string {
-  const chosen = ui.plannedSkill.get(u.id);
-  const planned = [...ui.planned.values()];
-  const tiles = (u.skills ?? []).map((s) => {
-    // Usable only if its energy isn't already committed to this turn's other queued skills (so the player
-    // can never queue a set the pool can't pay — the excess used to be silently dropped at resolution).
-    const ok = canUsePlanned(state, u, s, planned);
-    const cost = effectiveCost(u, s, state);
-    const costStr = [cost.generic ? `${cost.generic} generic` : "", cost.specific ? `${cost.specific} ${s.element}` : ""].filter(Boolean).join(" + ") || "free";
-    const text = SKILL_TEXT[s.id];
-    const tip = `${text?.n ?? s.name} — ${costStr}${s.currentCd > 0 ? ` — on cooldown (${s.currentCd})` : ""}${text?.d ? `\n${text.d}` : ""}`;
-    const cls = ["tile", ok ? "" : "off", chosen === s.id ? "chosen" : ""].filter(Boolean).join(" ");
-    const ic = iconOf(s.id, u.heroId ?? undefined);
-    // Always clickable — an unusable skill opens its detail (examine) instead of entering targeting.
-    return `<button class="${cls}" data-owner="${u.id}" data-skill="${s.id}" title="${esc(tip)}">
-      ${ic ? `<img src="${ic}" alt="${esc(s.name)}" ${IMG_FALLBACK} />` : `<span class="tile-abbr">${esc(s.name.slice(0, 3))}</span>`}
-      ${s.currentCd > 0 ? `<span class="cdbadge">${s.currentCd}</span>` : ""}</button>`;
-  }).join("");
-  return `<div class="tiles">${tiles}</div>`;
+  return `<div class="tiles">${(u.skills ?? []).map((s) => skillTile(state, u, ui, s)).join("")}</div>`;
 }
 
 const livingOn = (state: MatchState, side: TeamId): Unit[] =>
@@ -239,15 +240,19 @@ function portraitCol(state: MatchState, u: Unit, ui: UiState, incoming: Map<stri
   </div>`;
 }
 
-/** YOUR hero's element-themed action panel: the active-skill tiles (3-wide grid → 3+2) plus the passive slot. */
+/** YOUR hero's element-themed action panel: five NORMAL skill slots (fixed positions: 3 basic, fusion,
+ *  defensive — empty ones locked) plus a larger ULTIMATE slot. The passive gets no slot here. */
 function kit(state: MatchState, u: Unit, ui: UiState): string {
-  const passiveId = `${u.heroId ?? ""}${u.fused ?? ""}0`;
-  const pText = SKILL_TEXT[passiveId];
-  const pIc = iconOf(passiveId, u.heroId ?? undefined);
-  const pTip = pText ? `${pText.n}${pText.d ? ` — ${pText.d}` : ""}` : "Passive";
-  const passive = `<div class="kit-passive" title="${esc(pTip)}">
-    ${pIc ? `<img src="${pIc}" alt="passive" ${IMG_FALLBACK} />` : `<span class="tile-abbr">P</span>`}<span class="kit-tag">Passive</span></div>`;
-  return `<div class="kit" style="--el:${elColor(u.currentElement)}">${skillTiles(state, u, ui)}${passive}</div>`;
+  const skills = u.skills ?? [];
+  // Canonical slot layout so a given position always means the same skill kind (a hero has exactly 3 basics
+  // and at most one fusion / defensive / ultimate — see fusion splice at slot 3). Empty slots render locked.
+  const basics = skills.filter((s) => s.klass === "basic");
+  const fusion = skills.find((s) => s.klass === "fusion") ?? null;
+  const defensive = skills.find((s) => s.klass === "defensive") ?? null;
+  const ultimate = skills.find((s) => s.klass === "ultimate") ?? null; // undefined for Prisma Trinity → locked
+  const slots: (SkillInstance | null)[] = [basics[0] ?? null, basics[1] ?? null, basics[2] ?? null, fusion, defensive];
+  const normals = slots.map((s) => skillTile(state, u, ui, s)).join("");
+  return `<div class="kit" style="--el:${elColor(u.currentElement)}"><div class="tiles">${normals}</div>${skillTile(state, u, ui, ultimate, true)}</div>`;
 }
 
 /** One hero in the vertical column: a framed portrait, plus (for YOUR living heroes) the skill kit beside it. */
@@ -255,21 +260,26 @@ function unitRow(state: MatchState, u: Unit, ui: UiState, isYou: boolean, incomi
   const targetable = ui.phase === "plan" && !!ui.targeting && ui.legalTargets.has(u.id);
   const essence = u.kind === "hero" && u.alive && hasEssenceIncome(u); // element glow — has an Essence charge, or is the middle hero
   const cls = ["unit", isYou ? "mine" : "enemy", u.alive ? "" : "dead", targetable ? "targetable" : "", essence ? "essence" : "", ui.plannedSkill.has(u.id) ? "acted" : ""].filter(Boolean).join(" ");
-  // Heroes get the full element-themed kit (skill tiles + passive slot); a controllable minion gets only its
-  // bare skill tiles (no passive — minions have none, and their heroId is null so a passive id is meaningless).
+  // Heroes get the full element-themed kit (five normal skill slots + an ultimate slot, no passive); a
+  // controllable minion gets only a flat row of its bare skill tiles (minions have only basic skills).
   const controls = isYou && u.alive ? (u.kind === "hero" ? kit(state, u, ui) : skillTiles(state, u, ui)) : "";
   return `<div class="${cls}">${portraitCol(state, u, ui, incoming)}${controls}</div>`;
 }
 
-/** A whole team stacked vertically: heroes (then any minions), each as a unitRow. */
+/** A team's HEROES stacked vertically, each as a unitRow. */
 function teamColumn(state: MatchState, side: TeamId, ui: UiState, isYou: boolean, incoming: Map<string, Incoming[]>): string {
-  const units = state.teams[side].units.map((id) => state.units[id]).filter((u): u is Unit => !!u);
-  const heroes = units.filter((u) => u.kind === "hero");
-  const minions = units.filter((u) => u.kind === "minion");
+  const heroes = state.teams[side].units.map((id) => state.units[id]).filter((u): u is Unit => !!u && u.kind === "hero");
   return `<div class="teamcol ${isYou ? "you" : "foe"}">
     <div class="units">${heroes.map((u) => unitRow(state, u, ui, isYou, incoming)).join("")}</div>
-    ${minions.length ? `<div class="units minions">${minions.map((u) => unitRow(state, u, ui, isYou, incoming)).join("")}</div>` : ""}
   </div>`;
+}
+
+/** A team's MINIONS (capped at MINION_CAP shown) as a vertical list "in front of" their heroes — between the
+ *  hero columns and the centre. Your minions are controllable (skill tiles); the foe's are portraits only. */
+const MINION_CAP = 6;
+function minionColumn(state: MatchState, side: TeamId, ui: UiState, isYou: boolean, incoming: Map<string, Incoming[]>): string {
+  const minions = state.teams[side].units.map((id) => state.units[id]).filter((u): u is Unit => !!u && u.kind === "minion").slice(0, MINION_CAP);
+  return `<div class="minioncol ${isYou ? "you" : "foe"}">${minions.map((u) => unitRow(state, u, ui, isYou, incoming)).join("")}</div>`;
 }
 
 function energyPool(state: MatchState, ui: UiState): string {
@@ -280,34 +290,45 @@ function energyPool(state: MatchState, ui: UiState): string {
   for (const id of state.teams[ui.you].units) { const u = state.units[id]; if (u?.kind === "hero") els.add(u.currentElement); }
   for (const k of Object.keys(pool)) if ((pool[k] ?? 0) > 0) els.add(k);
   const usedOf = (el: string) => el === "generic" ? reserved.generic : reserved.specific[el] ?? 0;
-  const rows = [...els].sort((a, b) => elementRank(a) - elementRank(b) || a.localeCompare(b))
+  const chips = [...els].sort((a, b) => elementRank(a) - elementRank(b) || a.localeCompare(b))
     .map((el) => {
       const have = pool[el] ?? 0, left = Math.max(0, have - usedOf(el)), spent = have - left;
-      return `<div class="ep-row"><img class="ep-ic" src="${energyIcon(el)}" alt="${esc(el)}" title="${esc(el)}" ${IMG_FALLBACK} />
-      <span class="ep-el">${esc(el)}</span><span class="ep-n${spent > 0 ? " spent" : ""}">${left}</span>${spent > 0 ? `<span class="ep-was">of ${have}</span>` : ""}</div>`;
+      return `<span class="ep-chip" title="${esc(el)}${spent > 0 ? ` — ${spent} committed of ${have}` : ""}"><img class="ep-ic" src="${energyIcon(el)}" alt="${esc(el)}" ${IMG_FALLBACK} /><span class="ep-n${spent > 0 ? " spent" : ""}">${left}</span></span>`;
     }).join("");
   // The single "how much can I still spend" number: the whole pool minus everything queued this turn reserves.
   const total = Math.max(0, poolTotal(pool) - reservationTotal(reserved));
-  const totalRow = `<div class="ep-row ep-total"><span class="ep-el">Total unallocated</span><span class="ep-n">${total}</span></div>`;
-  return `<div class="epool"><div class="ep-title">Energy Pool</div>${rows}${totalRow}</div>`;
+  return `<div class="epool"><span class="ep-title">Energy</span>${chips}<span class="ep-chip ep-total"><span class="ep-el">Total</span><span class="ep-n">${total}</span></span></div>`;
 }
 
-function midbar(state: MatchState, ui: UiState): string {
+/** A player's identity chip for the top bar: avatar, name, and round score. (Only the local player has an
+ *  avatar; the opponent shows a placeholder — no opponent avatar is transmitted.) */
+function playerChip(avatar: string, name: string, score: number, side: "you" | "foe"): string {
+  return `<div class="pc ${side}">
+    <div class="pc-av">${avatar ? `<img src="${avatar}" alt="" ${IMG_FALLBACK} />` : `<span class="pc-ph">👤</span>`}</div>
+    <div class="pc-txt"><div class="pc-name">${esc(name)}</div><div class="pc-score">${score} round${score === 1 ? "" : "s"} won</div></div>
+  </div>`;
+}
+
+/** The top bar: your player chip (far left, above your team), the shared controls in the centre (the energy
+ *  pool + the turn / Resolve / — while targeting — the skill detail), and the opponent's chip (far right). */
+function topBar(state: MatchState, ui: UiState, player: { name: string; avatar: string }): string {
+  const foe = ui.you === "A" ? "B" : "A";
   const yourTurn = ui.phase === "plan";
-  // While targeting, the skill detail lives HERE (between the lanes) — never over a portrait, so every
-  // highlighted target stays clickable. Otherwise: your-turn controls, or the AI's "acting…" bar.
-  const center = ui.targeting || ui.examine
+  const control = ui.targeting || ui.examine
     ? skillPanel(state, ui)
     : yourTurn
-    ? `<div class="turn you">Your turn</div><div class="hint">${esc(ui.hint)}</div>
-       <button class="resolve" data-resolve="1">Resolve turn ▶</button>`
+    ? `<div class="turn you">Your turn</div><button class="resolve" data-resolve="1">Resolve turn ▶</button>`
     : `<div class="turn foe">${esc(ui.phaseLabel)}</div><div class="bar"><div class="bar-fill"></div></div>`;
-  return `<div class="midbar">
-    <div class="mid-left">${energyPool(state, ui)}</div>
-    <div class="mid-center">${center}</div>
-    <div class="mid-right">${ui.opponentName ? `<div style="font-size:12px;opacity:.85;margin-bottom:2px">vs ${esc(ui.opponentName)}</div>` : ""}<div class="score">${state.teams.A.roundsWon}–${state.teams.B.roundsWon} · R${state.round}</div>
-      <button class="surrender" data-surrender="1">Surrender</button></div>
+  return `<div class="topbar">
+    ${playerChip(player.avatar, player.name, state.teams[ui.you].roundsWon, "you")}
+    <div class="control"><div class="control-mid">${control}</div>${energyPool(state, ui)}<div class="rnd">Round ${state.round}</div></div>
+    ${playerChip("", ui.opponentName ?? "Bot", state.teams[foe].roundsWon, "foe")}
   </div>`;
+}
+
+/** The bottom bar: the Surrender control, pinned bottom-right. */
+function bottomBar(): string {
+  return `<div class="bottombar"><button class="surrender" data-surrender="1">Surrender</button></div>`;
 }
 
 /** The skill detail in the midbar — shown either while targeting a usable skill, or while merely
@@ -434,16 +455,19 @@ function draftPanel(state: MatchState, ui: UiState): string {
   </div></div>`;
 }
 
-export function renderApp(state: MatchState, ui: UiState): string {
+export function renderApp(state: MatchState, ui: UiState, player: { name: string; sub: string; avatar: string }): string {
   const foe = ui.you === "A" ? "B" : "A";
   const incoming = incomingBy(state, ui);
   const notice = ui.notice
     ? `<div style="position:fixed;top:0;left:0;right:0;z-index:60;background:#6b2b3a;color:#fff;text-align:center;padding:6px 10px;font-size:14px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.4)">${esc(ui.notice)}</div>`
     : "";
   return `<div class="arena">
-    ${teamColumn(state, ui.you, ui, true, incoming)}
-    ${midbar(state, ui)}
-    ${teamColumn(state, foe, ui, false, incoming)}
+    ${topBar(state, ui, player)}
+    <div class="board">
+      <div class="side you">${teamColumn(state, ui.you, ui, true, incoming)}${minionColumn(state, ui.you, ui, true, incoming)}</div>
+      <div class="side foe">${minionColumn(state, foe, ui, false, incoming)}${teamColumn(state, foe, ui, false, incoming)}</div>
+    </div>
+    ${bottomBar()}
   </div>${notice}${ui.energyPanel ? energyPanel(ui) : ""}${ui.draft ? draftPanel(state, ui) : ""}${ui.overlay ?? ""}`;
 }
 
