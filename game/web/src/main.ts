@@ -198,8 +198,34 @@ function hideSkpop(): void { skpop.hidden = true; }
 // effects from the human. We redact only the render copy — the live `state` the loop mutates stays whole.
 function render(): void { hideFx(); app.innerHTML = renderApp(redactState(state, ui.you), ui, playerPanel()); }
 /** The team-select screen (its player panel reads the profile) plus the avatar picker when open. */
-function renderSetupScreen(): void { app.innerHTML = renderSetup(setup!, playerPanel()) + avatarPickerHtml(); }
-function showSetup(): void { setup = { picked: [], oppo: randomTeam([]), inspect: null }; renderSetupScreen(); }
+function renderSetupScreen(): void { app.innerHTML = renderSetup(setup!, playerPanel()) + avatarPickerHtml(); fitCharSelect(); }
+/** Open team select, optionally pre-seeded with an already-chosen team (e.g. after cancelling matchmaking). */
+function showSetup(picked: string[] = []): void {
+  const keep = picked.slice(0, 3);
+  setup = { picked: keep, oppo: randomTeam(keep), inspect: keep[0] ?? null };
+  renderSetupScreen();
+}
+/** Scale + recentre the (fixed-width) character-select scene to fit narrow windows, so it never runs off the
+ *  edges. The scene isn't centred within its own box (right-heavy roster), so we measure its true extent and
+ *  apply a translate+scale that both shrinks it to fit and centres it in the viewport. */
+function fitCharSelect(): void {
+  const cs = document.querySelector<HTMLElement>(".cs");
+  const stage = document.querySelector<HTMLElement>(".cs-stage");
+  if (!cs || !stage) return;
+  stage.style.transform = "none"; // measure the natural (unscaled) horizontal extent in viewport coords
+  let min = Infinity, max = -Infinity;
+  for (const el of cs.querySelectorAll<HTMLElement>(".cs-hero, .cs-mid, .cs-show > *")) {
+    const r = el.getBoundingClientRect();
+    if (r.width) { min = Math.min(min, r.left); max = Math.max(max, r.right); }
+  }
+  const W = cs.clientWidth, natural = max - min;
+  if (!(natural > 0) || natural <= W - 16) { stage.style.transform = ""; return; } // already fits
+  const s = Math.max(0.4, (W - 16) / natural);
+  const stageLeft = stage.getBoundingClientRect().left; // transform-origin is the stage's top-left
+  const dx = W / 2 - stageLeft - ((min + max) / 2 - stageLeft) * s; // recentre the scaled content
+  stage.style.transform = `translateX(${dx}px) scale(${s})`;
+}
+window.addEventListener("resize", () => { if (setup) fitCharSelect(); });
 
 /** The avatar chooser: a grid of every avatar in the manifest; clicking one sets it. Empty string when closed. */
 function avatarPickerHtml(): string {
@@ -366,7 +392,14 @@ app.addEventListener("click", (e) => {
 
   if (setup) { // team-select screen
     if (d.augfuse) { setup.augfuse = true; renderSetupScreen(); }
-    else if (d.inspect) { setup.inspect = d.inspect; renderSetupScreen(); }
+    else if (d.inspect) { // first click inspects; clicking the ALREADY-inspected hero toggles it on/off the team
+      if (setup.inspect === d.inspect) {
+        const i = setup.picked.indexOf(d.inspect);
+        if (i >= 0) setup.picked.splice(i, 1);
+        else if (setup.picked.length < 3) setup.picked.push(d.inspect);
+      } else setup.inspect = d.inspect;
+      renderSetupScreen();
+    }
     else if (d.pick) { // add / remove (detail button or a tray slot)
       const i = setup.picked.indexOf(d.pick);
       if (i >= 0) setup.picked.splice(i, 1);
@@ -624,10 +657,11 @@ function tryResumeStoredMatch(): boolean {
 }
 
 function cancelQuickMatch(): void {
+  const keep = pvp?.intent.kind === "queue" ? pvp.intent.team : []; // keep the team the player had queued with
   pvp?.sock.send({ t: "cancelQueue" });
   pvp?.sock.close();
   pvp = null;
-  showSetup();
+  showSetup(keep);
 }
 
 /** Open the between-round draft modal for a side (shared by yourDraft and a reconnect resumed at draft). */

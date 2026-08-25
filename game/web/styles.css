@@ -335,8 +335,11 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .energy-modal .resolve:disabled { opacity: .4; cursor: default; }
 
 /* ── character select — redesigned scene (assets/ui) ───────────────────── */
-.cs { position: fixed; inset: 0; overflow: auto; display: flex; flex-direction: column; gap: 8px; padding: 14px 18px 18px;
+.cs { position: fixed; inset: 0; overflow-x: hidden; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 14px 18px 18px;
   background: url(../../assets/ui/backgrounds/background.png) center top / cover no-repeat, var(--bg); }
+/* The showcase + roster rows live in a stage that JS scales-and-recentres to fit narrow windows, so the
+   scene never runs off the left/right edges (see fitCharSelect). */
+.cs-stage { flex: 1; min-height: 0; display: flex; flex-direction: column; transform-origin: 0 0; }
 .cs::before { content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
   background: radial-gradient(ellipse at 50% 38%, transparent 34%, #000000b0 100%); }
 .cs > * { position: relative; z-index: 1; }

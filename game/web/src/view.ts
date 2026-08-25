@@ -544,6 +544,7 @@ export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: 
       </div>
     </div>
 
+    <div class="cs-stage">
     <div class="cs-show">
       <div class="cs-info">
         <div class="cs-hname">${esc(shortName(def.name))}</div>
@@ -578,6 +579,7 @@ export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: 
         <div class="cs-prompt">${full ? "Ready — press Bot Match ▶" : `Select ${3 - setup.picked.length} more — 3 Heroes to begin!`}</div>
       </div>
       <div class="cs-roster right">${panelRows(RIGHT_ROWS)}</div>
+    </div>
     </div>
   </div>${setup.augfuse ? augFuseModal(inspectId) : ""}`;
 }
