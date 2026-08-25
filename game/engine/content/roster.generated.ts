@@ -9761,6 +9761,7 @@ export const ROSTER: HeroDef[] = [
     "name": "Refrain",
     "element": "holy",
     "targeting": "single",
+    "targetsEitherFaction": true,
     "klass": "basic",
     "tags": [
      "Harmful",
@@ -10876,6 +10877,7 @@ export const ROSTER: HeroDef[] = [
     "name": "Nightwrap",
     "element": "shadow",
     "targeting": "single",
+    "targetsEitherFaction": true,
     "klass": "basic",
     "tags": [
      "Harmful",
@@ -11574,6 +11576,7 @@ export const ROSTER: HeroDef[] = [
     "name": "Fox Fire",
     "element": "apocalypse",
     "targeting": "single",
+    "targetsEitherFaction": true,
     "klass": "basic",
     "tags": [
      "Harmful",

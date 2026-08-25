@@ -38,7 +38,7 @@ def strip_notes(obj):
 
 SKILL_FIELDS = {"id", "name", "element", "targeting", "targetKind", "effects", "cost", "cooldown",
                 "klass", "tags", "channelTurns", "doesNotInterrupt", "requires", "uncounterableIf", "bypassingIf", "costMods", "isHidden",
-                "doesNotBreakVeil", "disguiseAs", "autoTargetMark", "canTargetDead", "cannotTargetSelf"}
+                "doesNotBreakVeil", "disguiseAs", "autoTargetMark", "canTargetDead", "cannotTargetSelf", "targetsEitherFaction"}
 
 
 def clean_skill(s):

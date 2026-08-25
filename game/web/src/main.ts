@@ -7,13 +7,13 @@
 import type { MatchState, TeamId, Unit } from "../../engine/src/types.ts";
 import type { Action } from "../../engine/src/scheduler.ts";
 import type { SkillInstance } from "../../engine/src/skill.ts";
-import { legalTargets, canUse, canPay, effectiveCost } from "../../engine/src/scheduler.ts";
+import { canPay, effectiveCost, canUsePlanned, canPayAfter, reserveEnergy } from "../../engine/src/scheduler.ts";
 import { redactState } from "../../engine/src/visibility.ts";
-import { Rng } from "../../engine/src/rng.ts";
 import { buildMatch, defaultPolicy, type Draft } from "../../engine/content/match.ts";
 import { ROSTER } from "../../engine/content/roster.generated.ts";
 import { runMatch, type AsyncProvider } from "../../client/loop.ts";
 import { autoDraft, applyDraftChoice, hasDraftOptions, draftableHeroes, type DraftChoice } from "../../client/draft.ts";
+import { poolFor } from "../../client/targeting.ts";
 import { renderApp, renderSetup } from "./view.ts";
 import { energyIcon, elementRank, avatarUrl } from "./assets.ts";
 import { MatchSocket, serverUrl, fetchProfile, fetchAvatars, type AvatarInfo } from "./net.ts";
@@ -83,7 +83,21 @@ function uuid(): string {
   return "g-" + Array.from(b, (x) => x.toString(16).padStart(2, "0")).join("");
 }
 
+/** Local-testing override: `?player=<key>` gives this window its OWN deterministic guest identity, so two
+ *  tabs in the SAME browser become DISTINCT players the server will pair against each other (it never
+ *  self-pairs one identity). Stable per key, so a reload keeps the same seat; it does not touch the normal
+ *  persisted `arenaIdentity`. Use for manual PvP testing (see game/scripts/local-pvp-web.*). */
+function identityOverride(): Identity | null {
+  const key = (() => { try { return new URLSearchParams(location.search).get("player"); } catch { return null; } })();
+  if (!key) return null;
+  const k = key.slice(0, 40);
+  const name = (() => { try { return localStorage.getItem(`arenaName:${k}`) || `Player ${k}`; } catch { return `Player ${k}`; } })();
+  return { playerId: `local-${k}`, secret: `local-secret-${k}`, name };
+}
+
 function identity(): Identity {
+  const override = identityOverride();
+  if (override) return override;
   if (!cachedCreds) {
     try { const c = JSON.parse(localStorage.getItem("arenaIdentity") ?? "null"); if (c?.playerId && c?.secret) cachedCreds = c; } catch { /* blocked */ }
     if (!cachedCreds) {
@@ -94,7 +108,11 @@ function identity(): Identity {
   const name = (() => { try { return localStorage.getItem("arenaName") || "Guest"; } catch { return "Guest"; } })();
   return { ...cachedCreds, name };
 }
-function setStoredName(name: string): void { try { localStorage.setItem("arenaName", name.slice(0, MAX_NAME_LEN)); } catch { /* ignore */ } }
+function setStoredName(name: string): void {
+  const key = (() => { try { return new URLSearchParams(location.search).get("player"); } catch { return null; } })();
+  const storeKey = key ? `arenaName:${key.slice(0, 40)}` : "arenaName"; // keep `?player=` windows' names distinct
+  try { localStorage.setItem(storeKey, name.slice(0, MAX_NAME_LEN)); } catch { /* ignore */ }
+}
 
 // The pickable avatar set (from assets/avatars/manifest.json) and the player's chosen one.
 let avatars: AvatarInfo[] = [];
@@ -216,26 +234,11 @@ async function boot(): Promise<void> {
   showSetup();
 }
 
-/** Legal single-target set (Harmful→enemies, Helpful→allies, else either), run through targeting rules. */
+/** The single-target set the UI highlights for a skill — the offering logic (faction rules + fusion
+ *  widenings like Merciless/Swoop, then the engine's legalTargets) lives in the shared client/targeting.ts. */
 function targetsFor(u: Unit, skillId: string): Set<string> {
   const skill = (u.skills ?? []).find((s) => s.id === skillId)!;
-  const enemy: TeamId = u.team === "A" ? "B" : "A";
-  // Merciless (black knight "evil" fusion): "Oathbreaker Strike may now be used on allied Heroes."
-  // The engine already permits ally-targeting (no faction filter) and scores the +10-on-ally-kill clause;
-  // this is only the client offering those allied heroes (not self, not allied minions) as candidates.
-  const merciless = skillId === "blackknight1" && u.fused === "evil";
-  // Mountain Rescue Team (syl "winter" fusion): "Swoop can now be used to make a stunned ally invulnerable."
-  // Swoop (sylminion2) is the Eagle's skill; the engine already carries the stunned-ally invuln branch, so
-  // this only offers stunned allies (alongside its normal enemy pool) when the Eagle's summoner is winter-fused.
-  const swoopRescue = skillId === "sylminion2" && state.units[u.summoner ?? ""]?.fused === "winter";
-  const pool = merciless
-    ? [...living(state, enemy), ...living(state, u.team).filter((x) => x.kind === "hero" && x.id !== u.id)]
-    : swoopRescue
-    ? [...living(state, enemy), ...living(state, u.team).filter((x) => x.id !== u.id && x.statuses.some((s) => s.kind === "stun"))]
-    : skill.tags.includes("Harmful") ? living(state, enemy)
-    : skill.tags.includes("Helpful") ? living(state, u.team)
-    : [...living(state, u.team), ...living(state, enemy)];
-  return new Set(legalTargets(state, u, skill, pool, Rng.fromState(state.rngState)).map((x) => x.id));
+  return new Set(poolFor(state, u, skill).map((x) => x.id));
 }
 
 /** The portraits to highlight for a skill — EVERY skill requires a target click, even self/auto ones. */
@@ -261,7 +264,12 @@ function queue(unitId: string, skillId: string, targets: string[] | undefined): 
 /** Why a skill can't be used right now — shown in the examine panel for an unusable tile. */
 function unusableReason(u: Unit, skill: SkillInstance): string {
   if (skill.currentCd > 0) return `On cooldown — ${skill.currentCd} turn${skill.currentCd > 1 ? "s" : ""} remaining.`;
-  if (!canPay(state.teams[u.team].energy, u.currentElement, effectiveCost(u, skill, state))) return "Not enough energy in the pool.";
+  const pool = state.teams[u.team].energy;
+  const cost = effectiveCost(u, skill, state);
+  if (!canPay(pool, u.currentElement, cost)) return "Not enough energy in the pool.";
+  // Affordable against the full pool, but its energy is already spoken for by other skills queued this turn.
+  const others = [...ui.planned.values()].filter((a) => a.unit !== u.id);
+  if (!canPayAfter(pool, u, cost, reserveEnergy(state, others))) return "Its energy is already committed to your other queued skills this turn.";
   return "Can't be used right now (stunned, silenced, or no valid target).";
 }
 
@@ -379,7 +387,7 @@ app.addEventListener("click", (e) => {
   if (d.owner && d.skill) { // pick a skill → target it (if usable) or just examine it (if not)
     const u = state.units[d.owner]!;
     const skill = (u.skills ?? []).find((s) => s.id === d.skill)!;
-    if (canUse(state, u, skill)) {
+    if (canUsePlanned(state, u, skill, [...ui.planned.values()])) {
       ui.examine = undefined;
       ui.targeting = { unitId: u.id, skillId: skill.id, skillName: skill.name, single: skill.targeting === "single" };
       ui.legalTargets = highlightSet(u, skill);
@@ -442,9 +450,11 @@ function defaultAlloc(generic: number, avail: Record<string, number>): Record<st
 function commitTurn(): void {
   const actions = [...ui.planned.values()];
   const { generic, avail } = planGeneric(actions);
-  const totalAvail = Object.values(avail).reduce((a, b) => a + b, 0);
-  // Ask the player to allocate only when there's a real choice (>1 color) and it's affordable.
-  if (generic > 0 && Object.keys(avail).length >= 2 && totalAvail >= generic) {
+  // ALWAYS surface the allocation panel whenever the turn has any generic cost — even when the choice is
+  // forced (a single payable color) — so the player always sees and confirms which energy pays it. (Queuing
+  // is already gated to a jointly-payable set, so `avail` is guaranteed to cover `generic` here.) With no
+  // generic cost there is nothing to allocate, so resolve straight through.
+  if (generic > 0) {
     ui.energyPanel = { actions, generic, avail, alloc: defaultAlloc(generic, avail) };
     render();
     return;

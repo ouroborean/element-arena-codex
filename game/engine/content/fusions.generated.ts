@@ -5976,6 +5976,7 @@ export const FUSIONS: FusionForm[] = [
    "name": "A Sprinkle of Recklessness",
    "element": "faerie",
    "targeting": "single",
+   "targetsEitherFaction": true,
    "klass": "fusion",
    "tags": [
     "Harmful",
@@ -11827,6 +11828,7 @@ export const FUSIONS: FusionForm[] = [
    "name": "Tormentor's Brand",
    "element": "ritual",
    "targeting": "single",
+   "targetsEitherFaction": true,
    "klass": "fusion",
    "tags": [
     "Harmful",
@@ -16954,6 +16956,7 @@ export const FUSIONS: FusionForm[] = [
    "element": "antidote",
    "klass": "fusion",
    "targeting": "single",
+   "targetsEitherFaction": true,
    "tags": [
     "Harmful",
     "Helpful",

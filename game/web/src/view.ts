@@ -5,7 +5,7 @@
 import type { MatchState, TeamId, Unit, Status } from "../../engine/src/types.ts";
 import type { SkillInstance } from "../../engine/src/skill.ts";
 import { totalShield } from "../../engine/src/damage.ts";
-import { canUse, effectiveCost, hasEssenceIncome } from "../../engine/src/scheduler.ts";
+import { effectiveCost, hasEssenceIncome, canUsePlanned, reserveEnergy, reservationTotal, poolTotal } from "../../engine/src/scheduler.ts";
 import { availableFusions, availableAugments } from "../../engine/content/metagame.ts";
 import { fusionsFor } from "../../engine/content/fusions.generated.ts";
 import { fusionResult } from "../../engine/content/recipes.generated.ts";
@@ -155,8 +155,11 @@ function costIcons(cost: { generic: number; specific: number }, element: string)
 
 function skillTiles(state: MatchState, u: Unit, ui: UiState): string {
   const chosen = ui.plannedSkill.get(u.id);
+  const planned = [...ui.planned.values()];
   const tiles = (u.skills ?? []).map((s) => {
-    const ok = canUse(state, u, s);
+    // Usable only if its energy isn't already committed to this turn's other queued skills (so the player
+    // can never queue a set the pool can't pay — the excess used to be silently dropped at resolution).
+    const ok = canUsePlanned(state, u, s, planned);
     const cost = effectiveCost(u, s, state);
     const costStr = [cost.generic ? `${cost.generic} generic` : "", cost.specific ? `${cost.specific} ${s.element}` : ""].filter(Boolean).join(" + ") || "free";
     const text = SKILL_TEXT[s.id];
@@ -250,13 +253,22 @@ function sideRow(state: MatchState, side: TeamId, ui: UiState, isYou: boolean, i
 
 function energyPool(state: MatchState, ui: UiState): string {
   const pool = state.teams[ui.you].energy;
+  // The energy this turn's queued skills set aside — so the pool decrements live as skills are queued.
+  const reserved = reserveEnergy(state, [...ui.planned.values()]);
   const els = new Set<string>(["generic"]);
   for (const id of state.teams[ui.you].units) { const u = state.units[id]; if (u?.kind === "hero") els.add(u.currentElement); }
   for (const k of Object.keys(pool)) if ((pool[k] ?? 0) > 0) els.add(k);
+  const usedOf = (el: string) => el === "generic" ? reserved.generic : reserved.specific[el] ?? 0;
   const rows = [...els].sort((a, b) => elementRank(a) - elementRank(b) || a.localeCompare(b))
-    .map((el) => `<div class="ep-row"><img class="ep-ic" src="${energyIcon(el)}" alt="${esc(el)}" title="${esc(el)}" ${IMG_FALLBACK} />
-      <span class="ep-el">${esc(el)}</span><span class="ep-n">${pool[el] ?? 0}</span></div>`).join("");
-  return `<div class="epool"><div class="ep-title">Energy Pool</div>${rows}</div>`;
+    .map((el) => {
+      const have = pool[el] ?? 0, left = Math.max(0, have - usedOf(el)), spent = have - left;
+      return `<div class="ep-row"><img class="ep-ic" src="${energyIcon(el)}" alt="${esc(el)}" title="${esc(el)}" ${IMG_FALLBACK} />
+      <span class="ep-el">${esc(el)}</span><span class="ep-n${spent > 0 ? " spent" : ""}">${left}</span>${spent > 0 ? `<span class="ep-was">of ${have}</span>` : ""}</div>`;
+    }).join("");
+  // The single "how much can I still spend" number: the whole pool minus everything queued this turn reserves.
+  const total = Math.max(0, poolTotal(pool) - reservationTotal(reserved));
+  const totalRow = `<div class="ep-row ep-total"><span class="ep-el">Total unallocated</span><span class="ep-n">${total}</span></div>`;
+  return `<div class="epool"><div class="ep-title">Energy Pool</div>${rows}${totalRow}</div>`;
 }
 
 function midbar(state: MatchState, ui: UiState): string {

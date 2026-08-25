@@ -356,7 +356,7 @@ function skillBypasses(state: MatchState, caster: Unit, skill: SkillInstance): b
 }
 
 /** Total energy in a pool. */
-function poolTotal(pool: EnergyPool): number {
+export function poolTotal(pool: EnergyPool): number {
   let t = 0;
   for (const k of Object.keys(pool)) t += pool[k] ?? 0;
   return t;
@@ -424,6 +424,52 @@ export function canPay(pool: EnergyPool, element: string, cost: SkillInstance["c
   if (specificHave < cost.specific) return false;
   // Generic is payable by anything left after the specific reservation.
   return poolTotal(pool) - cost.specific >= cost.generic;
+}
+
+/** The energy a set of QUEUED (not-yet-resolved) actions sets aside: specific per caster-element, and
+ *  total generic (which any color may ultimately pay). Used by the client to plan a whole turn's spend. */
+export interface EnergyReservation { specific: Record<string, number>; generic: number; }
+export function reserveEnergy(state: MatchState, actions: readonly { unit: string; skillId: string }[]): EnergyReservation {
+  const specific: Record<string, number> = {};
+  let generic = 0;
+  for (const a of actions) {
+    const u = state.units[a.unit];
+    const sk = (u?.skills ?? []).find((s) => s.id === a.skillId);
+    if (!u || !sk) continue;
+    const c = effectiveCost(u, sk, state);
+    generic += c.generic;
+    if (c.specific > 0) specific[u.currentElement] = (specific[u.currentElement] ?? 0) + c.specific;
+  }
+  return { specific, generic };
+}
+
+/** Total energy a reservation consumes (all specific colors + generic). */
+export function reservationTotal(r: EnergyReservation): number {
+  let t = r.generic;
+  for (const k of Object.keys(r.specific)) t += r.specific[k] ?? 0;
+  return t;
+}
+
+/**
+ * Can `caster` still pay `cost` from `pool` AFTER `reserved` (other actions already queued this turn) is set
+ * aside? This is the exact JOINT-feasibility test, not a greedy subtraction: because generic is fully
+ * fungible, a set is payable iff (a) every color has enough for its own specific demands, and (b) the total
+ * pool covers all specific + all generic. So `caster`'s skill fits iff its color still has room for its
+ * specific AND the leftover total covers its generic — regardless of how generic is later allocated.
+ */
+export function canPayAfter(pool: EnergyPool, caster: Unit, cost: SkillInstance["cost"], reserved: EnergyReservation): boolean {
+  const el = caster.currentElement;
+  if ((pool[el] ?? 0) - (reserved.specific[el] ?? 0) < cost.specific) return false;
+  return poolTotal(pool) - reservationTotal(reserved) - cost.specific >= cost.generic;
+}
+
+/** Client planning gate: can `caster` use `skill` GIVEN the actions already queued this turn? `canUse` (not
+ *  on cooldown / stunned / has a legal target / affordable at all) AND still affordable once every OTHER
+ *  queued action's cost is reserved — so a hero can't queue a skill whose energy is already spoken for. */
+export function canUsePlanned(state: MatchState, caster: Unit, skill: SkillInstance, planned: readonly { unit: string; skillId: string }[]): boolean {
+  if (!canUse(state, caster, skill)) return false;
+  const others = planned.filter((a) => a.unit !== caster.id);
+  return canPayAfter(team(state, caster.team).energy, caster, effectiveCost(caster, skill, state), reserveEnergy(state, others));
 }
 
 /**
