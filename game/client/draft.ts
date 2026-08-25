@@ -1,8 +1,8 @@
 /**
  * The between-round AUGMENT_OR_FUSE draft — I/O-free logic so the CLI (and any future client) and the
- * tests share it. Provisional ruling (the exact draft structure is open in RULINGS.md): each round the
- * match continues, EACH team makes ONE choice — fuse one hero, augment one hero, or hold — with the
- * round loser choosing first. Fusion is once-per-hero and partner-gated (see engine `availableFusions`).
+ * tests share it. Each upgrade phase, EACH team upgrades EVERY eligible hero — per hero: fuse, augment, or
+ * hold — with the round loser choosing first. A DraftChoice is the per-hero atom; a phase applies a LIST of
+ * them (at most one per hero). Fusion is once-per-hero and partner-gated (see engine `availableFusions`).
  */
 import type { MatchState, TeamId, Unit } from "../engine/src/types.ts";
 import { applyFusion } from "../engine/content/fusion.ts";
@@ -52,18 +52,32 @@ export function applyDraftChoice(state: MatchState, choice: DraftChoice): DraftR
   return { ok: true, desc: `${unit.name} gained augment: ${aug.name}` };
 }
 
+/** Apply a whole phase's choices (at most one per hero). Dedupes by unitId (a hero upgrades once per phase),
+ *  drops any choice for a unit not on `side`, and applies each via applyDraftChoice. Returns the results. */
+export function applyDraftChoices(state: MatchState, side: TeamId, choices: readonly DraftChoice[]): DraftResult[] {
+  const owned = new Set(draftableHeroes(state, side).map((u) => u.id));
+  const seen = new Set<string>();
+  const results: DraftResult[] = [];
+  for (const c of choices) {
+    if (c.kind === "skip") continue;
+    if (!owned.has(c.unitId) || seen.has(c.unitId)) continue; // not yours, or this hero already upgraded this phase
+    seen.add(c.unitId);
+    results.push(applyDraftChoice(state, c));
+  }
+  return results;
+}
+
 /**
- * A simple deterministic bot draft: fuse the first hero that still can (fusion is the bigger power
- * spike), otherwise augment the first hero with an untaken augment, otherwise hold.
+ * A simple deterministic bot draft, ONE choice per eligible hero: fuse if it still can (the bigger power
+ * spike), else augment with an untaken augment, else nothing for that hero. Heroes with no options are omitted.
  */
-export function autoDraft(state: MatchState, side: TeamId): DraftChoice {
+export function autoDraft(state: MatchState, side: TeamId): DraftChoice[] {
+  const out: DraftChoice[] = [];
   for (const u of draftableHeroes(state, side)) {
     const forms = availableFusions(state, u);
-    if (forms.length) return { kind: "fuse", unitId: u.id, formKey: forms[0]!.key };
-  }
-  for (const u of draftableHeroes(state, side)) {
+    if (forms.length) { out.push({ kind: "fuse", unitId: u.id, formKey: forms[0]!.key }); continue; }
     const augs = availableAugments(u);
-    if (augs.length) return { kind: "augment", unitId: u.id, augmentId: augs[0]!.id };
+    if (augs.length) out.push({ kind: "augment", unitId: u.id, augmentId: augs[0]!.id });
   }
-  return { kind: "skip" };
+  return out;
 }

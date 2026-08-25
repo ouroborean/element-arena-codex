@@ -11,7 +11,7 @@ import { fusionsFor } from "../../engine/content/fusions.generated.ts";
 import { fusionResult } from "../../engine/content/recipes.generated.ts";
 import { augmentsFor } from "../../engine/content/augments.generated.ts";
 import type { FusionForm } from "../../engine/content/fusion.ts";
-import { draftableHeroes } from "../../client/draft.ts";
+import { draftableHeroes, type DraftChoice } from "../../client/draft.ts";
 import { ROSTER } from "../../engine/content/roster.generated.ts";
 import { heroPortrait, iconOf, minionPortrait, energyIcon, characterButton, elColor, ELEMENT_ORDER, elementRank } from "./assets.ts";
 import { SKILL_TEXT } from "./skilltext.generated.ts";
@@ -413,11 +413,14 @@ function fusionHead(base: string, f: FusionForm): string {
 }
 
 /** The fusion/augment options for one hero — fused portraits + new element + passive for each fusion form,
- *  and name + prose for each untaken augment. One click commits the whole team's single upgrade this round. */
-function draftOptions(state: MatchState, u: Unit): string {
+ *  and name + prose for each untaken augment. Clicking one selects it as THIS hero's upgrade (click again to
+ *  un-choose); `pick` is the hero's currently-selected upgrade, highlighted. */
+function draftOptions(state: MatchState, u: Unit, pick?: DraftChoice): string {
   const hid = u.heroId ?? "";
   const forms = orderFusions(u.baseElement, availableFusions(state, u));
   const augs = availableAugments(u);
+  const fuseOn = (key: string) => pick?.kind === "fuse" && pick.formKey === key ? " chosen" : "";
+  const augOn = (id: string) => pick?.kind === "augment" && pick.augmentId === id ? " chosen" : "";
   const fusion = u.fused
     ? `<div class="do-note">Already fused into <b>${esc(cap(u.fused))}</b> — a hero fuses once per match.</div>`
     : forms.length
@@ -428,7 +431,7 @@ function draftOptions(state: MatchState, u: Unit): string {
           `<span class="fc-block"><span class="fc-label">${label}</span>
             <span class="fc-line">${ic ? `<img src="${ic}" ${IMG_FALLBACK} />` : ""}<b>${esc(name)}</b></span>
             <span class="fc-desc">${esc(desc)}</span></span>`;
-        return `<button class="do-card fusion-card" data-fuse-unit="${u.id}" data-fuse-form="${esc(f.key)}">
+        return `<button class="do-card fusion-card${fuseOn(f.key)}" data-fuse-unit="${u.id}" data-fuse-form="${esc(f.key)}">
           <img class="fc-port" src="${heroPortrait(hid, f.key)}" ${IMG_FALLBACK} />
           <span class="fc-body">
             <span class="fc-head">${fusionHead(u.baseElement, f)}</span>
@@ -438,34 +441,38 @@ function draftOptions(state: MatchState, u: Unit): string {
       }).join("")
     : `<div class="do-note">No fusion available — needs a teammate whose element forms a recipe.</div>`;
   const augment = augs.length
-    ? augs.map((a) => `<button class="do-card" data-aug-unit="${u.id}" data-aug-id="${esc(a.id)}">
+    ? augs.map((a) => `<button class="do-card${augOn(a.id)}" data-aug-unit="${u.id}" data-aug-id="${esc(a.id)}">
         <span class="do-txt"><span class="do-name">★ ${esc(a.name)}</span><span class="do-desc">${esc(a.description)}</span></span></button>`).join("")
     : `<div class="do-note">All of this hero's augments are taken.</div>`;
   return `<div class="do-sec fusion"><h4>Fusion <span>(re-elements the hero, new passive + skill)</span></h4>${fusion}</div>
     <div class="do-sec augment"><h4>Augments <span>(a permanent tweak; cumulative)</span></h4>${augment}</div>`;
 }
 
-/** The between-round draft modal: pick one hero and one upgrade (fuse / augment), or hold. */
+/** The between-round draft modal: pick a fusion/augment for EACH hero (or leave some), then confirm the batch. */
 function draftPanel(state: MatchState, ui: UiState): string {
   const d = ui.draft!;
   const heroes = draftableHeroes(state, d.side);
   const sel = heroes.find((h) => h.id === d.inspect) ?? heroes[0];
+  const pickLabel = (p?: DraftChoice) => p?.kind === "fuse" ? `⚛ ${esc(cap(p.formKey))}` : p?.kind === "augment" ? "★ augment" : "";
   const heroList = heroes.map((h) => {
     const nf = h.fused ? 0 : availableFusions(state, h).length;
     const na = availableAugments(h).length;
-    return `<button class="dh ${sel?.id === h.id ? "on" : ""}" data-draft-inspect="${h.id}">
+    const p = d.picks.get(h.id);
+    const opts = p ? `<b class="dh-pick">${pickLabel(p)}</b>` : `${h.fused ? `fused: ${esc(cap(h.fused))}` : `${nf} ⚛`} · ${na} ★`;
+    return `<button class="dh ${sel?.id === h.id ? "on" : ""}${p ? " picked" : ""}" data-draft-inspect="${h.id}">
       <img src="${heroPortrait(h.heroId ?? "", h.fused)}" ${IMG_FALLBACK} />
       <span class="dh-name">${esc(shortName(h.name))}</span>
-      <span class="dh-opts">${h.fused ? `fused: ${esc(cap(h.fused))}` : `${nf} ⚛`} · ${na} ★</span></button>`;
+      <span class="dh-opts">${opts}</span></button>`;
   }).join("");
+  const n = d.picks.size;
   return `<div class="overlay"><div class="modal draft-modal">
-    <h2>Round ${state.round} — choose an upgrade</h2>
-    <p class="draft-sub">Fuse or augment <b>one</b> hero, or hold. This is your team's single upgrade for the round.</p>
+    <h2>Round ${state.round} — upgrade your heroes</h2>
+    <p class="draft-sub">Pick a fusion or augment for <b>each</b> hero (click a selected one again to un-choose), then confirm. Unpicked heroes hold.</p>
     <div class="draft-body">
       <div class="draft-heroes">${heroList}</div>
-      <div class="draft-options">${sel ? draftOptions(state, sel) : ""}</div>
+      <div class="draft-options">${sel ? draftOptions(state, sel, d.picks.get(sel.id)) : ""}</div>
     </div>
-    <div class="modal-foot"><button class="mini" data-draft-hold="1">Hold — no upgrade ▶</button></div>
+    <div class="modal-foot"><button class="resolve" data-draft-confirm="1">Confirm ${n ? `${n} upgrade${n > 1 ? "s" : ""}` : "— hold all"} ▶</button></div>
   </div></div>`;
 }
 

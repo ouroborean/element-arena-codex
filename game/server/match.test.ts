@@ -49,7 +49,7 @@ class Double implements MatchClient {
       const state = msg.state;
       queueMicrotask(() => this.match.handleMessage(this, { t: "turn", actions: defaultPolicy(state, this.side!) }));
     } else if (msg.t === "yourDraft") {
-      queueMicrotask(() => this.match.handleMessage(this, { t: "draftChoice", choice: { kind: "skip" } }));
+      queueMicrotask(() => this.match.handleMessage(this, { t: "draftChoice", choices: [] }));
     }
   }
 

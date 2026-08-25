@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { buildMatch, defaultPolicy } from "../engine/content/match.ts";
 import { availableFusions, availableAugments } from "../engine/content/metagame.ts";
 import { runMatch } from "./loop.ts";
-import { draftableHeroes, applyDraftChoice, autoDraft, hasDraftOptions } from "./draft.ts";
+import { draftableHeroes, applyDraftChoice, applyDraftChoices, autoDraft, hasDraftOptions } from "./draft.ts";
 
 const DRAFT = { A: ["syl", "jarrik", "gommar"], B: ["keeper", "riverdaughter", "saya"], seed: 7 };
 
@@ -37,19 +37,15 @@ test("applyDraftChoice rejects illegal choices (unavailable fusion / already-tak
   assert.equal(st.units["a1"]!.fused, undefined, "no illegal fusion slipped through");
 });
 
-test("autoDraft prefers a fusion, then an augment; a choice is always applicable", () => {
+test("autoDraft returns one choice per eligible hero, preferring fusion; each is applicable", () => {
   const st = buildMatch({ ...DRAFT });
-  const c1 = autoDraft(st, "A");
-  assert.equal(c1.kind, "fuse");
-  assert.equal(applyDraftChoice(st, c1).ok, true);
-  // fuse everyone who can, then autoDraft falls back to augment
-  for (const u of draftableHeroes(st, "A")) {
-    const f = availableFusions(st, u)[0];
-    if (f) applyDraftChoice(st, { kind: "fuse", unitId: u.id, formKey: f.key });
-  }
-  const c2 = autoDraft(st, "A");
-  assert.equal(c2.kind, "augment");
-  assert.equal(applyDraftChoice(st, c2).ok, true);
+  const cs1 = autoDraft(st, "A");
+  assert.ok(cs1.length >= 1, "at least one hero has an upgrade");
+  assert.ok(cs1.some((c) => c.kind === "fuse"), "prefers a fusion when available");
+  for (const res of applyDraftChoices(st, "A", cs1)) assert.equal(res.ok, true); // apply the whole phase
+  // everyone who could fuse now has; the next phase can only offer augments
+  const cs2 = autoDraft(st, "A");
+  assert.ok(cs2.every((c) => c.kind === "augment"), "already-fused heroes fall back to augment");
 });
 
 test("draftableHeroes includes wiped heroes (the round loser drafts for the next fresh battle)", () => {
@@ -66,8 +62,7 @@ test("full match with a between-round draft: an upgrade is drafted and persists 
     roundsToWin: 2, maxTurns: 200,
     onBetweenRounds: (s) => {
       for (const side of ["A", "B"] as const) {
-        const choice = autoDraft(s, side);
-        if (choice.kind !== "skip" && applyDraftChoice(s, choice).ok) drafts++;
+        for (const res of applyDraftChoices(s, side, autoDraft(s, side))) if (res.ok) drafts++;
       }
     },
   });
