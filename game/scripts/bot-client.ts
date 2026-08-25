@@ -99,9 +99,9 @@ ws.addEventListener("message", (ev) => {
     case "opponentTurn":
       break; // the opponent is acting; nothing to do
     case "yourDraft": {
-      const choice = autoDraft(msg.state, you!);
-      log(`between-round draft: ${describeDraft(choice)}`);
-      send({ t: "draftChoice", choice });
+      const choices = autoDraft(msg.state, you!);
+      log(`between-round draft: ${choices.length ? choices.map(describeDraft).join(", ") : "hold all"}`);
+      send({ t: "draftChoice", choices });
       break;
     }
     case "opponentDraft":
@@ -128,7 +128,7 @@ ws.addEventListener("message", (ev) => {
   }
 });
 
-function describeDraft(c: ReturnType<typeof autoDraft>): string {
+function describeDraft(c: ReturnType<typeof autoDraft>[number]): string {
   if (c.kind === "fuse") return `fuse ${c.unitId} -> ${c.formKey}`;
   if (c.kind === "augment") return `augment ${c.unitId} (${c.augmentId})`;
   return "skip";

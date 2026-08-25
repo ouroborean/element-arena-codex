@@ -22,6 +22,7 @@ import { applyDamage, applyHeal, outgoingDtypeOverride, tickShieldsForTeam } fro
 import { Rng } from "./rng.ts";
 import { applyStatus, clearRoundStatuses, removeStatus, tickDurationsForTeam } from "./status.ts";
 import { isConcealed } from "./visibility.ts";
+import { hybridsFor } from "./elements.ts";
 
 /** Provisional base income (ENERGY_INCOME, ruling open): +1 generic per living hero. */
 const GENERIC_PER_LIVING_HERO = 1;
@@ -441,12 +442,28 @@ export function effectiveCooldown(caster: Unit, skill: SkillInstance): number {
   return Math.max(0, skill.cooldown + delta);
 }
 
-/** Can the pool cover a cost for a skill of `element`? */
+/** Can the pool cover a cost for a skill of `element`? A specific cost is paid from `element`'s own energy
+ *  PLUS any hybrid whose components include `element` (Mirror energy pays a Water or Shadow cost). */
 export function canPay(pool: EnergyPool, element: string, cost: SkillInstance["cost"]): boolean {
-  const specificHave = pool[element] ?? 0;
+  let specificHave = pool[element] ?? 0;
+  for (const h of hybridsFor(element)) specificHave += pool[h] ?? 0;
   if (specificHave < cost.specific) return false;
   // Generic is payable by anything left after the specific reservation.
   return poolTotal(pool) - cost.specific >= cost.generic;
+}
+
+/** Can a pool cover a whole SET of specific demands (Record of element→count), where each demand draws from
+ *  its own colour first, then greedily from hybrids containing it? Sound (a success is a real assignment);
+ *  a base cost stays exact, a hybrid cost is covered only by its own colour (hybridsFor(hybrid) is empty). */
+function specificsCoverable(pool: EnergyPool, demands: Record<string, number>): boolean {
+  const p: EnergyPool = { ...pool };
+  for (const el of Object.keys(demands)) {
+    let need = demands[el] ?? 0;
+    const takeBase = Math.min(need, p[el] ?? 0); p[el] = (p[el] ?? 0) - takeBase; need -= takeBase;
+    for (const h of hybridsFor(el)) { if (need <= 0) break; const t = Math.min(need, p[h] ?? 0); p[h] = (p[h] ?? 0) - t; need -= t; }
+    if (need > 0) return false;
+  }
+  return true;
 }
 
 /** The energy a set of QUEUED (not-yet-resolved) actions sets aside: specific per caster-element, and
@@ -481,9 +498,13 @@ export function reservationTotal(r: EnergyReservation): number {
  * specific AND the leftover total covers its generic — regardless of how generic is later allocated.
  */
 export function canPayAfter(pool: EnergyPool, caster: Unit, cost: SkillInstance["cost"], reserved: EnergyReservation): boolean {
-  const el = caster.currentElement;
-  if ((pool[el] ?? 0) - (reserved.specific[el] ?? 0) < cost.specific) return false;
-  return poolTotal(pool) - reservationTotal(reserved) - cost.specific >= cost.generic;
+  // All specific demands (others' + this cast's) must be coverable together — base first, then hybrids that
+  // contain the colour — and the total pool must still cover every specific + every generic.
+  const demands: Record<string, number> = { ...reserved.specific };
+  if (cost.specific > 0) demands[caster.currentElement] = (demands[caster.currentElement] ?? 0) + cost.specific;
+  if (!specificsCoverable(pool, demands)) return false;
+  let totalSpec = 0; for (const k of Object.keys(demands)) totalSpec += demands[k] ?? 0;
+  return poolTotal(pool) >= totalSpec + reserved.generic + cost.generic;
 }
 
 /** Client planning gate: can `caster` use `skill` GIVEN the actions already queued this turn? `canUse` (not
@@ -501,7 +522,13 @@ export function canUsePlanned(state: MatchState, caster: Unit, skill: SkillInsta
  * remainder. Any color may pay generic; specific is never taken from the generic pool.
  */
 function pay(pool: EnergyPool, element: string, cost: SkillInstance["cost"], alloc?: EnergyPool): void {
-  pool[element] = (pool[element] ?? 0) - cost.specific;
+  // Specific: the caster's own colour first, then greedily from any hybrid that contains it (Mirror covers a
+  // Water/Shadow cost). Cap the base draw so a colour short of its cost pulls the remainder from hybrids
+  // instead of going negative.
+  let spec = cost.specific;
+  const fromBase = Math.min(spec, pool[element] ?? 0);
+  pool[element] = (pool[element] ?? 0) - fromBase; spec -= fromBase;
+  for (const h of hybridsFor(element)) { if (spec <= 0) break; const t = Math.min(spec, pool[h] ?? 0); pool[h] = (pool[h] ?? 0) - t; spec -= t; }
   let generic = cost.generic;
   if (alloc) {
     for (const k of Object.keys(alloc)) {

@@ -12,7 +12,7 @@ import type { MatchState, TeamId } from "../engine/src/types.ts";
 import type { MatchOutcome } from "../engine/content/match.ts";
 import { buildMatch } from "../engine/content/match.ts";
 import { runMatch } from "../client/loop.ts";
-import { applyDraftChoice, autoDraft, hasDraftOptions, type DraftChoice } from "../client/draft.ts";
+import { applyDraftChoices, autoDraft, hasDraftOptions, type DraftChoice } from "../client/draft.ts";
 import { ROUNDS_TO_WIN, TURN_MS, DRAFT_MS, RECONNECT_GRACE_MS, type ClientMsg, type ServerMsg, type EndReason } from "../net/protocol.ts";
 import { redactState } from "../engine/src/visibility.ts";
 
@@ -47,7 +47,7 @@ export type RatingChanges = Partial<Record<TeamId, RatingChange>>;
 
 const other = (side: TeamId): TeamId => (side === "A" ? "B" : "A");
 const HOLD: TurnMsg = { t: "turn", actions: [] };
-const SKIP: DraftMsg = { t: "draftChoice", choice: { kind: "skip" } };
+const SKIP: DraftMsg = { t: "draftChoice", choices: [] };
 
 /** Keep only well-formed actions; the engine still validates legality per action (illegal → a no-op). */
 function sanitizeActions(actions: unknown): Action[] {
@@ -96,6 +96,10 @@ function sanitizeChoice(c: unknown): DraftChoice {
     if (o.kind === "augment" && typeof o.unitId === "string" && typeof o.augmentId === "string") return { kind: "augment", unitId: o.unitId, augmentId: o.augmentId };
   }
   return { kind: "skip" };
+}
+/** Sanitize a whole phase's choice list (cap at a small bound; applyDraftChoices dedupes + gates ownership). */
+function sanitizeChoices(cs: unknown): DraftChoice[] {
+  return Array.isArray(cs) ? cs.slice(0, 8).map(sanitizeChoice) : [];
 }
 
 export class Match {
@@ -278,7 +282,7 @@ export class Match {
       if (!hasDraftOptions(this.state, side)) continue; // nothing to pick — skip the prompt
       const drafter = this.bySide[side];
       const waiting = this.bySide[other(side)];
-      let choice = await new Promise<DraftChoice>((resolve) => {
+      const choices = await new Promise<DraftChoice[]>((resolve) => {
         const deadline = Date.now() + this.draftMs;
         this.pending[side] = { control: "draft", deadline };
         this.pending[other(side)] = { control: "waitDraft" };
@@ -290,14 +294,14 @@ export class Match {
         }, this.draftMs);
         drafter.pendingDraft = (msg) => {
           clearTimeout(timer);
-          resolve(sanitizeChoice(msg.choice));
+          resolve(sanitizeChoices(msg.choices));
         };
       });
-      // Authoritative gate: you may only fuse/augment your OWN hero (else a client could consume the
-      // opponent's once-per-match fusion during its own draft window).
-      if (choice.kind !== "skip" && this.state.units[choice.unitId]?.team !== side) choice = { kind: "skip" };
-      const res = applyDraftChoice(this.state, choice); // validates availability; an illegal pick is a no-op
-      if (res.ok && choice.kind !== "skip") this.state.log.push(`draft — Team ${side}: ${res.desc}`);
+      // applyDraftChoices is the authoritative gate: it drops choices for units not on `side` (so a client
+      // can't consume the opponent's fusion), dedupes to one upgrade per hero, and validates availability.
+      for (const res of applyDraftChoices(this.state, side, choices)) {
+        if (res.ok) this.state.log.push(`draft — Team ${side}: ${res.desc}`);
+      }
       this.broadcastState();
     }
   }

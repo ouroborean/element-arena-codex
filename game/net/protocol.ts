@@ -15,7 +15,7 @@ import type { MatchOutcome } from "../engine/content/match.ts";
 import type { DraftChoice } from "../client/draft.ts";
 
 /** Bumped on any breaking change to the messages below; the server rejects a mismatched client. */
-export const PROTOCOL_VERSION = 1;
+export const PROTOCOL_VERSION = 2;
 
 /** Default port the match server listens on (overridable via ARENA_PORT / the client's ?server=). */
 export const DEFAULT_PORT = 8790;
@@ -58,7 +58,7 @@ export type ClientMsg =
   /** The active player's committed turn: one action per acting hero (+ the optional generic-payment plan). */
   | { t: "turn"; actions: Action[]; genericPay?: EnergyPool }
   /** The drafting player's between-round upgrade choice (fuse / augment / skip). */
-  | { t: "draftChoice"; choice: DraftChoice }
+  | { t: "draftChoice"; choices: DraftChoice[] } // one phase = up to one upgrade per hero
   /** Concede the match immediately (the opponent wins by forfeit). */
   | { t: "surrender" }
   /** Concede only the CURRENT round (the opponent takes it); the match continues into the between-round

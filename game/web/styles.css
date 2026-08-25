@@ -296,6 +296,10 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .draft-modal .dh { display: grid; grid-template-columns: 38px 1fr; align-items: center; gap: 9px; padding: 7px 9px; background: var(--panel2); border: 1px solid var(--line); border-radius: var(--radius); color: var(--ink); cursor: pointer; text-align: left; font: inherit; }
 .draft-modal .dh:hover { border-color: var(--acc); }
 .draft-modal .dh.on { border-color: var(--acc); background: color-mix(in srgb, var(--acc) 16%, var(--panel2)); }
+.draft-modal .dh.picked { border-color: var(--you); } /* a hero that already has an upgrade chosen this phase */
+.dh-pick { color: var(--you); font-weight: 800; }
+/* the chosen fusion/augment card for the inspected hero */
+.draft-modal .do-card.chosen { border-color: var(--you); box-shadow: 0 0 0 2px var(--you) inset; }
 .dh img { width: 38px; height: 38px; border-radius: var(--radius); object-fit: cover; object-position: top center; background: var(--panel); }
 .dh-name { font-weight: 700; font-size: 12.5px; color: var(--ink); }
 .dh-opts { grid-column: 2; color: var(--dim); font-size: 10.5px; }
@@ -335,8 +339,11 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .energy-modal .resolve:disabled { opacity: .4; cursor: default; }
 
 /* ── character select — redesigned scene (assets/ui) ───────────────────── */
-.cs { position: fixed; inset: 0; overflow: auto; display: flex; flex-direction: column; gap: 8px; padding: 14px 18px 18px;
+.cs { position: fixed; inset: 0; overflow-x: hidden; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 14px 18px 18px;
   background: url(../../assets/ui/backgrounds/background.png) center top / cover no-repeat, var(--bg); }
+/* The showcase + roster rows live in a stage that JS scales-and-recentres to fit narrow windows, so the
+   scene never runs off the left/right edges (see fitCharSelect). */
+.cs-stage { flex: 1; min-height: 0; display: flex; flex-direction: column; transform-origin: 0 0; }
 .cs::before { content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
   background: radial-gradient(ellipse at 50% 38%, transparent 34%, #000000b0 100%); }
 .cs > * { position: relative; z-index: 1; }

@@ -12,7 +12,7 @@ import { redactState } from "../../engine/src/visibility.ts";
 import { buildMatch, defaultPolicy, type Draft } from "../../engine/content/match.ts";
 import { ROSTER } from "../../engine/content/roster.generated.ts";
 import { runMatch, type AsyncProvider } from "../../client/loop.ts";
-import { autoDraft, applyDraftChoice, hasDraftOptions, draftableHeroes, type DraftChoice } from "../../client/draft.ts";
+import { autoDraft, applyDraftChoices, hasDraftOptions, draftableHeroes, type DraftChoice } from "../../client/draft.ts";
 import { poolFor } from "../../client/targeting.ts";
 import { renderApp, renderSetup } from "./view.ts";
 import { energyIcon, elementRank, avatarUrl } from "./assets.ts";
@@ -32,7 +32,7 @@ export interface UiState {
   energyPanel?: { actions: Action[]; generic: number; avail: Record<string, number>; alloc: Record<string, number> };
   // The between-round fusion/augment draft: which of your heroes' options are shown, and the resolver to
   // settle once you commit a choice (or hold).
-  draft?: { side: TeamId; inspect: string | null; resolve: () => void };
+  draft?: { side: TeamId; inspect: string | null; picks: Map<string, DraftChoice>; resolve: () => void };
   overlay?: string;
   /** A thin fixed banner over the board (e.g. "opponent disconnected — waiting…"). */
   notice?: string;
@@ -198,8 +198,34 @@ function hideSkpop(): void { skpop.hidden = true; }
 // effects from the human. We redact only the render copy — the live `state` the loop mutates stays whole.
 function render(): void { hideFx(); app.innerHTML = renderApp(redactState(state, ui.you), ui, playerPanel()); }
 /** The team-select screen (its player panel reads the profile) plus the avatar picker when open. */
-function renderSetupScreen(): void { app.innerHTML = renderSetup(setup!, playerPanel()) + avatarPickerHtml(); }
-function showSetup(): void { setup = { picked: [], oppo: randomTeam([]), inspect: null }; renderSetupScreen(); }
+function renderSetupScreen(): void { app.innerHTML = renderSetup(setup!, playerPanel()) + avatarPickerHtml(); fitCharSelect(); }
+/** Open team select, optionally pre-seeded with an already-chosen team (e.g. after cancelling matchmaking). */
+function showSetup(picked: string[] = []): void {
+  const keep = picked.slice(0, 3);
+  setup = { picked: keep, oppo: randomTeam(keep), inspect: keep[0] ?? null };
+  renderSetupScreen();
+}
+/** Scale + recentre the (fixed-width) character-select scene to fit narrow windows, so it never runs off the
+ *  edges. The scene isn't centred within its own box (right-heavy roster), so we measure its true extent and
+ *  apply a translate+scale that both shrinks it to fit and centres it in the viewport. */
+function fitCharSelect(): void {
+  const cs = document.querySelector<HTMLElement>(".cs");
+  const stage = document.querySelector<HTMLElement>(".cs-stage");
+  if (!cs || !stage) return;
+  stage.style.transform = "none"; // measure the natural (unscaled) horizontal extent in viewport coords
+  let min = Infinity, max = -Infinity;
+  for (const el of cs.querySelectorAll<HTMLElement>(".cs-hero, .cs-mid, .cs-show > *")) {
+    const r = el.getBoundingClientRect();
+    if (r.width) { min = Math.min(min, r.left); max = Math.max(max, r.right); }
+  }
+  const W = cs.clientWidth, natural = max - min;
+  if (!(natural > 0) || natural <= W - 16) { stage.style.transform = ""; return; } // already fits
+  const s = Math.max(0.4, (W - 16) / natural);
+  const stageLeft = stage.getBoundingClientRect().left; // transform-origin is the stage's top-left
+  const dx = W / 2 - stageLeft - ((min + max) / 2 - stageLeft) * s; // recentre the scaled content
+  stage.style.transform = `translateX(${dx}px) scale(${s})`;
+}
+window.addEventListener("resize", () => { if (setup) fitCharSelect(); });
 
 /** The avatar chooser: a grid of every avatar in the manifest; clicking one sets it. Empty string when closed. */
 function avatarPickerHtml(): string {
@@ -272,12 +298,12 @@ function unusableReason(u: Unit, skill: SkillInstance): string {
   return "Can't be used right now (stunned, silenced, or no valid target).";
 }
 
-// Between-round draft: show your heroes' fusion/augment options and await one choice (or hold).
+// Between-round draft: show your heroes' fusion/augment options and await a batch (one upgrade per hero).
 function humanDraft(st: MatchState, side: TeamId): Promise<void> {
   return new Promise((resolve) => {
     ui.phase = "busy";
-    ui.phaseLabel = "choose your upgrade";
-    ui.draft = { side, inspect: draftableHeroes(st, side)[0]?.id ?? null, resolve };
+    ui.phaseLabel = "choose your upgrades";
+    ui.draft = { side, inspect: draftableHeroes(st, side)[0]?.id ?? null, picks: new Map(), resolve };
     render();
   });
 }
@@ -326,7 +352,7 @@ app.addEventListener("click", (e) => {
     if (t.closest("[data-augfuse-close]") || t.classList.contains("overlay")) { setup.augfuse = false; renderSetupScreen(); }
     return;
   }
-  const el = (e.target as HTMLElement).closest<HTMLElement>("[data-owner],[data-skill],[data-target],[data-cancel],[data-resolve],[data-surrender],[data-pick],[data-inspect],[data-reroll],[data-start],[data-quick],[data-ranked],[data-quick-cancel],[data-plus],[data-minus],[data-energy-confirm],[data-energy-cancel],[data-draft-inspect],[data-fuse-unit],[data-aug-unit],[data-draft-hold],[data-concede-round],[data-forfeit],[data-keep],[data-augfuse],[data-avatar-pick],[data-avatar-set],[data-avatar-close]");
+  const el = (e.target as HTMLElement).closest<HTMLElement>("[data-owner],[data-skill],[data-target],[data-cancel],[data-resolve],[data-surrender],[data-pick],[data-inspect],[data-reroll],[data-start],[data-quick],[data-ranked],[data-quick-cancel],[data-plus],[data-minus],[data-energy-confirm],[data-energy-cancel],[data-draft-inspect],[data-fuse-unit],[data-aug-unit],[data-draft-confirm],[data-draft-clear],[data-concede-round],[data-forfeit],[data-keep],[data-augfuse],[data-avatar-pick],[data-avatar-set],[data-avatar-close]");
   if (!el) return;
   const d = el.dataset;
 
@@ -337,19 +363,26 @@ app.addEventListener("click", (e) => {
   if (d.avatarClose) { avatarPickerOpen = false; renderSetupScreen(); return; }
   if (d.avatarPick !== undefined) { avatarPickerOpen = true; renderSetupScreen(); return; }
 
-  if (ui.draft) { // the between-round draft modal is up — only its controls respond
+  if (ui.draft) { // the between-round draft modal is up — pick an upgrade PER hero, then confirm the batch
+    const picks = ui.draft.picks;
     if (d.draftInspect) { ui.draft.inspect = d.draftInspect; render(); return; }
-    let choice: DraftChoice | null = null;
-    if (d.fuseUnit && d.fuseForm) choice = { kind: "fuse", unitId: d.fuseUnit, formKey: d.fuseForm };
-    else if (d.augUnit && d.augId) choice = { kind: "augment", unitId: d.augUnit, augmentId: d.augId };
-    else if (d.draftHold) choice = { kind: "skip" };
-    if (!choice) return;
-    if (pvp) { // networked: the server applies the choice authoritatively and broadcasts the new state
-      pvp.sock.send({ t: "draftChoice", choice });
-      pvpBusy("Applying your upgrade…");
-    } else {
-      if (choice.kind !== "skip") logDraft(applyDraftChoice(state, choice));
-      finishDraft();
+    if (d.fuseUnit && d.fuseForm) { // toggle: click the chosen fusion again to un-choose it
+      const cur = picks.get(d.fuseUnit);
+      if (cur?.kind === "fuse" && cur.formKey === d.fuseForm) picks.delete(d.fuseUnit);
+      else picks.set(d.fuseUnit, { kind: "fuse", unitId: d.fuseUnit, formKey: d.fuseForm });
+      render(); return;
+    }
+    if (d.augUnit && d.augId) {
+      const cur = picks.get(d.augUnit);
+      if (cur?.kind === "augment" && cur.augmentId === d.augId) picks.delete(d.augUnit);
+      else picks.set(d.augUnit, { kind: "augment", unitId: d.augUnit, augmentId: d.augId });
+      render(); return;
+    }
+    if (d.draftClear) { picks.delete(d.draftClear); render(); return; } // un-choose one hero
+    if (d.draftConfirm) { // commit every hero's pick at once (an empty batch = hold all)
+      const choices = [...picks.values()];
+      if (pvp) { pvp.sock.send({ t: "draftChoice", choices }); pvpBusy("Applying your upgrades…"); }
+      else { for (const res of applyDraftChoices(state, ui.draft.side, choices)) logDraft(res); finishDraft(); }
     }
     return;
   }
@@ -366,7 +399,14 @@ app.addEventListener("click", (e) => {
 
   if (setup) { // team-select screen
     if (d.augfuse) { setup.augfuse = true; renderSetupScreen(); }
-    else if (d.inspect) { setup.inspect = d.inspect; renderSetupScreen(); }
+    else if (d.inspect) { // first click inspects; clicking the ALREADY-inspected hero toggles it on/off the team
+      if (setup.inspect === d.inspect) {
+        const i = setup.picked.indexOf(d.inspect);
+        if (i >= 0) setup.picked.splice(i, 1);
+        else if (setup.picked.length < 3) setup.picked.push(d.inspect);
+      } else setup.inspect = d.inspect;
+      renderSetupScreen();
+    }
     else if (d.pick) { // add / remove (detail button or a tray slot)
       const i = setup.picked.indexOf(d.pick);
       if (i >= 0) setup.picked.splice(i, 1);
@@ -531,11 +571,9 @@ async function startMatch(draft: Draft): Promise<void> {
       ui.phase = "busy"; ui.phaseLabel = "between-round draft…";
       for (const side of [w === "A" ? "B" : "A", w] as TeamId[]) { // loser drafts first
         if (side === ui.you && hasDraftOptions(st, side)) {
-          await humanDraft(st, side); // interactive — awaits your fuse/augment/hold choice
+          await humanDraft(st, side); // interactive — awaits your per-hero upgrade batch
         } else {
-          const choice = autoDraft(st, side);
-          const res = applyDraftChoice(st, choice);
-          if (choice.kind !== "skip") st.log.push(`draft — Team ${side}: ${res.desc}`);
+          for (const res of applyDraftChoices(st, side, autoDraft(st, side))) st.log.push(`draft — Team ${side}: ${res.desc}`);
         }
         render();
         await delay(side === ui.you ? 200 : 900); // brief beat after yours; let the AI's read
@@ -624,16 +662,17 @@ function tryResumeStoredMatch(): boolean {
 }
 
 function cancelQuickMatch(): void {
+  const keep = pvp?.intent.kind === "queue" ? pvp.intent.team : []; // keep the team the player had queued with
   pvp?.sock.send({ t: "cancelQueue" });
   pvp?.sock.close();
   pvp = null;
-  showSetup();
+  showSetup(keep);
 }
 
 /** Open the between-round draft modal for a side (shared by yourDraft and a reconnect resumed at draft). */
 function openPvpDraft(side: TeamId): void {
   ui.phase = "busy"; ui.phaseLabel = "choose your upgrade"; ui.overlay = undefined; ui.energyPanel = undefined;
-  ui.draft = { side, inspect: draftableHeroes(state, side)[0]?.id ?? null, resolve: () => {} };
+  ui.draft = { side, inspect: draftableHeroes(state, side)[0]?.id ?? null, picks: new Map(), resolve: () => {} };
   render();
 }
 
