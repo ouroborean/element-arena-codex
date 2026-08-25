@@ -11,8 +11,8 @@ ${m.d}`:""}`,k=[i,r?"":"off",o?"chosen":""].filter(Boolean).join(" "),y=re(n.id,
     <div class="pc-av">${e?`<img src="${e}" alt="" ${H} />`:'<span class="pc-ph">\u{1F464}</span>'}</div>
     <div class="pc-txt"><div class="pc-name">${v(t)}</div><div class="pc-score">${a} round${a===1?"":"s"} won</div></div>
   </div>`}function Js(e,t,a){let n=t.you==="A"?"B":"A",s=t.phase==="plan",i=t.targeting||t.examine?qs(e,t):s?'<div class="turn you">Your turn</div><button class="resolve" data-resolve="1">Resolve turn \u25B6</button>':`<div class="turn foe">${v(t.phaseLabel)}</div><div class="bar"><div class="bar-fill"></div></div>`;return`<div class="topbar">
-    ${nn(a.avatar,a.name,e.teams[t.you].roundsWon,"you")}
-    <div class="control"><div class="control-mid">${i}</div>${Vs(e,t)}<div class="rnd">Round ${e.round}</div></div>
+    <div class="side-info you">${nn(a.avatar,a.name,e.teams[t.you].roundsWon,"you")}${Vs(e,t)}</div>
+    <div class="control"><div class="control-mid">${i}</div><div class="rnd">Round ${e.round}</div></div>
     ${nn("",t.opponentName??"Bot",e.teams[n].roundsWon,"foe")}
   </div>`}function Zs(){return'<div class="bottombar"><button class="surrender" data-surrender="1">Surrender</button></div>'}function qs(e,t){let a=t.targeting??t.examine,n=!t.targeting,s=e.units[a.unitId],i=(s?.skills??[]).find(k=>k.id===a.skillId),r=Y[a.skillId],o=re(a.skillId,s?.heroId??void 0),l=s&&i?ie(s,i,e):null,d=l?sn(l,i.element):"",m=r?.n??t.targeting?.skillName??i?.name??a.skillId,p=n?`<span class="sp-warn">\u26A0 ${v(t.examine.reason)}</span> <button class="mini" data-cancel="1">close</button>`:'\u25B8 Click a highlighted target to use <button class="mini" data-cancel="1">cancel</button>';return`<div class="skillpanel${n?" examine":""}">
     ${o?`<img class="sp-icon" src="${o}" ${H} />`:""}

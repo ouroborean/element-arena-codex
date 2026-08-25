@@ -327,9 +327,11 @@ function topBar(state: MatchState, ui: UiState, player: { name: string; avatar: 
     : yourTurn
     ? `<div class="turn you">Your turn</div><button class="resolve" data-resolve="1">Resolve turn ▶</button>`
     : `<div class="turn foe">${esc(ui.phaseLabel)}</div><div class="bar"><div class="bar-fill"></div></div>`;
+  // Your chip + your energy pool sit on the LEFT, directly over your own team column; the turn/Resolve control
+  // (and round) stay centred; the opponent's chip is on the right, over their column.
   return `<div class="topbar">
-    ${playerChip(player.avatar, player.name, state.teams[ui.you].roundsWon, "you")}
-    <div class="control"><div class="control-mid">${control}</div>${energyPool(state, ui)}<div class="rnd">Round ${state.round}</div></div>
+    <div class="side-info you">${playerChip(player.avatar, player.name, state.teams[ui.you].roundsWon, "you")}${energyPool(state, ui)}</div>
+    <div class="control"><div class="control-mid">${control}</div><div class="rnd">Round ${state.round}</div></div>
     ${playerChip("", ui.opponentName ?? "Bot", state.teams[foe].roundsWon, "foe")}
   </div>`;
 }

@@ -89,11 +89,13 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .tile-ult .cdbadge { font-size: 22px; }
 
 /* ── top bar: your chip (far left) · shared controls (centre) · opponent chip (far right) ── */
-.topbar { display: grid; grid-template-columns: 1fr auto 1fr; gap: 14px; align-items: center;
+.topbar { display: grid; grid-template-columns: 1fr auto 1fr; gap: 14px; align-items: start;
   background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 8px 14px; }
+.topbar > .control { align-self: center; } /* both player chips top-align; the centre control stays vertically centred */
 .pc { display: flex; align-items: center; gap: 10px; min-width: 0; }
-.pc.you { justify-self: start; }
 .pc.foe { justify-self: end; flex-direction: row-reverse; text-align: right; }
+/* Left cell: your chip with your energy pool beneath it, over your own team column. */
+.side-info { justify-self: start; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; min-width: 0; }
 .pc-av { width: 46px; height: 46px; flex: 0 0 46px; border-radius: 10px; overflow: hidden; background: #0c0e16;
   border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; }
 .pc.you .pc-av { border-color: color-mix(in srgb, var(--you) 60%, #000); }
