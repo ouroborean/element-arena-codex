@@ -132,7 +132,10 @@ function effectIcons(state: MatchState, u: Unit): string {
     const icon = src ? iconOf(src) : null;
     const { title, body, dur } = effectDesc(state, u, s, src);
     const tone = BAD_KINDS.has(s.kind) ? "bad" : GOOD_KINDS.has(s.kind) ? "good" : "state";
-    out.push(`<span class="fx ${tone}" data-fxtitle="${esc(title)}" data-fxbody="${esc(body)}" data-fxdur="${esc(dur)}">${icon ? `<img src="${icon}" ${IMG_FALLBACK} />` : `<span class="fx-abbr">${esc((s.name ?? s.kind)[0]!.toUpperCase())}</span>`}${s.kind === "stack" && (s.magnitude ?? 0) > 1 ? `<span class="fx-n">${s.magnitude}</span>` : ""}</span>`);
+    // Always render the abbr behind the icon; if the icon fails to load (missing file OR a flaky environment),
+    // its onerror removes the img and the abbr shows through — never a blank box. The tooltip works regardless.
+    const abbr = `<span class="fx-abbr">${esc((s.name ?? s.kind)[0]!.toUpperCase())}</span>`;
+    out.push(`<span class="fx ${tone}" data-fxtitle="${esc(title)}" data-fxbody="${esc(body)}" data-fxdur="${esc(dur)}">${abbr}${icon ? `<img src="${icon}" onerror="this.remove()" />` : ""}${s.kind === "stack" && (s.magnitude ?? 0) > 1 ? `<span class="fx-n">${s.magnitude}</span>` : ""}</span>`);
   }
   return out.length ? `<div class="fxrow">${out.slice(0, 6).join("")}</div>` : "";
 }
@@ -167,7 +170,8 @@ function skillTile(state: MatchState, u: Unit, ui: UiState, s: SkillInstance | n
   const tip = `${text?.n ?? s.name} — ${costStr}${s.currentCd > 0 ? ` — on cooldown (${s.currentCd})` : ""}${text?.d ? `\n${text.d}` : ""}`;
   const cls = [base, ok ? "" : "off", chosen ? "chosen" : ""].filter(Boolean).join(" ");
   const ic = iconOf(s.id, u.heroId ?? undefined);
-  return `<button class="${cls}" data-owner="${u.id}" data-skill="${s.id}" title="${esc(tip)}">${ic ? `<img src="${ic}" alt="${esc(s.name)}" ${IMG_FALLBACK} />` : `<span class="tile-abbr">${esc(s.name.slice(0, 3))}</span>`}${s.currentCd > 0 ? `<span class="cdbadge">${s.currentCd}</span>` : ""}</button>`;
+  // Abbr behind the icon: a failed icon load (missing file / flaky env) reveals the abbr instead of a blank tile.
+  return `<button class="${cls}" data-owner="${u.id}" data-skill="${s.id}" title="${esc(tip)}"><span class="tile-abbr">${esc(s.name.slice(0, 3))}</span>${ic ? `<img src="${ic}" alt="${esc(s.name)}" onerror="this.remove()" />` : ""}${s.currentCd > 0 ? `<span class="cdbadge">${s.currentCd}</span>` : ""}</button>`;
 }
 
 /** A flat row of a unit's skill tiles (used for controllable MINIONS, which have only a few basic skills). */
