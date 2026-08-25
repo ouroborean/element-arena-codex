@@ -122,15 +122,17 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .resolve { background: var(--acc); color: #0b0e1c; border: 0; border-radius: 9px; padding: 8px 18px; font: inherit; font-weight: 800; cursor: pointer; }
 .mini { background: var(--panel2); color: var(--ink); border: 1px solid var(--line); border-radius: 7px; padding: 5px 12px; font: inherit; font-size: 12px; cursor: pointer; }
 
-/* horizontal energy pool (top bar): a row of element chips + the running "Total" left to spend this turn */
-.epool { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
-.ep-title { font-size: 10px; color: var(--dim); font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
-.ep-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; }
+/* energy pool (top bar): two compact rows — specific types on top, generic + Total on the bottom. Each chip is
+   just [symbol] × [number] (no element name), so the whole display stays small. */
+.epool { display: flex; flex-direction: column; gap: 4px; }
+.ep-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; min-height: 22px; }
+.ep-chip { display: inline-flex; align-items: center; gap: 3px; font-size: 13px; }
 .ep-ic { width: 20px; height: 20px; border-radius: 4px; object-fit: cover; }
-.ep-el { color: var(--dim); text-transform: uppercase; font-size: 10px; letter-spacing: .5px; }
+.ep-x { color: var(--dim); font-size: 11px; }
 .ep-n { font-weight: 700; }
 .ep-n.spent { color: var(--acc); } /* a color with energy reserved by queued skills reads as "being spent" */
-.ep-total { padding-left: 9px; border-left: 1px solid var(--line); }
+.ep-el { color: var(--dim); text-transform: uppercase; font-size: 10px; letter-spacing: .5px; } /* only the Total keeps a text label */
+.ep-total { padding-left: 10px; border-left: 1px solid var(--line); gap: 5px; }
 .ep-total .ep-n { font-size: 14px; }
 
 /* skill-cost pips: one energy icon per unit of cost, no numbers/words */

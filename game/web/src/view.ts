@@ -286,18 +286,26 @@ function energyPool(state: MatchState, ui: UiState): string {
   const pool = state.teams[ui.you].energy;
   // The energy this turn's queued skills set aside — so the pool decrements live as skills are queued.
   const reserved = reserveEnergy(state, [...ui.planned.values()]);
-  const els = new Set<string>(["generic"]);
-  for (const id of state.teams[ui.you].units) { const u = state.units[id]; if (u?.kind === "hero") els.add(u.currentElement); }
-  for (const k of Object.keys(pool)) if ((pool[k] ?? 0) > 0) els.add(k);
-  const usedOf = (el: string) => el === "generic" ? reserved.generic : reserved.specific[el] ?? 0;
-  const chips = [...els].sort((a, b) => elementRank(a) - elementRank(b) || a.localeCompare(b))
-    .map((el) => {
-      const have = pool[el] ?? 0, left = Math.max(0, have - usedOf(el)), spent = have - left;
-      return `<span class="ep-chip" title="${esc(el)}${spent > 0 ? ` — ${spent} committed of ${have}` : ""}"><img class="ep-ic" src="${energyIcon(el)}" alt="${esc(el)}" ${IMG_FALLBACK} /><span class="ep-el">${esc(el)}</span><span class="ep-n${spent > 0 ? " spent" : ""}">${left}</span></span>`;
-    }).join("");
-  // The single "how much can I still spend" number: the whole pool minus everything queued this turn reserves.
+  // Top row = the SPECIFIC energy types the team actually uses: the distinct CURRENT elements of its heroes.
+  // A fused hero uses its fusion element, NOT its components — so a fused-away element stops showing as its own
+  // type (any leftover energy of that colour still counts toward the Total below, it just has no chip). Driven
+  // by currentElement, never by "any colour that happens to have energy in the pool".
+  const specific: string[] = [];
+  for (const id of state.teams[ui.you].units) {
+    const u = state.units[id];
+    if (u?.kind === "hero" && u.currentElement !== "generic" && !specific.includes(u.currentElement)) specific.push(u.currentElement);
+  }
+  specific.sort((a, b) => elementRank(a) - elementRank(b) || a.localeCompare(b));
+  // Each present type as [symbol] × [number], the number decremented live by what this turn's plan reserves.
+  const chip = (el: string, reservedAmt: number) => {
+    const have = pool[el] ?? 0, left = Math.max(0, have - reservedAmt), spent = have - left;
+    return `<span class="ep-chip" title="${esc(el)}${spent > 0 ? ` — ${spent} committed of ${have}` : ""}"><img class="ep-ic" src="${energyIcon(el)}" alt="${esc(el)}" ${IMG_FALLBACK} /><span class="ep-x">×</span><span class="ep-n${spent > 0 ? " spent" : ""}">${left}</span></span>`;
+  };
+  const top = specific.map((el) => chip(el, reserved.specific[el] ?? 0)).join("");
   const total = Math.max(0, poolTotal(pool) - reservationTotal(reserved));
-  return `<div class="epool"><span class="ep-title">Energy</span>${chips}<span class="ep-chip ep-total"><span class="ep-el">Total</span><span class="ep-n">${total}</span></span></div>`;
+  const totalChip = `<span class="ep-chip ep-total" title="total unallocated energy this turn"><span class="ep-el">Total</span><span class="ep-n">${total}</span></span>`;
+  // Bottom row = generic + the running Total.
+  return `<div class="epool"><div class="ep-row">${top}</div><div class="ep-row">${chip("generic", reserved.generic)}${totalChip}</div></div>`;
 }
 
 /** A player's identity chip for the top bar: avatar, name, and round score. (Only the local player has an
