@@ -23,7 +23,6 @@ export interface UiState {
   you: TeamId;
   phase: "plan" | "busy" | "over";
   phaseLabel: string;
-  hint: string;
   targeting?: { unitId: string; skillId: string; skillName: string; single: boolean };
   examine?: { unitId: string; skillId: string; reason: string }; // read-only inspect of an unusable skill
   legalTargets: Set<string>;
@@ -137,7 +136,7 @@ function playerPanel(): { name: string; sub: string; avatar: string } {
 function authMsg() { const id = identity(); return { t: "auth" as const, playerId: id.playerId, secret: id.secret, name: id.name, protocolVersion: PROTOCOL_VERSION }; }
 const escHtml = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
 const ui: UiState = {
-  you: "A", phase: "busy", phaseLabel: "starting…", hint: "",
+  you: "A", phase: "busy", phaseLabel: "starting…",
   legalTargets: new Set(), planned: new Map(), plannedSkill: new Map(),
 };
 
@@ -197,7 +196,7 @@ function hideSkpop(): void { skpop.hidden = true; }
 // In PvP the server already redacted `state`, so this is idempotent; in local vs-bot play (where `state` is
 // the full authoritative board the engine loop runs on) this is what actually hides the bot's Invisible
 // effects from the human. We redact only the render copy — the live `state` the loop mutates stays whole.
-function render(): void { hideFx(); app.innerHTML = renderApp(redactState(state, ui.you), ui); }
+function render(): void { hideFx(); app.innerHTML = renderApp(redactState(state, ui.you), ui, playerPanel()); }
 /** The team-select screen (its player panel reads the profile) plus the avatar picker when open. */
 function renderSetupScreen(): void { app.innerHTML = renderSetup(setup!, playerPanel()) + avatarPickerHtml(); }
 function showSetup(): void { setup = { picked: [], oppo: randomTeam([]), inspect: null }; renderSetupScreen(); }
@@ -289,14 +288,28 @@ function finishDraft(): void {
 }
 function logDraft(res: { ok: boolean; desc: string }): void { state.log.push(`draft — ${res.desc}`); }
 
-// In-app surrender confirmation (native confirm() is unreliable in embedded/sandboxed browser contexts).
-const SURRENDER_CONFIRM = `<div class="overlay"><div class="modal">
-  <h2>Surrender?</h2>
-  <p>You'll concede the match and return to team select.</p>
+// In-app surrender menu (native confirm() is unreliable in embedded/sandboxed browser contexts). Two ways
+// out: concede just this ROUND (the opponent takes it, then you draft an upgrade), or forfeit the whole MATCH.
+const SURRENDER_MENU = `<div class="overlay"><div class="modal surrender-menu">
+  <h2>Surrender</h2>
+  <p>Concede just this <b>round</b> — the opponent takes it and you go to the upgrade draft — or forfeit the whole <b>match</b>?</p>
   <div class="modal-foot">
+    <button data-concede-round="1">Concede round</button>
+    <button class="forfeit" data-forfeit="1">Forfeit match</button>
     <button class="mini" data-keep="1">Keep playing</button>
-    <button data-concede="1">Concede</button>
   </div></div></div>`;
+
+/** Bot-mode: concede the current round locally. Set the engine flag (roundWinner awards the AI), clear the
+ *  plan, and unblock the local match loop so it resolves the turn and advances into the between-round draft. */
+function concedeRoundLocal(): void {
+  state.concededRound = ui.you;
+  ui.targeting = undefined; ui.examine = undefined; ui.legalTargets = new Set();
+  ui.planned.clear(); ui.plannedSkill.clear();
+  const resolve = ui.resolveTurn; ui.resolveTurn = undefined;
+  ui.phase = "busy"; ui.phaseLabel = "conceding round…";
+  render();
+  resolve?.([]); // if it's your turn, the loop resolves an empty turn; roundWinner then ends the round
+}
 
 // ── interaction (event delegation) ───────────────────────────────────────────────────────────────── //
 app.addEventListener("click", (e) => {
@@ -313,7 +326,7 @@ app.addEventListener("click", (e) => {
     if (t.closest("[data-augfuse-close]") || t.classList.contains("overlay")) { setup.augfuse = false; renderSetupScreen(); }
     return;
   }
-  const el = (e.target as HTMLElement).closest<HTMLElement>("[data-owner],[data-skill],[data-target],[data-cancel],[data-resolve],[data-surrender],[data-pick],[data-inspect],[data-reroll],[data-start],[data-quick],[data-ranked],[data-quick-cancel],[data-plus],[data-minus],[data-energy-confirm],[data-energy-cancel],[data-draft-inspect],[data-fuse-unit],[data-aug-unit],[data-draft-hold],[data-concede],[data-keep],[data-augfuse],[data-avatar-pick],[data-avatar-set],[data-avatar-close]");
+  const el = (e.target as HTMLElement).closest<HTMLElement>("[data-owner],[data-skill],[data-target],[data-cancel],[data-resolve],[data-surrender],[data-pick],[data-inspect],[data-reroll],[data-start],[data-quick],[data-ranked],[data-quick-cancel],[data-plus],[data-minus],[data-energy-confirm],[data-energy-cancel],[data-draft-inspect],[data-fuse-unit],[data-aug-unit],[data-draft-hold],[data-concede-round],[data-forfeit],[data-keep],[data-augfuse],[data-avatar-pick],[data-avatar-set],[data-avatar-close]");
   if (!el) return;
   const d = el.dataset;
 
@@ -374,13 +387,19 @@ app.addEventListener("click", (e) => {
     return;
   }
 
-  if (d.surrender) { ui.overlay = SURRENDER_CONFIRM; render(); return; }
-  if (d.concede) { // networked: tell the server (it decides the forfeit); bot mode just restarts
-    if (pvp) { pvp.sock.send({ t: "surrender" }); pvpBusy("Conceding…"); }
+  if (d.surrender) { ui.overlay = SURRENDER_MENU; render(); return; }
+  if (d.keep) { ui.overlay = undefined; render(); return; }
+  if (d.forfeit) { // forfeit the whole MATCH → back to team select
+    if (pvp) { pvp.sock.send({ t: "surrender" }); pvpBusy("Forfeiting…"); }
     else location.reload();
     return;
   }
-  if (d.keep) { ui.overlay = undefined; render(); return; }
+  if (d.concedeRound) { // concede only the CURRENT round → the between-round draft
+    ui.overlay = undefined;
+    if (pvp) { pvp.sock.send({ t: "concedeRound" }); pvpBusy("Conceding round…"); }
+    else concedeRoundLocal();
+    return;
+  }
   if (ui.phase !== "plan") return;
   if (d.cancel) { ui.targeting = undefined; ui.examine = undefined; ui.legalTargets = new Set(); render(); return; }
   if (d.resolve) { commitTurn(); return; }
@@ -483,7 +502,6 @@ function finalizeTurn(actions: Action[], alloc: Record<string, number> | undefin
 const human: AsyncProvider = (st, side) => new Promise<Action[]>((resolve) => {
   ui.phase = "plan";
   ui.phaseLabel = "your move";
-  ui.hint = "Pick a skill on each hero, then a target. Skip a hero to hold it.";
   ui.planned.clear(); ui.plannedSkill.clear();
   ui.targeting = undefined; ui.examine = undefined; ui.legalTargets = new Set();
   ui.resolveTurn = resolve;
@@ -623,7 +641,6 @@ function openPvpDraft(side: TeamId): void {
 function enterPvpPlanning(): void {
   ui.phase = "plan";
   ui.phaseLabel = "your move";
-  ui.hint = "Pick a skill on each hero, then a target. Skip a hero to hold it.";
   ui.planned.clear(); ui.plannedSkill.clear();
   ui.targeting = undefined; ui.examine = undefined; ui.legalTargets = new Set();
   ui.energyPanel = undefined; ui.overlay = undefined; ui.draft = undefined;

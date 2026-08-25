@@ -133,6 +133,7 @@ export class MatchServer {
         case "turn":
         case "draftChoice":
         case "surrender":
+        case "concedeRound":
           conn.seat?.match.handleMessage(conn.seat, msg);
           return;
       }

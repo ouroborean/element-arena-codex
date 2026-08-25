@@ -197,6 +197,24 @@ test("a surrender hands the win to the opponent", async () => {
   assert.equal(aEnd!.you !== bEnd!.you, true, "each side is told its own perspective");
 });
 
+test("conceding a ROUND awards that round to the opponent and continues into the draft (not a match forfeit)", async () => {
+  const { a, b, match } = pair(["pyrrha", "jarrik", "gommar"], ["ando", "syl", "riverdaughter"]);
+  a.silent = true; // A won't play — it will concede round 1, then auto-hold round 2 and lose on the board
+  const running = match.run();
+  await tick(); // A's first turn is pending
+  match.handleMessage(a, { t: "concedeRound" }); // A gives up the CURRENT round only
+  await running;
+
+  const bEnd = b.end();
+  const aSide = (a.messages.find((m) => m.t === "start") as Extract<ServerMsg, { t: "start" }>).you;
+  const bSide = aSide === "A" ? "B" : "A";
+  assert.ok(b.got("yourDraft").length > 0, "a between-round draft happened — the concede ended the ROUND, not the match");
+  assert.ok(bEnd, "the match still concludes");
+  assert.equal(bEnd!.reason, "decided", "a round concede is a normal best-of-N decision, NOT a forfeit");
+  assert.equal(bEnd!.outcome.winner, bSide, "the opponent of the conceder wins the match");
+  assert.equal(bEnd!.outcome.roundsWon[bSide], 2, "B took both rounds (the conceded one + the board win)");
+});
+
 test("filterTurnActions keeps only the active side's own units, one action each", () => {
   const units = { a1: { team: "A" }, a2: { team: "A" }, b1: { team: "B" } } as const;
   const submitted = [

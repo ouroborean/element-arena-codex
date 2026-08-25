@@ -263,6 +263,12 @@ export interface MatchState {
    * any remainder. Set before resolving a turn; cleared by resolveTurn. Absent = the default auto order.
    */
   genericPay?: EnergyPool;
+  /** The turn value at which the CURRENT round began (set by startRound). The active team's opening turn of a
+   *  round is `turn === roundStartTurn`; the player who goes first that round gets reduced opening income. */
+  roundStartTurn?: number;
+  /** Set when a side CONCEDES the current round (the value is the conceding side): roundWinner then awards the
+   *  round to the opponent. Cleared by startRound so it never bleeds into the next round. */
+  concededRound?: TeamId;
   log: string[];
 }
 
