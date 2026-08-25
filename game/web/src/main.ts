@@ -14,9 +14,9 @@ import { ROSTER } from "../../engine/content/roster.generated.ts";
 import { runMatch, type AsyncProvider } from "../../client/loop.ts";
 import { autoDraft, applyDraftChoices, hasDraftOptions, draftableHeroes, type DraftChoice } from "../../client/draft.ts";
 import { poolFor } from "../../client/targeting.ts";
-import { renderApp, renderSetup } from "./view.ts";
+import { renderApp, renderSetup, renderLogin, renderClaim } from "./view.ts";
 import { energyIcon, elementRank, avatarUrl } from "./assets.ts";
-import { MatchSocket, serverUrl, fetchProfile, fetchAvatars, type AvatarInfo } from "./net.ts";
+import { MatchSocket, serverUrl, fetchProfile, fetchAvatars, register, login, claimAccount, saveProfile, type AvatarInfo } from "./net.ts";
 import { PROTOCOL_VERSION, MAX_NAME_LEN, type ServerMsg, type Profile } from "../../net/protocol.ts";
 
 export interface UiState {
@@ -111,6 +111,7 @@ function setStoredName(name: string): void {
   const key = (() => { try { return new URLSearchParams(location.search).get("player"); } catch { return null; } })();
   const storeKey = key ? `arenaName:${key.slice(0, 40)}` : "arenaName"; // keep `?player=` windows' names distinct
   try { localStorage.setItem(storeKey, name.slice(0, MAX_NAME_LEN)); } catch { /* ignore */ }
+  syncProfile({ name: name.slice(0, MAX_NAME_LEN) }); // persist the display name to the account too
 }
 
 // The pickable avatar set (from assets/avatars/manifest.json) and the player's chosen one.
@@ -121,16 +122,46 @@ function playerAvatarFile(): string {
   if (stored && (!avatars.length || avatars.some((a) => a.file === stored))) return stored;
   return avatars[0]?.file ?? "";
 }
-function setAvatarFile(file: string): void { try { localStorage.setItem("arenaAvatar", file); } catch { /* ignore */ } }
+function setAvatarFile(file: string): void { try { localStorage.setItem("arenaAvatar", file); } catch { /* ignore */ } syncProfile({ avatar: file }); }
 
-/** The player-profile panel's data: display name, an avatar image, and a rating + record subtitle. */
-function playerPanel(): { name: string; sub: string; avatar: string } {
+// ── login / account session ─────────────────────────────────────────────────────────────────────────── //
+let screen: "login" | "setup" = "setup"; // which pre-match screen is live (boot decides)
+let loginState: { mode: "login" | "register"; error?: string; busy?: boolean } = { mode: "login" };
+let claimForm: { error?: string; busy?: boolean } | null = null; // the "save your account" modal (guest → registered)
+
+/** Store a server-issued (register/login) or guest identity so all later auth reuses it across reloads. */
+function setStoredIdentity(playerId: string, secret: string): void {
+  cachedCreds = { playerId, secret };
+  try { localStorage.setItem("arenaIdentity", JSON.stringify(cachedCreds)); } catch { /* ignore */ }
+}
+/** Has this browser a stored identity already (a returning guest or logged-in account)? The ?player= test
+ *  path also counts, so local 2-tab PvP skips the login gate. */
+function hasStoredIdentity(): boolean {
+  if (identityOverride()) return true;
+  try { const c = JSON.parse(localStorage.getItem("arenaIdentity") ?? "null"); return !!(c?.playerId && c?.secret); } catch { return false; }
+}
+/** Persist a changed profile field (name/avatar) to the account and fold the server's echo back into `profile`. */
+function syncProfile(patch: { name?: string; avatar?: string; progress?: unknown }): void {
+  const id = identity();
+  void saveProfile(id.playerId, id.secret, patch).then((p) => { if (p) profile = p; });
+}
+/** Sign out: drop the stored identity + local prefs and return to the login screen. */
+function logout(): void {
+  try { for (const k of ["arenaIdentity", "arenaName", "arenaAvatar"]) localStorage.removeItem(k); } catch { /* ignore */ }
+  cachedCreds = null; profile = null; setup = null; avatarPickerOpen = false;
+  loginState = { mode: "login" }; screen = "login"; renderLoginScreen();
+}
+function renderLoginScreen(): void { app.innerHTML = renderLogin(loginState); }
+
+/** The player-profile panel's data: display name, an avatar image, a rating + record subtitle, and (for a
+ *  registered account) the login handle — its presence marks the player as claimed vs. an anonymous guest. */
+function playerPanel(): { name: string; sub: string; avatar: string; username?: string } {
   const name = profile?.name ?? identity().name;
   const sub = profile
     ? `★ ${profile.rating} · ${profile.wins}W · ${profile.losses}L${profile.draws ? ` · ${profile.draws}D` : ""}`
     : "offline";
   const file = playerAvatarFile();
-  return { name, sub, avatar: file ? avatarUrl(file) : "" };
+  return { name, sub, avatar: file ? avatarUrl(file) : "", username: profile?.username };
 }
 /** The `auth` message every match socket sends first, from the stored identity. */
 function authMsg() { const id = identity(); return { t: "auth" as const, playerId: id.playerId, secret: id.secret, name: id.name, protocolVersion: PROTOCOL_VERSION }; }
@@ -198,7 +229,7 @@ function hideSkpop(): void { skpop.hidden = true; }
 // effects from the human. We redact only the render copy — the live `state` the loop mutates stays whole.
 function render(): void { hideFx(); app.innerHTML = renderApp(redactState(state, ui.you), ui, playerPanel()); }
 /** The team-select screen (its player panel reads the profile) plus the avatar picker when open. */
-function renderSetupScreen(): void { app.innerHTML = renderSetup(setup!, playerPanel()) + avatarPickerHtml(); fitCharSelect(); }
+function renderSetupScreen(): void { app.innerHTML = renderSetup(setup!, playerPanel()) + avatarPickerHtml() + (claimForm ? renderClaim(claimForm) : ""); fitCharSelect(); }
 /** Open team select, optionally pre-seeded with an already-chosen team (e.g. after cancelling matchmaking). */
 function showSetup(picked: string[] = []): void {
   const keep = picked.slice(0, 3);
@@ -252,12 +283,21 @@ async function refreshProfile(): Promise<void> {
 /** App entry: resume an in-progress match if one is stored, else load the profile + avatars and show team-select. */
 async function boot(): Promise<void> {
   if (tryResumeStoredMatch()) return; // an accidental reload rejoins the live match first
-  const id = identity();
-  const [prof, avs] = await Promise.all([fetchProfile(id.playerId, id.secret, id.name), fetchAvatars()]);
-  profile = prof;
-  avatars = avs;
+  avatars = await fetchAvatars();
+  if (hasStoredIdentity()) await enterSetup(); // returning guest or logged-in account → straight to team select
+  else { screen = "login"; renderLoginScreen(); } // first visit → log in / register / continue as guest
+}
+
+/** Authenticate with the current stored identity and open team select (shared by boot + the login handlers). */
+async function enterSetup(): Promise<void> {
+  screen = "setup";
+  const id = identity(); // mints a fresh guest identity here if none is stored (the "Continue as guest" path)
+  profile = await fetchProfile(id.playerId, id.secret, id.name);
+  if (profile?.avatar) setAvatarFileLocal(profile.avatar); // adopt the account's synced avatar
   showSetup();
 }
+/** Write the avatar locally WITHOUT re-syncing to the server (used when adopting the account's own value). */
+function setAvatarFileLocal(file: string): void { try { localStorage.setItem("arenaAvatar", file); } catch { /* ignore */ } }
 
 /** The single-target set the UI highlights for a skill — the offering logic (faction rules + fusion
  *  widenings like Merciless/Swoop, then the engine's legalTargets) lives in the shared client/targeting.ts. */
@@ -352,9 +392,51 @@ app.addEventListener("click", (e) => {
     if (t.closest("[data-augfuse-close]") || t.classList.contains("overlay")) { setup.augfuse = false; renderSetupScreen(); }
     return;
   }
-  const el = (e.target as HTMLElement).closest<HTMLElement>("[data-owner],[data-skill],[data-target],[data-cancel],[data-resolve],[data-surrender],[data-pick],[data-inspect],[data-reroll],[data-start],[data-quick],[data-ranked],[data-quick-cancel],[data-plus],[data-minus],[data-energy-confirm],[data-energy-cancel],[data-draft-inspect],[data-fuse-unit],[data-aug-unit],[data-draft-confirm],[data-draft-clear],[data-concede-round],[data-forfeit],[data-keep],[data-augfuse],[data-avatar-pick],[data-avatar-set],[data-avatar-close]");
+
+  if (claimForm) { // the "save your account" modal is up — only its controls respond
+    const t = e.target as HTMLElement;
+    if (t.closest("[data-claim-cancel]") || t.classList.contains("overlay")) { claimForm = null; renderSetupScreen(); return; }
+    if (t.closest("[data-claim-submit]") && !claimForm.busy) {
+      const val = (sel: string) => (app.querySelector<HTMLInputElement>(sel)?.value ?? "").trim();
+      const uname = val("[data-claim-username]"), pass = val("[data-claim-password]");
+      claimForm = { busy: true }; renderSetupScreen();
+      const id = identity();
+      void (async () => {
+        const r = await claimAccount(id.playerId, id.secret, uname, pass); // keeps the same identity; adds a login
+        if (r.ok) { profile = r.creds.profile; claimForm = null; renderSetupScreen(); }
+        else { claimForm = { error: r.error }; renderSetupScreen(); }
+      })();
+    }
+    return; // swallow other clicks (the inputs still focus normally)
+  }
+  const el = (e.target as HTMLElement).closest<HTMLElement>("[data-login],[data-register],[data-guest],[data-login-mode],[data-logout],[data-claim-open],[data-owner],[data-skill],[data-target],[data-cancel],[data-resolve],[data-surrender],[data-pick],[data-inspect],[data-reroll],[data-start],[data-quick],[data-ranked],[data-quick-cancel],[data-plus],[data-minus],[data-energy-confirm],[data-energy-cancel],[data-draft-inspect],[data-fuse-unit],[data-aug-unit],[data-draft-confirm],[data-draft-clear],[data-concede-round],[data-forfeit],[data-keep],[data-augfuse],[data-avatar-pick],[data-avatar-set],[data-avatar-close]");
   if (!el) return;
   const d = el.dataset;
+
+  if (d.logout) { logout(); return; } // sign out → back to the login screen
+  if (d.claimOpen) { claimForm = {}; renderSetupScreen(); return; } // a guest opens the "save your account" modal
+
+  if (screen === "login") { // the pre-character-select login screen — only its controls respond
+    if (d.loginMode) { loginState = { mode: d.loginMode === "register" ? "register" : "login" }; renderLoginScreen(); return; }
+    if (d.guest) { void enterSetup(); return; } // continue as guest (identity() mints/keeps a guest id)
+    if ((d.login || d.register) && !loginState.busy) {
+      const val = (sel: string) => (app.querySelector<HTMLInputElement>(sel)?.value ?? "").trim();
+      const uname = val("[data-username-input]"), pass = val("[data-password-input]"), nm = val("[data-name-input]");
+      const wantRegister = !!d.register;
+      loginState = { ...loginState, busy: true, error: undefined }; renderLoginScreen();
+      void (async () => {
+        const r = wantRegister ? await register(uname, pass, nm || uname) : await login(uname, pass);
+        if (r.ok) {
+          setStoredIdentity(r.creds.playerId, r.creds.secret);
+          setStoredName(r.creds.profile.name);
+          if (r.creds.profile.avatar) setAvatarFileLocal(r.creds.profile.avatar);
+          profile = r.creds.profile;
+          await enterSetup();
+        } else { loginState = { mode: loginState.mode, error: r.error }; renderLoginScreen(); }
+      })();
+    }
+    return; // swallow any other click while the login screen is up
+  }
 
   if (d.quickCancel) { cancelQuickMatch(); return; } // leave the Quick Match queue (searching screen)
 
@@ -765,7 +847,9 @@ function handleServerMsg(msg: ServerMsg): void {
 // Rename: committing the profile-bar name input stores it and re-verifies with the server.
 app.addEventListener("change", (e) => {
   const t = e.target as HTMLElement;
-  if (t instanceof HTMLInputElement && t.hasAttribute("data-name-input")) {
+  // Only the team-select rename field commits a name; on the login screen the name input is part of the
+  // register form and must NOT prematurely create/auth a guest profile.
+  if (screen === "setup" && t instanceof HTMLInputElement && t.hasAttribute("data-name-input")) {
     setStoredName(t.value.trim() || "Guest");
     void refreshProfile();
   }

@@ -509,7 +509,42 @@ const RIGHT_ROWS = [
 ];
 const ROSTER_ORDER = [...LEFT_ROWS.flat(), ...RIGHT_ROWS.flat()];
 
-export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: string | null; augfuse?: boolean }, player: { name: string; sub: string; avatar: string }): string {
+/** The pre-character-select login screen: log in / register / continue as guest, over the menu backdrop. */
+export function renderLogin(s: { mode: "login" | "register"; error?: string; busy?: boolean }): string {
+  const reg = s.mode === "register";
+  const dis = s.busy ? "disabled" : "";
+  return `<div class="cs login-scene"><div class="login-card">
+    <div class="login-title">Element Arena</div>
+    <div class="login-sub">${reg ? "Create your account" : "Log in to play"}</div>
+    <input class="login-input" data-username-input placeholder="Username" autocomplete="username" maxlength="20" ${dis} />
+    ${reg ? `<input class="login-input" data-name-input placeholder="Display name (optional)" maxlength="${MAX_NAME_LEN}" ${dis} />` : ""}
+    <input class="login-input" data-password-input type="password" placeholder="Password" autocomplete="${reg ? "new-password" : "current-password"}" ${dis} />
+    ${s.error ? `<div class="login-error">${esc(s.error)}</div>` : ""}
+    <button class="login-primary" ${reg ? "data-register=\"1\"" : "data-login=\"1\""} ${dis}>${s.busy ? "…" : reg ? "Register" : "Log in"}</button>
+    <div class="login-toggle">${reg ? "Already have an account?" : "New here?"} <a data-login-mode="${reg ? "login" : "register"}">${reg ? "Log in" : "Create one"}</a></div>
+    <div class="login-or">or</div>
+    <button class="login-guest" data-guest="1" ${dis}>Continue as guest</button>
+  </div></div>`;
+}
+
+/** The "claim your guest account" modal: attach a username + password to the current identity so its record
+ *  and progress carry over (shown over character select for a guest who hasn't registered). */
+export function renderClaim(s: { error?: string; busy?: boolean }): string {
+  const dis = s.busy ? "disabled" : "";
+  return `<div class="overlay"><div class="modal login-card claim-modal">
+    <div class="login-title">Save your account</div>
+    <div class="login-sub">Pick a username + password to keep your progress and log in from any device — your current record carries over.</div>
+    <input class="login-input" data-claim-username placeholder="Username" autocomplete="username" maxlength="20" ${dis} />
+    <input class="login-input" data-claim-password type="password" placeholder="Password" autocomplete="new-password" ${dis} />
+    ${s.error ? `<div class="login-error">${esc(s.error)}</div>` : ""}
+    <div class="modal-foot">
+      <button class="login-primary" data-claim-submit="1" ${dis}>${s.busy ? "…" : "Save account"}</button>
+      <button class="mini" data-claim-cancel="1" ${dis}>Cancel</button>
+    </div>
+  </div></div>`;
+}
+
+export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: string | null; augfuse?: boolean }, player: { name: string; sub: string; avatar: string; username?: string }): string {
   const inspectId = setup.inspect ?? ROSTER_ORDER[0]!;
   const def = ROSTER.find((h) => h.id === inspectId)!;
   const on = setup.picked.includes(inspectId);
@@ -549,6 +584,10 @@ export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: 
         <input class="cs-uname" data-name-input maxlength="${MAX_NAME_LEN}" value="${esc(player.name)}" placeholder="Guest" title="Your display name — edit to rename" />
         <span>${esc(player.sub)}</span>
       </div>
+      ${player.username
+        ? `<span class="cs-handle" title="Logged in">@${esc(player.username)}</span>`
+        : `<button class="cs-claim" data-claim-open="1" title="Save your account so it works on any device">Save account</button>`}
+      <button class="cs-logout" data-logout="1" title="Log out">⎋</button>
     </div>
 
     <div class="cs-stage">
