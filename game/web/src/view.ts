@@ -223,31 +223,52 @@ function targetingRow(state: MatchState, incoming: Incoming[]): string {
   return `<div class="tgtrow">${icons}</div>`;
 }
 
-function heroCard(state: MatchState, u: Unit, ui: UiState, isYou: boolean, incoming: Map<string, Incoming[]>): string {
+/** The portrait column (queued-skill row, framed portrait with effects + name, HP bar). Shared by both teams. */
+function portraitCol(state: MatchState, u: Unit, ui: UiState, incoming: Map<string, Incoming[]>): string {
   const targetable = ui.phase === "plan" && !!ui.targeting && ui.legalTargets.has(u.id);
-  const essence = u.kind === "hero" && u.alive && hasEssenceIncome(u); // element glow — has an Essence charge, or is the middle hero
-  const cls = ["hero", u.alive ? "" : "dead", targetable ? "targetable" : "", essence ? "essence" : "", ui.plannedSkill.has(u.id) ? "acted" : ""].filter(Boolean).join(" ");
   const mart = u.kind === "minion" ? minionPortrait(u.name) : null;
   const portrait = u.heroId
     ? `<img class="portrait" src="${heroPortrait(u.heroId, u.fused)}" alt="${esc(u.name)}" ${IMG_FALLBACK} />`
     : mart
     ? `<img class="portrait" src="${mart}" alt="${esc(u.name)}" ${IMG_FALLBACK} />`
     : `<div class="portrait minion-art">${esc(shortName(u.name))}</div>`;
-  const pcol = `<div class="pcol">
+  return `<div class="pcol">
     ${targetingRow(state, incoming.get(u.id) ?? [])}
     <div class="frame" style="--el:${elColor(u.currentElement)}" ${targetable ? `data-target="${u.id}"` : ""}>${portrait}${effectIcons(state, u)}<div class="name">${esc(shortName(u.name))}</div></div>
     ${hpBar(u)}
   </div>`;
-  return `<div class="${cls}">${pcol}${isYou && u.alive ? skillTiles(state, u, ui) : ""}</div>`;
 }
 
-function sideRow(state: MatchState, side: TeamId, ui: UiState, isYou: boolean, incoming: Map<string, Incoming[]>): string {
+/** YOUR hero's element-themed action panel: the active-skill tiles (3-wide grid → 3+2) plus the passive slot. */
+function kit(state: MatchState, u: Unit, ui: UiState): string {
+  const passiveId = `${u.heroId ?? ""}${u.fused ?? ""}0`;
+  const pText = SKILL_TEXT[passiveId];
+  const pIc = iconOf(passiveId, u.heroId ?? undefined);
+  const pTip = pText ? `${pText.n}${pText.d ? ` — ${pText.d}` : ""}` : "Passive";
+  const passive = `<div class="kit-passive" title="${esc(pTip)}">
+    ${pIc ? `<img src="${pIc}" alt="passive" ${IMG_FALLBACK} />` : `<span class="tile-abbr">P</span>`}<span class="kit-tag">Passive</span></div>`;
+  return `<div class="kit" style="--el:${elColor(u.currentElement)}">${skillTiles(state, u, ui)}${passive}</div>`;
+}
+
+/** One hero in the vertical column: a framed portrait, plus (for YOUR living heroes) the skill kit beside it. */
+function unitRow(state: MatchState, u: Unit, ui: UiState, isYou: boolean, incoming: Map<string, Incoming[]>): string {
+  const targetable = ui.phase === "plan" && !!ui.targeting && ui.legalTargets.has(u.id);
+  const essence = u.kind === "hero" && u.alive && hasEssenceIncome(u); // element glow — has an Essence charge, or is the middle hero
+  const cls = ["unit", isYou ? "mine" : "enemy", u.alive ? "" : "dead", targetable ? "targetable" : "", essence ? "essence" : "", ui.plannedSkill.has(u.id) ? "acted" : ""].filter(Boolean).join(" ");
+  // Heroes get the full element-themed kit (skill tiles + passive slot); a controllable minion gets only its
+  // bare skill tiles (no passive — minions have none, and their heroId is null so a passive id is meaningless).
+  const controls = isYou && u.alive ? (u.kind === "hero" ? kit(state, u, ui) : skillTiles(state, u, ui)) : "";
+  return `<div class="${cls}">${portraitCol(state, u, ui, incoming)}${controls}</div>`;
+}
+
+/** A whole team stacked vertically: heroes (then any minions), each as a unitRow. */
+function teamColumn(state: MatchState, side: TeamId, ui: UiState, isYou: boolean, incoming: Map<string, Incoming[]>): string {
   const units = state.teams[side].units.map((id) => state.units[id]).filter((u): u is Unit => !!u);
   const heroes = units.filter((u) => u.kind === "hero");
   const minions = units.filter((u) => u.kind === "minion");
-  return `<div class="lane ${isYou ? "you" : "foe"}">
-    <div class="heroes">${heroes.map((u) => heroCard(state, u, ui, isYou, incoming)).join("")}</div>
-    ${minions.length ? `<div class="minions">${minions.map((u) => heroCard(state, u, ui, isYou, incoming)).join("")}</div>` : ""}
+  return `<div class="teamcol ${isYou ? "you" : "foe"}">
+    <div class="units">${heroes.map((u) => unitRow(state, u, ui, isYou, incoming)).join("")}</div>
+    ${minions.length ? `<div class="units minions">${minions.map((u) => unitRow(state, u, ui, isYou, incoming)).join("")}</div>` : ""}
   </div>`;
 }
 
@@ -420,9 +441,9 @@ export function renderApp(state: MatchState, ui: UiState): string {
     ? `<div style="position:fixed;top:0;left:0;right:0;z-index:60;background:#6b2b3a;color:#fff;text-align:center;padding:6px 10px;font-size:14px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.4)">${esc(ui.notice)}</div>`
     : "";
   return `<div class="arena">
-    ${sideRow(state, foe, ui, false, incoming)}
+    ${teamColumn(state, ui.you, ui, true, incoming)}
     ${midbar(state, ui)}
-    ${sideRow(state, ui.you, ui, true, incoming)}
+    ${teamColumn(state, foe, ui, false, incoming)}
   </div>${notice}${ui.energyPanel ? energyPanel(ui) : ""}${ui.draft ? draftPanel(state, ui) : ""}${ui.overlay ?? ""}`;
 }
 
