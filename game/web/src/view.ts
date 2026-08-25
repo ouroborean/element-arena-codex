@@ -293,7 +293,7 @@ function energyPool(state: MatchState, ui: UiState): string {
   const chips = [...els].sort((a, b) => elementRank(a) - elementRank(b) || a.localeCompare(b))
     .map((el) => {
       const have = pool[el] ?? 0, left = Math.max(0, have - usedOf(el)), spent = have - left;
-      return `<span class="ep-chip" title="${esc(el)}${spent > 0 ? ` — ${spent} committed of ${have}` : ""}"><img class="ep-ic" src="${energyIcon(el)}" alt="${esc(el)}" ${IMG_FALLBACK} /><span class="ep-n${spent > 0 ? " spent" : ""}">${left}</span></span>`;
+      return `<span class="ep-chip" title="${esc(el)}${spent > 0 ? ` — ${spent} committed of ${have}` : ""}"><img class="ep-ic" src="${energyIcon(el)}" alt="${esc(el)}" ${IMG_FALLBACK} /><span class="ep-el">${esc(el)}</span><span class="ep-n${spent > 0 ? " spent" : ""}">${left}</span></span>`;
     }).join("");
   // The single "how much can I still spend" number: the whole pool minus everything queued this turn reserves.
   const total = Math.max(0, poolTotal(pool) - reservationTotal(reserved));
