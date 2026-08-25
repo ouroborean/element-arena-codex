@@ -304,8 +304,8 @@ function energyPool(state: MatchState, ui: UiState): string {
   const top = specific.map((el) => chip(el, reserved.specific[el] ?? 0)).join("");
   const total = Math.max(0, poolTotal(pool) - reservationTotal(reserved));
   const totalChip = `<span class="ep-chip ep-total" title="total unallocated energy this turn"><span class="ep-el">Total</span><span class="ep-n">${total}</span></span>`;
-  // Bottom row = generic + the running Total.
-  return `<div class="epool"><div class="ep-row">${top}</div><div class="ep-row">${chip("generic", reserved.generic)}${totalChip}</div></div>`;
+  // Bottom row = generic + the running Total. A labelled border marks it out as a key resource panel.
+  return `<div class="epool"><span class="ep-legend">Energy Pool</span><div class="ep-row">${top}</div><div class="ep-row">${chip("generic", reserved.generic)}${totalChip}</div></div>`;
 }
 
 /** A player's identity chip for the top bar: avatar, name, and round score. (Only the local player has an
