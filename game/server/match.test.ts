@@ -11,9 +11,10 @@ import "../engine/content/custom_effects.ts";
 import "../engine/content/fusion_effects.ts";
 import "../engine/content/augment_effects.ts";
 import { defaultPolicy } from "../engine/content/match.ts";
-import type { TeamId } from "../engine/src/types.ts";
+import { pendingTicks, type Action } from "../engine/src/scheduler.ts";
+import type { MatchState, TeamId } from "../engine/src/types.ts";
 import { Match, filterTurnActions, type MatchClient } from "./session.ts";
-import type { ServerMsg } from "../net/protocol.ts";
+import type { ServerMsg, WireTurnOrder } from "../net/protocol.ts";
 
 const tick = (ms = 5) => new Promise((r) => setTimeout(r, ms));
 
@@ -47,10 +48,16 @@ class Double implements MatchClient {
     // Reply on a microtask: the match sets pendingTurn AFTER this synchronous send returns.
     if (msg.t === "yourTurn" || (msg.t === "resumed" && msg.control === "turn")) {
       const state = msg.state;
-      queueMicrotask(() => this.match.handleMessage(this, { t: "turn", actions: defaultPolicy(state, this.side!) }));
+      queueMicrotask(() => this.match.handleMessage(this, { t: "turn", ...this.turnFor(state) }));
     } else if (msg.t === "yourDraft") {
       queueMicrotask(() => this.match.handleMessage(this, { t: "draftChoice", choices: [] }));
     }
+  }
+
+  /** The committed turn this player sends — actions (+ an optional explicit resolution order). Overridable so a
+   *  test can drive networked interleave orders; the default just auto-attacks. */
+  turnFor(state: MatchState): { actions: Action[]; order?: WireTurnOrder } {
+    return { actions: defaultPolicy(state, this.side!) };
   }
 
   got(t: ServerMsg["t"]): ServerMsg[] {
@@ -93,6 +100,38 @@ test("a full Quick Match plays to a decisive winner and both players are told th
   assert.notEqual(aEnd!.outcome.winner, null, "there is a decisive winner (no stalemate)");
   assert.equal(aEnd!.outcome.winner, bEnd!.outcome.winner, "both are told the same winning side");
   assert.equal(aEnd!.you, aStart.you, "each matchEnd carries that player's own side");
+});
+
+test("networked interleave: turns carrying an explicit tick/skill order resolve through a full match to a clean, consistent end", async () => {
+  // A sends, on every turn that has pending dot/regen ticks, an order that interleaves those ticks BEFORE its
+  // skills — exercising the server's wire → rebuildTurnOrder → state.turnOrder → resolveTurn seam over a real,
+  // deterministic (seeded) match. pyrrha lays Affliction dots, so pending ticks genuinely arise.
+  class Interleaver extends Double {
+    interleaved = 0;
+    turnFor(state: MatchState): { actions: Action[]; order?: WireTurnOrder } {
+      const actions = defaultPolicy(state, this.side!);
+      const ticks = pendingTicks(state, this.side!);
+      if (!ticks.length) return { actions };
+      this.interleaved++;
+      const order: WireTurnOrder = [
+        ...ticks.map((t) => ({ kind: "tick" as const, unit: t.unitId, name: t.status.name, by: t.status.appliedBy, regen: t.status.kind === "regen" })),
+        ...actions.map(() => ({ kind: "action" as const })),
+      ];
+      return { actions, order };
+    }
+  }
+  const a = new Interleaver(["pyrrha", "jarrik", "gommar"]);
+  const b = new Double(["ando", "syl", "riverdaughter"]);
+  const draftLog: DraftEvent[] = [];
+  a.draftLog = b.draftLog = draftLog;
+  const match = new Match(a, b, 12345, { turnMs: 40, draftMs: 40, graceMs: 5000 });
+  a.match = match; b.match = match;
+  await match.run();
+
+  const aEnd = a.end(), bEnd = b.end();
+  assert.ok(aEnd && bEnd, "both players received matchEnd (the interleave never desynced or crashed the match)");
+  assert.equal(aEnd!.outcome.winner, bEnd!.outcome.winner, "both are told the same outcome");
+  assert.ok(a.interleaved > 0, "at least one turn actually carried an interleaved tick order (else the seam went untested)");
 });
 
 test("a silent player is auto-held every turn, and the active opponent wins", async () => {

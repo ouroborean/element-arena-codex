@@ -19,7 +19,7 @@ import { energyIcon, elementRank, avatarUrl } from "./assets.ts";
 import { ELEMENT_BY_ID } from "./elementid.generated.ts";
 import { cbEnabled, cbEnergyEl, toggleColorblind } from "./colorblind.ts";
 import { MatchSocket, serverUrl, fetchProfile, fetchAvatars, register, login, claimAccount, saveProfile, type AvatarInfo } from "./net.ts";
-import { PROTOCOL_VERSION, MAX_NAME_LEN, type ServerMsg, type Profile } from "../../net/protocol.ts";
+import { PROTOCOL_VERSION, MAX_NAME_LEN, type ServerMsg, type Profile, type WireTurnOrder } from "../../net/protocol.ts";
 
 export interface UiState {
   you: TeamId;
@@ -654,10 +654,10 @@ function defaultAlloc(generic: number, avail: Record<string, number>): Record<st
 
 // ── end-of-turn resolution order (bot matches) ──────────────────────────────────────────────────────── //
 /** Open the resolution-order panel: the queued skills plus this turn's pending dot/regen ticks, arranged in
- *  their default resolution order (all skills, then ticks). PvP keeps the direct flow (server-authoritative;
- *  interleaving is a follow-up). With nothing to resolve, commit straight through. */
+ *  their default resolution order (all skills, then ticks). Works in bot AND networked play — in PvP the
+ *  chosen order rides along on the committed turn and the authoritative server re-resolves it. With nothing
+ *  to resolve, commit straight through. */
 function openResolveOrder(): void {
-  if (pvp) { commitTurn(); return; }
   const actions = [...ui.planned.values()];
   const ticks = pendingTicks(state, ui.you);
   const items: OrderItem[] = [
@@ -690,6 +690,16 @@ function isCanonicalOrder(items: OrderItem[]): boolean {
   return arranged.every((s, i) => s === natural[i]);
 }
 
+/** Convert the local interleave order (Status refs) to the wire form the server re-resolves: each action item
+ *  becomes a "next action" marker; each tick carries its bearer + status identity, which the server matches
+ *  against its OWN recomputed pending ticks (it never trusts a client-named tick). */
+function toWireOrder(order: TurnResolutionItem[]): WireTurnOrder {
+  return order.map((it) =>
+    it.kind === "action"
+      ? { kind: "action" as const }
+      : { kind: "tick" as const, unit: it.unitId, name: it.status.name, by: it.status.appliedBy, regen: it.status.kind === "regen" });
+}
+
 /** Confirm the resolution order → build the ordered actions (+ an explicit interleave order only when the
  *  player actually reordered ticks among skills), then continue into the normal energy/commit flow. */
 function confirmResolveOrder(): void {
@@ -719,9 +729,10 @@ function commitTurn(actions: Action[] = [...ui.planned.values()]): void {
 }
 
 function finalizeTurn(actions: Action[], alloc: Record<string, number> | undefined): void {
-  if (pvp) { // networked: hand the committed turn to the authoritative server, then wait for its next state
-    pendingTurnOrder = undefined; // interleave is bot-only for now (server resolves its own order)
-    pvp.sock.send({ t: "turn", actions, genericPay: alloc });
+  if (pvp) { // networked: hand the committed turn (+ any explicit interleave) to the authoritative server
+    const order = pendingTurnOrder ? toWireOrder(pendingTurnOrder) : undefined;
+    pendingTurnOrder = undefined;
+    pvp.sock.send({ t: "turn", actions, genericPay: alloc, order });
     pvpBusy("Waiting for opponent…");
     return;
   }
