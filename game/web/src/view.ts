@@ -18,6 +18,7 @@ import { SKILL_TEXT } from "./skilltext.generated.ts";
 import { STATUS_SOURCE } from "./statussource.generated.ts";
 import { ELEMENT_BY_ID } from "./elementid.generated.ts";
 import { HERO_META } from "./herometa.generated.ts";
+import { cbEnabled, cbEnergyHtml } from "./colorblind.ts";
 import { EFFECT_DESC, EFFECT_VARIANT, EFFECT_HIDE } from "./effectdesc.generated.ts";
 import { MAX_NAME_LEN } from "../../net/protocol.ts";
 import type { UiState } from "./main.ts";
@@ -32,7 +33,8 @@ function descHtml(text: string): string {
   return text.split(/(\[\d+\])/).map((part) => {
     const m = /^\[(\d+)\]$/.exec(part);
     const el = m ? ELEMENT_BY_ID[+m[1]!] : undefined;
-    return el ? `<img class="tt-en" src="${energyIcon(el)}" alt="${esc(el)}" title="${esc(el)}" ${IMG_FALLBACK} />` : esc(part);
+    if (!el) return esc(part);
+    return cbEnabled() ? cbEnergyHtml(el) : `<img class="tt-en" src="${energyIcon(el)}" alt="${esc(el)}" title="${esc(el)}" ${IMG_FALLBACK} />`;
   }).join("");
 }
 
@@ -170,7 +172,7 @@ function hpBar(u: Unit): string {
 
 /** A skill's cost as a row of energy icons — one per unit, specific (element) then generic, no numbers/words. */
 function costIcons(cost: { generic: number; specific: number }, element: string): string {
-  const pip = (el: string) => `<img class="cost-ic" src="${energyIcon(el)}" alt="${esc(el)}" title="${esc(el)}" ${IMG_FALLBACK} />`;
+  const pip = (el: string) => cbEnabled() ? cbEnergyHtml(el, "cb-cost") : `<img class="cost-ic" src="${energyIcon(el)}" alt="${esc(el)}" title="${esc(el)}" ${IMG_FALLBACK} />`;
   const icons = element && cost.specific > 0 ? pip(element).repeat(cost.specific) : "";
   const gen = cost.generic > 0 ? pip("generic").repeat(cost.generic) : "";
   const all = icons + gen;
@@ -324,7 +326,8 @@ function energyPool(state: MatchState, ui: UiState): string {
   // Each present type as [symbol] × [number], the number decremented live by what this turn's plan reserves.
   const chip = (el: string, reservedAmt: number) => {
     const have = pool[el] ?? 0, left = Math.max(0, have - reservedAmt), spent = have - left;
-    return `<span class="ep-chip" title="${esc(el)}${spent > 0 ? ` — ${spent} committed of ${have}` : ""}"><img class="ep-ic" src="${energyIcon(el)}" alt="${esc(el)}" ${IMG_FALLBACK} /><span class="ep-x">×</span><span class="ep-n${spent > 0 ? " spent" : ""}">${left}</span></span>`;
+    const glyph = cbEnabled() ? cbEnergyHtml(el, "cb-pool") : `<img class="ep-ic" src="${energyIcon(el)}" alt="${esc(el)}" ${IMG_FALLBACK} />`;
+    return `<span class="ep-chip" title="${esc(el)}${spent > 0 ? ` — ${spent} committed of ${have}` : ""}">${glyph}<span class="ep-x">×</span><span class="ep-n${spent > 0 ? " spent" : ""}">${left}</span></span>`;
   };
   const top = specific.map((el) => chip(el, reserved.specific[el] ?? 0)).join("");
   const total = Math.max(0, poolTotal(pool) - reservationTotal(reserved));
@@ -400,7 +403,7 @@ function energyPanel(ui: UiState): string {
   const rows = colors.map((c) => {
     const have = p.avail[c] ?? 0, put = p.alloc[c] ?? 0;
     return `<div class="alloc-row">
-      <img class="ep-ic" src="${energyIcon(c)}" alt="${esc(c)}" title="${esc(c)}" ${IMG_FALLBACK} />
+      ${cbEnabled() ? cbEnergyHtml(c, "cb-pool") : `<img class="ep-ic" src="${energyIcon(c)}" alt="${esc(c)}" title="${esc(c)}" ${IMG_FALLBACK} />`}
       <span class="ac-el">${esc(c)}</span><span class="ac-avail">${have} available</span>
       <span class="ac-step"><button class="step" data-minus="${c}" ${put <= 0 ? "disabled" : ""}>−</button>
         <span class="ac-n">${put}</span>
@@ -609,6 +612,7 @@ export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: 
       ${player.username
         ? `<span class="cs-handle" title="Logged in">@${esc(player.username)}</span>`
         : `<button class="cs-claim" data-claim-open="1" title="Save your account so it works on any device">Save account</button>`}
+      <button class="cs-cb ${cbEnabled() ? "on" : ""}" data-cb-toggle="1" aria-pressed="${cbEnabled()}" title="Colorblind mode — replace energy icons with coloured [Element] text labels">Colorblind${cbEnabled() ? " ✓" : ""}</button>
       <button class="cs-logout" data-logout="1" title="Log out">⎋</button>
     </div>
 

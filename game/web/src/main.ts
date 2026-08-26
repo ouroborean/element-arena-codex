@@ -17,6 +17,7 @@ import { poolFor } from "../../client/targeting.ts";
 import { renderApp, renderSetup, renderLogin, renderClaim } from "./view.ts";
 import { energyIcon, elementRank, avatarUrl } from "./assets.ts";
 import { ELEMENT_BY_ID } from "./elementid.generated.ts";
+import { cbEnabled, cbEnergyEl, toggleColorblind } from "./colorblind.ts";
 import { MatchSocket, serverUrl, fetchProfile, fetchAvatars, register, login, claimAccount, saveProfile, type AvatarInfo } from "./net.ts";
 import { PROTOCOL_VERSION, MAX_NAME_LEN, type ServerMsg, type Profile } from "../../net/protocol.ts";
 
@@ -183,9 +184,8 @@ function renderTokens(el: HTMLElement, text: string): void {
     const curly = /^\{([a-z]+)\}$/i.exec(part), brack = /^\[(\d+)\]$/.exec(part);
     const name = curly ? curly[1]!.toLowerCase() : brack ? ELEMENT_BY_ID[+brack[1]!] : undefined;
     if (name) {
-      const img = document.createElement("img");
-      img.className = "tt-en"; img.src = energyIcon(name); img.alt = name;
-      el.append(img);
+      if (cbEnabled()) el.append(cbEnergyEl(name));
+      else { const img = document.createElement("img"); img.className = "tt-en"; img.src = energyIcon(name); img.alt = name; el.append(img); }
     } else if (part) el.append(document.createTextNode(part));
   }
 }
@@ -213,7 +213,10 @@ function showSkpop(el: HTMLElement): void {
   const name = document.createElement("b"); name.textContent = d.skname ?? "";
   const meta = document.createElement("div"); meta.className = "skpop-meta"; meta.textContent = d.skmeta ?? "";
   const spec = +(d.skspec ?? 0), gen = +(d.skgen ?? 0), cel = d.skel || "generic";
-  const pip = (elm: string) => { const im = document.createElement("img"); im.className = "skpop-cost"; im.src = energyIcon(elm); meta.append(im); };
+  const pip = (elm: string) => {
+    if (cbEnabled()) { meta.append(cbEnergyEl(elm, "cb-cost")); return; }
+    const im = document.createElement("img"); im.className = "skpop-cost"; im.src = energyIcon(elm); meta.append(im);
+  };
   for (let i = 0; i < spec; i++) pip(cel);
   for (let i = 0; i < gen; i++) pip("generic");
   const desc = document.createElement("div"); desc.className = "skpop-desc"; renderTokens(desc, d.skdesc || "No description.");
@@ -415,12 +418,13 @@ app.addEventListener("click", (e) => {
     }
     return; // swallow other clicks (the inputs still focus normally)
   }
-  const el = (e.target as HTMLElement).closest<HTMLElement>("[data-login],[data-register],[data-guest],[data-login-mode],[data-logout],[data-claim-open],[data-owner],[data-skill],[data-target],[data-cancel],[data-resolve],[data-surrender],[data-pick],[data-inspect],[data-reroll],[data-start],[data-quick],[data-ranked],[data-quick-cancel],[data-plus],[data-minus],[data-energy-confirm],[data-energy-cancel],[data-draft-inspect],[data-fuse-unit],[data-aug-unit],[data-draft-confirm],[data-draft-clear],[data-concede-round],[data-forfeit],[data-keep],[data-augfuse],[data-avatar-pick],[data-avatar-set],[data-avatar-close]");
+  const el = (e.target as HTMLElement).closest<HTMLElement>("[data-login],[data-register],[data-guest],[data-login-mode],[data-logout],[data-claim-open],[data-owner],[data-skill],[data-target],[data-cancel],[data-resolve],[data-surrender],[data-pick],[data-inspect],[data-reroll],[data-start],[data-quick],[data-ranked],[data-quick-cancel],[data-plus],[data-minus],[data-energy-confirm],[data-energy-cancel],[data-draft-inspect],[data-fuse-unit],[data-aug-unit],[data-draft-confirm],[data-draft-clear],[data-concede-round],[data-forfeit],[data-keep],[data-augfuse],[data-avatar-pick],[data-avatar-set],[data-avatar-close],[data-cb-toggle]");
   if (!el) return;
   const d = el.dataset;
 
   if (d.logout) { logout(); return; } // sign out → back to the login screen
   if (d.claimOpen) { claimForm = {}; renderSetupScreen(); return; } // a guest opens the "save your account" modal
+  if (d.cbToggle) { toggleColorblind(); if (setup) renderSetupScreen(); else render(); return; } // accessibility: energy icons ⇄ coloured [Element] labels
 
   if (screen === "login") { // the pre-character-select login screen — only its controls respond
     if (d.loginMode) { loginState = { mode: d.loginMode === "register" ? "register" : "login" }; renderLoginScreen(); return; }

@@ -255,6 +255,15 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .tt-en { display: inline-block; width: 1.2em; height: 1.2em; vertical-align: -0.22em; margin: 0 1px; border-radius: var(--radius); object-fit: cover; }
 .fxpop .tt-en { width: 14px; height: 14px; border-radius: var(--radius); vertical-align: -2px; margin: 0 1px; object-fit: cover; }
 
+/* Colorblind mode: energy icons become coloured [Element] text labels. The element colour is applied inline
+   (style="color:…"), with a per-colour contrast halo (--halo) so even dark colours (shadow, water) stay
+   legible on the dark board. Sizes: .82em (text-relative) in descriptions; fixed px for cost/pool chips. */
+.cb-en { display: inline-block; font-weight: 700; font-size: .82em; line-height: 1.15; white-space: nowrap;
+  vertical-align: baseline; margin: 0 1px; padding: 0 3px; border-radius: var(--radius);
+  background: rgba(232, 235, 242, .10); text-shadow: 0 0 1px var(--halo), 0 0 2px var(--halo); }
+.cb-en.cb-cost { font-size: 11px; }
+.cb-en.cb-pool { font-size: 12px; }
+
 /* ── skill detail (shown IN the midbar while targeting — never over a portrait) ── */
 .skillpanel { display: flex; gap: 11px; align-items: flex-start; text-align: left; }
 .sp-icon { width: 46px; height: 46px; flex: 0 0 46px; border-radius: var(--radius); object-fit: cover; background: var(--panel2); border: 1px solid var(--acc); }
@@ -285,7 +294,7 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .energy-modal h2 { text-align: center; }
 .energy-modal p { text-align: center; font-size: 12.5px; line-height: 1.5; }
 .alloc-rows { display: flex; flex-direction: column; gap: 6px; margin: 4px 0 12px; }
-.alloc-row { display: grid; grid-template-columns: 20px 1fr auto auto; align-items: center; gap: 9px; background: var(--panel2); border: 1px solid var(--line); border-radius: var(--radius); padding: 6px 10px; }
+.alloc-row { display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: 9px; background: var(--panel2); border: 1px solid var(--line); border-radius: var(--radius); padding: 6px 10px; } /* col 1 = auto so it fits either the 20px icon or a wider [Element] colorblind label */
 .alloc-row .ep-ic { width: 20px; height: 20px; }
 .ac-el { font-size: 12.5px; font-weight: 600; text-transform: capitalize; }
 .ac-avail { color: var(--dim); font-size: 11px; }
@@ -383,6 +392,11 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .cs-claim { align-self: center; padding: 4px 10px; font: inherit; font-size: 11px; font-weight: 700; color: var(--acc); background: transparent; border: 1px solid color-mix(in srgb, var(--acc) 55%, var(--line)); border-radius: var(--radius); cursor: pointer; white-space: nowrap; }
 .cs-claim:hover { background: color-mix(in srgb, var(--acc) 14%, transparent); }
 .cs-handle { align-self: center; color: var(--dim); font-size: 11px; font-weight: 700; }
+/* colorblind-mode toggle in the profile bar — a small pill, accent-filled when on */
+.cs-cb { align-self: center; padding: 4px 9px; font: inherit; font-size: 11px; font-weight: 700; color: var(--dim);
+  background: transparent; border: 1px solid var(--line); border-radius: var(--radius); cursor: pointer; white-space: nowrap; }
+.cs-cb:hover { color: var(--ink); border-color: color-mix(in srgb, var(--acc) 45%, var(--line)); }
+.cs-cb.on { color: var(--acc); border-color: color-mix(in srgb, var(--acc) 60%, var(--line)); background: color-mix(in srgb, var(--acc) 14%, transparent); }
 .claim-modal { gap: 12px; text-align: left; }
 .claim-modal .login-sub { text-align: left; }
 
