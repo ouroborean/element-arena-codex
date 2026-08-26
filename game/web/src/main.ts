@@ -233,7 +233,7 @@ function renderSetupScreen(): void { app.innerHTML = renderSetup(setup!, playerP
 /** Open team select, optionally pre-seeded with an already-chosen team (e.g. after cancelling matchmaking). */
 function showSetup(picked: string[] = []): void {
   const keep = picked.slice(0, 3);
-  setup = { picked: keep, oppo: randomTeam(keep), inspect: keep[0] ?? null };
+  setup = { picked: keep, oppo: randomTeam(keep), inspect: null }; // nothing selected on load — the player clicks a hero to inspect it
   renderSetupScreen();
 }
 /** Scale + recentre the (fixed-width) character-select scene to fit narrow windows, so it never runs off the
@@ -257,6 +257,9 @@ function fitCharSelect(): void {
   stage.style.transform = `translateX(${dx}px) scale(${s})`;
 }
 window.addEventListener("resize", () => { if (setup) fitCharSelect(); });
+// <img>s are natively draggable — a few px of mouse movement while clicking a button starts a native image
+// drag and swallows the click, making the icon/character buttons hard to press. Suppress it app-wide.
+window.addEventListener("dragstart", (e) => { if ((e.target as Element | null)?.tagName === "IMG") e.preventDefault(); });
 
 /** The avatar chooser: a grid of every avatar in the manifest; clicking one sets it. Empty string when closed. */
 function avatarPickerHtml(): string {

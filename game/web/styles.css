@@ -18,6 +18,10 @@
 }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif; }
+/* Images are natively draggable, so a few px of mouse movement while pressing an image button starts a
+   drag and cancels the click. Disable image dragging + selection UI-wide (the cross-browser dragstart
+   guard is in main.ts). */
+img { -webkit-user-drag: none; user-select: none; -webkit-user-select: none; }
 #app { max-width: 1080px; margin: 0 auto; min-height: 100vh; padding: 10px 14px; }
 
 /* Consistent thin scrollbars everywhere (skill description, draft lists, roster grid, avatar picker, …). */
@@ -343,7 +347,10 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
   background: url(../../assets/ui/backgrounds/background.png) center top / cover no-repeat, var(--bg); }
 /* The showcase + roster rows live in a stage that JS scales-and-recentres to fit narrow windows, so the
    scene never runs off the left/right edges (see fitCharSelect). */
-.cs-stage { flex: 1; min-height: 0; display: flex; flex-direction: column; transform-origin: 0 0; }
+/* margin-top clears the absolutely-positioned top-left player card (.cs-mini, ~86px tall) so the showcase
+   below starts under it, not behind it. It's a plain margin (outside the fit-transform) so the clearance
+   holds at every scale. */
+.cs-stage { flex: 1; min-height: 0; display: flex; flex-direction: column; transform-origin: 0 0; margin-top: 76px; }
 .cs::before { content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
   background: radial-gradient(ellipse at 50% 38%, transparent 34%, #000000b0 100%); }
 .cs > * { position: relative; z-index: 1; }
@@ -400,25 +407,29 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 
 /* hero showcase: info | big art | skills */
 /* Snug, centred group — info, art and skills sit next to each other, not spread to the edges. */
-.cs-show { display: flex; justify-content: center; align-items: center; gap: 20px; padding: 8px 20px 0; margin-top: 30px; min-height: 44vh; }
+/* flex:1 + stretch makes the showcase fill all the room between the player card and the roster, and the
+   panels + portrait grow to that height (the portrait is height-driven below). */
+.cs-show { flex: 1 1 auto; display: flex; justify-content: center; align-items: center; gap: 22px; padding: 4px 20px 10px; }
+/* Shown in the showcase when no hero is selected (the load state) — a quiet prompt in place of the panels. */
+.cs-empty { flex: 1; display: flex; align-items: center; justify-content: center; color: var(--dim); font-size: 20px; font-weight: 600; letter-spacing: .3px; text-align: center; padding: 40px 20px; text-shadow: 0 2px 6px #000; }
 /* Info column on its own backing panel (matches the skill kit), so the name/element/buttons read clearly. */
-.cs-info { width: 236px; display: flex; flex-direction: column; align-items: stretch; gap: 10px; padding: 15px 16px; border-radius: var(--radius);
+.cs-info { width: 292px; display: flex; flex-direction: column; justify-content: center; align-items: stretch; gap: 16px; padding: 24px 22px; border-radius: var(--radius);
   border: 1px solid var(--line); background: linear-gradient(165deg, color-mix(in srgb, var(--panel2) 95%, transparent), color-mix(in srgb, var(--bg) 95%, transparent)); box-shadow: var(--shadow), inset 0 1px 0 #ffffff14; }
-.cs-hname { font-size: 31px; font-weight: 800; color: #fff; line-height: 1.05; text-shadow: 0 2px 6px #000, 0 0 3px #000; }
-.cs-hel { font-size: 14px; font-weight: 600; color: var(--acc); text-shadow: 0 1px 3px #000; margin-bottom: 4px; }
-.cs-abtn { width: 100%; padding: 12px 18px; font: inherit; font-weight: 700; font-size: 15px; color: #fff; cursor: pointer; text-align: center;
+.cs-hname { font-size: 38px; font-weight: 800; color: #fff; line-height: 1.05; text-shadow: 0 2px 6px #000, 0 0 3px #000; }
+.cs-hel { font-size: 17px; font-weight: 600; color: var(--acc); text-shadow: 0 1px 3px #000; margin-bottom: 4px; }
+.cs-abtn { width: 100%; padding: 15px 20px; font: inherit; font-weight: 700; font-size: 16px; color: #fff; cursor: pointer; text-align: center;
   background: linear-gradient(var(--panel2), var(--bg2)); border: 1px solid var(--line); clip-path: polygon(6% 0, 100% 0, 94% 100%, 0 100%); text-shadow: 0 1px 2px #000; }
 .cs-abtn:hover:not(:disabled) { background: linear-gradient(var(--panel2), var(--panel)); border-color: var(--acc); }
 .cs-abtn.rem { background: linear-gradient(color-mix(in srgb, var(--foe) 42%, var(--bg)), var(--bg)); border-color: color-mix(in srgb, var(--foe) 60%, #000); }
 .cs-abtn:disabled { opacity: .5; cursor: default; }
 
-.cs-art { justify-self: center; width: min(300px, 23vw); aspect-ratio: 3/3.5; border-radius: var(--radius); overflow: hidden;
+.cs-art { align-self: center; flex: none; position: relative; height: 90%; width: auto; max-width: 40vw; aspect-ratio: 500 / 731; border-radius: var(--radius); overflow: hidden;
   border: 3px solid #ffffff55; box-shadow: var(--shadow), inset 0 0 0 6px color-mix(in srgb, var(--bg2) 40%, transparent); background: var(--bg2); }
-.cs-art img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+.cs-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; display: block; }
 
 /* Skill kit — a modern card: label-left / icons-right rows, colour-coded by skill class, on a
    translucent gradient panel so the labels + art read cleanly over the background. */
-.cs-skills { width: 300px; display: flex; flex-direction: column; padding: 15px 16px; border-radius: var(--radius);
+.cs-skills { width: 360px; display: flex; flex-direction: column; justify-content: space-between; padding: 22px 20px; border-radius: var(--radius);
   border: 1px solid var(--line); background: linear-gradient(165deg, color-mix(in srgb, var(--panel2) 95%, transparent), color-mix(in srgb, var(--bg) 95%, transparent)); box-shadow: var(--shadow), inset 0 1px 0 #ffffff14; }
 .cs-sk-title { font-size: 11px; font-weight: 800; letter-spacing: 2.5px; text-transform: uppercase; color: #fff; opacity: .82; margin-bottom: 6px; }
 .cs-sk { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 10px; padding: 9px 0; }
@@ -427,7 +438,7 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .cs-sk h4::before { content: ""; width: 3px; height: 14px; border-radius: var(--radius); background: var(--sk, var(--dim)); }
 .cs-sk.passive { --sk: #aab2d6; } .cs-sk.basic { --sk: var(--acc); } .cs-sk.fusion { --sk: #c88ae8; } .cs-sk.defensive { --sk: var(--you); } .cs-sk.ultimate { --sk: var(--mid); }
 .cs-icons { display: flex; gap: 6px; }
-.cs-sicon { width: 44px; height: 44px; padding: 0; border-radius: var(--radius); overflow: hidden; border: 1px solid #ffffff26; background: var(--bg); box-shadow: var(--shadow); cursor: pointer; transition: transform .1s, border-color .1s, box-shadow .1s; }
+.cs-sicon { width: 52px; height: 52px; padding: 0; border-radius: var(--radius); overflow: hidden; border: 1px solid #ffffff26; background: var(--bg); box-shadow: var(--shadow); cursor: pointer; transition: transform .1s, border-color .1s, box-shadow .1s; }
 .cs-sicon img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .cs-sicon:hover { transform: translateY(-2px); border-color: var(--sk, var(--acc)); box-shadow: var(--shadow); }
 /* floating skill-info popup — hovers/pops off a skill icon, never affects layout */
@@ -439,7 +450,10 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .skpop-desc { color: var(--dim); font-size: 11.5px; line-height: 1.4; }
 
 /* bottom band: angled roster panels flanking the match controls */
-.cs-bottom { display: grid; grid-template-columns: 1fr minmax(320px, auto) 1fr; align-items: end; gap: 14px; margin-top: auto; }
+/* Outer columns are minmax(0,1fr) (not 1fr) so they can shrink below the roster's intrinsic width: on
+   narrow screens the rosters then overflow OUTWARD symmetrically, keeping cs-mid — and the showcase above
+   it — centred in the viewport, instead of the whole grid left-anchoring and drifting the scene sideways. */
+.cs-bottom { display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, auto) minmax(0, 1fr); align-items: end; gap: 14px; margin-top: auto; }
 .cs-roster { display: flex; flex-direction: column; justify-content: flex-end; gap: 5px; padding: 8px; }
 .cs-roster.left { transform: perspective(1500px) rotateY(13deg); transform-origin: right bottom; }
 .cs-roster.right { transform: perspective(1500px) rotateY(-13deg); transform-origin: left bottom; }
