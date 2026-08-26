@@ -16,6 +16,7 @@ import { ROSTER } from "../../engine/content/roster.generated.ts";
 import { heroPortrait, iconOf, minionPortrait, energyIcon, characterButton, elColor, ELEMENT_ORDER, elementRank } from "./assets.ts";
 import { SKILL_TEXT } from "./skilltext.generated.ts";
 import { STATUS_SOURCE } from "./statussource.generated.ts";
+import { ELEMENT_BY_ID } from "./elementid.generated.ts";
 import { EFFECT_DESC, EFFECT_VARIANT, EFFECT_HIDE } from "./effectdesc.generated.ts";
 import { MAX_NAME_LEN } from "../../net/protocol.ts";
 import type { UiState } from "./main.ts";
@@ -24,6 +25,15 @@ const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&l
 const shortName = (name: string) => name.split(",")[0]!.trim();
 const nameOf = (id: string) => shortName(ROSTER.find((h) => h.id === id)?.name ?? id);
 const IMG_FALLBACK = `onerror="this.style.visibility='hidden'"`;
+/** Render a description to HTML, turning [<element id>] energy refs (e.g. [65] = generic) into inline
+ *  energy-tooltip icons; everything else is HTML-escaped. For authored/frozen description strings. */
+function descHtml(text: string): string {
+  return text.split(/(\[\d+\])/).map((part) => {
+    const m = /^\[(\d+)\]$/.exec(part);
+    const el = m ? ELEMENT_BY_ID[+m[1]!] : undefined;
+    return el ? `<img class="tt-en" src="${energyIcon(el)}" alt="${esc(el)}" title="${esc(el)}" ${IMG_FALLBACK} />` : esc(part);
+  }).join("");
+}
 
 // Kinds NOT worth a portrait chip — pure engine plumbing, or (elemental_essence) shown as a glow instead.
 const HIDDEN_KINDS = new Set<Status["kind"]>(["conditional_bypass", "stack_read_mod", "instant_cast", "elemental_essence"]);
@@ -364,7 +374,7 @@ function skillPanel(state: MatchState, ui: UiState): string {
     ${ic ? `<img class="sp-icon" src="${ic}" ${IMG_FALLBACK} />` : ""}
     <div class="sp-body">
       <div class="sp-name">${esc(name)} <span class="sp-cost">${costEl}</span></div>
-      <div class="sp-desc">${esc(text?.d ?? "")}</div>
+      <div class="sp-desc">${descHtml(text?.d ?? "")}</div>
       <div class="sp-foot">${foot}</div>
     </div>
   </div>`;
@@ -430,7 +440,7 @@ function draftOptions(state: MatchState, u: Unit, pick?: DraftChoice): string {
         const block = (label: string, ic: string | null, name: string, desc: string) =>
           `<span class="fc-block"><span class="fc-label">${label}</span>
             <span class="fc-line">${ic ? `<img src="${ic}" ${IMG_FALLBACK} />` : ""}<b>${esc(name)}</b></span>
-            <span class="fc-desc">${esc(desc)}</span></span>`;
+            <span class="fc-desc">${descHtml(desc)}</span></span>`;
         return `<button class="do-card fusion-card${fuseOn(f.key)}" data-fuse-unit="${u.id}" data-fuse-form="${esc(f.key)}">
           <img class="fc-port" src="${heroPortrait(hid, f.key)}" ${IMG_FALLBACK} />
           <span class="fc-body">
@@ -442,7 +452,7 @@ function draftOptions(state: MatchState, u: Unit, pick?: DraftChoice): string {
     : `<div class="do-note">No fusion available — needs a teammate whose element forms a recipe.</div>`;
   const augment = augs.length
     ? augs.map((a) => `<button class="do-card${augOn(a.id)}" data-aug-unit="${u.id}" data-aug-id="${esc(a.id)}">
-        <span class="do-txt"><span class="do-name">★ ${esc(a.name)}</span><span class="do-desc">${esc(a.description)}</span></span></button>`).join("")
+        <span class="do-txt"><span class="do-name">★ ${esc(a.name)}</span><span class="do-desc">${descHtml(a.description)}</span></span></button>`).join("")
     : `<div class="do-note">All of this hero's augments are taken.</div>`;
   return `<div class="do-sec fusion"><h4>Fusion <span>(re-elements the hero, new passive + skill)</span></h4>${fusion}</div>
     <div class="do-sec augment"><h4>Augments <span>(a permanent tweak; cumulative)</span></h4>${augment}</div>`;
@@ -640,7 +650,7 @@ function augFuseModal(heroId: string): string {
   const block = (label: string, ic: string | null, name: string, meta: string, desc: string) =>
     `<span class="fc-block"><span class="fc-label">${label}</span>
       <span class="fc-line">${ic ? `<img src="${ic}" ${IMG_FALLBACK} />` : ""}<b>${esc(name)}</b></span>
-      ${meta}<span class="fc-desc">${esc(desc)}</span></span>`;
+      ${meta}<span class="fc-desc">${descHtml(desc)}</span></span>`;
   const fusion = forms.map((f) => {
     const sk = f.skill, skText = SKILL_TEXT[sk.id];
     const cd = sk.cooldown > 0 ? `${sk.cooldown}-turn cooldown` : "no cooldown";
@@ -653,7 +663,7 @@ function augFuseModal(heroId: string): string {
         ${block("New skill", iconOf(sk.id, heroId), skText?.n ?? sk.name, skMeta, skText?.d ?? "")}
       </span></div>`;
   }).join("");
-  const augment = augs.map((a) => `<div class="do-card"><span class="do-txt"><span class="do-name">★ ${esc(a.name)}</span><span class="do-desc">${esc(a.description)}</span></span></div>`).join("");
+  const augment = augs.map((a) => `<div class="do-card"><span class="do-txt"><span class="do-name">★ ${esc(a.name)}</span><span class="do-desc">${descHtml(a.description)}</span></span></div>`).join("");
   return `<div class="overlay"><div class="modal draft-modal augfuse-modal">
     <h2>${esc(shortName(def.name))} — Fusions &amp; Augments</h2>
     <p class="draft-sub">Every fusion form (one per partner element) and every augment this hero can take.</p>

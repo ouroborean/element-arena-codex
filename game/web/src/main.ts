@@ -16,6 +16,7 @@ import { autoDraft, applyDraftChoices, hasDraftOptions, draftableHeroes, type Dr
 import { poolFor } from "../../client/targeting.ts";
 import { renderApp, renderSetup, renderLogin, renderClaim } from "./view.ts";
 import { energyIcon, elementRank, avatarUrl } from "./assets.ts";
+import { ELEMENT_BY_ID } from "./elementid.generated.ts";
 import { MatchSocket, serverUrl, fetchProfile, fetchAvatars, register, login, claimAccount, saveProfile, type AvatarInfo } from "./net.ts";
 import { PROTOCOL_VERSION, MAX_NAME_LEN, type ServerMsg, type Profile } from "../../net/protocol.ts";
 
@@ -175,13 +176,15 @@ const ui: UiState = {
 const fxpop = document.createElement("div");
 fxpop.className = "fxpop"; fxpop.hidden = true;
 document.body.appendChild(fxpop);
-// Render authored text into `el`, turning {generic}/{fire}/… tokens into inline energy icons.
+// Render authored text into `el`, turning {generic}/{fire}/… name tokens AND [<id>] element-id energy
+// refs (e.g. [65] = generic) into inline energy icons; unknown ids stay as literal text.
 function renderTokens(el: HTMLElement, text: string): void {
-  for (const part of text.split(/(\{[a-z]+\})/i)) {
-    const m = /^\{([a-z]+)\}$/i.exec(part);
-    if (m) {
+  for (const part of text.split(/(\{[a-z]+\}|\[\d+\])/i)) {
+    const curly = /^\{([a-z]+)\}$/i.exec(part), brack = /^\[(\d+)\]$/.exec(part);
+    const name = curly ? curly[1]!.toLowerCase() : brack ? ELEMENT_BY_ID[+brack[1]!] : undefined;
+    if (name) {
       const img = document.createElement("img");
-      img.className = "tt-en"; img.src = energyIcon(m[1]!.toLowerCase()); img.alt = m[1]!;
+      img.className = "tt-en"; img.src = energyIcon(name); img.alt = name;
       el.append(img);
     } else if (part) el.append(document.createTextNode(part));
   }
@@ -213,7 +216,7 @@ function showSkpop(el: HTMLElement): void {
   const pip = (elm: string) => { const im = document.createElement("img"); im.className = "skpop-cost"; im.src = energyIcon(elm); meta.append(im); };
   for (let i = 0; i < spec; i++) pip(cel);
   for (let i = 0; i < gen; i++) pip("generic");
-  const desc = document.createElement("div"); desc.className = "skpop-desc"; desc.textContent = d.skdesc || "No description.";
+  const desc = document.createElement("div"); desc.className = "skpop-desc"; renderTokens(desc, d.skdesc || "No description.");
   skpop.append(name, meta, desc);
   skpop.hidden = false;
   const r = el.getBoundingClientRect(), pw = skpop.offsetWidth, ph = skpop.offsetHeight;
