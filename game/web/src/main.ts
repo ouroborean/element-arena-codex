@@ -121,7 +121,7 @@ let avatarPickerOpen = false;
 function playerAvatarFile(): string {
   const stored = (() => { try { return localStorage.getItem("arenaAvatar"); } catch { return null; } })();
   if (stored && (!avatars.length || avatars.some((a) => a.file === stored))) return stored;
-  return avatars[0]?.file ?? "";
+  return "default.png"; // new players (no chosen avatar) get the "Default" avatar
 }
 function setAvatarFile(file: string): void { try { localStorage.setItem("arenaAvatar", file); } catch { /* ignore */ } syncProfile({ avatar: file }); }
 
@@ -269,8 +269,8 @@ function avatarPickerHtml(): string {
   if (!avatarPickerOpen) return "";
   const current = playerAvatarFile();
   const cells = avatars.length
-    ? avatars.map((a) => `<button class="av-cell ${a.file === current ? "on" : ""}" data-avatar-set="${escHtml(a.file)}" title="${escHtml(a.name)}">
-        <img src="${avatarUrl(a.file)}" alt="${escHtml(a.name)}" onerror="this.style.visibility='hidden'" /></button>`).join("")
+    ? avatars.map((a) => `<button class="av-cell ${a.file === current ? "on" : ""}" data-avatar-set="${escHtml(a.file)}">
+        <img src="${avatarUrl(a.file)}" alt="" onerror="this.style.visibility='hidden'" /></button>`).join("")
     : `<div class="do-note">No avatars found. Add images to <code>assets/avatars/</code> and run <code>build_avatars.py</code>.</div>`;
   return `<div class="overlay" data-avatar-close="1"><div class="modal av-modal">
     <h2>Choose your avatar</h2>

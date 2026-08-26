@@ -17,6 +17,7 @@ import { heroPortrait, iconOf, minionPortrait, energyIcon, characterButton, elCo
 import { SKILL_TEXT } from "./skilltext.generated.ts";
 import { STATUS_SOURCE } from "./statussource.generated.ts";
 import { ELEMENT_BY_ID } from "./elementid.generated.ts";
+import { HERO_META } from "./herometa.generated.ts";
 import { EFFECT_DESC, EFFECT_VARIANT, EFFECT_HIDE } from "./effectdesc.generated.ts";
 import { MAX_NAME_LEN } from "../../net/protocol.ts";
 import type { UiState } from "./main.ts";
@@ -614,7 +615,8 @@ export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: 
     <div class="cs-stage">
     <div class="cs-show">
       ${def ? `<div class="cs-info">
-        <div class="cs-hname">${esc(shortName(def.name))}</div>
+        <div class="cs-hname">${esc(HERO_META[def.id]?.name ?? shortName(def.name))}</div>
+        ${HERO_META[def.id]?.title ? `<div class="cs-htitle">${esc(HERO_META[def.id]!.title)}</div>` : ""}
         <div class="cs-hel">${esc(cap(def.element))} Element</div>
         <button class="cs-abtn ${on ? "rem" : ""}" data-pick="${def.id}" ${!on && full ? "disabled" : ""}>${on ? "Remove Hero" : "Add to Team"}</button>
         <button class="cs-abtn" disabled title="Not available yet">Mastery</button>
