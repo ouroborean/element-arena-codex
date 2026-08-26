@@ -147,7 +147,17 @@ function effectIcons(state: MatchState, u: Unit): string {
     const abbr = `<span class="fx-abbr">${esc((s.name ?? s.kind)[0]!.toUpperCase())}</span>`;
     out.push(`<span class="fx ${tone}" data-fxtitle="${esc(title)}" data-fxbody="${esc(body)}" data-fxdur="${esc(dur)}">${abbr}${icon ? `<img src="${icon}" onerror="this.remove()" />` : ""}${s.kind === "stack" && (s.magnitude ?? 0) > 1 ? `<span class="fx-n">${s.magnitude}</span>` : ""}</span>`);
   }
-  return out.length ? `<div class="fxrow">${out.slice(0, 6).join("")}</div>` : "";
+  // Passives have no skill slot in a match, so surface each hero's CURRENT passive (base or fusion form) as a
+  // permanent, hover-describable chip — its effect is otherwise invisible mid-match.
+  const pid = u.heroId ? `${u.heroId}${u.fused ?? ""}0` : "";
+  const pt = pid ? SKILL_TEXT[pid] : undefined;
+  let passive = "";
+  if (pt?.d) {
+    const pic = iconOf(pid, u.heroId);
+    passive = `<span class="fx passive" data-fxtitle="${esc(pt.n)}" data-fxbody="${esc(pt.d)}" data-fxdur=""><span class="fx-abbr">${esc((pt.n[0] ?? "P").toUpperCase())}</span>${pic ? `<img src="${pic}" onerror="this.remove()" />` : ""}</span>`;
+  }
+  const chips = passive ? [passive, ...out] : out;
+  return chips.length ? `<div class="fxrow">${chips.slice(0, 7).join("")}</div>` : "";
 }
 
 function hpBar(u: Unit): string {

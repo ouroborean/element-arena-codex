@@ -240,6 +240,8 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .fx { position: relative; width: 22px; height: 22px; border-radius: var(--radius); overflow: hidden; border: 1px solid #000a; background: var(--panel2); cursor: help; box-shadow: var(--shadow); }
 .fx img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; } /* covers the abbr; onerror removes it -> abbr shows */
 .fx.bad { border-color: var(--foe); } .fx.good { border-color: var(--you); } .fx.state { border-color: var(--mid); }
+/* The always-on passive chip — a permanent, informational effect, marked with the accent + an inset ring. */
+.fx.passive { border-color: var(--acc); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--acc) 65%, transparent), var(--shadow); }
 .fx-abbr { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: var(--dim); }
 .fx-n { position: absolute; right: 0; bottom: 0; font-size: 9px; font-weight: 800; background: #000c; color: #fff; padding: 0 2px; border-top-left-radius: var(--radius); }
 .fxpop { position: fixed; z-index: 20; max-width: 240px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 10px; box-shadow: var(--shadow); pointer-events: none; }
