@@ -241,6 +241,13 @@ export interface Team {
   roundsWon: number;
 }
 
+/** One step of an explicitly-ordered turn resolution (the interactive interleave of the active team's queued
+ *  skills with its pending damage/heal-over-time ticks). `action` indexes the actions array handed to
+ *  resolveTurn; `tick` names one pending dot/regen (by bearer + the live Status) to apply at that point. */
+export type TurnResolutionItem =
+  | { kind: "action"; index: number }
+  | { kind: "tick"; unitId: UnitId; status: Status };
+
 export interface MatchState {
   round: number;
   /** Monotonic turn counter across the whole match. */
@@ -263,6 +270,14 @@ export interface MatchState {
    * any remainder. Set before resolving a turn; cleared by resolveTurn. Absent = the default auto order.
    */
   genericPay?: EnergyPool;
+  /** An explicit resolution order for THIS turn: the active team's queued skills and pending dot/regen ticks,
+   *  interleaved as the player arranged them (see TurnResolutionItem). Set before resolving; consumed + cleared
+   *  by resolveTurn, which then sets dotsTicked so endTurn won't re-tick. Absent = the default order (all skills
+   *  in submission order, then tickDots at turn-end). */
+  turnOrder?: TurnResolutionItem[];
+  /** Set by resolveTurn when it already applied this turn's dot/regen ticks (an interleaved turnOrder); endTurn
+   *  reads it to skip its own tickDots. Cleared at the next startTurn so it never bleeds across turns/rounds. */
+  dotsTicked?: boolean;
   /** The turn value at which the CURRENT round began (set by startRound). The active team's opening turn of a
    *  round is `turn === roundStartTurn`; the player who goes first that round gets reduced opening income. */
   roundStartTurn?: number;
