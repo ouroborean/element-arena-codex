@@ -15,12 +15,14 @@ import os
 HERE = os.path.dirname(os.path.abspath(__file__))
 AVATAR_DIR = os.path.normpath(os.path.join(HERE, "..", "..", "..", "assets", "avatars"))
 EXTS = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg"}
+SKIP_STEMS = {"empty"}  # blank/utility placeholders, not selectable avatars
 
 
 def main():
     files = sorted(
         f for f in os.listdir(AVATAR_DIR)
         if os.path.splitext(f)[1].lower() in EXTS
+        and os.path.splitext(f)[0].lower() not in SKIP_STEMS
     )
     manifest = [
         {"file": f, "name": os.path.splitext(f)[0].replace("_", " ").replace("-", " ").title()}

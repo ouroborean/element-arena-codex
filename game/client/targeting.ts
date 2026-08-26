@@ -35,11 +35,15 @@ export function poolFor(state: MatchState, u: Unit, skill: SkillInstance): Unit[
   //  - Mountain Rescue Team (syl "winter"): the Eagle's Swoop may target a stunned ally (for invuln).
   const merciless = skill.id === "blackknight1" && u.fused === "evil";
   const swoopRescue = skill.id === "sylminion2" && state.units[u.summoner ?? ""]?.fused === "winter";
+  // Roland's "Strength From The Earth" targets an enemy OR one of his ally Boulders (which it launches).
+  const rolandLaunch = skill.id === "roland1";
 
   const pool = merciless
     ? [...enemies(), ...allies().filter((x) => x.kind === "hero" && x.id !== u.id)]
     : swoopRescue
     ? [...enemies(), ...allies().filter((x) => x.id !== u.id && x.statuses.some((s) => s.kind === "stun"))]
+    : rolandLaunch
+    ? [...enemies(), ...allies().filter((x) => x.kind === "minion" && x.name === "Boulder")]
     // A cross-faction skill ("target an enemy OR an ally") offers both teams. This is authored per-skill —
     // NOT derived from tags, which are an unreliable proxy (Bog Witch's Bargain is Harmful+Helpful but
     // enemies-only; Tormentor's Brand is Harmful-only but targets either faction).
