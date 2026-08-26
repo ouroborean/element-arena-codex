@@ -57,14 +57,23 @@ export interface Profile {
 /** Max display-name length (server-clamped). */
 export const MAX_NAME_LEN = 20;
 
+/** An explicit end-of-turn resolution order (the client's "resolution order" panel): a flat sequence of the
+ *  active team's queued skills and its pending dot/regen ticks. Each `action` entry means the NEXT queued
+ *  action (in the committed `actions` order); each `tick` names one pending tick by bearer + status identity,
+ *  which the server matches against its OWN recomputed pending ticks — it never trusts a client-named tick,
+ *  and any pending tick the order omits is still applied (appended in natural order). Absent = the default
+ *  order (all skills, then ticks at turn-end). Additive + optional, so it needs no PROTOCOL_VERSION bump. */
+export type WireTurnOrder = ({ kind: "action" } | { kind: "tick"; unit: string; name?: string; by: string; regen: boolean })[];
+
 // --------------------------------------------------------------------------- //
 //  Client → server
 // --------------------------------------------------------------------------- //
 export type ClientMsg =
   /** Enter the queue with a chosen 3-hero team. `ranked` uses Elo + rating-window matchmaking. */
   | { t: "queue"; team: string[]; ranked?: boolean; protocolVersion: number }
-  /** The active player's committed turn: one action per acting hero (+ the optional generic-payment plan). */
-  | { t: "turn"; actions: Action[]; genericPay?: EnergyPool }
+  /** The active player's committed turn: one action per acting hero (+ the optional generic-payment plan and
+   *  an optional explicit skill/tick resolution order — see WireTurnOrder). */
+  | { t: "turn"; actions: Action[]; genericPay?: EnergyPool; order?: WireTurnOrder }
   /** The drafting player's between-round upgrade choice (fuse / augment / skip). */
   | { t: "draftChoice"; choices: DraftChoice[] } // one phase = up to one upgrade per hero
   /** Concede the match immediately (the opponent wins by forfeit). */

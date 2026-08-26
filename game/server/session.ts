@@ -7,13 +7,13 @@
  * tests. Turn/draft timeouts auto-fill; a surrender forfeits immediately; a dropped socket starts a grace
  * window (onSeatDisconnect) so the player can reconnect (onSeatReconnect) instead of losing outright.
  */
-import type { Action } from "../engine/src/scheduler.ts";
-import type { MatchState, TeamId } from "../engine/src/types.ts";
+import { pendingTicks, type Action } from "../engine/src/scheduler.ts";
+import type { MatchState, TeamId, TurnResolutionItem } from "../engine/src/types.ts";
 import type { MatchOutcome } from "../engine/content/match.ts";
 import { buildMatch } from "../engine/content/match.ts";
 import { runMatch } from "../client/loop.ts";
 import { applyDraftChoices, autoDraft, hasDraftOptions, type DraftChoice } from "../client/draft.ts";
-import { ROUNDS_TO_WIN, TURN_MS, DRAFT_MS, RECONNECT_GRACE_MS, type ClientMsg, type ServerMsg, type EndReason } from "../net/protocol.ts";
+import { ROUNDS_TO_WIN, TURN_MS, DRAFT_MS, RECONNECT_GRACE_MS, type ClientMsg, type ServerMsg, type EndReason, type WireTurnOrder } from "../net/protocol.ts";
 import { redactState } from "../engine/src/visibility.ts";
 
 type TurnMsg = Extract<ClientMsg, { t: "turn" }>;
@@ -87,6 +87,35 @@ export function filterTurnActions(actions: Action[], side: TeamId, units: Record
     out.push(a);
   }
   return out;
+}
+
+/**
+ * Reconstruct the active team's explicit resolution order from the client's wire form (its "resolution order"
+ * panel). "action" markers consume the committed `actions` in order; each wire "tick" is matched to one of the
+ * SERVER's OWN pending ticks by bearer + status identity — a client can only permute its real skills/ticks,
+ * never inject a tick or touch the opponent's. Any action or pending tick the wire didn't place is appended in
+ * natural order, so every skill + tick resolves exactly once. Absent/empty wire → undefined (default resolution).
+ */
+export function rebuildTurnOrder(wire: WireTurnOrder | undefined, actions: Action[], side: TeamId, state: MatchState): TurnResolutionItem[] | undefined {
+  if (!Array.isArray(wire) || wire.length === 0) return undefined;
+  const ticks = pendingTicks(state, side).map((t) => ({ t, used: false }));
+  const order: TurnResolutionItem[] = [];
+  let ai = 0;
+  for (const w of wire) {
+    if (w && w.kind === "action") {
+      if (ai < actions.length) order.push({ kind: "action", index: ai++ });
+    } else if (w && w.kind === "tick") {
+      const m = ticks.find((r) => !r.used
+        && r.t.unitId === w.unit
+        && (r.t.status.name ?? "") === (w.name ?? "")
+        && r.t.status.appliedBy === w.by
+        && (r.t.status.kind === "regen") === !!w.regen);
+      if (m) { m.used = true; order.push({ kind: "tick", unitId: m.t.unitId, status: m.t.status }); }
+    }
+  }
+  for (; ai < actions.length; ai++) order.push({ kind: "action", index: ai });                       // actions the wire under-counted
+  for (const r of ticks) if (!r.used) order.push({ kind: "tick", unitId: r.t.unitId, status: r.t.status }); // ticks it never placed
+  return order;
 }
 
 function sanitizeChoice(c: unknown): DraftChoice {
@@ -271,7 +300,9 @@ export class Match {
       active.pendingTurn = (msg) => {
         clearTimeout(timer);
         this.state.genericPay = sanitizeGenericPay(msg.genericPay);
-        resolve(filterTurnActions(sanitizeActions(msg.actions), side, this.state.units));
+        const actions = filterTurnActions(sanitizeActions(msg.actions), side, this.state.units);
+        this.state.turnOrder = rebuildTurnOrder(msg.order, actions, side, this.state); // explicit skill/tick interleave (or default)
+        resolve(actions);
       };
     });
   }
