@@ -14,7 +14,7 @@
  * duration logic already keys on. ENERGY_INCOME's base rate is provisional (ruling
  * still open) and lives behind one constant.
  */
-import type { EnergyPool, MatchState, TeamId, Unit } from "./types.ts";
+import type { EnergyPool, MatchState, Status, TeamId, Unit } from "./types.ts";
 import type { SkillInstance } from "./skill.ts";
 import type { Value } from "./effects/ast.ts";
 import { emit, evalConditionReadOnly, evalSkillCondition, evalTargetPredicate, evalValueReadOnly, resolveDeclaration, runEffects } from "./effects/interpret.ts";
@@ -215,6 +215,7 @@ export function runChannels(state: MatchState, id: TeamId): void {
 /** Begin the active team's turn: income, cooldowns, channels, then turn-start triggers. */
 export function startTurn(state: MatchState): void {
   state.actedThisTurn = []; // fresh ledger of who acts this turn (drives "acts alone")
+  state.dotsTicked = undefined; state.turnOrder = undefined; // never let a prior turn's resolution plan leak in
   // The player who goes FIRST in a round gets reduced opening income (1 of their center hero's element) to
   // offset the first-move advantage; everyone else gets normal income. Guarded on roundStartTurn so direct-
   // constructed test states (helpers.makeState, which never sets it) keep the normal income path.
@@ -258,6 +259,44 @@ export function tickDots(state: MatchState, id: TeamId): void {
   }
 }
 
+/**
+ * The dot/regen ticks that WILL fire at `team`'s turn-end, in the exact order tickDots would apply them
+ * (unit iteration × status order, same eligibility predicate). Read-only — used to preview the end-of-turn
+ * resolution and, optionally, let the player interleave these ticks among their queued skills. The returned
+ * `status` is the live object, so a chosen order can point back at it (see applyOneTick / resolveTurn).
+ */
+export function pendingTicks(state: MatchState, team: TeamId): { unitId: string; status: Status }[] {
+  const out: { unitId: string; status: Status }[] = [];
+  for (const u of Object.values(state.units)) {
+    if (!u.alive) continue;
+    for (const s of u.statuses) {
+      if (s.kind !== "dot" && s.kind !== "regen") continue;
+      const owner = state.units[s.appliedBy];
+      const byThisTeam = owner ? owner.team === team : false;
+      if (!(byThisTeam && s.appliedTurn < state.turn)) continue; // same gate as tickDots (skip the birth turn)
+      out.push({ unitId: u.id, status: s });
+    }
+  }
+  return out;
+}
+
+/**
+ * Apply ONE previewed dot/regen tick now, for the interleaved-resolution path (mirrors the per-status body of
+ * tickDots). No-op if the bearer has since died — matching tickDots, which skips dead units entirely. Used by
+ * resolveTurn when state.turnOrder places a tick among the skills; the default turn path still uses tickDots.
+ */
+function applyOneTick(state: MatchState, unitId: string, s: Status): void {
+  const u = state.units[unitId];
+  if (!u || !u.alive) return;
+  const owner = state.units[s.appliedBy];
+  if (s.kind === "regen") { applyHeal(u, s.magnitude ?? 0); return; }
+  const wasAlive = u.alive;
+  const dtype = (owner ? outgoingDtypeOverride(owner) : undefined) ?? s.dtype ?? "affliction";
+  const r = applyDamage(u, { amount: s.magnitude ?? 0, type: dtype, sourceId: s.name });
+  emit(state, { type: "damageDealt", source: s.appliedBy, target: u.id, amount: r.hpLost, dtype, sourceId: s.name });
+  if (wasAlive && r.lethal) emit(state, { type: "unitDied", unit: u.id, killer: s.appliedBy });
+}
+
 /** Fire deferred effects whose delay has elapsed (anchored to the caster's turn-end). */
 function fireScheduled(state: MatchState, id: TeamId): void {
   const remaining: typeof state.scheduled = [];
@@ -299,7 +338,8 @@ export function tickTriggersForTeam(state: MatchState, team: TeamId): void {
 export function endTurn(state: MatchState): void {
   const team = state.activeTeam;
   advanceCooldowns(state, team); // tick this team's cooldowns (skips skills used this turn — state.turn not yet bumped)
-  tickDots(state, team);
+  if (!state.dotsTicked) tickDots(state, team); // an interleaved turnOrder (resolveTurn) already ticked these
+  state.dotsTicked = undefined;
   const expired = tickDurationsForTeam(state, team);
   tickShieldsForTeam(state, team);
   tickTriggersForTeam(state, team);
@@ -797,9 +837,24 @@ export function performAction(state: MatchState, action: Action): ActionResult {
   return { ok: true };
 }
 
-/** Resolve a team's staged actions in submission order (RESOLUTION_ORDER). */
+/** Resolve a team's staged actions in submission order (RESOLUTION_ORDER). When state.turnOrder is set, the
+ *  active team's queued skills and its pending dot/regen ticks resolve in that exact interleaved order instead,
+ *  and endTurn skips its own tickDots (the ticks are applied here). Absent = the default (all skills, then
+ *  tickDots at turn-end) — the path AI, PvP and the test suite always take. */
 export function resolveTurn(state: MatchState, actions: Action[]): ActionResult[] {
-  const results = actions.map((a) => performAction(state, a));
+  const order = state.turnOrder;
+  state.turnOrder = undefined; // an explicit order applies to exactly one turn
+  let results: ActionResult[];
+  if (order) {
+    results = [];
+    for (const item of order) {
+      if (item.kind === "action") { const a = actions[item.index]; if (a) results.push(performAction(state, a)); }
+      else applyOneTick(state, item.unitId, item.status);
+    }
+    state.dotsTicked = true; // endTurn must not re-tick what we just applied
+  } else {
+    results = actions.map((a) => performAction(state, a));
+  }
   state.genericPay = undefined; // a generic-payment allocation applies to exactly one turn
   return results;
 }

@@ -21,7 +21,7 @@ import { HERO_META } from "./herometa.generated.ts";
 import { cbEnabled, cbEnergyHtml } from "./colorblind.ts";
 import { EFFECT_DESC, EFFECT_VARIANT, EFFECT_HIDE } from "./effectdesc.generated.ts";
 import { MAX_NAME_LEN } from "../../net/protocol.ts";
-import type { UiState } from "./main.ts";
+import type { UiState, OrderItem } from "./main.ts";
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
 const shortName = (name: string) => name.split(",")[0]!.trim();
@@ -431,6 +431,46 @@ function skillInspectRow(ic: string | null, name: string, cost: string, cd: stri
   </div>`;
 }
 
+/** The resolution-order panel (bot matches): the active team's queued skills and this turn's pending dot/regen
+ *  ticks, listed in the order they'll resolve. The player drags a row (or uses ▲▼) to reorder — moving a tick
+ *  among the skills changes exactly when that damage/heal lands. */
+function resolveOrderPanel(state: MatchState, ui: UiState): string {
+  const items = ui.orderPanel!.items;
+  const row = (it: OrderItem, i: number): string => {
+    const up = i > 0 ? `<button class="ro-btn" data-order-up="${i}" title="Move earlier">▲</button>` : `<span class="ro-btn ghost">▲</span>`;
+    const down = i < items.length - 1 ? `<button class="ro-btn" data-order-down="${i}" title="Move later">▼</button>` : `<span class="ro-btn ghost">▼</span>`;
+    let tag: string, body: string;
+    if (it.kind === "action") {
+      const u = state.units[it.action.unit];
+      const nm = SKILL_TEXT[it.action.skillId]?.n ?? (u?.skills ?? []).find((s) => s.id === it.action.skillId)?.name ?? it.action.skillId;
+      const tgts = (it.action.targets ?? []).map((t) => shortName(state.units[t]?.name ?? t)).join(", ");
+      tag = `<span class="ro-tag skill">Skill</span>`;
+      body = `<b>${esc(shortName(u?.name ?? it.action.unit))}</b> <span class="ro-arrow">▸</span> ${esc(nm)}${tgts ? ` <span class="ro-tgt">→ ${esc(tgts)}</span>` : ""}`;
+    } else {
+      const u = state.units[it.unitId];
+      const s = it.status, heal = s.kind === "regen";
+      const nm = s.name ?? (heal ? "Regeneration" : "Damage over time");
+      tag = `<span class="ro-tag ${heal ? "regen" : "dot"}">${heal ? "Heal tick" : "Damage tick"}</span>`;
+      body = `<b>${esc(shortName(u?.name ?? it.unitId))}</b> <span class="ro-arrow">▸</span> ${esc(nm)} <span class="ro-amt ${heal ? "heal" : "dmg"}">${heal ? "+" : "−"}${s.magnitude ?? 0}${heal ? " HP" : ` ${esc(s.dtype ?? "affliction")}`}</span>`;
+    }
+    return `<div class="ro-item" draggable="true" data-ro-index="${i}">
+      <span class="ro-handle" title="Drag to reorder">⠿</span>
+      <span class="ro-num">${i + 1}</span>${tag}
+      <span class="ro-body">${body}</span>
+      <span class="ro-move">${up}${down}</span>
+    </div>`;
+  };
+  return `<div class="overlay"><div class="modal ro-modal">
+    <h2>Resolution order</h2>
+    <p class="ro-sub">Queued skills and the effects ticking this turn resolve top → bottom. Drag a row, or use ▲▼, to change the order they resolve in.</p>
+    <div class="ro-list">${items.map(row).join("")}</div>
+    <div class="modal-foot">
+      <button class="mini" data-order-cancel="1">Back</button>
+      <button class="ro-go" data-order-confirm="1">Resolve turn ▶</button>
+    </div>
+  </div></div>`;
+}
+
 /** The end-of-turn panel: choose which energy colors cover the generic costs spent this turn. */
 function energyPanel(ui: UiState): string {
   const p = ui.energyPanel!;
@@ -550,7 +590,7 @@ export function renderApp(state: MatchState, ui: UiState, player: { name: string
       <div class="side foe">${minionColumn(state, foe, ui, false, incoming)}${teamColumn(state, foe, ui, false, incoming)}</div>
     </div>
     ${bottomBar()}
-  </div>${notice}${ui.energyPanel ? energyPanel(ui) : ""}${ui.draft ? draftPanel(state, ui) : ""}${ui.overlay ?? ""}`;
+  </div>${notice}${ui.orderPanel ? resolveOrderPanel(state, ui) : ""}${ui.energyPanel ? energyPanel(ui) : ""}${ui.draft ? draftPanel(state, ui) : ""}${ui.overlay ?? ""}`;
 }
 
 // ── team select (redesigned scene) ────────────────────────────────────────────────────────────────── //

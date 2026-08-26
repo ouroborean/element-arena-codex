@@ -4,10 +4,10 @@
  * team from `defaultPolicy`. Between rounds each team auto-drafts an upgrade for now — an interactive draft
  * UI is the next increment. All rendering goes through view.ts; interaction is event-delegated on data-*.
  */
-import type { MatchState, TeamId, Unit } from "../../engine/src/types.ts";
+import type { MatchState, TeamId, Unit, Status, TurnResolutionItem } from "../../engine/src/types.ts";
 import type { Action } from "../../engine/src/scheduler.ts";
 import type { SkillInstance } from "../../engine/src/skill.ts";
-import { canPay, effectiveCost, canUsePlanned, canPayAfter, reserveEnergy } from "../../engine/src/scheduler.ts";
+import { canPay, effectiveCost, canUsePlanned, canPayAfter, reserveEnergy, pendingTicks } from "../../engine/src/scheduler.ts";
 import { redactState } from "../../engine/src/visibility.ts";
 import { buildMatch, defaultPolicy, type Draft } from "../../engine/content/match.ts";
 import { ROSTER } from "../../engine/content/roster.generated.ts";
@@ -33,6 +33,9 @@ export interface UiState {
   plannedSkill: Map<string, string>; // unitId -> chosen skill id (to highlight its tile)
   // The end-of-turn generic-payment allocation panel: how much of each color pays the turn's generic.
   energyPanel?: { actions: Action[]; generic: number; avail: Record<string, number>; alloc: Record<string, number> };
+  // The end-of-turn resolution-order panel (bot matches): the queued skills + this turn's pending dot/regen
+  // ticks, arranged top-to-bottom; the player drags to change the order they resolve in.
+  orderPanel?: { items: OrderItem[] };
   // The between-round fusion/augment draft: which of your heroes' options are shown, and the resolver to
   // settle once you commit a choice (or hold).
   draft?: { side: TeamId; inspect: string | null; picks: Map<string, DraftChoice>; resolve: () => void };
@@ -43,6 +46,11 @@ export interface UiState {
   opponentName?: string;
   resolveTurn?: (actions: Action[]) => void;
 }
+
+/** One row of the resolution-order panel: a queued skill, or one of this turn's pending dot/regen ticks. */
+export type OrderItem =
+  | { kind: "action"; action: Action }
+  | { kind: "tick"; unitId: string; status: Status };
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const ALL_IDS = ROSTER.map((h) => h.id);
@@ -57,6 +65,10 @@ const living = (s: MatchState, side: TeamId): Unit[] =>
 
 const app = document.getElementById("app")!;
 let state: MatchState;
+// The interleaved resolution order built from the order panel, applied to state.turnOrder at finalize (bot
+// matches only). Undefined = the default order (skills in submission order, then ticks at turn-end).
+let pendingTurnOrder: TurnResolutionItem[] | undefined;
+let dragOrderIndex: number | null = null; // the row being dragged in the resolution-order panel
 let setup: { picked: string[]; oppo: string[]; inspect: string | null; augfuse?: boolean } | null = null;
 // A live Quick Match (PvP) session. Non-null only in networked play; in bot mode it stays null and the
 // local runMatch loop drives everything. When set, the turn/draft/concede commit points send to the server
@@ -401,7 +413,7 @@ app.addEventListener("click", (e) => {
   // kit in the upper area — works for the ENEMY team too, so you can check their current skills.
   if ((e.target as HTMLElement).closest("[data-inspect-close]")) { ui.inspectUnit = undefined; render(); return; }
   const frameEl = (e.target as HTMLElement).closest<HTMLElement>(".frame[data-inspect-unit]");
-  if (frameEl && !ui.targeting && !ui.draft && !ui.energyPanel && !ui.overlay) {
+  if (frameEl && !ui.targeting && !ui.draft && !ui.energyPanel && !ui.orderPanel && !ui.overlay) {
     const id = frameEl.dataset.inspectUnit!;
     ui.inspectUnit = ui.inspectUnit === id ? undefined : id; // clicking the same portrait again closes it
     render(); return;
@@ -429,7 +441,7 @@ app.addEventListener("click", (e) => {
     }
     return; // swallow other clicks (the inputs still focus normally)
   }
-  const el = (e.target as HTMLElement).closest<HTMLElement>("[data-login],[data-register],[data-guest],[data-login-mode],[data-logout],[data-claim-open],[data-owner],[data-skill],[data-target],[data-cancel],[data-resolve],[data-surrender],[data-pick],[data-inspect],[data-reroll],[data-start],[data-quick],[data-ranked],[data-quick-cancel],[data-plus],[data-minus],[data-energy-confirm],[data-energy-cancel],[data-draft-inspect],[data-fuse-unit],[data-aug-unit],[data-draft-confirm],[data-draft-clear],[data-concede-round],[data-forfeit],[data-keep],[data-augfuse],[data-avatar-pick],[data-avatar-set],[data-avatar-close],[data-cb-toggle]");
+  const el = (e.target as HTMLElement).closest<HTMLElement>("[data-login],[data-register],[data-guest],[data-login-mode],[data-logout],[data-claim-open],[data-owner],[data-skill],[data-target],[data-cancel],[data-resolve],[data-surrender],[data-pick],[data-inspect],[data-reroll],[data-start],[data-quick],[data-ranked],[data-quick-cancel],[data-plus],[data-minus],[data-energy-confirm],[data-energy-cancel],[data-draft-inspect],[data-fuse-unit],[data-aug-unit],[data-draft-confirm],[data-draft-clear],[data-concede-round],[data-forfeit],[data-keep],[data-augfuse],[data-avatar-pick],[data-avatar-set],[data-avatar-close],[data-cb-toggle],[data-order-cancel],[data-order-confirm],[data-order-up],[data-order-down]");
   if (!el) return;
   const d = el.dataset;
 
@@ -490,13 +502,21 @@ app.addEventListener("click", (e) => {
     return;
   }
 
+  if (ui.orderPanel) { // the resolution-order panel is up — reorder the rows, then confirm or go back
+    if (d.orderCancel) { ui.orderPanel = undefined; pendingTurnOrder = undefined; render(); return; }
+    if (d.orderConfirm) { confirmResolveOrder(); return; }
+    if (d.orderUp) { const i = +d.orderUp; moveOrderItem(i, i - 1); return; }
+    if (d.orderDown) { const i = +d.orderDown; moveOrderItem(i, i + 1); return; }
+    return; // swallow other clicks while the panel is up
+  }
+
   if (ui.energyPanel) { // the generic-payment modal is up — only its controls respond
     const p = ui.energyPanel;
     const sum = () => Object.values(p.alloc).reduce((a, b) => a + b, 0);
     if (d.plus && sum() < p.generic) { p.alloc[d.plus] = Math.min((p.alloc[d.plus] ?? 0) + 1, p.avail[d.plus] ?? 0); render(); }
     else if (d.minus) { p.alloc[d.minus] = Math.max((p.alloc[d.minus] ?? 0) - 1, 0); render(); }
     else if (d.energyConfirm && sum() === p.generic) finalizeTurn(p.actions, p.alloc);
-    else if (d.energyCancel) { ui.energyPanel = undefined; render(); } // back to planning
+    else if (d.energyCancel) { ui.energyPanel = undefined; pendingTurnOrder = undefined; render(); } // back to planning
     return;
   }
 
@@ -545,7 +565,7 @@ app.addEventListener("click", (e) => {
   }
   if (ui.phase !== "plan") return;
   if (d.cancel) { ui.targeting = undefined; ui.examine = undefined; ui.legalTargets = new Set(); render(); return; }
-  if (d.resolve) { commitTurn(); return; }
+  if (d.resolve) { openResolveOrder(); return; }
   if (d.owner && d.skill) { // pick a skill → target it (if usable) or just examine it (if not)
     ui.inspectUnit = undefined; // picking a skill takes over the upper area from any open inspector
     const u = state.units[d.owner]!;
@@ -575,6 +595,28 @@ app.addEventListener("mouseout", (e) => {
   if (t.closest(".fx, .tgt")) hideFx();
   if (t.closest(".cs-sicon")) hideSkpop();
 });
+
+// Drag-to-reorder for the resolution-order panel (rows are plain divs, so the app-wide IMG drag guard doesn't
+// interfere). ▲▼ buttons do the same via clicks, for touch / keyboard.
+app.addEventListener("dragstart", (e) => {
+  const it = (e.target as HTMLElement).closest<HTMLElement>(".ro-item");
+  if (!ui.orderPanel || !it) return;
+  dragOrderIndex = +it.dataset.roIndex!;
+  if (e.dataTransfer) { e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", it.dataset.roIndex!); }
+  it.classList.add("ro-dragging");
+});
+app.addEventListener("dragover", (e) => {
+  if (ui.orderPanel && dragOrderIndex !== null && (e.target as HTMLElement).closest(".ro-item, .ro-list")) e.preventDefault();
+});
+app.addEventListener("drop", (e) => {
+  if (!ui.orderPanel || dragOrderIndex === null) return;
+  e.preventDefault();
+  const it = (e.target as HTMLElement).closest<HTMLElement>(".ro-item");
+  const to = it ? +it.dataset.roIndex! : ui.orderPanel.items.length - 1;
+  const from = dragOrderIndex; dragOrderIndex = null;
+  moveOrderItem(from, to);
+});
+app.addEventListener("dragend", () => { dragOrderIndex = null; app.querySelector(".ro-dragging")?.classList.remove("ro-dragging"); });
 
 /** The turn's total generic cost, and how much of each color is free to pay it (pool minus the specific
  *  each element must reserve). Generic energy is fully available; it can only ever pay generic. */
@@ -610,8 +652,59 @@ function defaultAlloc(generic: number, avail: Record<string, number>): Record<st
   return alloc;
 }
 
-function commitTurn(): void {
+// ── end-of-turn resolution order (bot matches) ──────────────────────────────────────────────────────── //
+/** Open the resolution-order panel: the queued skills plus this turn's pending dot/regen ticks, arranged in
+ *  their default resolution order (all skills, then ticks). PvP keeps the direct flow (server-authoritative;
+ *  interleaving is a follow-up). With nothing to resolve, commit straight through. */
+function openResolveOrder(): void {
+  if (pvp) { commitTurn(); return; }
   const actions = [...ui.planned.values()];
+  const ticks = pendingTicks(state, ui.you);
+  const items: OrderItem[] = [
+    ...actions.map((action): OrderItem => ({ kind: "action", action })),
+    ...ticks.map((t): OrderItem => ({ kind: "tick", unitId: t.unitId, status: t.status })),
+  ];
+  if (!items.length) { commitTurn(); return; }
+  ui.orderPanel = { items };
+  render();
+}
+
+/** Move a resolution-order row from index `from` to index `to` (drag drop / ▲▼). */
+function moveOrderItem(from: number, to: number): void {
+  const items = ui.orderPanel?.items;
+  if (!items || from === to || from < 0 || to < 0 || from >= items.length || to >= items.length) return;
+  const [it] = items.splice(from, 1);
+  items.splice(to, 0, it!);
+  render();
+}
+
+/** True when the arranged order is the engine's DEFAULT: every tick after every skill, ticks still in their
+ *  natural (pendingTicks) order. Then the normal turn path reproduces it (skills in array order, then tickDots)
+ *  and no explicit interleave is needed — so the battle-tested path runs unless the player truly interleaves. */
+function isCanonicalOrder(items: OrderItem[]): boolean {
+  let seenTick = false;
+  for (const it of items) { if (it.kind === "tick") seenTick = true; else if (seenTick) return false; } // skill after a tick
+  const natural = pendingTicks(state, ui.you).map((t) => t.status);
+  const arranged = items.filter((it): it is Extract<OrderItem, { kind: "tick" }> => it.kind === "tick").map((it) => it.status);
+  if (arranged.length !== natural.length) return false;
+  return arranged.every((s, i) => s === natural[i]);
+}
+
+/** Confirm the resolution order → build the ordered actions (+ an explicit interleave order only when the
+ *  player actually reordered ticks among skills), then continue into the normal energy/commit flow. */
+function confirmResolveOrder(): void {
+  const items = ui.orderPanel!.items;
+  ui.orderPanel = undefined;
+  const orderedActions: Action[] = [];
+  const turnOrder: TurnResolutionItem[] = items.map((it) =>
+    it.kind === "action"
+      ? { kind: "action", index: (orderedActions.push(it.action), orderedActions.length - 1) }
+      : { kind: "tick", unitId: it.unitId, status: it.status });
+  pendingTurnOrder = isCanonicalOrder(items) ? undefined : turnOrder; // default path unless a real interleave
+  commitTurn(orderedActions);
+}
+
+function commitTurn(actions: Action[] = [...ui.planned.values()]): void {
   const { generic, avail } = planGeneric(actions);
   // ALWAYS surface the allocation panel whenever the turn has any generic cost — even when the choice is
   // forced (a single payable color) — so the player always sees and confirms which energy pays it. (Queuing
@@ -627,11 +720,14 @@ function commitTurn(): void {
 
 function finalizeTurn(actions: Action[], alloc: Record<string, number> | undefined): void {
   if (pvp) { // networked: hand the committed turn to the authoritative server, then wait for its next state
+    pendingTurnOrder = undefined; // interleave is bot-only for now (server resolves its own order)
     pvp.sock.send({ t: "turn", actions, genericPay: alloc });
     pvpBusy("Waiting for opponent…");
     return;
   }
   if (alloc) state.genericPay = { ...alloc }; // the engine drains generic from these colors first
+  if (pendingTurnOrder) state.turnOrder = pendingTurnOrder; // an explicit skill/tick interleave for this turn
+  pendingTurnOrder = undefined;
   const resolve = ui.resolveTurn;
   ui.resolveTurn = undefined;
   ui.phase = "busy";
@@ -648,6 +744,7 @@ const human: AsyncProvider = (st, side) => new Promise<Action[]>((resolve) => {
   ui.phaseLabel = "your move";
   ui.planned.clear(); ui.plannedSkill.clear();
   ui.targeting = undefined; ui.examine = undefined; ui.legalTargets = new Set(); ui.inspectUnit = undefined;
+  ui.orderPanel = undefined; pendingTurnOrder = undefined;
   ui.resolveTurn = resolve;
   render();
 });
