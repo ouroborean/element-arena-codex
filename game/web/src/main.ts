@@ -27,6 +27,7 @@ export interface UiState {
   phaseLabel: string;
   targeting?: { unitId: string; skillId: string; skillName: string; single: boolean };
   examine?: { unitId: string; skillId: string; reason: string }; // read-only inspect of an unusable skill
+  inspectUnit?: string; // a unit whose full kit is shown in the upper area (click any portrait outside targeting)
   legalTargets: Set<string>;
   planned: Map<string, Action>;
   plannedSkill: Map<string, string>; // unitId -> chosen skill id (to highlight its tile)
@@ -396,6 +397,16 @@ app.addEventListener("click", (e) => {
   if (skEl) { showSkpop(skEl); return; } // tap a skill icon → pop off its info
   hideSkpop(); // any other click dismisses the skill popup
 
+  // In-match: close the unit inspector, or click any portrait (outside targeting / no modal) to inspect its
+  // kit in the upper area — works for the ENEMY team too, so you can check their current skills.
+  if ((e.target as HTMLElement).closest("[data-inspect-close]")) { ui.inspectUnit = undefined; render(); return; }
+  const frameEl = (e.target as HTMLElement).closest<HTMLElement>(".frame[data-inspect-unit]");
+  if (frameEl && !ui.targeting && !ui.draft && !ui.energyPanel && !ui.overlay) {
+    const id = frameEl.dataset.inspectUnit!;
+    ui.inspectUnit = ui.inspectUnit === id ? undefined : id; // clicking the same portrait again closes it
+    render(); return;
+  }
+
   if (setup?.augfuse) { // the Fusions & Augments preview is open — only Close / the backdrop respond
     const t = e.target as HTMLElement;
     if (t.closest("[data-augfuse-close]") || t.classList.contains("overlay")) { setup.augfuse = false; renderSetupScreen(); }
@@ -536,6 +547,7 @@ app.addEventListener("click", (e) => {
   if (d.cancel) { ui.targeting = undefined; ui.examine = undefined; ui.legalTargets = new Set(); render(); return; }
   if (d.resolve) { commitTurn(); return; }
   if (d.owner && d.skill) { // pick a skill → target it (if usable) or just examine it (if not)
+    ui.inspectUnit = undefined; // picking a skill takes over the upper area from any open inspector
     const u = state.units[d.owner]!;
     const skill = (u.skills ?? []).find((s) => s.id === d.skill)!;
     if (canUsePlanned(state, u, skill, [...ui.planned.values()])) {
@@ -635,7 +647,7 @@ const human: AsyncProvider = (st, side) => new Promise<Action[]>((resolve) => {
   ui.phase = "plan";
   ui.phaseLabel = "your move";
   ui.planned.clear(); ui.plannedSkill.clear();
-  ui.targeting = undefined; ui.examine = undefined; ui.legalTargets = new Set();
+  ui.targeting = undefined; ui.examine = undefined; ui.legalTargets = new Set(); ui.inspectUnit = undefined;
   ui.resolveTurn = resolve;
   render();
 });

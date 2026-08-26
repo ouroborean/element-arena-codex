@@ -262,7 +262,7 @@ function portraitCol(state: MatchState, u: Unit, ui: UiState, incoming: Map<stri
     : `<div class="portrait minion-art">${esc(shortName(u.name))}</div>`;
   return `<div class="pcol">
     ${targetingRow(state, incoming.get(u.id) ?? [])}
-    <div class="frame" style="--el:${elColor(u.currentElement)}" ${targetable ? `data-target="${u.id}"` : ""}>${portrait}${effectIcons(state, u)}<div class="name">${esc(shortName(u.name))}</div></div>
+    <div class="frame" style="--el:${elColor(u.currentElement)}" data-inspect-unit="${u.id}" ${targetable ? `data-target="${u.id}"` : ""}>${portrait}${effectIcons(state, u)}<div class="name">${esc(shortName(u.name))}</div></div>
     ${hpBar(u)}
   </div>`;
 }
@@ -352,6 +352,8 @@ function topBar(state: MatchState, ui: UiState, player: { name: string; avatar: 
   const yourTurn = ui.phase === "plan";
   const control = ui.targeting || ui.examine
     ? skillPanel(state, ui)
+    : ui.inspectUnit && state.units[ui.inspectUnit]
+    ? unitInspectPanel(state, ui)
     : yourTurn
     ? `<div class="turn you">Your turn</div><button class="resolve" data-resolve="1">Resolve turn ▶</button>`
     : `<div class="turn foe">${esc(ui.phaseLabel)}</div><div class="bar"><div class="bar-fill"></div></div>`;
@@ -390,6 +392,41 @@ function skillPanel(state: MatchState, ui: UiState): string {
       <div class="sp-name">${esc(name)} <span class="sp-cost">${costEl}</span></div>
       <div class="sp-desc">${descHtml(text?.d ?? "")}</div>
       <div class="sp-foot">${foot}</div>
+    </div>
+  </div>`;
+}
+
+/** Read-only inspection of ANY unit's kit, shown in the upper control area when a portrait is clicked outside
+ *  of targeting — so a player can review their own OR the enemy team's current skills (name, cost, cooldown,
+ *  description) mid-match. Driven by ui.inspectUnit. */
+function unitInspectPanel(state: MatchState, ui: UiState): string {
+  const u = state.units[ui.inspectUnit!];
+  if (!u) return "";
+  const side = u.team === ui.you ? "you" : "foe";
+  // The hero's current passive (base or fusion form) has no skill slot in a match, so surface it first.
+  const pid = u.heroId ? `${u.heroId}${u.fused ?? ""}0` : "";
+  const pt = pid ? SKILL_TEXT[pid] : undefined;
+  const rowP = pt?.d ? skillInspectRow(iconOf(pid, u.heroId), pt.n, "", "Passive", pt.d) : "";
+  const rows = (u.skills ?? []).map((s) => {
+    const t = SKILL_TEXT[s.id];
+    const cd = s.cooldown > 0 ? (s.currentCd > 0 ? `on cooldown (${s.currentCd})` : `${s.cooldown}-turn cooldown`) : "";
+    return skillInspectRow(iconOf(s.id, u.heroId ?? undefined), t?.n ?? s.name, costIcons(effectiveCost(u, s, state), s.element), cd, t?.d ?? "");
+  }).join("");
+  return `<div class="uinspect ${side}">
+    <div class="ui-head"><span class="ui-name">${esc(shortName(u.name))}</span><span class="ui-el" style="color:${elColor(u.currentElement)}">${esc(cap(u.currentElement))}</span><button class="mini ui-close" data-inspect-close="1" title="Close">✕</button></div>
+    <div class="ui-skills">${rowP}${rows || `<div class="ui-none">No active skills.</div>`}</div>
+  </div>`;
+}
+
+/** One row of the unit-inspect panel: icon, name + cost/cooldown meta, description. `cost` is pre-rendered HTML
+ *  (energy pips or ""); `cd` is a plain label (e.g. "Passive", "2-turn cooldown"). */
+function skillInspectRow(ic: string | null, name: string, cost: string, cd: string, desc: string): string {
+  const meta = [cost, cd ? `<span class="ui-cd">${esc(cd)}</span>` : ""].filter(Boolean).join(`<span class="ui-dot">·</span>`);
+  return `<div class="ui-sk">
+    ${ic ? `<img class="ui-sk-ic" src="${ic}" ${IMG_FALLBACK} />` : `<div class="ui-sk-ic"></div>`}
+    <div class="ui-sk-body">
+      <div class="ui-sk-top"><b class="ui-sk-name">${esc(name)}</b>${meta ? `<span class="ui-sk-meta">${meta}</span>` : ""}</div>
+      <div class="ui-sk-desc">${descHtml(desc)}</div>
     </div>
   </div>`;
 }

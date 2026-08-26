@@ -278,6 +278,26 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .skillpanel.examine .sp-name { color: var(--ink); }
 .sp-warn { color: var(--acc); font-weight: 700; }
 
+/* In-match unit inspector: click any portrait (outside targeting) to review its whole kit in the upper area.
+   Works for the enemy team too. Scrolls internally so a long kit never grows the top bar without bound. */
+.uinspect { width: 100%; text-align: left; display: flex; flex-direction: column; gap: 6px; max-height: 232px; }
+.ui-head { display: flex; align-items: baseline; gap: 8px; }
+.ui-name { font-weight: 800; font-size: 14px; }
+.uinspect.you .ui-name { color: var(--you); } .uinspect.foe .ui-name { color: var(--foe); }
+.ui-el { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; }
+.ui-close { margin-left: auto; padding: 2px 8px; align-self: center; }
+.ui-skills { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; padding-right: 5px; }
+.ui-sk { display: flex; gap: 8px; align-items: flex-start; }
+.ui-sk-ic { width: 30px; height: 30px; flex: 0 0 30px; border-radius: var(--radius); object-fit: cover; background: var(--panel2); border: 1px solid var(--line); }
+.ui-sk-body { min-width: 0; flex: 1; }
+.ui-sk-top { display: flex; align-items: baseline; gap: 7px; flex-wrap: wrap; }
+.ui-sk-name { font-size: 12.5px; font-weight: 700; color: var(--ink); }
+.ui-sk-meta { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: var(--dim); }
+.ui-cd { color: var(--mid); }
+.ui-dot { opacity: .5; }
+.ui-sk-desc { font-size: 11px; line-height: 1.42; color: var(--dim); margin-top: 1px; }
+.ui-none { color: var(--dim); font-size: 12px; }
+
 /* ── queued-skill indicators (who queued what, on whom) ─────────────────── */
 .unit.acted .frame { outline: 2px solid color-mix(in srgb, var(--you) 55%, transparent); outline-offset: 1px; }
 /* Targeting icons: the queued skills aimed at this character, straddling the top edge of the portrait,
