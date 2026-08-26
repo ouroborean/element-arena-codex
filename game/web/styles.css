@@ -136,7 +136,9 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 /* Reserve the targeting height always, so swapping turn/Resolve ↔ skill-detail never resizes the top bar and
    shifts the board / centred player chips. Wider + taller than the turn state so most skill text fits; the
    description scrolls (thin scrollbar) when it doesn't. */
-.control-mid { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 130px; width: 440px; }
+/* min-height reserves space for the tallest skill panel (a full 80px-scrolling description ≈ 130.4px), so
+   selecting/deselecting a long-description skill never nudges the board below. */
+.control-mid { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 134px; width: 440px; }
 .control .skillpanel { max-width: 100%; align-items: flex-start; }
 .control .sp-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } /* keep the name to one line */
 /* Show most of the description; scroll the rest. ~5 lines at the panel width covers nearly every skill. */
@@ -401,13 +403,13 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 
 /* Avatar picker */
 .av-modal { max-width: 560px; }
-.av-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 12px; margin: 14px 0; max-height: 56vh; overflow-y: auto; }
-.av-cell { display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 6px; background: var(--bg);
-  border: 1px solid var(--line); border-radius: var(--radius); cursor: pointer; transition: border-color .12s, transform .08s; }
+.av-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 10px; margin: 14px 0; max-height: 56vh; overflow-y: auto; }
+/* Image-only tiles — no labels; the grid gap is the spacing between avatars. */
+.av-cell { padding: 0; background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius);
+  overflow: hidden; cursor: pointer; transition: border-color .12s, transform .08s; }
 .av-cell:hover { border-color: #fff; transform: translateY(-2px); }
 .av-cell.on { border-color: var(--acc); box-shadow: 0 0 0 2px var(--acc); }
-.av-cell > img { width: 64px; height: 64px; border-radius: var(--radius); object-fit: cover; }
-.av-cell > span { font-size: 11px; color: var(--dim); }
+.av-cell > img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
 
 /* hero showcase: info | big art | skills */
 /* Snug, centred group — info, art and skills sit next to each other, not spread to the edges. */

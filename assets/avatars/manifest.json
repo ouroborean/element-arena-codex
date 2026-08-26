@@ -1,34 +1,378 @@
 [
  {
+  "file": "andoadeptavatar.png",
+  "name": "Andoadeptavatar"
+ },
+ {
+  "file": "andobasicavatar.png",
+  "name": "Andobasicavatar"
+ },
+ {
+  "file": "andoeliteavatar.png",
+  "name": "Andoeliteavatar"
+ },
+ {
+  "file": "angywendy.png",
+  "name": "Angywendy"
+ },
+ {
+  "file": "aramaoadeptavatar.png",
+  "name": "Aramaoadeptavatar"
+ },
+ {
+  "file": "aramaobasicavatar.png",
+  "name": "Aramaobasicavatar"
+ },
+ {
+  "file": "aramaoeliteavatar.png",
+  "name": "Aramaoeliteavatar"
+ },
+ {
+  "file": "ayanaadeptavatar.png",
+  "name": "Ayanaadeptavatar"
+ },
+ {
+  "file": "ayanabasicavatar.png",
+  "name": "Ayanabasicavatar"
+ },
+ {
+  "file": "ayanaeliteavatar.png",
+  "name": "Ayanaeliteavatar"
+ },
+ {
+  "file": "blackknightadeptavatar.png",
+  "name": "Blackknightadeptavatar"
+ },
+ {
+  "file": "blackknightbasicavatar.png",
+  "name": "Blackknightbasicavatar"
+ },
+ {
+  "file": "blackknighteliteavatar.png",
+  "name": "Blackknighteliteavatar"
+ },
+ {
   "file": "bolt.svg",
   "name": "Bolt"
+ },
+ {
+  "file": "cheshirespooky.png",
+  "name": "Cheshirespooky"
+ },
+ {
+  "file": "default.png",
+  "name": "Default"
+ },
+ {
+  "file": "dennisadeptavatar.png",
+  "name": "Dennisadeptavatar"
+ },
+ {
+  "file": "dennisbasicavatar.png",
+  "name": "Dennisbasicavatar"
+ },
+ {
+  "file": "denniseliteavatar.png",
+  "name": "Denniseliteavatar"
+ },
+ {
+  "file": "dlanoravatar.png",
+  "name": "Dlanoravatar"
+ },
+ {
+  "file": "dlanoravatar2.png",
+  "name": "Dlanoravatar2"
  },
  {
   "file": "ember.svg",
   "name": "Ember"
  },
  {
+  "file": "fateadeptavatar.png",
+  "name": "Fateadeptavatar"
+ },
+ {
+  "file": "fatebasicavatar.png",
+  "name": "Fatebasicavatar"
+ },
+ {
+  "file": "fateeliteavatar.png",
+  "name": "Fateeliteavatar"
+ },
+ {
+  "file": "fghopavatar.png",
+  "name": "Fghopavatar"
+ },
+ {
   "file": "frost.svg",
   "name": "Frost"
+ },
+ {
+  "file": "gaiaadeptavatar.png",
+  "name": "Gaiaadeptavatar"
+ },
+ {
+  "file": "gaiabasicavatar.png",
+  "name": "Gaiabasicavatar"
+ },
+ {
+  "file": "gaiaeliteavatar.png",
+  "name": "Gaiaeliteavatar"
+ },
+ {
+  "file": "galazaxadeptavatar.png",
+  "name": "Galazaxadeptavatar"
+ },
+ {
+  "file": "galazaxbasicavatar.png",
+  "name": "Galazaxbasicavatar"
+ },
+ {
+  "file": "galazaxeliteavatar.png",
+  "name": "Galazaxeliteavatar"
  },
  {
   "file": "gale.svg",
   "name": "Gale"
  },
  {
+  "file": "gommaradeptavatar.png",
+  "name": "Gommaradeptavatar"
+ },
+ {
+  "file": "gommarbasicavatar.png",
+  "name": "Gommarbasicavatar"
+ },
+ {
+  "file": "gommareliteavatar.png",
+  "name": "Gommareliteavatar"
+ },
+ {
   "file": "halo.svg",
   "name": "Halo"
+ },
+ {
+  "file": "hectoradeptavatar.png",
+  "name": "Hectoradeptavatar"
+ },
+ {
+  "file": "hectorbasicavatar.png",
+  "name": "Hectorbasicavatar"
+ },
+ {
+  "file": "hectoreliteavatar.png",
+  "name": "Hectoreliteavatar"
+ },
+ {
+  "file": "jarrikadeptavatar.png",
+  "name": "Jarrikadeptavatar"
+ },
+ {
+  "file": "jarrikbasicavatar.png",
+  "name": "Jarrikbasicavatar"
+ },
+ {
+  "file": "jarrikeliteavatar.png",
+  "name": "Jarrikeliteavatar"
+ },
+ {
+  "file": "keeperadeptavatar.png",
+  "name": "Keeperadeptavatar"
+ },
+ {
+  "file": "keeperbasicavatar.png",
+  "name": "Keeperbasicavatar"
+ },
+ {
+  "file": "keepereliteavatar.png",
+  "name": "Keepereliteavatar"
+ },
+ {
+  "file": "lariaadeptavatar.png",
+  "name": "Lariaadeptavatar"
+ },
+ {
+  "file": "lariabasicavatar.png",
+  "name": "Lariabasicavatar"
+ },
+ {
+  "file": "lariaeliteavatar.png",
+  "name": "Lariaeliteavatar"
+ },
+ {
+  "file": "maggieadeptavatar.png",
+  "name": "Maggieadeptavatar"
+ },
+ {
+  "file": "maggiebasicavatar.png",
+  "name": "Maggiebasicavatar"
+ },
+ {
+  "file": "maggieeliteavatar.png",
+  "name": "Maggieeliteavatar"
+ },
+ {
+  "file": "mojuavatar.png",
+  "name": "Mojuavatar"
+ },
+ {
+  "file": "pyrrha prof.png",
+  "name": "Pyrrha Prof"
+ },
+ {
+  "file": "pyrrhaadeptavatar.png",
+  "name": "Pyrrhaadeptavatar"
+ },
+ {
+  "file": "pyrrhabasicavatar.png",
+  "name": "Pyrrhabasicavatar"
+ },
+ {
+  "file": "pyrrhaeliteavatar.png",
+  "name": "Pyrrhaeliteavatar"
+ },
+ {
+  "file": "riverdaughteradeptavatar.png",
+  "name": "Riverdaughteradeptavatar"
+ },
+ {
+  "file": "riverdaughterbasicavatar.png",
+  "name": "Riverdaughterbasicavatar"
+ },
+ {
+  "file": "riverdaughtereliteavatar.png",
+  "name": "Riverdaughtereliteavatar"
+ },
+ {
+  "file": "rolandadeptavatar.png",
+  "name": "Rolandadeptavatar"
+ },
+ {
+  "file": "rolandbasicavatar.png",
+  "name": "Rolandbasicavatar"
+ },
+ {
+  "file": "rolandeliteavatar.png",
+  "name": "Rolandeliteavatar"
+ },
+ {
+  "file": "sayaadeptavatar.png",
+  "name": "Sayaadeptavatar"
+ },
+ {
+  "file": "sayabasicavatar.png",
+  "name": "Sayabasicavatar"
+ },
+ {
+  "file": "sayaeliteavatar.png",
+  "name": "Sayaeliteavatar"
+ },
+ {
+  "file": "seraadeptavatar.png",
+  "name": "Seraadeptavatar"
+ },
+ {
+  "file": "serabasicavatar.png",
+  "name": "Serabasicavatar"
+ },
+ {
+  "file": "seraeliteavatar.png",
+  "name": "Seraeliteavatar"
  },
  {
   "file": "stone.svg",
   "name": "Stone"
  },
  {
+  "file": "syladeptavatar.png",
+  "name": "Syladeptavatar"
+ },
+ {
+  "file": "sylbasicavatar.png",
+  "name": "Sylbasicavatar"
+ },
+ {
+  "file": "syleliteavatar.png",
+  "name": "Syleliteavatar"
+ },
+ {
+  "file": "tarynadeptavatar.png",
+  "name": "Tarynadeptavatar"
+ },
+ {
+  "file": "tarynbasicavatar.png",
+  "name": "Tarynbasicavatar"
+ },
+ {
+  "file": "taryneliteavatar.png",
+  "name": "Taryneliteavatar"
+ },
+ {
   "file": "tide.svg",
   "name": "Tide"
  },
  {
+  "file": "titaniaadeptavatar.png",
+  "name": "Titaniaadeptavatar"
+ },
+ {
+  "file": "titaniabasicavatar.png",
+  "name": "Titaniabasicavatar"
+ },
+ {
+  "file": "titaniaeliteavatar.png",
+  "name": "Titaniaeliteavatar"
+ },
+ {
+  "file": "trinityadeptavatar.png",
+  "name": "Trinityadeptavatar"
+ },
+ {
+  "file": "trinitybasicavatar.png",
+  "name": "Trinitybasicavatar"
+ },
+ {
+  "file": "trinityeliteavatar.png",
+  "name": "Trinityeliteavatar"
+ },
+ {
   "file": "umbra.svg",
   "name": "Umbra"
+ },
+ {
+  "file": "xyrisadeptavatar.png",
+  "name": "Xyrisadeptavatar"
+ },
+ {
+  "file": "xyrisbasicavatar.png",
+  "name": "Xyrisbasicavatar"
+ },
+ {
+  "file": "xyriseliteavatar.png",
+  "name": "Xyriseliteavatar"
+ },
+ {
+  "file": "zephyrexadeptavatar.png",
+  "name": "Zephyrexadeptavatar"
+ },
+ {
+  "file": "zephyrexbasicavatar.png",
+  "name": "Zephyrexbasicavatar"
+ },
+ {
+  "file": "zephyrexeliteavatar.png",
+  "name": "Zephyrexeliteavatar"
+ },
+ {
+  "file": "zevkiradeptavatar.png",
+  "name": "Zevkiradeptavatar"
+ },
+ {
+  "file": "zevkirbasicavatar.png",
+  "name": "Zevkirbasicavatar"
+ },
+ {
+  "file": "zevkireliteavatar.png",
+  "name": "Zevkireliteavatar"
  }
 ]
