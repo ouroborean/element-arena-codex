@@ -278,24 +278,25 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .skillpanel.examine .sp-name { color: var(--ink); }
 .sp-warn { color: var(--acc); font-weight: 700; }
 
-/* In-match unit inspector: click any portrait (outside targeting) to review its whole kit in the upper area.
-   Works for the enemy team too. Scrolls internally so a long kit never grows the top bar without bound. */
-.uinspect { width: 100%; text-align: left; display: flex; flex-direction: column; gap: 6px; max-height: 232px; }
-.ui-head { display: flex; align-items: baseline; gap: 8px; }
-.ui-name { font-weight: 800; font-size: 14px; }
-.uinspect.you .ui-name { color: var(--you); } .uinspect.foe .ui-name { color: var(--foe); }
-.ui-el { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; }
-.ui-close { margin-left: auto; padding: 2px 8px; align-self: center; }
-.ui-skills { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; padding-right: 5px; }
-.ui-sk { display: flex; gap: 8px; align-items: flex-start; }
-.ui-sk-ic { width: 30px; height: 30px; flex: 0 0 30px; border-radius: var(--radius); object-fit: cover; background: var(--panel2); border: 1px solid var(--line); }
+/* In-match unit inspector: a floating popup OVER the board (so opening it never reflows the layout), reviewing
+   a unit's whole kit. Click any portrait outside targeting — works for the enemy team too. */
+.uipop { text-align: left; width: min(480px, 92vw); max-width: 480px; }
+.ui-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.ui-name { font-weight: 800; font-size: 16px; }
+.uipop.you .ui-name { color: var(--you); } .uipop.foe .ui-name { color: var(--foe); }
+.ui-el { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; }
+.uipop .ui-close { margin-left: auto; width: 26px; height: 26px; padding: 0; font-size: 13px; color: var(--dim); background: transparent; border: 1px solid var(--line); border-radius: var(--radius); cursor: pointer; }
+.uipop .ui-close:hover { color: var(--foe); border-color: color-mix(in srgb, var(--foe) 50%, var(--line)); }
+.ui-skills { display: flex; flex-direction: column; gap: 9px; overflow-y: auto; max-height: 62vh; padding-right: 6px; }
+.ui-sk { display: flex; gap: 9px; align-items: flex-start; text-align: left; }
+.ui-sk-ic { width: 32px; height: 32px; flex: 0 0 32px; border-radius: var(--radius); object-fit: cover; background: var(--panel2); border: 1px solid var(--line); }
 .ui-sk-body { min-width: 0; flex: 1; }
 .ui-sk-top { display: flex; align-items: baseline; gap: 7px; flex-wrap: wrap; }
-.ui-sk-name { font-size: 12.5px; font-weight: 700; color: var(--ink); }
+.ui-sk-name { font-size: 13px; font-weight: 700; color: var(--ink); }
 .ui-sk-meta { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: var(--dim); }
 .ui-cd { color: var(--mid); }
 .ui-dot { opacity: .5; }
-.ui-sk-desc { font-size: 11px; line-height: 1.42; color: var(--dim); margin-top: 1px; }
+.ui-sk-desc { font-size: 11.5px; line-height: 1.45; color: var(--dim); margin-top: 2px; }
 .ui-none { color: var(--dim); font-size: 12px; }
 
 /* Resolution-order panel (bot matches): drag the queued skills + this turn's ticks into the order they resolve. */
@@ -317,9 +318,10 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .ro-amt { font-weight: 700; font-size: 11.5px; }
 .ro-amt.dmg { color: var(--foe); } .ro-amt.heal { color: var(--you); }
 .ro-move { display: flex; flex-direction: column; gap: 1px; }
-.ro-btn { width: 22px; height: 15px; padding: 0; line-height: 1; font-size: 9px; color: var(--dim); background: transparent; border: 1px solid var(--line); border-radius: var(--radius); cursor: pointer; }
-.ro-btn:hover { color: var(--ink); border-color: var(--acc); }
-.ro-btn.ghost { visibility: hidden; }
+/* scope under .ro-modal so it beats the global `.modal button` fill+padding (which was pushing the wedge off) */
+.ro-modal .ro-btn { display: flex; align-items: center; justify-content: center; width: 20px; height: 16px; padding: 0; line-height: 1; font-size: 8px; color: var(--dim); background: transparent; border: 1px solid var(--line); border-radius: var(--radius); cursor: pointer; }
+.ro-modal .ro-btn:hover { color: var(--ink); border-color: var(--acc); background: transparent; }
+.ro-modal .ro-btn.ghost { visibility: hidden; }
 .ro-go { padding: 7px 16px; font-weight: 800; color: #06210f; background: var(--you); border: 0; border-radius: var(--radius); cursor: pointer; }
 .ro-go:hover { filter: brightness(1.08); }
 
