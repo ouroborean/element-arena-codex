@@ -11,3 +11,6 @@ game/web/tools/batches/
 game/server/*.db
 game/server/*.db-journal
 arena.db
+
+# Server deploy bundle (built by deploy-server.ps1)
+deploy/

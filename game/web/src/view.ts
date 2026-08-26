@@ -545,20 +545,21 @@ export function renderClaim(s: { error?: string; busy?: boolean }): string {
 }
 
 export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: string | null; augfuse?: boolean }, player: { name: string; sub: string; avatar: string; username?: string }): string {
-  const inspectId = setup.inspect ?? ROSTER_ORDER[0]!;
-  const def = ROSTER.find((h) => h.id === inspectId)!;
-  const on = setup.picked.includes(inspectId);
+  const inspectId = setup.inspect;                                  // null until the player clicks a hero — nothing selected on load
+  const def = inspectId ? ROSTER.find((h) => h.id === inspectId) ?? null : null;
+  const on = def ? setup.picked.includes(def.id) : false;
   const full = setup.picked.length >= 3;
 
   // Each skill icon carries its info as data-* for a floating hover/tap popup (skpop in main.ts) — no
   // inline detail panel, so switching skills never shoves the layout around.
   const skTile = (id: string) => {
+    if (!def) return "";
     const t = SKILL_TEXT[id], isPassive = id === `${def.id}0`;
     const sk = (def.skills ?? []).find((s) => s.id === id);
     const meta = [isPassive ? "Passive" : cap(sk?.klass ?? ""), isPassive || !sk ? "" : sk.cooldown > 0 ? `${sk.cooldown}-turn cooldown` : "no cooldown"].filter(Boolean).join(" · ");
     return `<button class="cs-sicon" data-skname="${esc(t?.n ?? id)}" data-skmeta="${esc(meta)}" data-skdesc="${esc(t?.d ?? "")}" data-skgen="${sk?.cost.generic ?? 0}" data-skspec="${sk?.cost.specific ?? 0}" data-skel="${esc(sk?.element ?? "")}" title="${esc(t?.n ?? id)}"><img src="${iconOf(id, def.id) ?? ""}" ${IMG_FALLBACK} /></button>`;
   };
-  const byClass = (k: string) => (def.skills ?? []).filter((s) => s.klass === k).map((s) => skTile(s.id)).join("");
+  const byClass = (k: string) => (def?.skills ?? []).filter((s) => s.klass === k).map((s) => skTile(s.id)).join("");
   // Render a section only when the hero actually has that class of skill (Trinity has no defensive/ultimate;
   // only the fusion-element heroes carry a built-in "fusion" skill, since they can't fuse).
   const section = (label: string, cls: string, icons: string) => icons ? `<div class="cs-sk ${cls}"><h4>${label}</h4><div class="cs-icons">${icons}</div></div>` : "";
@@ -592,14 +593,14 @@ export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: 
 
     <div class="cs-stage">
     <div class="cs-show">
-      <div class="cs-info">
+      ${def ? `<div class="cs-info">
         <div class="cs-hname">${esc(shortName(def.name))}</div>
         <div class="cs-hel">${esc(cap(def.element))} Element</div>
-        <button class="cs-abtn ${on ? "rem" : ""}" data-pick="${inspectId}" ${!on && full ? "disabled" : ""}>${on ? "Remove Hero" : "Add to Team"}</button>
+        <button class="cs-abtn ${on ? "rem" : ""}" data-pick="${def.id}" ${!on && full ? "disabled" : ""}>${on ? "Remove Hero" : "Add to Team"}</button>
         <button class="cs-abtn" disabled title="Not available yet">Mastery</button>
         <button class="cs-abtn" data-augfuse="1" title="Preview this hero's fusion forms and augments">Fusions &amp; Augments</button>
       </div>
-      <div class="cs-art"><img src="${heroPortrait(inspectId)}" alt="${esc(shortName(def.name))}" ${IMG_FALLBACK} /></div>
+      <div class="cs-art"><img src="${heroPortrait(def.id)}" alt="${esc(shortName(def.name))}" ${IMG_FALLBACK} /></div>
       <div class="cs-skills">
         <div class="cs-sk-title">Kit</div>
         ${section("Passive", "passive", skTile(`${def.id}0`))}
@@ -607,7 +608,7 @@ export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: 
         ${section("Fusion", "fusion", byClass("fusion"))}
         ${section("Defensive", "defensive", byClass("defensive"))}
         ${section("Ultimate", "ultimate", byClass("ultimate"))}
-      </div>
+      </div>` : `<div class="cs-empty">Select a hero below to preview their kit</div>`}
     </div>
 
     <div class="cs-bottom">
@@ -627,7 +628,7 @@ export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: 
       <div class="cs-roster right">${panelRows(RIGHT_ROWS)}</div>
     </div>
     </div>
-  </div>${setup.augfuse ? augFuseModal(inspectId) : ""}`;
+  </div>${setup.augfuse && inspectId ? augFuseModal(inspectId) : ""}`;
 }
 
 /** A read-only modal previewing every fusion form (by partner element) and every augment a base hero
