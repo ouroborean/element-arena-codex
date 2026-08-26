@@ -11,6 +11,13 @@ chars = json.load(open(os.path.join(ROOT, "game/content/frozen/characters.json")
 chars = chars if isinstance(chars, list) else chars.get("characters", chars)
 
 
+# Hand-authored title overrides, for heroes whose title isn't cleanly derivable from the name.
+TITLE_OVERRIDES = {
+    "scratch": "Crossroads Dealer",
+    "trinity": "Prismari Rangers",
+}
+
+
 def split(full, short):
     full = (full or "").strip()
     if short and short != full and short in full:
@@ -29,6 +36,7 @@ for c in chars:
     if not c.get("in_roster"):
         continue
     name, title = split(c.get("character_name"), c.get("short_name"))
+    title = TITLE_OVERRIDES.get(c["id"], title)
     meta[c["id"]] = {"name": name, "title": title}
 
 lines = [
