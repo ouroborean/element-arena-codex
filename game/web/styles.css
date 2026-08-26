@@ -247,6 +247,8 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .fxpop b { display: block; font-size: 12.5px; margin-bottom: 2px; }
 .fxpop div { color: var(--dim); font-size: 11.5px; }
 .fxpop .fxdur { margin-top: 5px; color: var(--acc); font-size: 11px; font-weight: 600; }
+/* Inline energy-tooltip icon inside a description — the [<id>] energy refs; scales with the text size. */
+.tt-en { display: inline-block; width: 1.2em; height: 1.2em; vertical-align: -0.22em; margin: 0 1px; border-radius: var(--radius); object-fit: cover; }
 .fxpop .tt-en { width: 14px; height: 14px; border-radius: var(--radius); vertical-align: -2px; margin: 0 1px; object-fit: cover; }
 
 /* ── skill detail (shown IN the midbar while targeting — never over a portrait) ── */
