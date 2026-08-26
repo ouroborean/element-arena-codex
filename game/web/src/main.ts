@@ -412,6 +412,7 @@ app.addEventListener("click", (e) => {
   // In-match: close the unit inspector, or click any portrait (outside targeting / no modal) to inspect its
   // kit in the upper area — works for the ENEMY team too, so you can check their current skills.
   if ((e.target as HTMLElement).closest("[data-inspect-close]")) { ui.inspectUnit = undefined; render(); return; }
+  if ((e.target as HTMLElement).classList.contains("ui-backdrop")) { ui.inspectUnit = undefined; render(); return; } // click the dimmed backdrop to close
   const frameEl = (e.target as HTMLElement).closest<HTMLElement>(".frame[data-inspect-unit]");
   if (frameEl && !ui.targeting && !ui.draft && !ui.energyPanel && !ui.orderPanel && !ui.overlay) {
     const id = frameEl.dataset.inspectUnit!;

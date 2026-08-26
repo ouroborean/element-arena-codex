@@ -352,8 +352,6 @@ function topBar(state: MatchState, ui: UiState, player: { name: string; avatar: 
   const yourTurn = ui.phase === "plan";
   const control = ui.targeting || ui.examine
     ? skillPanel(state, ui)
-    : ui.inspectUnit && state.units[ui.inspectUnit]
-    ? unitInspectPanel(state, ui)
     : yourTurn
     ? `<div class="turn you">Your turn</div><button class="resolve" data-resolve="1">Resolve turn ▶</button>`
     : `<div class="turn foe">${esc(ui.phaseLabel)}</div><div class="bar"><div class="bar-fill"></div></div>`;
@@ -412,10 +410,12 @@ function unitInspectPanel(state: MatchState, ui: UiState): string {
     const cd = s.cooldown > 0 ? (s.currentCd > 0 ? `on cooldown (${s.currentCd})` : `${s.cooldown}-turn cooldown`) : "";
     return skillInspectRow(iconOf(s.id, u.heroId ?? undefined), t?.n ?? s.name, costIcons(effectiveCost(u, s, state), s.element), cd, t?.d ?? "");
   }).join("");
-  return `<div class="uinspect ${side}">
-    <div class="ui-head"><span class="ui-name">${esc(shortName(u.name))}</span><span class="ui-el" style="color:${elColor(u.currentElement)}">${esc(cap(u.currentElement))}</span><button class="mini ui-close" data-inspect-close="1" title="Close">✕</button></div>
+  // A floating popup over the board — NOT part of the top bar — so opening it never reflows the layout. Its
+  // backdrop (ui-backdrop) dismisses on click, as does the ✕.
+  return `<div class="overlay ui-backdrop"><div class="modal uipop ${side}">
+    <div class="ui-head"><span class="ui-name">${esc(shortName(u.name))}</span><span class="ui-el" style="color:${elColor(u.currentElement)}">${esc(cap(u.currentElement))}</span><button class="ui-close" data-inspect-close="1" title="Close">✕</button></div>
     <div class="ui-skills">${rowP}${rows || `<div class="ui-none">No active skills.</div>`}</div>
-  </div>`;
+  </div></div>`;
 }
 
 /** One row of the unit-inspect panel: icon, name + cost/cooldown meta, description. `cost` is pre-rendered HTML
@@ -590,7 +590,7 @@ export function renderApp(state: MatchState, ui: UiState, player: { name: string
       <div class="side foe">${minionColumn(state, foe, ui, false, incoming)}${teamColumn(state, foe, ui, false, incoming)}</div>
     </div>
     ${bottomBar()}
-  </div>${notice}${ui.orderPanel ? resolveOrderPanel(state, ui) : ""}${ui.energyPanel ? energyPanel(ui) : ""}${ui.draft ? draftPanel(state, ui) : ""}${ui.overlay ?? ""}`;
+  </div>${notice}${ui.inspectUnit && state.units[ui.inspectUnit] ? unitInspectPanel(state, ui) : ""}${ui.orderPanel ? resolveOrderPanel(state, ui) : ""}${ui.energyPanel ? energyPanel(ui) : ""}${ui.draft ? draftPanel(state, ui) : ""}${ui.overlay ?? ""}`;
 }
 
 // ── team select (redesigned scene) ────────────────────────────────────────────────────────────────── //
