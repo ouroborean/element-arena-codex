@@ -19,6 +19,7 @@ import { STATUS_SOURCE } from "./statussource.generated.ts";
 import { ELEMENT_BY_ID } from "./elementid.generated.ts";
 import { HERO_META } from "./herometa.generated.ts";
 import { cbEnabled, cbEnergyHtml } from "./colorblind.ts";
+import { glossHtml } from "./glossary.ts";
 import { EFFECT_DESC, EFFECT_VARIANT, EFFECT_HIDE } from "./effectdesc.generated.ts";
 import { MAX_NAME_LEN } from "../../net/protocol.ts";
 import type { UiState, OrderItem } from "./main.ts";
@@ -33,7 +34,7 @@ function descHtml(text: string): string {
   return text.split(/(\[\d+\])/).map((part) => {
     const m = /^\[(\d+)\]$/.exec(part);
     const el = m ? ELEMENT_BY_ID[+m[1]!] : undefined;
-    if (!el) return esc(part);
+    if (!el) return glossHtml(part); // non-energy text → escape + wrap glossary keywords as hover links
     return cbEnabled() ? cbEnergyHtml(el) : `<img class="tt-en" src="${energyIcon(el)}" alt="${esc(el)}" title="${esc(el)}" ${IMG_FALLBACK} />`;
   }).join("");
 }

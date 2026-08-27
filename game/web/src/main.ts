@@ -18,6 +18,7 @@ import { renderApp, renderSetup, renderLogin, renderClaim } from "./view.ts";
 import { energyIcon, elementRank, avatarUrl } from "./assets.ts";
 import { ELEMENT_BY_ID } from "./elementid.generated.ts";
 import { cbEnabled, cbEnergyEl, toggleColorblind } from "./colorblind.ts";
+import { glossHtml, initGloss, closeTransientGloss } from "./glossary.ts";
 import { MatchSocket, serverUrl, fetchProfile, fetchAvatars, register, login, claimAccount, saveProfile, type AvatarInfo } from "./net.ts";
 import { PROTOCOL_VERSION, MAX_NAME_LEN, type ServerMsg, type Profile, type WireTurnOrder } from "../../net/protocol.ts";
 
@@ -190,6 +191,13 @@ const ui: UiState = {
 const fxpop = document.createElement("div");
 fxpop.className = "fxpop"; fxpop.hidden = true;
 document.body.appendChild(fxpop);
+// Hover-bridge: the popup is interactive (its text has glossary keyword links), so leaving the icon schedules
+// a hide that entering the popup cancels — giving the cursor time to travel from the icon into the popup.
+let fxHideT: ReturnType<typeof setTimeout> | null = null;
+const clearFxHide = () => { if (fxHideT) { clearTimeout(fxHideT); fxHideT = null; } };
+const scheduleHideFx = () => { clearFxHide(); fxHideT = setTimeout(hideFx, 180); };
+fxpop.addEventListener("mouseenter", clearFxHide);
+fxpop.addEventListener("mouseleave", scheduleHideFx);
 // Render authored text into `el`, turning {generic}/{fire}/… name tokens AND [<id>] element-id energy
 // refs (e.g. [65] = generic) into inline energy icons; unknown ids stay as literal text.
 function renderTokens(el: HTMLElement, text: string): void {
@@ -199,10 +207,11 @@ function renderTokens(el: HTMLElement, text: string): void {
     if (name) {
       if (cbEnabled()) el.append(cbEnergyEl(name));
       else { const img = document.createElement("img"); img.className = "tt-en"; img.src = energyIcon(name); img.alt = name; el.append(img); }
-    } else if (part) el.append(document.createTextNode(part));
+    } else if (part) { const tmp = document.createElement("template"); tmp.innerHTML = glossHtml(part); el.append(tmp.content); } // wrap glossary keywords as hover links
   }
 }
 function showFx(el: HTMLElement): void {
+  clearFxHide();
   fxpop.textContent = "";
   const b = document.createElement("b"); b.textContent = el.dataset.fxtitle ?? "";
   const body = document.createElement("div"); renderTokens(body, el.dataset.fxbody ?? "");
@@ -220,7 +229,14 @@ function hideFx(): void { fxpop.hidden = true; }
 const skpop = document.createElement("div");
 skpop.className = "skpop"; skpop.hidden = true;
 document.body.appendChild(skpop);
+// Same hover-bridge as fxpop: keep the popup alive while the cursor moves into it to reach its keyword links.
+let skHideT: ReturnType<typeof setTimeout> | null = null;
+const clearSkHide = () => { if (skHideT) { clearTimeout(skHideT); skHideT = null; } };
+const scheduleHideSkpop = () => { clearSkHide(); skHideT = setTimeout(hideSkpop, 180); };
+skpop.addEventListener("mouseenter", clearSkHide);
+skpop.addEventListener("mouseleave", scheduleHideSkpop);
 function showSkpop(el: HTMLElement): void {
+  clearSkHide();
   const d = el.dataset;
   skpop.textContent = "";
   const name = document.createElement("b"); name.textContent = d.skname ?? "";
@@ -246,9 +262,9 @@ function hideSkpop(): void { skpop.hidden = true; }
 // In PvP the server already redacted `state`, so this is idempotent; in local vs-bot play (where `state` is
 // the full authoritative board the engine loop runs on) this is what actually hides the bot's Invisible
 // effects from the human. We redact only the render copy — the live `state` the loop mutates stays whole.
-function render(): void { hideFx(); app.innerHTML = renderApp(redactState(state, ui.you), ui, playerPanel()); }
+function render(): void { hideFx(); closeTransientGloss(); app.innerHTML = renderApp(redactState(state, ui.you), ui, playerPanel()); }
 /** The team-select screen (its player panel reads the profile) plus the avatar picker when open. */
-function renderSetupScreen(): void { app.innerHTML = renderSetup(setup!, playerPanel()) + avatarPickerHtml() + (claimForm ? renderClaim(claimForm) : ""); fitCharSelect(); }
+function renderSetupScreen(): void { closeTransientGloss(); app.innerHTML = renderSetup(setup!, playerPanel()) + avatarPickerHtml() + (claimForm ? renderClaim(claimForm) : ""); fitCharSelect(); }
 /** Open team select, optionally pre-seeded with an already-chosen team (e.g. after cancelling matchmaking). */
 function showSetup(picked: string[] = []): void {
   const keep = picked.slice(0, 3);
@@ -304,6 +320,7 @@ async function refreshProfile(): Promise<void> {
 
 /** App entry: resume an in-progress match if one is stored, else load the profile + avatars and show team-select. */
 async function boot(): Promise<void> {
+  initGloss(); // wire the delegated hover-keyword glossary (document-level; safe to call once at startup)
   if (tryResumeStoredMatch()) return; // an accidental reload rejoins the live match first
   avatars = await fetchAvatars();
   if (hasStoredIdentity()) await enterSetup(); // returning guest or logged-in account → straight to team select
@@ -593,8 +610,8 @@ app.addEventListener("mouseover", (e) => {
 });
 app.addEventListener("mouseout", (e) => {
   const t = e.target as HTMLElement;
-  if (t.closest(".fx, .tgt")) hideFx();
-  if (t.closest(".cs-sicon")) hideSkpop();
+  if (t.closest(".fx, .tgt")) scheduleHideFx(); // delayed so the cursor can travel into the (now interactive) popup
+  if (t.closest(".cs-sicon")) scheduleHideSkpop();
 });
 
 // Drag-to-reorder for the resolution-order panel (rows are plain divs, so the app-wide IMG drag guard doesn't

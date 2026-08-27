@@ -246,7 +246,7 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .fx.passive { border-color: var(--acc); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--acc) 65%, transparent), var(--shadow); }
 .fx-abbr { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: var(--dim); }
 .fx-n { position: absolute; right: 0; bottom: 0; font-size: 9px; font-weight: 800; background: #000c; color: #fff; padding: 0 2px; border-top-left-radius: var(--radius); }
-.fxpop { position: fixed; z-index: 20; max-width: 240px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 10px; box-shadow: var(--shadow); pointer-events: none; }
+.fxpop { position: fixed; z-index: 20; max-width: 240px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 10px; box-shadow: var(--shadow); pointer-events: auto; }
 .fxpop[hidden] { display: none; }
 .fxpop b { display: block; font-size: 12.5px; margin-bottom: 2px; }
 .fxpop div { color: var(--dim); font-size: 11.5px; }
@@ -513,12 +513,32 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .cs-sicon img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .cs-sicon:hover { transform: translateY(-2px); border-color: var(--sk, var(--acc)); box-shadow: var(--shadow); }
 /* floating skill-info popup — hovers/pops off a skill icon, never affects layout */
-.skpop { position: fixed; z-index: 30; max-width: 260px; background: color-mix(in srgb, var(--panel) 95%, transparent); border: 1px solid var(--acc); border-radius: var(--radius); padding: 9px 11px; box-shadow: var(--shadow); pointer-events: none; }
+.skpop { position: fixed; z-index: 30; max-width: 260px; background: color-mix(in srgb, var(--panel) 95%, transparent); border: 1px solid var(--acc); border-radius: var(--radius); padding: 9px 11px; box-shadow: var(--shadow); pointer-events: auto; }
 .skpop[hidden] { display: none; }
 .skpop b { display: block; font-size: 13px; color: #fff; margin-bottom: 3px; }
 .skpop-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; color: var(--dim); font-size: 11px; margin-bottom: 4px; text-transform: capitalize; }
 .skpop-cost { width: 15px; height: 15px; border-radius: var(--radius); object-fit: cover; }
 .skpop-desc { color: var(--dim); font-size: 11.5px; line-height: 1.4; }
+
+/* ── Glossary: keyword hover links (in any description / tooltip) + chainable, pinnable definition panels ── */
+.gloss { color: var(--gc, var(--acc)); cursor: pointer; border-bottom: 1px dotted color-mix(in srgb, var(--gc, var(--acc)) 55%, transparent); transition: background-color .1s, border-color .1s; }
+.gloss:hover { border-bottom-style: solid; background: color-mix(in srgb, var(--gc, var(--acc)) 18%, transparent); }
+.gloss-panel { position: fixed; z-index: 80; width: 300px; max-width: calc(100vw - 16px); max-height: min(56vh, 420px); overflow: auto;
+  background: var(--panel2); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); font-size: 12.5px; color: var(--ink);
+  animation: gpop .1s ease-out; }
+@keyframes gpop { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+.gloss-panel.pinned { border-color: var(--acc); box-shadow: 0 0 0 1px var(--acc), var(--shadow); }
+.gp-head { display: flex; align-items: center; gap: 7px; padding: 7px 7px 7px 11px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--panel2); z-index: 1; }
+.gp-title { font-weight: 700; font-size: 13.5px; line-height: 1.2; }
+.gp-kind { font-size: 9px; text-transform: uppercase; letter-spacing: .06em; color: var(--dim); border: 1px solid var(--line); border-radius: var(--radius); padding: 1px 5px; flex: none; }
+.gp-spring { flex: 1 1 auto; }
+.gp-btn { background: var(--bg2); border: 1px solid var(--line); color: var(--dim); border-radius: var(--radius); cursor: pointer; font-size: 11px; padding: 3px 7px; line-height: 1; flex: none; }
+.gp-btn:hover { color: var(--ink); border-color: var(--acc); }
+.gp-pin { filter: grayscale(.4); }
+.gloss-panel.pinned .gp-pin { filter: none; }
+.gp-body { padding: 10px 12px 12px; }
+.gp-def { line-height: 1.5; color: var(--ink); }
+@media (max-width: 720px) { .gloss-panel { width: calc(100vw - 16px); } }
 
 /* bottom band: angled roster panels flanking the match controls */
 /* Outer columns are minmax(0,1fr) (not 1fr) so they can shrink below the roster's intrinsic width: on
