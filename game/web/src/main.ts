@@ -515,6 +515,10 @@ app.addEventListener("click", (e) => {
   if (ui.draft) { // the between-round draft modal is up — pick an upgrade PER hero, then confirm the batch
     const picks = ui.draft.picks;
     if (d.draftInspect) { ui.draft.inspect = d.draftInspect; render(); return; }
+    // Tutorial: cap the draft at ONE upgraded hero — a full 3-hero batch runs past the last few coach-marks. The
+    // player can still change WHICH hero (toggle it off first), just not stack a second pick.
+    const pickUnit = d.fuseUnit ?? d.augUnit;
+    if (tutorial && pickUnit && !picks.has(pickUnit) && picks.size >= 1) return;
     if (d.fuseUnit && d.fuseForm) { // toggle: click the chosen fusion again to un-choose it
       const cur = picks.get(d.fuseUnit);
       if (cur?.kind === "fuse" && cur.formKey === d.fuseForm) picks.delete(d.fuseUnit);
@@ -860,14 +864,14 @@ const TUT_SCRIPT: TutStep[] = [
   { blocking: true, anchor: ".teamcol.foe", title: "The enemy", body: "Your opponents are on the right and <b>will fight back</b>. Wipe their team to win the round." },
   { blocking: true, anchor: ".epool", title: "Energy", body: "Skills cost energy. Each hero makes energy of their <b>element</b>, plus <b>Generic</b> that any colour can pay. Early on you'll have little — it grows each turn. This pool updates live as you queue." },
   { blocking: true, anchor: ".unit.mine.essence .frame", title: "Elemental Essence", body: "Your middle hero glows: it has <b>Elemental Essence</b>, so it generates one energy of its element at the <b>start of every turn</b> (that's your energy this turn). Keeping essence heroes alive keeps energy flowing." },
-  { blocking: true, anchor: ".unit.enemy .fx", title: "Effects &amp; keywords", body: "Every unit shows effect chips like this — passives and status effects. <b>Hover a chip</b> to read it, and hover any coloured keyword in a description to open the glossary." },
+  { blocking: true, anchor: ".unit.enemy .fx", title: "Effects & keywords", body: "Every unit shows effect chips like this — passives and status effects. <b>Hover a chip</b> to read it, and hover any coloured keyword in a description to open the glossary." },
   { blocking: false, anchor: "[data-skill=\"pyrrha1\"]", title: "Take an action", body: "Let's act with your middle hero. Click <b>Pyrrha</b>'s <b>Fan the Flames</b> to aim it.", done: () => ui.targeting?.skillId === "pyrrha1" },
   { blocking: false, anchor: "[data-target]", title: "Choose a target", body: "Click any highlighted enemy to queue the attack on it.", done: queued("pyrrha1") },
   { blocking: false, anchor: "[data-resolve]", title: "Resolve your turn", body: "One skill is queued (this turn you can only afford one — later you can queue one per hero). Press <b>Resolve turn</b>.", done: () => !!ui.orderPanel },
   { blocking: true, anchor: ".ro-list", title: "Resolution order", body: "Your queued skills and any effects ticking this turn resolve top → bottom. <b>Drag a row</b> or use ▲▼ to reorder — timing can matter." },
   { blocking: false, anchor: "[data-order-confirm]", title: "Lock in the order", body: "Click <b>Resolve turn ▶</b> to confirm.", done: () => !!ui.energyPanel },
   { blocking: true, anchor: ".alloc-rows", title: "Pay the cost", body: "Generic cost is paid with any colour you own — here your <b>Fire</b> energy covers it. The game pre-fills a sensible split (spending your Generic first, or all of your energy when it's all needed anyway). Confirm to run the turn." },
-  { blocking: false, anchor: "[data-energy-confirm]", title: "Confirm &amp; resolve", body: "Click <b>Confirm &amp; resolve ▶</b>. The enemy responds, then it's your turn again.", done: () => tutTurn >= 2 },
+  { blocking: false, anchor: "[data-energy-confirm]", title: "Confirm & resolve", body: "Click <b>Confirm &amp; resolve ▶</b>. The enemy responds, then it's your turn again.", done: () => tutTurn >= 2 },
   // turn 2: how energy is generated, and Laria's own way to earn Essence
   { blocking: true, anchor: ".epool", title: "Where energy comes from", body: "At the start of each turn, every hero makes <b>1 Generic</b> energy — unless it has <b>Elemental Essence</b>, which makes 1 of its own element instead. Your <b>centre</b> hero always has Essence; every other hero has its own way to earn it." },
   { blocking: true, anchor: "[data-inspect-unit=\"a3\"]", title: "Laria's Essence", body: "<b>Laria</b> earns Essence by using her S1, <b>Nightwrap</b>, on a target that already <b>has Elemental Essence</b> — like a glowing centre hero, yours or the enemy's." },
