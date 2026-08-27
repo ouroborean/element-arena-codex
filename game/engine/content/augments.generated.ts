@@ -5558,8 +5558,7 @@ export const AUGMENTS: Augment[] = [
       "op": "if",
       "cond": {
        "not": {
-        "has": "elemental_essence",
-        "of": "target"
+        "hasEssenceIncome": "target"
        }
       },
       "then": [

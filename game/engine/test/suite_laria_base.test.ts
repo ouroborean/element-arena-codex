@@ -149,6 +149,18 @@ test("laria1: if the target has Elemental Essence, Laria gains Elemental Essence
   assert.equal(hasKind(laria, "elemental_essence"), true, "Laria gains Elemental Essence from an essence-bearing target");
 });
 
+test("laria1: a MIDDLE-slot target has Elemental Essence via slot income (glows, no charge) — Laria still gains it", () => {
+  const laria = loadHero(heroById("laria"), "A", "la");
+  const mid = makeUnit({ id: "e1", team: "B", hp: 100, slot: 1 }); // MIDDLE slot (1): always has Essence income, but no charge status
+  const state = makeState([laria], [mid]);
+  fund(state);
+
+  assert.equal(hasKind(mid, "elemental_essence"), false, "the middle hero holds no essence CHARGE — its Essence is slot income");
+  const r = performAction(state, { unit: "la", skillId: "laria1", targets: ["e1"] });
+  assert.ok(r.ok, "Nightwrap resolves");
+  assert.equal(hasKind(laria, "elemental_essence"), true, "the glowing middle hero counts as having Elemental Essence, so Laria gains it");
+});
+
 test("laria1: control — no Elemental Essence gained when the target has none", () => {
   const laria = loadHero(heroById("laria"), "A", "la");
   const e1 = makeUnit({ id: "e1", team: "B", hp: 100 }); // no essence
