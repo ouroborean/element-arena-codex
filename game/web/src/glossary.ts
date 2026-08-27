@@ -9,6 +9,9 @@
  * only the floating panels (built imperatively, appended to <body>) carry their own listeners.
  */
 import { GLOSSARY_DEFS } from "./glossary.generated.ts";
+import { SKILL_REFS, SKILL_CARDS, MINION_REFS, type MinionRef } from "./glossref.generated.ts";
+import { SKILL_TEXT } from "./skilltext.generated.ts";
+import { elColor } from "./assets.ts";
 
 // Godot colour-constant names -> dark-theme-legible hex, so a term keeps the game's hue coding.
 const GODOT_COLORS: Record<string, string> = {
@@ -23,28 +26,60 @@ const GODOT_COLORS: Record<string, string> = {
 const DEF_COLOR = "var(--acc)";
 const glossColor = (name: string): string => GODOT_COLORS[name] ?? DEF_COLOR;
 
-interface Cand { lckey: string; len: number; color: string; }
+type Kind = "def" | "skill" | "minion";
+interface Cand { key: string; lckey: string; len: number; ci: boolean; kind: Kind; color: string; ref: string; }
 interface Term { term: string; definition: string; color: string; }
+type Target =
+  | { kind: "def"; term: string; definition: string; color: string }
+  | { kind: "skill"; id: string }
+  | { kind: "minion"; id: string };
 
-// Keyword index: first-char (lowercase) -> candidates sorted longest-first; and lckey -> the term it opens.
+// Match index: first-char (lowercase) -> candidates sorted longest-first. Definitions match case-insensitively
+// (ci=true); skill/minion NAMES match case-sensitively (ci=false). Lookups: def keyword -> term, minion id -> ref.
 const BUCKET = new Map<string, Cand[]>();
 const TERM_BY_KEY = new Map<string, Term>();
+const MINION_BY_ID = new Map<string, MinionRef>();
+function addCand(c: Cand): void {
+  const f = c.lckey.charAt(0);
+  let arr = BUCKET.get(f);
+  if (!arr) { arr = []; BUCKET.set(f, arr); }
+  arr.push(c);
+}
 {
-  const seen = new Set<string>();
+  const seenDef = new Set<string>();
   for (const d of GLOSSARY_DEFS) {
     const color = glossColor(d.color);
     for (const kw of d.keywords) {
       const lc = kw.toLowerCase();
-      if (!lc || seen.has(lc)) continue;
-      seen.add(lc);
+      if (!lc || seenDef.has(lc)) continue;
+      seenDef.add(lc);
       TERM_BY_KEY.set(lc, { term: d.term, definition: d.definition, color });
-      const f = lc.charAt(0);
-      let arr = BUCKET.get(f);
-      if (!arr) { arr = []; BUCKET.set(f, arr); }
-      arr.push({ lckey: lc, len: kw.length, color });
+      addCand({ key: kw, lckey: lc, len: kw.length, ci: true, kind: "def", color, ref: lc });
     }
   }
-  for (const arr of BUCKET.values()) arr.sort((a, b) => b.len - a.len);
+  // Skill + minion NAMES (already deduped name-first-wins by the generator) match case-sensitively.
+  for (const s of SKILL_REFS) {
+    if (!s.name) continue;
+    addCand({ key: s.name, lckey: s.name.toLowerCase(), len: s.name.length, ci: false, kind: "skill", color: elColor(SKILL_CARDS[s.id]?.elem ?? "generic"), ref: s.id });
+  }
+  for (const m of MINION_REFS) {
+    if (!m.name) continue;
+    MINION_BY_ID.set(m.id, m);
+    addCand({ key: m.name, lckey: m.name.toLowerCase(), len: m.name.length, ci: false, kind: "minion", color: elColor(m.elem || "generic"), ref: m.id });
+  }
+  // Longest first; on a tie prefer a case-sensitive name (ci=false) over a definition, matching the codex.
+  for (const arr of BUCKET.values()) arr.sort((a, b) => (b.len - a.len) || (a.ci === b.ci ? 0 : a.ci ? 1 : -1));
+}
+
+function resolveTarget(gt: string | undefined): Target | null {
+  if (!gt) return null;
+  const i = gt.indexOf(":");
+  if (i < 0) return null;
+  const kind = gt.slice(0, i), key = gt.slice(i + 1);
+  if (kind === "def") { const t = TERM_BY_KEY.get(key); return t ? { kind: "def", term: t.term, definition: t.definition, color: t.color } : null; }
+  if (kind === "skill") return SKILL_CARDS[key] ? { kind: "skill", id: key } : null;
+  if (kind === "minion") return MINION_BY_ID.has(key) ? { kind: "minion", id: key } : null;
+  return null;
 }
 
 const esc = (s: string): string => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
@@ -60,20 +95,20 @@ export function glossHtml(textIn: string | null | undefined): string {
   const flush = () => { if (buf) { out += esc(buf); buf = ""; } };
   while (i < n) {
     const bucket = BUCKET.get(text.charAt(i).toLowerCase());
-    let matched: string | null = null, mcolor = DEF_COLOR;
+    let matched: string | null = null, mc: Cand | null = null;
     if (bucket) {
       for (const c of bucket) {
         if (i + c.len > n) continue;
         const slice = text.substr(i, c.len);
-        if (slice.toLowerCase() !== c.lckey) continue;
+        if (c.ci ? slice.toLowerCase() !== c.lckey : slice !== c.key) continue;
         const beforeOK = !isWordChar(slice.charAt(0)) || !isWordChar(text.charAt(i - 1) ?? "");
         const afterOK = !isWordChar(slice.charAt(c.len - 1)) || !isWordChar(text.charAt(i + c.len) ?? "");
-        if (beforeOK && afterOK) { matched = slice; mcolor = c.color; break; }
+        if (beforeOK && afterOK) { matched = slice; mc = c; break; }
       }
     }
-    if (matched) {
+    if (matched && mc) {
       flush();
-      out += `<span class="gloss" data-gk="${esc(matched.toLowerCase())}" style="--gc:${mcolor}">${esc(matched)}</span>`;
+      out += `<span class="gloss gloss-${mc.kind}" data-gt="${esc(mc.kind + ":" + mc.ref)}" style="--gc:${mc.color}">${esc(matched)}</span>`;
       i += matched.length;
     } else { buf += text.charAt(i); i++; }
   }
@@ -129,19 +164,55 @@ function positionPanel(node: HTMLElement, anchor: HTMLElement): void {
   node.style.top = `${Math.round(top)}px`;
 }
 
-function buildPanel(t: Term): { el: HTMLElement; pinBtn: HTMLElement } {
+const cap = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1);
+function statSpan(k: string, v: string): HTMLElement {
+  const s = document.createElement("span"); s.className = "gp-stat";
+  const i = document.createElement("i"); i.textContent = `${k} `;
+  s.append(i, document.createTextNode(v));
+  return s;
+}
+function costText(gen: number, spec: number, elem: string): string {
+  if (!gen && !spec) return "Free";
+  const parts: string[] = [];
+  if (gen) parts.push(`${gen} generic`);
+  if (spec) parts.push(`${spec} ${cap(elem || "element")}`);
+  return parts.join(" + ");
+}
+function defBlock(html: string): HTMLElement { const d = document.createElement("div"); d.className = "gp-def"; d.innerHTML = html; return d; }
+function footBlock(text: string): HTMLElement { const f = document.createElement("div"); f.className = "gp-foot"; f.textContent = text; return f; }
+
+function buildPanel(t: Target): { el: HTMLElement; pinBtn: HTMLElement } {
   const node = document.createElement("div");
-  node.className = "gloss-panel";
+  node.className = `gloss-panel gloss-panel-${t.kind}`;
   const head = document.createElement("div"); head.className = "gp-head";
-  const kind = document.createElement("span"); kind.className = "gp-kind"; kind.textContent = "keyword";
-  const title = document.createElement("span"); title.className = "gp-title"; title.textContent = t.term; title.style.color = t.color;
+  const kind = document.createElement("span"); kind.className = "gp-kind"; kind.textContent = t.kind === "def" ? "keyword" : t.kind;
+  const title = document.createElement("span"); title.className = "gp-title";
   const spring = document.createElement("span"); spring.className = "gp-spring";
   const pinBtn = document.createElement("button"); pinBtn.className = "gp-btn gp-pin"; pinBtn.textContent = "📌"; pinBtn.title = "Pin (keep open)";
   const closeBtn = document.createElement("button"); closeBtn.className = "gp-btn gp-close"; closeBtn.textContent = "✕"; closeBtn.title = "Close";
   head.append(kind, title, spring, pinBtn, closeBtn);
   const body = document.createElement("div"); body.className = "gp-body";
-  const def = document.createElement("div"); def.className = "gp-def"; def.innerHTML = glossHtml(t.definition);
-  body.append(def);
+
+  if (t.kind === "def") {
+    title.textContent = t.term; title.style.color = t.color;
+    body.append(defBlock(glossHtml(t.definition)));
+  } else if (t.kind === "skill") {
+    const c = SKILL_CARDS[t.id]!;
+    title.textContent = c.name; title.style.color = elColor(c.elem || "generic");
+    const stats = document.createElement("div"); stats.className = "gp-stats";
+    stats.append(statSpan("Cost", costText(c.gen, c.spec, c.elem)), statSpan("CD", String(c.cd)), statSpan("Type", c.passive ? "Passive" : "Active"));
+    if (c.target) stats.append(statSpan("Target", cap(c.target)));
+    body.append(stats, defBlock(glossHtml(SKILL_TEXT[t.id]?.d ?? "No description.")));
+    if (c.owner) body.append(footBlock(c.owner));
+  } else {
+    const m = MINION_BY_ID.get(t.id)!;
+    title.textContent = m.name; title.style.color = elColor(m.elem || "generic");
+    const stats = document.createElement("div"); stats.className = "gp-stats";
+    stats.append(statSpan("HP", m.hpDynamic ? "Dynamic" : (m.hp != null ? String(m.hp) : "—")));
+    if (m.elem) stats.append(statSpan("Element", cap(m.elem)));
+    body.append(stats);
+    if (m.owner) body.append(footBlock(`Summoned by ${m.owner}`));
+  }
   node.append(head, body);
   return { el: node, pinBtn };
 }
@@ -152,7 +223,7 @@ function togglePin(p: Panel): void {
   else { p.el.classList.remove("pinned"); p.pinBtn.textContent = "📌"; p.pinBtn.title = "Pin (keep open)"; scheduleSweep(); }
 }
 
-function openPanel(anchor: HTMLElement, t: Term): Panel | null {
+function openPanel(anchor: HTMLElement, t: Target): Panel | null {
   const parent = panelContaining(anchor);
   // Under the same parent, a hover elsewhere closes other transient chains (so only one hover-branch is open).
   panels.slice().forEach((p) => { if (p.parent === parent && !p.pinned && p.anchor !== anchor) closeChain(p); });
@@ -173,7 +244,7 @@ function openPanel(anchor: HTMLElement, t: Term): Panel | null {
   return p;
 }
 
-function linkEnter(link: HTMLElement, t: Term): void {
+function linkEnter(link: HTMLElement, t: Target): void {
   hovered.add(link); cancelSweep();
   if (openTimer) clearTimeout(openTimer);
   pendingAnchor = link;
@@ -184,7 +255,7 @@ function linkLeave(link: HTMLElement): void {
   if (openTimer && pendingAnchor === link) { clearTimeout(openTimer); openTimer = null; }
   scheduleSweep();
 }
-function linkClick(link: HTMLElement, t: Term): void {
+function linkClick(link: HTMLElement, t: Target): void {
   if (openTimer) { clearTimeout(openTimer); openTimer = null; }
   const p = openPanel(link, t);
   if (p && !p.pinned) togglePin(p); // a tap/click pins the panel so it stays put
@@ -197,7 +268,7 @@ export function initGloss(): void {
   inited = true;
   document.addEventListener("mouseover", (e) => {
     const link = (e.target as HTMLElement).closest?.<HTMLElement>(".gloss");
-    if (link) { const t = TERM_BY_KEY.get(link.dataset.gk ?? ""); if (t) linkEnter(link, t); }
+    if (link) { const t = resolveTarget(link.dataset.gt); if (t) linkEnter(link, t); }
   });
   document.addEventListener("mouseout", (e) => {
     const link = (e.target as HTMLElement).closest?.<HTMLElement>(".gloss");
@@ -205,7 +276,7 @@ export function initGloss(): void {
   });
   document.addEventListener("click", (e) => {
     const link = (e.target as HTMLElement).closest?.<HTMLElement>(".gloss");
-    if (link) { const t = TERM_BY_KEY.get(link.dataset.gk ?? ""); if (t) { e.stopPropagation(); linkClick(link, t); } }
+    if (link) { const t = resolveTarget(link.dataset.gt); if (t) { e.stopPropagation(); linkClick(link, t); } }
   });
   // A scroll outside the panels dismisses transient ones; resizing recomputes nothing, so just clear.
   window.addEventListener("scroll", (e) => {
