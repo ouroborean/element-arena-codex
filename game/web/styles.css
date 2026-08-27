@@ -552,8 +552,9 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .tut-root { position: fixed; inset: 0; z-index: 200; pointer-events: none; }
 .tut-root[hidden] { display: none; }
 .tut-scrim { position: absolute; inset: 0; background: transparent; pointer-events: none; transition: background .15s; }
-/* only the anchor-less steps (welcome / finish) dim the board; anchored steps never dim, so nothing is obscured */
-.tut-root.no-anchor .tut-scrim { background: rgba(0, 0, 0, .55); }
+/* only the anchor-less steps (welcome / finish) dim the board AND catch a click to advance; anchored steps never
+   dim or block, so the board stays live (clickable controls, hoverable chips) */
+.tut-root.no-anchor .tut-scrim { background: rgba(0, 0, 0, .55); pointer-events: auto; cursor: pointer; }
 .tut-ring { position: fixed; border: 2px solid var(--acc); border-radius: var(--radius); pointer-events: none; transition: left .18s, top .18s, width .18s, height .18s;
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--acc) 35%, transparent), 0 0 18px 3px color-mix(in srgb, var(--acc) 55%, transparent); }
 .tut-root:not(.blocking) .tut-ring { animation: tut-pulse 1.3s ease-in-out infinite; } /* act steps pulse: "use me" */
