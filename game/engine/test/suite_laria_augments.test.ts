@@ -193,7 +193,9 @@ test("laria1 Darkest Hour: the ally's Invulnerable functionally blocks an incomi
 test("laria2 Noble Thief: Nightwrap on an ALLY without Elemental Essence gives THAT ALLY Elemental Essence", () => {
   const laria = loadHero(heroById("laria"), "A", "la");
   applyAugment(laria, augmentById("laria2")!);
-  const ally = makeUnit({ id: "a1", team: "A", hp: 100, maxHp: 100 }); // no essence
+  // A NON-middle (slot 2), chargeless ally is genuinely WITHOUT Elemental Essence — a middle-slot hero always
+  // HAS it (income/glow), so it would take the base "target has essence" branch instead.
+  const ally = makeUnit({ id: "a1", team: "A", hp: 100, maxHp: 100, slot: 2 });
   const enemy = makeUnit({ id: "e1", team: "B", hp: 100 });
   const state = makeState([laria, ally], [enemy]);
   fund(state);
@@ -202,7 +204,7 @@ test("laria2 Noble Thief: Nightwrap on an ALLY without Elemental Essence gives T
   const r = performAction(state, { unit: "la", skillId: "laria1", targets: ["a1"] });
   assert.ok(r.ok, "Nightwrap resolves on the ally");
   assert.equal(hasKind(ally, "elemental_essence"), true, "the ally is GIVEN Elemental Essence");
-  // Laria does not steal essence here (base steal only fires if the target HAD essence).
+  // Base branch does not fire (the ally had no essence), so Laria gains none here.
   assert.equal(hasKind(laria, "elemental_essence"), false, "Laria gains no essence from an essence-less ally");
 });
 

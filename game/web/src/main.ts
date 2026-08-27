@@ -866,13 +866,20 @@ const TUT_SCRIPT: TutStep[] = [
   { blocking: false, anchor: "[data-resolve]", title: "Resolve your turn", body: "One skill is queued (this turn you can only afford one — later you can queue one per hero). Press <b>Resolve turn</b>.", done: () => !!ui.orderPanel },
   { blocking: true, anchor: ".ro-list", title: "Resolution order", body: "Your queued skills and any effects ticking this turn resolve top → bottom. <b>Drag a row</b> or use ▲▼ to reorder — timing can matter." },
   { blocking: false, anchor: "[data-order-confirm]", title: "Lock in the order", body: "Click <b>Resolve turn ▶</b> to confirm.", done: () => !!ui.energyPanel },
-  { blocking: true, anchor: ".alloc-rows", title: "Pay the cost", body: "Generic cost is paid with any colour you own — here your <b>Fire</b> essence covers it. It's pre-filled; confirm to run the turn." },
+  { blocking: true, anchor: ".alloc-rows", title: "Pay the cost", body: "Generic cost is paid with any colour you own — here your <b>Fire</b> energy covers it. The game pre-fills a sensible split (spending your Generic first, or all of your energy when it's all needed anyway). Confirm to run the turn." },
   { blocking: false, anchor: "[data-energy-confirm]", title: "Confirm &amp; resolve", body: "Click <b>Confirm &amp; resolve ▶</b>. The enemy responds, then it's your turn again.", done: () => tutTurn >= 2 },
-  { blocking: true, cta: "Got it ▶", title: "Now — play it out", body: "You've got the loop! Play the rest of the round yourself: build energy, queue <b>one skill per hero</b> each turn, resolve, and wipe the enemy team. I'll return when the round ends." },
+  // turn 2: how energy is generated, and Laria's own way to earn Essence
+  { blocking: true, anchor: ".epool", title: "Where energy comes from", body: "At the start of each turn, every hero makes <b>1 Generic</b> energy — unless it has <b>Elemental Essence</b>, which makes 1 of its own element instead. Your <b>centre</b> hero always has Essence; every other hero has its own way to earn it." },
+  { blocking: true, anchor: "[data-inspect-unit=\"a3\"]", title: "Laria's Essence", body: "<b>Laria</b> earns Essence by using her S1, <b>Nightwrap</b>, on a target that already <b>has Elemental Essence</b> — like a glowing centre hero, yours or the enemy's." },
+  { blocking: false, anchor: "[data-skill=\"laria1\"]", title: "Try it — Nightwrap", body: "Click <b>Laria's Nightwrap</b> to aim it.", done: () => ui.targeting?.skillId === "laria1" },
+  { blocking: false, anchor: "[data-target=\"b2\"]", title: "Hit an Essence holder", body: "Aim it at the enemy's <b>centre hero</b> (the glowing one) — or your Pyrrha. Laria earns Essence from it.", done: () => [...ui.planned.values()].some((a) => a.skillId === "laria1" && (a.targets ?? []).some((t) => t === "a2" || t === "b2")) },
+  { blocking: true, cta: "Got it ▶", title: "Now — play it out", body: "Resolve that, then play the rest of the round yourself: build energy, queue <b>one skill per hero</b> each turn, resolve, and wipe the enemy team. I'll return when the round ends." },
   { blocking: false, hidden: true, title: "", body: "", done: () => !!ui.draft }, // silent: the player fights the round out until the upgrade draft opens
-  { blocking: true, anchor: ".draft-options", title: "Between rounds: upgrade", body: "Round over — time to upgrade a hero. A <b>Fusion</b> merges a hero's element with a teammate's for a new form + skill; an <b>Augment</b> adds a permanent perk." },
-  { blocking: false, anchor: ".fusion-card", title: "Pick a fusion", body: "Click a <b>fusion form</b> to choose it for that hero.", done: () => (ui.draft?.picks.size ?? 0) > 0 },
-  { blocking: false, anchor: "[data-draft-confirm]", title: "Confirm your upgrade", body: "Click <b>Confirm ▶</b> to apply it and start the next round.", done: () => !ui.draft },
+  // between-round draft
+  { blocking: true, anchor: ".draft-heroes", title: "Between rounds: upgrade", body: "Round over! Now you may upgrade — a <b>Fusion</b> or <b>Augment</b> for <b>each</b> of your heroes (click a hero here to see its options; leave any as-is). A Fusion re-elements a hero into a new form + skill; an Augment adds a permanent perk." },
+  { blocking: false, anchor: ".fusion-card", title: "Pick a fusion", body: "Pick a <b>fusion form</b> for this hero — you could upgrade all three, but one is enough here.", done: () => (ui.draft?.picks.size ?? 0) > 0 },
+  { blocking: false, anchor: "[data-draft-confirm]", title: "Confirm your upgrades", body: "You can set one for every hero; here we'll take just this one. Click <b>Confirm ▶</b>.", done: () => !ui.draft },
+  { blocking: true, title: "Fused energy", body: "That hero is now <b>fused</b> into a hybrid element. Its energy is flexible — it pays for <b>either</b> of the two base elements it was made from, <b>as well as</b> its own new fused element." },
   { blocking: true, title: "You're ready!", cta: "Finish ▶", body: "That's the whole loop — build energy, queue your heroes, order the resolution, and upgrade between rounds. Hover any keyword to learn more. Now go build your own team!" },
 ];
 
@@ -904,7 +911,7 @@ async function startTutorial(): Promise<void> {
   // A normal-rules 3v3 versus the real (if weak) AI — representative of an actual game: normal HP, normal energy
   // income. All base-element heroes so they can fuse in the upgrade draft; Pyrrha sits in the MIDDLE slot, so
   // she carries Elemental Essence and her first-turn Fire income covers her opener.
-  state = buildMatch({ A: ["gommar", "pyrrha", "roland"], B: ["ando", "zevkir", "jarrik"], seed: 90210 });
+  state = buildMatch({ A: ["gommar", "pyrrha", "laria"], B: ["ando", "zevkir", "jarrik"], seed: 90210 });
   setup = null;
   ui.you = "A";
   tutTurn = 0;

@@ -10947,8 +10947,7 @@ export const ROSTER: HeroDef[] = [
      {
       "op": "if",
       "cond": {
-       "has": "elemental_essence",
-       "of": "target"
+       "hasEssenceIncome": "target"
       },
       "then": [
        {

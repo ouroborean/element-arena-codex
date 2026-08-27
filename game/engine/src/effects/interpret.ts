@@ -10,6 +10,7 @@ import type { MatchState, TeamId, Unit } from "../types.ts";
 import { Rng } from "../rng.ts";
 import { addShield, applyDamage, applyHeal, applyHealthLoss, bypassesAgainst, outgoingDamageMod, outgoingDamageMult, outgoingDtypeOverride, skillDamageBonus, totalShield } from "../damage.ts";
 import { applyStatus, removeStatus, stackCount } from "../status.ts";
+import { hasEssenceIncome } from "../scheduler.ts"; // runtime-only use (evalCondition) — the scheduler↔interpret cycle is benign
 import { applyRounding } from "../rulings.ts";
 import type { GameEvent, TriggeredEffect } from "../events.ts";
 import { MAX_TRIGGER_DEPTH } from "../events.ts";
@@ -308,6 +309,10 @@ export function evalCondition(c: Condition, ctx: Ctx): boolean {
   if ("has" in c) {
     const u = resolveOne(c.of, ctx);
     return u.statuses.some((s) => s.kind === c.has && (c.name === undefined || s.name === c.name));
+  }
+  if ("hasEssenceIncome" in c) {
+    // "has Elemental Essence" as the glow means it — the middle-slot hero OR an essence charge (not while Silenced).
+    return hasEssenceIncome(resolveOne(c.hasEssenceIncome, ctx));
   }
   if ("cmp" in c) {
     const l = evalValue(c.left, ctx);

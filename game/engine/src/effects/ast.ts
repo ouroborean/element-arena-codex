@@ -72,6 +72,9 @@ export type Selector =
 // --------------------------------------------------------------------------- //
 export type Condition =
   | { has: StatusKind; name?: string; of?: Selector }
+  | { hasEssenceIncome: Selector } // the unit "has Elemental Essence" the way the glow means it: it generates
+  //   element energy each turn — the MIDDLE-slot hero (always) OR any elemental_essence charge — unless Silenced.
+  //   (Distinct from `has: elemental_essence`, which counts only a literal charge and misses the middle hero.)
   | { cmp: ">" | ">=" | "<" | "<=" | "==" | "!="; left: Value; right: Value }
   | { sameUnit: [Selector, Selector] } // identity equality of the first unit each resolves to
   | { unitIn: [Selector, Selector] } // membership: the first selector's unit is among the second selector's set
