@@ -151,6 +151,9 @@ test("gommar1 Frost-Covered: after the single hit it deals 10 to the WHOLE enemy
   assert.equal(t.hp, 70, "primary target takes 20 (single) + 10 (team splash)");
   assert.equal(b.hp, 90, "other enemy takes the 10 splash");
   assert.equal(c.hp, 90, "other enemy takes the 10 splash");
+  // No self-trigger of Frost-Covered's Essence passive: the -5 damage debuff is applied AFTER both the 20 and
+  // the 10 land, so neither damage point hits a target that Iceblood Hammer itself just reduced.
+  assert.equal(hasEssence(g), false, "Iceblood Hammer does not grant Essence off its own -5 debuff");
 });
 
 // --------------------------------------------------------------------------- //
