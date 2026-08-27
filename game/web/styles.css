@@ -67,7 +67,7 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
   .unit { flex-wrap: wrap; } /* a kit that can't fit beside its portrait drops below it */
 }
 
-.pcol { position: relative; display: flex; flex-direction: column; align-items: center; width: 118px; }
+.pcol { position: relative; display: flex; flex-direction: column; align-items: center; width: 146px; }
 .frame { position: relative; width: 100%; aspect-ratio: 3/4; border-radius: var(--radius); overflow: hidden; border: 2px solid color-mix(in srgb, var(--el, #556) 60%, #000); background: var(--bg); box-shadow: var(--shadow); }
 /* Elemental Essence: an element-coloured glow (no tooltip) — the middle hero, or anyone holding a charge. */
 .unit.essence .frame { border-color: var(--el); box-shadow: 0 0 0 2px var(--el), 0 0 16px 3px color-mix(in srgb, var(--el) 60%, transparent), var(--shadow); }
@@ -79,10 +79,10 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .pip { font-size: 9px; padding: 1px 4px; border-radius: var(--radius); background: #000a; color: var(--dim); }
 .pip.stack { color: var(--acc); } .pip.bad { color: var(--foe); } .pip.good { color: var(--you); } .pip.state { color: var(--mid); }
 
-.minioncol .pcol { width: 66px; }
+.minioncol .pcol { width: 82px; }
 .minioncol .name { font-size: 9px; padding: 4px 2px 2px; }
-.minioncol .tiles { grid-template-columns: repeat(3, 30px); grid-auto-rows: 30px; gap: 3px; }
-.minioncol .tile { width: 30px; height: 30px; }
+.minioncol .tiles { grid-template-columns: repeat(3, 37px); grid-auto-rows: 37px; gap: 3px; }
+.minioncol .tile { width: 37px; height: 37px; }
 
 .hp { position: relative; height: 16px; width: 100%; margin-top: 5px; background: var(--bg); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); }
 .hp-fill { height: 100%; background: linear-gradient(var(--hi), #2f9e4f); transition: width .4s ease; }
@@ -91,8 +91,8 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .minioncol .hp { height: 13px; } .minioncol .hp-num { font-size: 9px; }
 
 /* Active-skill tiles: a fixed 3-wide grid (5 skills flow as 3 + 2), living inside the kit panel. */
-.tiles { display: grid; grid-template-columns: repeat(3, 38px); grid-auto-rows: 38px; gap: 6px; justify-content: center; }
-.tile { position: relative; width: 38px; height: 38px; padding: 0; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--panel2); cursor: pointer; }
+.tiles { display: grid; grid-template-columns: repeat(3, 46px); grid-auto-rows: 46px; gap: 6px; justify-content: center; }
+.tile { position: relative; width: 46px; height: 46px; padding: 0; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--panel2); cursor: pointer; }
 .tile img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; } /* covers the abbr behind it; onerror removes it -> abbr shows */
 .tile:hover { border-color: var(--acc); }
 .tile.chosen { border-color: var(--you); box-shadow: 0 0 0 2px var(--you) inset; }
@@ -110,7 +110,7 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
   background: linear-gradient(150deg, color-mix(in srgb, var(--el, #556) 24%, var(--panel)), var(--panel) 72%);
   box-shadow: inset 0 1px 0 #ffffff12, var(--shadow); }
 /* The Ultimate: a larger, distinct slot to the right of the five normal skill slots. */
-.tile-ult { width: 62px; height: 62px; border-width: 2px; border-color: color-mix(in srgb, var(--mid) 60%, #000); }
+.tile-ult { width: 74px; height: 74px; border-width: 2px; border-color: color-mix(in srgb, var(--mid) 60%, #000); }
 .tile-ult .cdbadge { font-size: 22px; }
 
 /* ── top bar: your chip (far left) · shared controls (centre) · opponent chip (far right) ── */
@@ -498,18 +498,18 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
   border: 3px solid #ffffff55; box-shadow: var(--shadow), inset 0 0 0 6px color-mix(in srgb, var(--bg2) 40%, transparent); background: var(--bg2); }
 .cs-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; display: block; }
 
-/* Skill kit — a modern card: label-left / icons-right rows, colour-coded by skill class, on a
-   translucent gradient panel so the labels + art read cleanly over the background. */
-.cs-skills { width: 360px; display: flex; flex-direction: column; justify-content: space-between; padding: 22px 20px; border-radius: var(--radius);
+/* Skill kit — labelled skill groups (label over its icons) laid out HORIZONTALLY and wrapping, colour-coded by
+   class, on a translucent gradient panel. A fixed min-height means a hero's extra Fusion group fills spare
+   row space instead of bouncing the whole layout, and the icons are large. */
+.cs-skills { width: 460px; min-height: 300px; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 18px 26px; padding: 22px 24px; border-radius: var(--radius);
   border: 1px solid var(--line); background: linear-gradient(165deg, color-mix(in srgb, var(--panel2) 95%, transparent), color-mix(in srgb, var(--bg) 95%, transparent)); box-shadow: var(--shadow), inset 0 1px 0 #ffffff14; }
-.cs-sk-title { font-size: 11px; font-weight: 800; letter-spacing: 2.5px; text-transform: uppercase; color: #fff; opacity: .82; margin-bottom: 6px; }
-.cs-sk { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 10px; padding: 9px 0; }
-.cs-sk + .cs-sk { border-top: 1px solid #ffffff12; }
+.cs-sk-title { flex-basis: 100%; font-size: 11px; font-weight: 800; letter-spacing: 2.5px; text-transform: uppercase; color: #fff; opacity: .82; margin: 0; }
+.cs-sk { display: flex; flex-direction: column; gap: 10px; padding: 0; }
 .cs-sk h4 { margin: 0; display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; font-style: normal; text-transform: uppercase; letter-spacing: .7px; color: var(--sk, var(--dim)); }
 .cs-sk h4::before { content: ""; width: 3px; height: 14px; border-radius: var(--radius); background: var(--sk, var(--dim)); }
 .cs-sk.passive { --sk: #aab2d6; } .cs-sk.basic { --sk: var(--acc); } .cs-sk.fusion { --sk: #c88ae8; } .cs-sk.defensive { --sk: var(--you); } .cs-sk.ultimate { --sk: var(--mid); }
-.cs-icons { display: flex; gap: 6px; }
-.cs-sicon { width: 52px; height: 52px; padding: 0; border-radius: var(--radius); overflow: hidden; border: 1px solid #ffffff26; background: var(--bg); box-shadow: var(--shadow); cursor: pointer; transition: transform .1s, border-color .1s, box-shadow .1s; }
+.cs-icons { display: flex; flex-wrap: wrap; gap: 8px; }
+.cs-sicon { width: 66px; height: 66px; padding: 0; border-radius: var(--radius); overflow: hidden; border: 1px solid #ffffff26; background: var(--bg); box-shadow: var(--shadow); cursor: pointer; transition: transform .1s, border-color .1s, box-shadow .1s; }
 .cs-sicon img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .cs-sicon:hover { transform: translateY(-2px); border-color: var(--sk, var(--acc)); box-shadow: var(--shadow); }
 /* floating skill-info popup — hovers/pops off a skill icon, never affects layout */
