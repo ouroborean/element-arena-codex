@@ -48,8 +48,8 @@ export function showCoach(step: CoachStep, onContinue: () => void): void {
   current = step;
   root!.hidden = false;
   root!.classList.toggle("blocking", step.blocking);
-  scrim!.onclick = step.blocking ? () => onContinue() : null;
-  scrim!.style.pointerEvents = step.blocking ? "auto" : "none";
+  // The overlay is click-THROUGH (see .tut-root pointer-events:none in the CSS) so the board stays fully live —
+  // only the popup's own buttons are interactive. Explain steps advance via the Continue button, not the scrim.
 
   pop!.innerHTML = "";
   if (step.progress) { const p = document.createElement("div"); p.className = "tut-step"; p.textContent = step.progress; pop!.append(p); }

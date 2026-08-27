@@ -547,15 +547,16 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 @media (max-width: 720px) { .gloss-panel { width: calc(100vw - 16px); } }
 
 /* ── Tutorial coach-marks: a message that points at the real UI (see tutorial.ts / the state machine in main.ts) ── */
-.tut-root { position: fixed; inset: 0; z-index: 200; }
+/* The overlay is click-THROUGH — only .tut-pop is interactive — so the board stays fully live: the player can
+   click the highlighted control and hover effect chips/keywords while a coach-mark is up. */
+.tut-root { position: fixed; inset: 0; z-index: 200; pointer-events: none; }
 .tut-root[hidden] { display: none; }
-.tut-scrim { position: absolute; inset: 0; background: transparent; transition: background .15s; }
-.tut-root.blocking.no-anchor .tut-scrim { background: rgba(0, 0, 0, .6); }
-.tut-ring { position: fixed; border: 2px solid var(--acc); border-radius: var(--radius); pointer-events: none; transition: left .18s, top .18s, width .18s, height .18s; }
-/* act step: a pulsing glow, board stays live */
-.tut-root:not(.blocking) .tut-ring { box-shadow: 0 0 0 3px color-mix(in srgb, var(--acc) 35%, transparent), 0 0 18px 3px color-mix(in srgb, var(--acc) 55%, transparent); animation: tut-pulse 1.3s ease-in-out infinite; }
-/* explain step: the ring's huge shadow spotlights the anchor (dims everything else); the scrim catches clicks */
-.tut-root.blocking .tut-ring { box-shadow: 0 0 0 9999px rgba(0, 0, 0, .62), 0 0 0 3px color-mix(in srgb, var(--acc) 45%, transparent); }
+.tut-scrim { position: absolute; inset: 0; background: transparent; pointer-events: none; transition: background .15s; }
+/* only the anchor-less steps (welcome / finish) dim the board; anchored steps never dim, so nothing is obscured */
+.tut-root.no-anchor .tut-scrim { background: rgba(0, 0, 0, .55); }
+.tut-ring { position: fixed; border: 2px solid var(--acc); border-radius: var(--radius); pointer-events: none; transition: left .18s, top .18s, width .18s, height .18s;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--acc) 35%, transparent), 0 0 18px 3px color-mix(in srgb, var(--acc) 55%, transparent); }
+.tut-root:not(.blocking) .tut-ring { animation: tut-pulse 1.3s ease-in-out infinite; } /* act steps pulse: "use me" */
 @keyframes tut-pulse { 50% { box-shadow: 0 0 0 5px color-mix(in srgb, var(--acc) 22%, transparent), 0 0 24px 5px color-mix(in srgb, var(--acc) 45%, transparent); } }
 .tut-pop { position: fixed; max-width: min(340px, calc(100vw - 20px)); background: var(--panel2); border: 1px solid var(--acc); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px 16px; pointer-events: auto; animation: gpop .12s ease-out; }
 .tut-step { font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: var(--dim); margin-bottom: 5px; }
