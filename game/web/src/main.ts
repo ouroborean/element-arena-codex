@@ -19,6 +19,7 @@ import { energyIcon, elementRank, avatarUrl } from "./assets.ts";
 import { ELEMENT_BY_ID } from "./elementid.generated.ts";
 import { cbEnabled, cbEnergyEl, toggleColorblind } from "./colorblind.ts";
 import { glossHtml, initGloss, closeTransientGloss } from "./glossary.ts";
+import { showCoach, positionCoach, hideCoach, coachActive } from "./tutorial.ts";
 import { MatchSocket, serverUrl, fetchProfile, fetchAvatars, register, login, claimAccount, saveProfile, type AvatarInfo } from "./net.ts";
 import { PROTOCOL_VERSION, MAX_NAME_LEN, type ServerMsg, type Profile, type WireTurnOrder } from "../../net/protocol.ts";
 
@@ -262,7 +263,7 @@ function hideSkpop(): void { skpop.hidden = true; }
 // In PvP the server already redacted `state`, so this is idempotent; in local vs-bot play (where `state` is
 // the full authoritative board the engine loop runs on) this is what actually hides the bot's Invisible
 // effects from the human. We redact only the render copy — the live `state` the loop mutates stays whole.
-function render(): void { hideFx(); closeTransientGloss(); app.innerHTML = renderApp(redactState(state, ui.you), ui, playerPanel()); }
+function render(): void { hideFx(); closeTransientGloss(); app.innerHTML = renderApp(redactState(state, ui.you), ui, playerPanel()); tutorialAfterRender(); }
 /** The team-select screen (its player panel reads the profile) plus the avatar picker when open. */
 function renderSetupScreen(): void { closeTransientGloss(); app.innerHTML = renderSetup(setup!, playerPanel()) + avatarPickerHtml() + (claimForm ? renderClaim(claimForm) : ""); fitCharSelect(); }
 // Remember the team just taken into a match so returning to team select (after the match's page reload)
@@ -474,7 +475,7 @@ app.addEventListener("click", (e) => {
     }
     return; // swallow other clicks (the inputs still focus normally)
   }
-  const el = (e.target as HTMLElement).closest<HTMLElement>("[data-login],[data-register],[data-guest],[data-login-mode],[data-logout],[data-claim-open],[data-owner],[data-skill],[data-target],[data-cancel],[data-resolve],[data-surrender],[data-pick],[data-inspect],[data-reroll],[data-start],[data-quick],[data-ranked],[data-quick-cancel],[data-plus],[data-minus],[data-energy-confirm],[data-energy-cancel],[data-draft-inspect],[data-fuse-unit],[data-aug-unit],[data-draft-confirm],[data-draft-clear],[data-concede-round],[data-forfeit],[data-keep],[data-augfuse],[data-avatar-pick],[data-avatar-set],[data-avatar-close],[data-cb-toggle],[data-order-cancel],[data-order-confirm],[data-order-up],[data-order-down]");
+  const el = (e.target as HTMLElement).closest<HTMLElement>("[data-login],[data-register],[data-guest],[data-login-mode],[data-logout],[data-claim-open],[data-owner],[data-skill],[data-target],[data-cancel],[data-resolve],[data-surrender],[data-pick],[data-inspect],[data-reroll],[data-start],[data-tutorial],[data-quick],[data-ranked],[data-quick-cancel],[data-plus],[data-minus],[data-energy-confirm],[data-energy-cancel],[data-draft-inspect],[data-fuse-unit],[data-aug-unit],[data-draft-confirm],[data-draft-clear],[data-concede-round],[data-forfeit],[data-keep],[data-augfuse],[data-avatar-pick],[data-avatar-set],[data-avatar-close],[data-cb-toggle],[data-order-cancel],[data-order-confirm],[data-order-up],[data-order-down]");
   if (!el) return;
   const d = el.dataset;
 
@@ -580,6 +581,9 @@ app.addEventListener("click", (e) => {
       saveLastTeam(setup.picked); // repopulate this team on return from the match
       setup = null;
       startMatch(draft).catch((err) => { app.innerHTML = `<pre style="color:#f88;padding:1rem">${(err as Error).stack ?? err}</pre>`; });
+    } else if (d.tutorial) {
+      setup = null;
+      startTutorial().catch((err) => { app.innerHTML = `<pre style="color:#f88;padding:1rem">${(err as Error).stack ?? err}</pre>`; });
     }
     return;
   }
@@ -835,6 +839,92 @@ async function startMatch(draft: Draft): Promise<void> {
   </div></div>`;
   ui.phaseLabel = "match over";
   render();
+}
+
+// ── Tutorial: a guided, scripted training battle ─────────────────────────────────────────────────────── //
+// A step is either "explain" (blocking: dim + click Continue) or "act" (non-blocking: highlight a control and
+// wait for `done` to become true). Bodies are trusted authored HTML. Anchors are CSS selectors, re-resolved
+// each render. The battle is a fixed Pyrrha(+idle Gommar) vs a fragile, passive dummy; a pre-seeded burn means
+// effects / glossary / the resolution-order interleave can all be taught on turn one, and the low-HP dummy
+// guarantees a round win → the fusion/augment draft.
+interface TutStep { anchor?: string; title: string; body: string; blocking: boolean; cta?: string; done?: () => boolean; }
+let tutorial: { steps: TutStep[]; i: number } | null = null;
+
+const TUT_SCRIPT: TutStep[] = [
+  { blocking: true, title: "Welcome to Element Arena", body: "This quick training battle covers the essentials. You'll command <b>Pyrrha</b> against a passive dummy — just follow the highlights." },
+  { blocking: true, anchor: ".teamcol.you", title: "Your team", body: "Your heroes stand on the left. You brought two; you'll only need Pyrrha here." },
+  { blocking: true, anchor: ".teamcol.foe", title: "The enemy", body: "Your opponent is on the right. It won't fight back — defeat it to win the round." },
+  { blocking: true, anchor: ".epool", title: "Energy", body: "Skills cost energy. Each hero makes energy of their element (Pyrrha's is <b>Fire</b>) plus <b>Generic</b>. This pool updates live as you queue skills." },
+  { blocking: true, anchor: ".unit.enemy .fx.bad", title: "Effects &amp; keywords", body: "Units carry effect chips like this burn. <b>Hover a chip</b> to read it — and hover any coloured keyword (like <span style=\"color:#ff6b6b\">Affliction</span>) in a description to open the glossary." },
+  { blocking: false, anchor: "[data-skill=\"pyrrha1\"]", title: "Use a skill", body: "Click <b>Fan the Flames</b> to aim it.", done: () => ui.targeting?.skillId === "pyrrha1" },
+  { blocking: false, anchor: "[data-target]", title: "Choose a target", body: "Now click the highlighted enemy to queue the attack.", done: () => ui.planned.size > 0 },
+  { blocking: false, anchor: "[data-resolve]", title: "Resolve your turn", body: "Your attack is queued (with more heroes you'd queue one skill each first). Press <b>Resolve turn</b>.", done: () => !!ui.orderPanel },
+  { blocking: true, anchor: ".ro-list", title: "Resolution order", body: "Your queued skill and any effects ticking this turn (like the burn) resolve top → bottom. <b>Drag a row</b> or use ▲▼ to reorder them — timing can matter." },
+  { blocking: false, anchor: "[data-order-confirm]", title: "Lock in the order", body: "Click <b>Resolve turn ▶</b> to confirm.", done: () => !!ui.energyPanel },
+  { blocking: true, anchor: ".alloc-rows", title: "Pay the cost", body: "Generic energy can be paid with any colour you own. Pick which energy covers it (it's pre-filled here)." },
+  { blocking: false, anchor: "[data-energy-confirm]", title: "Confirm &amp; resolve", body: "Click <b>Confirm &amp; resolve ▶</b> to run the turn.", done: () => !!ui.draft },
+  { blocking: true, anchor: ".draft-options", title: "Between rounds: upgrade", body: "You won the round! Now upgrade. A <b>Fusion</b> merges Pyrrha's Fire with a teammate's element for a new form + skill; an <b>Augment</b> adds a permanent perk." },
+  { blocking: false, anchor: ".fusion-card", title: "Pick a fusion", body: "Click a <b>fusion form</b> to choose it for Pyrrha.", done: () => (ui.draft?.picks.size ?? 0) > 0 },
+  { blocking: false, anchor: "[data-draft-confirm]", title: "Confirm your upgrade", body: "Click <b>Confirm ▶</b> to apply it and start the next round.", done: () => !ui.draft },
+  { blocking: true, title: "You're ready!", cta: "Finish ▶", body: "That's the core loop — queue skills, order their resolution, pay costs, and upgrade each round. Hover any keyword to learn more. Now go build your own team!" },
+];
+
+function tutStep(): TutStep | null { return tutorial ? (tutorial.steps[tutorial.i] ?? null) : null; }
+function showTutStep(): void {
+  const s = tutStep();
+  if (!s) { hideCoach(); return; }
+  const last = tutorial!.i === tutorial!.steps.length - 1;
+  showCoach({ anchor: s.anchor, title: s.title, body: s.body, blocking: s.blocking, cta: s.cta, progress: `${tutorial!.i + 1} / ${tutorial!.steps.length}` },
+    () => (last ? finishTutorial() : advanceTutorial()));
+}
+function advanceTutorial(): void {
+  if (!tutorial) return;
+  tutorial.i += 1;
+  if (tutorial.i >= tutorial.steps.length) { finishTutorial(); return; }
+  showTutStep();
+}
+/** Called after every render: mount the first coach-mark, auto-advance any satisfied act-step, reposition. */
+function tutorialAfterRender(): void {
+  if (!tutorial) return;
+  if (!coachActive()) showTutStep();
+  const s = tutStep();
+  if (s?.done && s.done()) { advanceTutorial(); return; }
+  positionCoach();
+}
+function finishTutorial(): void { tutorial = null; hideCoach(); location.reload(); } // reload cuts cleanly out of the loop → team select
+
+const tutorialFoe: AsyncProvider = () => []; // the training dummy never acts
+
+async function startTutorial(): Promise<void> {
+  state = buildMatch({ A: ["pyrrha", "gommar"], B: ["roland"], seed: 90210 });
+  const foe0 = state.units["b1"];
+  if (foe0) { foe0.maxHp = 8; foe0.hp = 8; } // a fragile, passive dummy: Pyrrha's opener ends the round → the upgrade draft
+  setup = null;
+  ui.you = "A";
+  tutorial = { steps: TUT_SCRIPT, i: 0 };
+  await runMatch(state, (st, side) => (side === "A" ? human(st, side) : tutorialFoe(st, side)), {
+    roundsToWin: 2,
+    hooks: {
+      onRoundStart: () => render(),
+      onTurnStart: (st, side) => {
+        if (side !== "A") return;
+        const e = st.teams.A.energy; e.fire = (e.fire ?? 0) + 3; e.generic = (e.generic ?? 0) + 3; // guarantee the opener is affordable
+        // Seed a burn on the dummy AFTER the round/turn is set up (so it survives startRound), tick-eligible now,
+        // so effects/keywords AND the resolution-order interleave are both teachable on turn one.
+        const f = st.units["b1"];
+        if (f && f.alive && !f.statuses.some((s) => s.name === "Burning")) {
+          f.statuses.push({ kind: "dot", name: "Burning", magnitude: 5, dtype: "affliction", appliedBy: "a1", appliedTurn: st.turn - 1, duration: 3 });
+        }
+      },
+      onResults: () => render(),
+      onRoundEnd: () => render(),
+    },
+    onBetweenRounds: async (st) => {
+      ui.phase = "busy"; ui.phaseLabel = "upgrade";
+      if (hasDraftOptions(st, "A")) await humanDraft(st, "A"); // the tutorial guides this draft
+      render();
+    },
+  }).catch(() => { /* finishTutorial reloads out of the loop */ });
 }
 
 // ── Quick Match (PvP, server-authoritative) ─────────────────────────────────────────────────────────── //

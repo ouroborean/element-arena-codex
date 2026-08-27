@@ -719,6 +719,7 @@ export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: 
       <div class="cs-roster left">${panelRows(LEFT_ROWS)}</div>
       <div class="cs-mid">
         <div class="cs-modes">
+          <button class="cs-mode tutorial wide" data-tutorial="1" title="A short guided battle that teaches the essentials">▶ Tutorial</button>
           <button class="cs-mode" data-quick="1" ${full ? "" : "disabled"}>Quick Match</button>
           <button class="cs-mode" data-ranked="1" ${full ? "" : "disabled"}>Ranked Match</button>
           <button class="cs-mode wide" disabled>Hero Challenge Trials</button>
