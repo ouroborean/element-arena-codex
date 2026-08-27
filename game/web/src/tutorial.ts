@@ -48,8 +48,10 @@ export function showCoach(step: CoachStep, onContinue: () => void): void {
   current = step;
   root!.hidden = false;
   root!.classList.toggle("blocking", step.blocking);
-  // The overlay is click-THROUGH (see .tut-root pointer-events:none in the CSS) so the board stays fully live —
-  // only the popup's own buttons are interactive. Explain steps advance via the Continue button, not the scrim.
+  // The overlay is click-THROUGH by default (.tut-root pointer-events:none) so an anchored step leaves the board
+  // fully live — the highlighted control is clickable and chips are hoverable. Only the anchor-less welcome /
+  // finish steps get a solid, click-to-advance scrim (CSS gives .no-anchor .tut-scrim pointer-events:auto).
+  scrim!.onclick = () => onContinue();
 
   pop!.innerHTML = "";
   if (step.progress) { const p = document.createElement("div"); p.className = "tut-step"; p.textContent = step.progress; pop!.append(p); }

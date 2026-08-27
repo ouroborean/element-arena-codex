@@ -842,31 +842,41 @@ async function startMatch(draft: Draft): Promise<void> {
 }
 
 // ── Tutorial: a guided, scripted training battle ─────────────────────────────────────────────────────── //
-// A step is either "explain" (blocking: dim + click Continue) or "act" (non-blocking: highlight a control and
-// wait for `done` to become true). Bodies are trusted authored HTML. Anchors are CSS selectors, re-resolved
-// each render. The battle is a fixed Pyrrha(+idle Gommar) vs a fragile, passive dummy; a pre-seeded burn means
-// effects / glossary / the resolution-order interleave can all be taught on turn one, and the low-HP dummy
-// guarantees a round win → the fusion/augment draft.
+// A step is either "explain" (dims the board, click Continue) or "act" (highlights a control and waits for
+// `done` to become true). Bodies are trusted authored HTML; anchors are CSS selectors re-resolved each render.
+// The battle is a real-looking 3v3 (Pyrrha/Ando/Sera vs three passive dummies). It teaches the loop with ONE
+// hero (a "test turn"), then focus-firing the same enemy with all three heroes' S1s — the enemy's HP is tuned
+// so those three S1s take it down. Every enemy already shows a real passive chip, so nothing is faked.
 interface TutStep { anchor?: string; title: string; body: string; blocking: boolean; cta?: string; done?: () => boolean; }
 let tutorial: { steps: TutStep[]; i: number } | null = null;
+let tutTurn = 0; // incremented at each of the player's turn-starts (1 = test turn, 2 = the all-three combine turn)
+const TUT_FOE = "b1"; // the focus enemy the player attacks throughout
+
+/** An act-step is satisfied once `skillId` is queued THIS turn onto the focus enemy (so the combine focus-fires). */
+const queuedAt = (skillId: string) => () => [...ui.planned.values()].some((a) => a.skillId === skillId && (a.targets ?? []).includes(TUT_FOE));
 
 const TUT_SCRIPT: TutStep[] = [
-  { blocking: true, title: "Welcome to Element Arena", body: "This quick training battle covers the essentials. You'll command <b>Pyrrha</b> against a passive dummy — just follow the highlights." },
-  { blocking: true, anchor: ".teamcol.you", title: "Your team", body: "Your heroes stand on the left. You brought two; you'll only need Pyrrha here." },
-  { blocking: true, anchor: ".teamcol.foe", title: "The enemy", body: "Your opponent is on the right. It won't fight back — defeat it to win the round." },
-  { blocking: true, anchor: ".epool", title: "Energy", body: "Skills cost energy. Each hero makes energy of their element (Pyrrha's is <b>Fire</b>) plus <b>Generic</b>. This pool updates live as you queue skills." },
-  { blocking: true, anchor: ".unit.enemy .fx.bad", title: "Effects &amp; keywords", body: "Units carry effect chips like this burn. <b>Hover a chip</b> to read it — and hover any coloured keyword (like <span style=\"color:#ff6b6b\">Affliction</span>) in a description to open the glossary." },
-  { blocking: false, anchor: "[data-skill=\"pyrrha1\"]", title: "Use a skill", body: "Click <b>Fan the Flames</b> to aim it.", done: () => ui.targeting?.skillId === "pyrrha1" },
-  { blocking: false, anchor: "[data-target]", title: "Choose a target", body: "Now click the highlighted enemy to queue the attack.", done: () => ui.planned.size > 0 },
-  { blocking: false, anchor: "[data-resolve]", title: "Resolve your turn", body: "Your attack is queued (with more heroes you'd queue one skill each first). Press <b>Resolve turn</b>.", done: () => !!ui.orderPanel },
-  { blocking: true, anchor: ".ro-list", title: "Resolution order", body: "Your queued skill and any effects ticking this turn (like the burn) resolve top → bottom. <b>Drag a row</b> or use ▲▼ to reorder them — timing can matter." },
+  { blocking: true, title: "Welcome to Element Arena", body: "This quick training battle covers the essentials. You command a team of three against passive dummies — just follow the highlights." },
+  { blocking: true, anchor: ".teamcol.you", title: "Your team", body: "Your three heroes stand on the left: <b>Pyrrha</b>, <b>Ando</b> and <b>Sera</b>. You command all of them." },
+  { blocking: true, anchor: ".teamcol.foe", title: "The enemy", body: "Your opponents are on the right. They won't fight back here — a real match pits your team against theirs." },
+  { blocking: true, anchor: ".epool", title: "Energy", body: "Skills cost energy. Each hero makes energy of their <b>element</b>, plus <b>Generic</b> that any colour can pay. This pool updates live as you queue skills." },
+  { blocking: true, anchor: ".unit.mine.essence .frame", title: "Elemental Essence", body: "Your middle hero glows: it has <b>Elemental Essence</b>, so it generates one energy of its element at the <b>start of every turn</b>. Keeping essence heroes alive keeps your energy flowing." },
+  { blocking: true, anchor: ".unit.enemy .fx", title: "Effects &amp; keywords", body: "Every unit shows effect chips like this — passives and status effects. <b>Hover a chip</b> to read it, and hover any coloured keyword in a description to open the glossary." },
+  { blocking: false, anchor: "[data-skill=\"pyrrha1\"]", title: "A test turn — one hero", body: "Let's start simple. Click <b>Pyrrha</b>'s <b>Fan the Flames</b> to aim it.", done: () => ui.targeting?.skillId === "pyrrha1" },
+  { blocking: false, anchor: `[data-target="${TUT_FOE}"]`, title: "Choose a target", body: "Click the highlighted enemy to queue the attack on it.", done: queuedAt("pyrrha1") },
+  { blocking: false, anchor: "[data-resolve]", title: "Resolve your turn", body: "One skill is queued. Press <b>Resolve turn</b> to run it.", done: () => !!ui.orderPanel },
+  { blocking: true, anchor: ".ro-list", title: "Resolution order", body: "Your queued skills and any effects ticking this turn resolve top → bottom. <b>Drag a row</b> or use ▲▼ to reorder — timing can matter." },
   { blocking: false, anchor: "[data-order-confirm]", title: "Lock in the order", body: "Click <b>Resolve turn ▶</b> to confirm.", done: () => !!ui.energyPanel },
-  { blocking: true, anchor: ".alloc-rows", title: "Pay the cost", body: "Generic energy can be paid with any colour you own. Pick which energy covers it (it's pre-filled here)." },
-  { blocking: false, anchor: "[data-energy-confirm]", title: "Confirm &amp; resolve", body: "Click <b>Confirm &amp; resolve ▶</b> to run the turn.", done: () => !!ui.draft },
-  { blocking: true, anchor: ".draft-options", title: "Between rounds: upgrade", body: "You won the round! Now upgrade. A <b>Fusion</b> merges Pyrrha's Fire with a teammate's element for a new form + skill; an <b>Augment</b> adds a permanent perk." },
-  { blocking: false, anchor: ".fusion-card", title: "Pick a fusion", body: "Click a <b>fusion form</b> to choose it for Pyrrha.", done: () => (ui.draft?.picks.size ?? 0) > 0 },
-  { blocking: false, anchor: "[data-draft-confirm]", title: "Confirm your upgrade", body: "Click <b>Confirm ▶</b> to apply it and start the next round.", done: () => !ui.draft },
-  { blocking: true, title: "You're ready!", cta: "Finish ▶", body: "That's the core loop — queue skills, order their resolution, pay costs, and upgrade each round. Hover any keyword to learn more. Now go build your own team!" },
+  { blocking: true, anchor: ".alloc-rows", title: "Pay the cost", body: "Generic cost can be paid with any colour you own — it's pre-filled here. Confirm to run the turn." },
+  { blocking: false, anchor: "[data-energy-confirm]", title: "Confirm &amp; resolve", body: "Click <b>Confirm &amp; resolve ▶</b>. The enemy takes its (idle) turn, then it's yours again.", done: () => tutTurn >= 2 },
+  { blocking: true, title: "Now — your whole team", body: "That was one hero. Each turn you may queue <b>one skill per hero</b> before resolving. Let's focus-fire that same enemy with all three heroes." },
+  { blocking: false, anchor: "[data-skill=\"pyrrha1\"]", title: "Queue Pyrrha", body: "Click <b>Pyrrha's Fan the Flames</b>, then the same enemy.", done: queuedAt("pyrrha1") },
+  { blocking: false, anchor: "[data-skill=\"ando1\"]", title: "Queue Ando", body: "Now <b>Ando's Electroblade</b> — click it, then that same enemy.", done: queuedAt("ando1") },
+  { blocking: false, anchor: "[data-skill=\"sera1\"]", title: "Queue Sera", body: "And <b>Sera's Synthetic Skyblade</b> on it too.", done: queuedAt("sera1") },
+  { blocking: false, anchor: "[data-resolve]", title: "Resolve — all three fire", body: "Three skills are queued this turn. Press <b>Resolve turn</b>.", done: () => !!ui.orderPanel },
+  { blocking: false, anchor: "[data-order-confirm]", title: "Confirm the order", body: "Click <b>Resolve turn ▶</b>.", done: () => !!ui.energyPanel },
+  { blocking: false, anchor: "[data-energy-confirm]", title: "Finish it", body: "Confirm the cost to unleash all three — it's enough to take the enemy down.", done: () => !state.units[TUT_FOE]?.alive },
+  { blocking: true, title: "That's a takedown!", cta: "Finish ▶", body: "Three focused S1s dropped it. That's the loop: build energy, queue your team, order the resolution, and focus your targets. Defeat the whole enemy team to win a round and earn an upgrade. Now go build your own team!" },
 ];
 
 function tutStep(): TutStep | null { return tutorial ? (tutorial.steps[tutorial.i] ?? null) : null; }
@@ -893,14 +903,16 @@ function tutorialAfterRender(): void {
 }
 function finishTutorial(): void { tutorial = null; hideCoach(); location.reload(); } // reload cuts cleanly out of the loop → team select
 
-const tutorialFoe: AsyncProvider = () => []; // the training dummy never acts
+const tutorialFoe: AsyncProvider = () => []; // the training dummies never act
 
 async function startTutorial(): Promise<void> {
-  state = buildMatch({ A: ["pyrrha", "gommar"], B: ["roland"], seed: 90210 });
-  const foe0 = state.units["b1"];
-  if (foe0) { foe0.maxHp = 8; foe0.hp = 8; } // a fragile, passive dummy: Pyrrha's opener ends the round → the upgrade draft
+  // A real-looking 3v3. Ando sits in the middle slot, so he carries Elemental Essence (a glow to point at).
+  state = buildMatch({ A: ["pyrrha", "ando", "sera"], B: ["galazax", "xyris", "titania"], seed: 90210 });
+  const foe = state.units[TUT_FOE];
+  if (foe) { foe.maxHp = 45; foe.hp = 45; } // tuned so all three 15-damage S1s (after the lone test hit) take it down
   setup = null;
   ui.you = "A";
+  tutTurn = 0;
   tutorial = { steps: TUT_SCRIPT, i: 0 };
   await runMatch(state, (st, side) => (side === "A" ? human(st, side) : tutorialFoe(st, side)), {
     roundsToWin: 2,
@@ -908,21 +920,13 @@ async function startTutorial(): Promise<void> {
       onRoundStart: () => render(),
       onTurnStart: (st, side) => {
         if (side !== "A") return;
-        const e = st.teams.A.energy; e.fire = (e.fire ?? 0) + 3; e.generic = (e.generic ?? 0) + 3; // guarantee the opener is affordable
-        // Seed a burn on the dummy AFTER the round/turn is set up (so it survives startRound), tick-eligible now,
-        // so effects/keywords AND the resolution-order interleave are both teachable on turn one.
-        const f = st.units["b1"];
-        if (f && f.alive && !f.statuses.some((s) => s.name === "Burning")) {
-          f.statuses.push({ kind: "dot", name: "Burning", magnitude: 5, dtype: "affliction", appliedBy: "a1", appliedTurn: st.turn - 1, duration: 3 });
-        }
+        tutTurn += 1;
+        // Grant plenty so every hero's opener is affordable and the pool looks lively for the energy lesson.
+        const e = st.teams.A.energy;
+        e.fire = (e.fire ?? 0) + 3; e.lightning = (e.lightning ?? 0) + 3; e.generic = (e.generic ?? 0) + 6;
       },
       onResults: () => render(),
       onRoundEnd: () => render(),
-    },
-    onBetweenRounds: async (st) => {
-      ui.phase = "busy"; ui.phaseLabel = "upgrade";
-      if (hasDraftOptions(st, "A")) await humanDraft(st, "A"); // the tutorial guides this draft
-      render();
     },
   }).catch(() => { /* finishTutorial reloads out of the loop */ });
 }
