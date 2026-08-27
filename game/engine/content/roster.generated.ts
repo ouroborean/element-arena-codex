@@ -3349,15 +3349,6 @@ export const ROSTER: HeroDef[] = [
       "to": "target"
      },
      {
-      "op": "applyStatus",
-      "to": "target",
-      "status": {
-       "kind": "outgoing_damage_mod",
-       "magnitude": -5,
-       "duration": 3
-      }
-     },
-     {
       "op": "if",
       "cond": {
        "has": "mark",
@@ -3374,6 +3365,15 @@ export const ROSTER: HeroDef[] = [
         }
        }
       ]
+     },
+     {
+      "op": "applyStatus",
+      "to": "target",
+      "status": {
+       "kind": "outgoing_damage_mod",
+       "magnitude": -5,
+       "duration": 3
+      }
      },
      {
       "op": "removeStatus",
