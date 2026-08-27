@@ -265,10 +265,25 @@ function hideSkpop(): void { skpop.hidden = true; }
 function render(): void { hideFx(); closeTransientGloss(); app.innerHTML = renderApp(redactState(state, ui.you), ui, playerPanel()); }
 /** The team-select screen (its player panel reads the profile) plus the avatar picker when open. */
 function renderSetupScreen(): void { closeTransientGloss(); app.innerHTML = renderSetup(setup!, playerPanel()) + avatarPickerHtml() + (claimForm ? renderClaim(claimForm) : ""); fitCharSelect(); }
-/** Open team select, optionally pre-seeded with an already-chosen team (e.g. after cancelling matchmaking). */
+// Remember the team just taken into a match so returning to team select (after the match's page reload)
+// can repopulate "Your Team" — requeuing with the same team then takes no re-picking.
+const LAST_TEAM_KEY = "arenaLastTeam";
+function saveLastTeam(team: string[]): void {
+  try { localStorage.setItem(LAST_TEAM_KEY, JSON.stringify(team.slice(0, 3))); } catch { /* ignore */ }
+}
+/** The stored last team, filtered to still-valid hero ids (max 3); [] if none / blocked. */
+function loadLastTeam(): string[] {
+  try {
+    const v = JSON.parse(localStorage.getItem(LAST_TEAM_KEY) ?? "[]");
+    return Array.isArray(v) ? v.filter((id): id is string => typeof id === "string" && ALL_IDS.includes(id)).slice(0, 3) : [];
+  } catch { return []; }
+}
+
+/** Open team select, optionally pre-seeded with an already-chosen team (e.g. after cancelling matchmaking).
+ *  With no explicit team, it repopulates the last team taken into a match, so requeuing is one click. */
 function showSetup(picked: string[] = []): void {
-  const keep = picked.slice(0, 3);
-  setup = { picked: keep, oppo: randomTeam(keep), inspect: null }; // nothing selected on load — the player clicks a hero to inspect it
+  const keep = (picked.length ? picked : loadLastTeam()).slice(0, 3);
+  setup = { picked: keep, oppo: randomTeam(keep), inspect: null }; // nothing INSPECTED on load — the player clicks a hero to preview it
   renderSetupScreen();
 }
 /** Scale + recentre the (fixed-width) character-select scene to fit narrow windows, so it never runs off the
@@ -562,6 +577,7 @@ app.addEventListener("click", (e) => {
       startQuickMatch([...setup.picked], true); // ranked: Elo + rating-window matchmaking
     } else if (d.start && setup.picked.length === 3) {
       const draft: Draft = { A: [...setup.picked], B: [...setup.oppo], seed: Math.floor(Math.random() * 1e6) };
+      saveLastTeam(setup.picked); // repopulate this team on return from the match
       setup = null;
       startMatch(draft).catch((err) => { app.innerHTML = `<pre style="color:#f88;padding:1rem">${(err as Error).stack ?? err}</pre>`; });
     }
@@ -871,6 +887,7 @@ function attemptReconnect(): void {
 
 /** Connect, join the (ranked or casual) queue with `team`, and let server messages drive the match. */
 function startQuickMatch(team: string[], ranked = false): void {
+  saveLastTeam(team); // repopulate this team on return from the match
   const sock = new MatchSocket(serverUrl());
   pvp = { sock, you: "A", over: false, started: false, reconnecting: false, attempts: 0, intent: { kind: "queue", team, ranked } };
   setup = null;
