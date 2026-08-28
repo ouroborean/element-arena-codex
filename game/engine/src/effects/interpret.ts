@@ -349,6 +349,10 @@ export function evalCondition(c: Condition, ctx: Ctx): boolean {
     const u = resolveSelector(c.isKind, ctx)[0];
     return !!u && u.kind === c.kind;
   }
+  if ("fused" in c) {
+    const u = resolveSelector(c.of ?? "self", ctx)[0];
+    return !!u && u.fused === c.fused;
+  }
   if ("isNamed" in c) {
     const u = resolveSelector(c.isNamed, ctx)[0];
     return !!u && u.name === c.name;

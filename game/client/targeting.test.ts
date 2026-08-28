@@ -9,8 +9,8 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { poolFor } from "./targeting.ts";
-import { makeState, makeUnit, skill } from "../engine/test/helpers.ts";
+import { poolFor, highlightFor, telegraphFor, isSingleTargetPick } from "./targeting.ts";
+import { makeState, makeUnit, skill, status } from "../engine/test/helpers.ts";
 import { ROSTER } from "../engine/content/roster.generated.ts";
 import { FUSIONS } from "../engine/content/fusions.generated.ts";
 import type { SkillInstance } from "../engine/src/skill.ts";
@@ -64,6 +64,75 @@ test("Merciless (blackknight1 while evil-fused): Oathbreaker Strike offers enemi
   assert.ok(pool.includes("ah"), "allied HERO offered");
   assert.ok(!pool.includes("bk"), "self NOT offered");
   assert.ok(!pool.includes("am"), "allied MINION not offered");
+});
+
+// ── The DYNAMIC widening seam (highlightFor / telegraphFor) — what a UI offers/telegraphs once a skill's
+// ── EFFECTIVE targeting changes mid-match. These read effectiveTargeting, the field both clients used to
+// ── ignore (they switched on the STATIC skill.targeting), which is how "ultimate castable on anyone" and
+// ── "AoE still looks single-target" survived an otherwise exhaustive engine suite. Uses the REAL shipped
+// ── Black Knight skills so the authored targeting is part of the assertion. ──────────────────────────── //
+
+const BK = ROSTER.find((h) => h.id === "blackknight")!;
+const bkSkill = (id: string): SkillInstance => ({ ...(BK.skills!.find((s) => s.id === id) as SkillInstance), currentCd: 0 });
+/** The skill_targeting_override Black Knight's ultimate self-applies to widen Oathbreaker Strike. */
+const overrideOathbreaker = (name: "all-enemies" | "all") =>
+  status("skill_targeting_override", { skillId: "blackknight1", name, duration: 2 });
+
+test("BUG 1 seam: The Nightmare Rides is self-target — it highlights ONLY the caster, never the whole board", () => {
+  const sk = bkSkill("blackknight5");
+  assert.equal(sk.targeting, "self", "content: the ultimate is authored self-target (was 'single')");
+  const bk = makeUnit({ id: "bk", team: "A", kind: "hero", skills: [sk] });
+  const state = makeState([bk, makeUnit({ id: "al", team: "A", kind: "hero" })], [makeUnit({ id: "e", team: "B", kind: "hero" })]);
+  assert.deepEqual([...highlightFor(state, bk, sk)], ["bk"], "only the caster is offered");
+});
+
+test("BUG 2 seam: under the ultimate's override, Oathbreaker Strike highlights AND telegraphs every enemy, not one", () => {
+  const sk = bkSkill("blackknight1");
+  const bk = makeUnit({ id: "bk", team: "A", kind: "hero", skills: [sk], statuses: [overrideOathbreaker("all-enemies")] });
+  const state = makeState([bk], [makeUnit({ id: "e1", team: "B", kind: "hero" }), makeUnit({ id: "e2", team: "B", kind: "hero" })]);
+  assert.deepEqual([...highlightFor(state, bk, sk)].sort(), ["e1", "e2"], "both enemies highlighted");
+  assert.deepEqual(telegraphFor(state, { unit: "bk", skillId: "blackknight1" }).sort(), ["e1", "e2"], "plan telegraph shows both enemies");
+});
+
+test("BUG 4 seam: the evil-fused widened Oathbreaker highlights EXACTLY what it hits — both enemies + both ally heroes, but NOT the caster or ally minions", () => {
+  const sk = bkSkill("blackknight1");
+  const bk = makeUnit({ id: "bk", team: "A", kind: "hero", fused: "evil", skills: [sk], statuses: [overrideOathbreaker("all")] });
+  const state = makeState(
+    [bk, makeUnit({ id: "al1", team: "A", kind: "hero" }), makeUnit({ id: "al2", team: "A", kind: "hero" }), makeUnit({ id: "am", team: "A", kind: "minion" })],
+    [makeUnit({ id: "e1", team: "B", kind: "hero" }), makeUnit({ id: "e2", team: "B", kind: "hero" })],
+  );
+  const hi = highlightFor(state, bk, sk);
+  assert.deepEqual([...hi].sort(), ["al1", "al2", "e1", "e2"], "exactly the four units the AoE hits — enemies + ally heroes");
+  assert.ok(!hi.has("bk"), "the caster is NOT highlighted (includeSelf:false — he's invulnerable and unhit)");
+  assert.ok(!hi.has("am"), "the ally MINION is NOT highlighted (the AoE hits ally heroes only)");
+  const tel = new Set(telegraphFor(state, { unit: "bk", skillId: "blackknight1" }));
+  assert.deepEqual([...tel].sort(), ["al1", "al2", "e1", "e2"], "the plan telegraph agrees exactly — no self, no minion");
+});
+
+test("the single-target-PICK flag follows effective targeting — a widened Oathbreaker no longer forces a one-target click", () => {
+  // This is the exact main.ts seam that made a widened AoE 'still look single-target': the client used the
+  // STATIC skill.targeting to decide whether to force a single click. isSingleTargetPick reads effectiveTargeting.
+  const sk = bkSkill("blackknight1");
+  const bare = makeUnit({ id: "bk", team: "A", kind: "hero", skills: [sk] });
+  assert.equal(isSingleTargetPick(bare, sk), true, "normally single-target — one click");
+  const widened = makeUnit({ id: "bk2", team: "A", kind: "hero", skills: [sk], statuses: [overrideOathbreaker("all-enemies")] });
+  assert.equal(isSingleTargetPick(widened, sk), false, "under the ultimate it auto-resolves the AoE (no forced single click)");
+});
+
+// The OTHER skill_targeting_override producer: Taryn's zealot Banner of Harmony (bannerAffectsAllEnemies) widens
+// the single-target taryn1 to all-enemies. Same dynamic-widen class as Black Knight — guard the offering seam
+// for it too (the existing Taryn suite only checks engine RESOLUTION with hand-picked targets).
+const TARYN = ROSTER.find((h) => h.id === "taryn")!;
+const taryn1 = (): SkillInstance => ({ ...(TARYN.skills!.find((s) => s.id === "taryn1") as SkillInstance), currentCd: 0 });
+
+test("Taryn's Banner override widens Banner of Harmony's offering to ALL enemies (client seam, not just engine resolution)", () => {
+  const sk = taryn1();
+  assert.equal(sk.targeting, "single", "content: Banner of Harmony is authored single-target");
+  const t = makeUnit({ id: "t", team: "A", kind: "hero", skills: [sk], statuses: [status("skill_targeting_override", { skillId: "taryn1", name: "all-enemies", duration: 1 })] });
+  const state = makeState([t], [makeUnit({ id: "e1", team: "B", kind: "hero" }), makeUnit({ id: "e2", team: "B", kind: "hero" })]);
+  assert.equal(isSingleTargetPick(t, sk), false, "no longer forces a single click while the Banner override is up");
+  assert.deepEqual(telegraphFor(state, { unit: "t", skillId: "taryn1" }).sort(), ["e1", "e2"], "the plan telegraphs BOTH enemies (pre-fix: only the caster)");
+  assert.deepEqual([...highlightFor(state, t, sk)].sort(), ["e1", "e2"], "and both enemies are highlighted");
 });
 
 // ── Data-driven guards over the real content (auto-cover future flagged skills) ──────────────────────── //

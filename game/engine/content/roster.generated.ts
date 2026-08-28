@@ -10124,6 +10124,24 @@ export const ROSTER: HeroDef[] = [
         "to": {
          "faction": "enemies"
         }
+       },
+       {
+        "op": "if",
+        "cond": {
+         "fused": "evil"
+        },
+        "then": [
+         {
+          "op": "damage",
+          "amount": 25,
+          "dtype": "piercing",
+          "to": {
+           "faction": "allies",
+           "includeSelf": false,
+           "kind": "hero"
+          }
+         }
+        ]
        }
       ],
       "else": [
@@ -10372,7 +10390,7 @@ export const ROSTER: HeroDef[] = [
     "id": "blackknight5",
     "name": "The Nightmare Rides",
     "element": "unholy",
-    "targeting": "single",
+    "targeting": "self",
     "klass": "ultimate",
     "tags": [
      "Strategic",
@@ -10400,6 +10418,36 @@ export const ROSTER: HeroDef[] = [
        "name": "The Nightmare Rides",
        "duration": 2
       }
+     },
+     {
+      "op": "if",
+      "cond": {
+       "fused": "evil"
+      },
+      "then": [
+       {
+        "op": "applyStatus",
+        "to": "self",
+        "status": {
+         "kind": "skill_targeting_override",
+         "skillId": "blackknight1",
+         "name": "all",
+         "duration": 2
+        }
+       }
+      ],
+      "else": [
+       {
+        "op": "applyStatus",
+        "to": "self",
+        "status": {
+         "kind": "skill_targeting_override",
+         "skillId": "blackknight1",
+         "name": "all-enemies",
+         "duration": 2
+        }
+       }
+      ]
      }
     ],
     "currentCd": 0
@@ -10742,25 +10790,36 @@ export const ROSTER: HeroDef[] = [
       "to": "self"
      },
      {
-      "op": "applyStatus",
-      "to": "self",
-      "status": {
-       "kind": "dot",
-       "name": "Curse of Thorns",
-       "magnitude": {
-        "op": "mul",
-        "args": [
-         5,
-         {
-          "ref": "stackCount",
-          "name": "Curse of Thorns",
-          "of": "self"
-         }
-        ]
-       },
-       "dtype": "affliction",
-       "duration": null
-      }
+      "op": "if",
+      "cond": {
+       "not": {
+        "has": "dot",
+        "name": "Curse of Thorns",
+        "of": "self"
+       }
+      },
+      "then": [
+       {
+        "op": "applyStatus",
+        "to": "self",
+        "status": {
+         "kind": "dot",
+         "name": "Curse of Thorns",
+         "magnitude": 5,
+         "dtype": "affliction",
+         "duration": null
+        }
+       }
+      ],
+      "else": [
+       {
+        "op": "modifyStatus",
+        "kind": "dot",
+        "name": "Curse of Thorns",
+        "magnitudeDelta": 5,
+        "from": "self"
+       }
+      ]
      }
     ],
     "source": "maggie0"

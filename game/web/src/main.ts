@@ -13,7 +13,7 @@ import { buildMatch, defaultPolicy, type Draft } from "../../engine/content/matc
 import { ROSTER } from "../../engine/content/roster.generated.ts";
 import { runMatch, type AsyncProvider } from "../../client/loop.ts";
 import { autoDraft, applyDraftChoices, hasDraftOptions, draftableHeroes, type DraftChoice } from "../../client/draft.ts";
-import { poolFor } from "../../client/targeting.ts";
+import { highlightFor, isSingleTargetPick } from "../../client/targeting.ts";
 import { renderApp, renderSetup, renderLogin, renderClaim } from "./view.ts";
 import { energyIcon, elementRank, avatarUrl } from "./assets.ts";
 import { ELEMENT_BY_ID } from "./elementid.generated.ts";
@@ -62,8 +62,6 @@ function randomTeam(exclude: string[]): string[] {
   while (out.length < 3 && pool.length) out.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]!);
   return out;
 }
-const living = (s: MatchState, side: TeamId): Unit[] =>
-  s.teams[side].units.map((id) => s.units[id]).filter((u): u is Unit => !!u && u.alive);
 
 const app = document.getElementById("app")!;
 let state: MatchState;
@@ -354,23 +352,12 @@ async function enterSetup(): Promise<void> {
 /** Write the avatar locally WITHOUT re-syncing to the server (used when adopting the account's own value). */
 function setAvatarFileLocal(file: string): void { try { localStorage.setItem("arenaAvatar", file); } catch { /* ignore */ } }
 
-/** The single-target set the UI highlights for a skill — the offering logic (faction rules + fusion
- *  widenings like Merciless/Swoop, then the engine's legalTargets) lives in the shared client/targeting.ts. */
-function targetsFor(u: Unit, skillId: string): Set<string> {
-  const skill = (u.skills ?? []).find((s) => s.id === skillId)!;
-  return new Set(poolFor(state, u, skill).map((x) => x.id));
-}
-
-/** The portraits to highlight for a skill — EVERY skill requires a target click, even self/auto ones. */
+/** The portraits to highlight for a skill — EVERY skill requires a target click, even self/auto ones.
+ *  Delegates to the shared, unit-tested highlightFor (client/targeting.ts), which reads effectiveTargeting
+ *  so a temporary skill_targeting_override — e.g. Black Knight's ultimate widening Oathbreaker Strike to
+ *  all-enemies / all — lights up the right group instead of a single target. */
 function highlightSet(u: Unit, skill: SkillInstance): Set<string> {
-  const enemy: TeamId = u.team === "A" ? "B" : "A";
-  switch (skill.targeting) {
-    case "single": return targetsFor(u, skill.id);
-    case "all-enemies": return new Set(living(state, enemy).map((x) => x.id));
-    case "all-allies": return new Set(living(state, u.team).map((x) => x.id));
-    case "all": return new Set([...living(state, u.team), ...living(state, enemy)].map((x) => x.id));
-    default: return new Set([u.id]); // self / none — confirm on the caster
-  }
+  return highlightFor(state, u, skill);
 }
 
 function queue(unitId: string, skillId: string, targets: string[] | undefined): void {
@@ -614,7 +601,7 @@ app.addEventListener("click", (e) => {
     const skill = (u.skills ?? []).find((s) => s.id === d.skill)!;
     if (canUsePlanned(state, u, skill, [...ui.planned.values()])) {
       ui.examine = undefined;
-      ui.targeting = { unitId: u.id, skillId: skill.id, skillName: skill.name, single: skill.targeting === "single" };
+      ui.targeting = { unitId: u.id, skillId: skill.id, skillName: skill.name, single: isSingleTargetPick(u, skill) };
       ui.legalTargets = highlightSet(u, skill);
     } else { // on cooldown / unaffordable / no target → show its detail, but do NOT enter targeting
       ui.targeting = undefined; ui.legalTargets = new Set();

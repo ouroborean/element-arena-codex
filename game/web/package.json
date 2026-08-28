@@ -6,7 +6,8 @@
   "scripts": {
     "build": "esbuild src/main.ts --bundle --format=esm --target=es2022 --minify --outfile=dist/app.js",
     "watch": "npm run build -- --watch",
-    "typecheck": "tsc --noEmit -p tsconfig.json"
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "node --test"
   },
   "devDependencies": {
     "esbuild": "^0.28.0",
