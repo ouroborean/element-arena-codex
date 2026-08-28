@@ -17,7 +17,7 @@
  */
 import type { MatchState, TeamId, Unit } from "../engine/src/types.ts";
 import type { SkillInstance } from "../engine/src/skill.ts";
-import { legalTargets } from "../engine/src/scheduler.ts";
+import { legalTargets, effectiveTargeting } from "../engine/src/scheduler.ts";
 import { Rng } from "../engine/src/rng.ts";
 
 export const livingOnTeam = (state: MatchState, side: TeamId): Unit[] =>
@@ -53,4 +53,61 @@ export function poolFor(state: MatchState, u: Unit, skill: SkillInstance): Unit[
     : both();
 
   return legalTargets(state, u, skill, pool, Rng.fromState(state.rngState));
+}
+
+/**
+ * The full set of portraits a UI should HIGHLIGHT when aiming `skill`, honoring the skill's *effective*
+ * targeting — a temporary skill_targeting_override (e.g. Black Knight's ultimate widening Oathbreaker Strike
+ * to all-enemies / all) makes a normally single-target skill light up its whole group. This is the seam that
+ * used to read the STATIC skill.targeting in each client, so a dynamically-widened skill still looked
+ * single-target in the UI. A single-target skill defers to poolFor (faction narrowing); the group categories
+ * resolve to their living set; self/none confirms on the caster.
+ */
+export function highlightFor(state: MatchState, u: Unit, skill: SkillInstance): Set<string> {
+  // A single-target skill — aimed normally OR dynamically widened to an AoE by an override — reaches exactly
+  // its legal pool, so highlight THAT. poolFor already encodes the fusion widenings (evil Oathbreaker reaches
+  // ally HEROES, never the caster or ally minions), so a widened cast lights up precisely the units it hits;
+  // using the coarse widened category ("all") instead would wrongly light up the caster and ally minions.
+  if (skill.targeting === "single") return new Set(poolFor(state, u, skill).map((x) => x.id));
+  const enemyTeam: TeamId = u.team === "A" ? "B" : "A";
+  switch (effectiveTargeting(u, skill)) {
+    case "all-enemies": return new Set(livingOnTeam(state, enemyTeam).map((x) => x.id));
+    case "all-allies": return new Set(livingOnTeam(state, u.team).map((x) => x.id));
+    case "all": return new Set([...livingOnTeam(state, u.team), ...livingOnTeam(state, enemyTeam)].map((x) => x.id));
+    default: return new Set([u.id]); // self / none — confirm on the caster
+  }
+}
+
+/**
+ * The units a QUEUED action will actually hit, for the plan-order telegraph: its explicit single target(s),
+ * else the whole group its *effective* targeting implies (self/none → the caster; all-* / a widened
+ * single-target → that living group). Shares effectiveTargeting with highlightFor so the telegraph and the
+ * aim-highlight can never disagree.
+ */
+export function telegraphFor(state: MatchState, a: { unit: string; skillId: string; targets?: string[] }): string[] {
+  if (a.targets && a.targets.length) return a.targets;
+  const u = state.units[a.unit];
+  const skill = (u?.skills ?? []).find((s) => s.id === a.skillId);
+  if (!u || !skill) return [];
+  // A widened single-target skill queued without an explicit target hits its whole legal pool — mirror
+  // highlightFor (poolFor), so the plan telegraph and the aim-highlight agree and never over-show self/minions.
+  if (skill.targeting === "single") return poolFor(state, u, skill).map((x) => x.id);
+  const enemyTeam: TeamId = u.team === "A" ? "B" : "A";
+  switch (effectiveTargeting(u, skill)) {
+    case "all-enemies": return livingOnTeam(state, enemyTeam).map((x) => x.id);
+    case "all-allies": return livingOnTeam(state, u.team).map((x) => x.id);
+    case "all": return [...livingOnTeam(state, u.team), ...livingOnTeam(state, enemyTeam)].map((x) => x.id);
+    default: return [u.id]; // self / none → the caster
+  }
+}
+
+/**
+ * Does aiming `skill` require the player to click exactly ONE target? True only for the 'single' category.
+ * Crucially this reads the EFFECTIVE targeting: a single-target skill dynamically widened by a
+ * skill_targeting_override (Black Knight's ultimate, Taryn's Banner) returns false, so the client
+ * auto-resolves the whole group instead of forcing a one-target click. The web client used to compute this
+ * from the STATIC skill.targeting, which is precisely why a widened AoE still demanded a single click.
+ */
+export function isSingleTargetPick(u: Unit, skill: SkillInstance): boolean {
+  return effectiveTargeting(u, skill) === "single";
 }

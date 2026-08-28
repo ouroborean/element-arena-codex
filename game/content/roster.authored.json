@@ -9047,6 +9047,24 @@
          "to": {
           "faction": "enemies"
          }
+        },
+        {
+         "op": "if",
+         "cond": {
+          "fused": "evil"
+         },
+         "then": [
+          {
+           "op": "damage",
+           "amount": 25,
+           "dtype": "piercing",
+           "to": {
+            "faction": "allies",
+            "includeSelf": false,
+            "kind": "hero"
+           }
+          }
+         ]
         }
        ],
        "else": [
@@ -9295,7 +9313,7 @@
      "id": "blackknight5",
      "name": "The Nightmare Rides",
      "element": "unholy",
-     "targeting": "single",
+     "targeting": "self",
      "klass": "ultimate",
      "tags": [
       "Strategic",
@@ -9323,9 +9341,39 @@
         "name": "The Nightmare Rides",
         "duration": 2
        }
+      },
+      {
+       "op": "if",
+       "cond": {
+        "fused": "evil"
+       },
+       "then": [
+        {
+         "op": "applyStatus",
+         "to": "self",
+         "status": {
+          "kind": "skill_targeting_override",
+          "skillId": "blackknight1",
+          "name": "all",
+          "duration": 2
+         }
+        }
+       ],
+       "else": [
+        {
+         "op": "applyStatus",
+         "to": "self",
+         "status": {
+          "kind": "skill_targeting_override",
+          "skillId": "blackknight1",
+          "name": "all-enemies",
+          "duration": 2
+         }
+        }
+       ]
       }
      ],
-     "note": "'For 2 turns, the Black Knight is invulnerable. During this time, Oathbreaker Strike will target all enemies and is always enhanced.' invulnerable = cannot be targeted by new harmful skills. The 2-turn 'The Nightmare Rides' mark is read by blackknight1's override branch (all enemies + always 25 piercing). targeting kept 'single' per frozen data; Strategic-only so no target is required."
+     "note": "'For 2 turns, the Black Knight is invulnerable. During this time, Oathbreaker Strike will target all enemies and is always enhanced.' invulnerable = cannot be targeted by new harmful skills. The 2-turn 'The Nightmare Rides' mark is read by blackknight1's override branch (all enemies + always 25 piercing). targeting is 'self' (Strategic self-buff — no target chosen). The skill_targeting_override makes effectiveTargeting(blackknight1) report the widened category so the CLIENT offers/telegraphs the AOE (engine resolution already hits the faction set via the mark). In the Evil fusion the override is 'all' (enemies + allies) to match blackknight1's Evil-only ally hit; otherwise 'all-enemies'."
     }
    ],
    "minions": [
@@ -9426,29 +9474,40 @@
        "to": "self"
       },
       {
-       "op": "applyStatus",
-       "to": "self",
-       "status": {
-        "kind": "dot",
-        "name": "Curse of Thorns",
-        "magnitude": {
-         "op": "mul",
-         "args": [
-          5,
-          {
-           "ref": "stackCount",
-           "name": "Curse of Thorns",
-           "of": "self"
-          }
-         ]
-        },
-        "dtype": "affliction",
-        "duration": null
-       }
+       "op": "if",
+       "cond": {
+        "not": {
+         "has": "dot",
+         "name": "Curse of Thorns",
+         "of": "self"
+        }
+       },
+       "then": [
+        {
+         "op": "applyStatus",
+         "to": "self",
+         "status": {
+          "kind": "dot",
+          "name": "Curse of Thorns",
+          "magnitude": 5,
+          "dtype": "affliction",
+          "duration": null
+         }
+        }
+       ],
+       "else": [
+        {
+         "op": "modifyStatus",
+         "kind": "dot",
+         "name": "Curse of Thorns",
+         "magnitudeDelta": 5,
+         "from": "self"
+        }
+       ]
       }
      ],
      "source": "maggie0",
-     "note": "Curse of Thorns passive. Re-applying the dot refreshes its magnitude to 5 x current stacks (non-'stacks' statuses refresh per DEFAULT_STACK_POLICY)."
+     "note": "Curse of Thorns passive. The dot is applied ONCE (magnitude 5) on the first skill use, then GROWN by +5 per subsequent use via modifyStatus (which never touches appliedTurn). Re-applying via applyStatus would refresh appliedTurn to the current turn, and tickDots skips a dot whose appliedTurn === state.turn (the birth-turn guard) — so while Maggie acts every turn the dot would never tick. Growing it keeps appliedTurn pinned to the first-use turn so it ticks every turn thereafter (magnitude = 5 x uses = 5 x stacks). The parallel 'Curse of Thorns' stack is the counter read by maggie3/4/5; the dot's name/dtype is what maggie5's damage_ignore suppresses."
     },
     {
      "on": "skillUsed",

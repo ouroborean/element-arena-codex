@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { performAction, startTurn, endTurn } from "../src/scheduler.ts";
+import { performAction, startTurn, endTurn, effectiveTargeting } from "../src/scheduler.ts";
 import { loadHero } from "../content/hero.ts"; // side-effect: registers handlers
 import { heroById } from "../content/match.ts";
 import { makeState, makeUnit, status } from "./helpers.ts";
@@ -309,6 +309,30 @@ test("The Nightmare Rides: Oathbreaker targets ALL enemies and is always enhance
   performAction(state, { unit: "b", skillId: "blackknight1", targets: ["e1"] });
   assert.equal(e1.hp, 75, "hit for 25 despite aiming at a single target");
   assert.equal(e2.hp, 75, "the OTHER enemy is also hit for 25 (targets all) — piercing ignores its 10 DR");
+});
+
+// --- The CLIENT-offering seam: effectiveTargeting (what the UI reads to decide which portraits to offer /
+// --- highlight / telegraph). The engine's behavioral tests hand performAction explicit targets, so they
+// --- verified RESOLUTION but never this seam — which is how "ultimate castable on anyone" and "AoE still
+// --- looks single-target" slipped through. effectiveTargeting is the exact value highlightFor/telegraphFor
+// --- (client/targeting.ts) now switch on.
+
+test("The Nightmare Rides is SELF-target: effectiveTargeting is 'self' so the client aims it at the caster only (regression: was authored 'single', which fell through to offering the whole board)", () => {
+  const k = bk("A", "b");
+  makeState([k], [makeUnit({ id: "e", team: "B", kind: "hero" })]);
+  const ult = k.skills!.find((s) => s.id === "blackknight5")!;
+  assert.equal(ult.targeting, "self", "authored targeting is 'self'");
+  assert.equal(effectiveTargeting(k, ult), "self", "the ultimate resolves to self-only for the UI");
+});
+
+test("While the ultimate is active, Oathbreaker Strike's effective targeting widens to 'all-enemies' — the seam the client reads to offer/telegraph the AoE (regression: client read the static 'single' and still offered one target)", () => {
+  const k = bk("A", "b");
+  const state = makeState([k], [makeUnit({ id: "e1", team: "B", kind: "hero" }), makeUnit({ id: "e2", team: "B", kind: "hero" })]);
+  fund(state);
+  const s1 = k.skills!.find((s) => s.id === "blackknight1")!;
+  assert.equal(effectiveTargeting(k, s1), "single", "single-target before the ultimate");
+  performAction(state, { unit: "b", skillId: "blackknight5" });
+  assert.equal(effectiveTargeting(k, s1), "all-enemies", "the ultimate widens Oathbreaker to all enemies");
 });
 
 test("Nightmare control: without it, Oathbreaker (un-enhanced) hits one enemy for 15", () => {

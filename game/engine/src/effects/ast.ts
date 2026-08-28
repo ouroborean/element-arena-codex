@@ -81,6 +81,7 @@ export type Condition =
   | { isFaction: Selector; faction: "ally" | "enemy" } // relative to the acting unit's team
   | { isKind: Selector; kind: "hero" | "minion" } // is the selected unit a hero or a minion?
   | { isNamed: Selector; name: string } // the selected unit's display name equals this (e.g. a specific minion template, "Stonecap Mushroom")
+  | { fused: string; of?: Selector } // the selected unit's active fusion form equals this (of defaults to "self"; e.g. Black Knight's "evil" form widens Oathbreaker Strike to allies)
   | { skillOnCooldown: string } // the caster's own skill (by id) is currently on cooldown (zephyrex3 requires Wind Step down)
   | { declaredTargetsSelf: true } // (skillDeclared) the trigger owner is among the declared targets
   | { eventTargetsFaction: "allies" | "enemies" } // (skillUsed/Declared) any declared target is on self's team / the opposing team

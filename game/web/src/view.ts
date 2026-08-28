@@ -12,6 +12,7 @@ import { fusionResult } from "../../engine/content/recipes.generated.ts";
 import { augmentsFor } from "../../engine/content/augments.generated.ts";
 import type { FusionForm } from "../../engine/content/fusion.ts";
 import { draftableHeroes, type DraftChoice } from "../../client/draft.ts";
+import { telegraphFor } from "../../client/targeting.ts";
 import { ROSTER } from "../../engine/content/roster.generated.ts";
 import { heroPortrait, iconOf, minionPortrait, energyIcon, characterButton, elColor, ELEMENT_ORDER, elementRank } from "./assets.ts";
 import { SKILL_TEXT } from "./skilltext.generated.ts";
@@ -129,14 +130,25 @@ function statusSource(state: MatchState, s: Status): string | undefined {
   return by?.heroId ? `${by.heroId}${by.fused ?? ""}0` : undefined;
 }
 
-/** Status icons on a portrait: the source skill's art, each hover-describable. */
-function effectIcons(state: MatchState, u: Unit): string {
+/** Status icons on a portrait: the source skill's art, each hover-describable. Exported for view tests. */
+export function effectIcons(state: MatchState, u: Unit): string {
   const shown = (s: Status) => !HIDDEN_KINDS.has(s.kind) && !(s.name && EFFECT_HIDE.has(s.name));
   // A stack/mark is a carrier; when the same NAME also manifests as a concrete effect (a dot, a damage
   // mod, …), that concrete chip already tells the story, so the carrier chip is redundant — drop it.
   // (Burning Blood Serum = a stack + its +damage mod + its dot → show just the mod and the dot.)
   const concreteNames = new Set<string>();
-  for (const s of u.statuses) if (shown(s) && s.name && s.kind !== "stack" && s.kind !== "mark") concreteNames.add(s.name);
+  const concreteCount = new Map<string, number>();
+  for (const s of u.statuses) if (shown(s) && s.name && s.kind !== "stack" && s.kind !== "mark") {
+    concreteNames.add(s.name);
+    concreteCount.set(s.name, (concreteCount.get(s.name) ?? 0) + 1);
+  }
+  // A deduped stack carrier still holds a meaningful COUNT; surface it on the single concrete chip that
+  // replaced it — Curse of Thorns: the dot chip shows the stack count ×N. Skip names carrying more than one
+  // concrete (e.g. Burning Blood Serum's +damage mod AND its dot) so the badge is never ambiguous.
+  const carrierCount = new Map<string, number>();
+  for (const s of u.statuses)
+    if (shown(s) && s.kind === "stack" && s.name && concreteCount.get(s.name) === 1 && (s.magnitude ?? 0) > 1)
+      carrierCount.set(s.name, s.magnitude!);
   const seen = new Set<string>(); const out: string[] = [];
   for (const s of u.statuses) {
     if (!shown(s)) continue;
@@ -149,7 +161,8 @@ function effectIcons(state: MatchState, u: Unit): string {
     // Always render the abbr behind the icon; if the icon fails to load (missing file OR a flaky environment),
     // its onerror removes the img and the abbr shows through — never a blank box. The tooltip works regardless.
     const abbr = `<span class="fx-abbr">${esc((s.name ?? s.kind)[0]!.toUpperCase())}</span>`;
-    out.push(`<span class="fx ${tone}" data-fxtitle="${esc(title)}" data-fxbody="${esc(body)}" data-fxdur="${esc(dur)}">${abbr}${icon ? `<img src="${icon}" onerror="this.remove()" />` : ""}${s.kind === "stack" && (s.magnitude ?? 0) > 1 ? `<span class="fx-n">${s.magnitude}</span>` : ""}</span>`);
+    const nBadge = s.kind === "stack" && (s.magnitude ?? 0) > 1 ? s.magnitude! : (s.name ? carrierCount.get(s.name) ?? 0 : 0);
+    out.push(`<span class="fx ${tone}" data-fxtitle="${esc(title)}" data-fxbody="${esc(body)}" data-fxdur="${esc(dur)}">${abbr}${icon ? `<img src="${icon}" onerror="this.remove()" />` : ""}${nBadge > 1 ? `<span class="fx-n">${nBadge}</span>` : ""}</span>`);
   }
   // Passives have no skill slot in a match, so surface each hero's CURRENT passive (base or fusion form) as a
   // permanent, hover-describable chip — its effect is otherwise invisible mid-match.
@@ -203,23 +216,11 @@ function skillTiles(state: MatchState, u: Unit, ui: UiState): string {
   return `<div class="tiles">${(u.skills ?? []).map((s) => skillTile(state, u, ui, s)).join("")}</div>`;
 }
 
-const livingOn = (state: MatchState, side: TeamId): Unit[] =>
-  state.teams[side].units.map((id) => state.units[id]).filter((u): u is Unit => !!u && u.alive);
-
-/** The units a queued action will actually hit: its explicit single target(s), else the whole set its
- *  targeting implies — self/none → the caster, all-enemies/all-allies/all → that living group. */
+/** The units a queued action will actually hit, for the plan-order telegraph. Delegates to the shared,
+ *  unit-tested telegraphFor (client/targeting.ts), which reads effectiveTargeting so a widened single-target
+ *  (e.g. Black Knight's ultimate) telegraphs its whole group and can never disagree with the aim-highlight. */
 function actionTargets(state: MatchState, a: { unit: string; skillId: string; targets?: string[] }): string[] {
-  if (a.targets && a.targets.length) return a.targets;
-  const u = state.units[a.unit];
-  const skill = (u?.skills ?? []).find((s) => s.id === a.skillId);
-  if (!u || !skill) return [];
-  const enemy: TeamId = u.team === "A" ? "B" : "A";
-  switch (skill.targeting) {
-    case "all-enemies": return livingOn(state, enemy).map((x) => x.id);
-    case "all-allies": return livingOn(state, u.team).map((x) => x.id);
-    case "all": return [...livingOn(state, u.team), ...livingOn(state, enemy)].map((x) => x.id);
-    default: return [u.id]; // self / none → the caster
-  }
+  return telegraphFor(state, a);
 }
 
 interface Incoming { caster: string; skillId: string; order: number; }

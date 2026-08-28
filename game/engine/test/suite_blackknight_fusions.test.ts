@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { performAction, startRound, endTurn } from "../src/scheduler.ts";
+import { performAction, startRound, endTurn, effectiveTargeting } from "../src/scheduler.ts";
 import { emit, runEffects } from "../src/effects/interpret.ts";
 import { applyFusion } from "../content/fusion.ts";
 import { fusionForm } from "../content/fusions.generated.ts";
@@ -401,6 +401,39 @@ test("Merciless control: an ally dying to someone ELSE grants no bonus", () => {
   const state = makeState([k, ally], [enemy("e")]); fund(state, "evil");
   emit(state, { type: "unitDied", unit: "al", killer: "e" }); // killed by the enemy, not the Black Knight
   assert.equal(find(k, "outgoing_damage_mod", "Merciless"), undefined, "only HIS kills count");
+});
+
+test("Merciless + The Nightmare Rides: evil-fused Oathbreaker AoE hits the WHOLE enemy team AND both allies (25 each), sparing the Black Knight", () => {
+  const k = bk("A", "b"); fuse(k, "evil");
+  const al1 = makeUnit({ id: "al1", team: "A", kind: "hero", hp: 100, maxHp: 100 });
+  const al2 = makeUnit({ id: "al2", team: "A", kind: "hero", hp: 100, maxHp: 100 });
+  const e1 = enemy("e1"); const e2 = enemy("e2");
+  const state = makeState([k, al1, al2], [e1, e2]); fund(state, "evil");
+  const s1 = k.skills!.find((s) => s.id === "blackknight1")!;
+
+  performAction(state, { unit: "b", skillId: "blackknight5" });
+  assert.equal(effectiveTargeting(k, s1), "all", "evil-fused ultimate widens Oathbreaker to ALL (allies + enemies) for the UI");
+  performAction(state, { unit: "b", skillId: "blackknight1", targets: ["e1"] });
+  assert.equal(e1.hp, 75, "enemy 1 hit for 25");
+  assert.equal(e2.hp, 75, "enemy 2 hit for 25 (whole enemy team)");
+  assert.equal(al1.hp, 75, "ally 1 ALSO hit for 25 (evil-fused AoE reaches allies)");
+  assert.equal(al2.hp, 75, "ally 2 ALSO hit for 25");
+  assert.equal(k.hp, 100, "the Black Knight himself is spared (invulnerable + includeSelf:false)");
+});
+
+test("Control: the BASE (un-fused) ultimate AoE widens to enemies only and never touches an ally", () => {
+  const k = bk("A", "b"); // NOT fused
+  const al = makeUnit({ id: "al", team: "A", kind: "hero", hp: 100, maxHp: 100 });
+  const e1 = enemy("e1"); const e2 = enemy("e2");
+  const state = makeState([k, al], [e1, e2]);
+  state.teams.A.energy = { generic: 40, unholy: 40 };
+  const s1 = k.skills!.find((s) => s.id === "blackknight1")!;
+
+  performAction(state, { unit: "b", skillId: "blackknight5" });
+  assert.equal(effectiveTargeting(k, s1), "all-enemies", "base ultimate widens to enemies only");
+  performAction(state, { unit: "b", skillId: "blackknight1", targets: ["e1"] });
+  assert.equal(e1.hp, 75); assert.equal(e2.hp, 75, "both enemies hit");
+  assert.equal(al.hp, 100, "the ally is NOT hit in the base form (ally hit is evil-only)");
 });
 
 test("Horrify (un-enhanced): 15 damage + a 1-turn stun; NOT Isolated", () => {

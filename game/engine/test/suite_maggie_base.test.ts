@@ -93,6 +93,31 @@ test("maggie0: the per-turn Affliction scales with the number of skills used (2 
   assert.equal(maggie.hp, 90, "2 stacks => 10 Affliction on Maggie's next turn");
 });
 
+test("maggie0 (regression): using a skill EVERY turn STILL inflicts the Curse each turn — a re-cast must not reset the dot's birth turn (the bug made it 'no damage at all')", () => {
+  // The original modelling re-APPLIED the dot on each skill use, which refreshed its appliedTurn to the
+  // current turn; tickDots skips a dot born this turn, so a Maggie who acts every turn (normal play) had the
+  // Curse perpetually "born now" and it never ticked. The existing tests only ever cast ONCE, so they never
+  // exercised the re-cast that killed it. Here Maggie acts on turns 1, 3 and 5 and MUST still take damage.
+  const maggie = loadHero(heroById("maggie"), "A", "maggie");
+  const e = makeUnit({ id: "e", team: "B" });
+  const state = makeState([maggie], [e]);
+  const refund = () => { state.teams.A.energy = fullEnergy(); };
+
+  refund();
+  assert.ok(performAction(state, { unit: "maggie", skillId: "maggie1", targets: ["e"] }).ok, "cast on turn 1");
+  endTurn(state); // end turn 1 A (birth turn — no tick)
+  endTurn(state); // end turn 2 B
+  refund();
+  assert.ok(performAction(state, { unit: "maggie", skillId: "maggie1", targets: ["e"] }).ok, "cast AGAIN on turn 3");
+  endTurn(state); // end turn 3 A -> MUST tick despite the re-cast this turn
+  assert.equal(maggie.hp, 90, "2 uses => 10 Affliction still lands the turn she re-cast (was 0 with the refresh bug)");
+  endTurn(state); // end turn 4 B
+  refund();
+  assert.ok(performAction(state, { unit: "maggie", skillId: "maggie1", targets: ["e"] }).ok, "cast AGAIN on turn 5");
+  endTurn(state); // end turn 5 A -> keeps ticking, now at 3 stacks
+  assert.equal(maggie.hp, 75, "3 uses => 15 Affliction the next turn — the Curse never stops once seeded");
+});
+
 // -------------------------------------------------------------------------------------------
 // maggie1 — Bramblelash
 // -------------------------------------------------------------------------------------------
