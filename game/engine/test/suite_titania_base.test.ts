@@ -373,8 +373,8 @@ test("Whimsy: Titania's skill USE and DAMAGE do not trigger an enemy's reactive 
     ],
   });
   const st = makeState([t, ally], [e]);
-  fund(st);
   startRound(st); // realizes the passive: Titania becomes stealthed (does not trigger enemy effects)
+  fund(st); // fund AFTER startRound — it wipes pools to an empty fresh-battle start
 
   // Titania acts on the enemy: her USE + DAMAGE must NOT set off the enemy's probes.
   performAction(st, { unit: "t", skillId: "titania1", targets: ["e"] });

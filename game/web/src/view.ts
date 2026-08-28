@@ -330,9 +330,10 @@ function energyPool(state: MatchState, ui: UiState): string {
   // The energy this turn's queued skills set aside — so the pool decrements live as skills are queued.
   const reserved = reserveEnergy(state, [...ui.planned.values()]);
   // Top row = the SPECIFIC energy types the team actually uses: the distinct CURRENT elements of its heroes.
-  // A fused hero uses its fusion element, NOT its components — so a fused-away element stops showing as its own
-  // type (any leftover energy of that colour still counts toward the Total below, it just has no chip). Driven
-  // by currentElement, never by "any colour that happens to have energy in the pool".
+  // Pools reset to empty each round (startRound), so income only ever re-accrues in the heroes' current
+  // elements + generic — a fused-away element leaves no stranded energy behind. Driven by currentElement,
+  // never by "any colour that happens to have energy in the pool"; any off-element energy from a one-off
+  // grant still counts toward the Total below, it just has no chip of its own.
   const specific: string[] = [];
   for (const id of state.teams[ui.you].units) {
     const u = state.units[id];

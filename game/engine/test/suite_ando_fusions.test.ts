@@ -504,8 +504,8 @@ test("Tempest: 15 to a random enemy now, then repeats 15 on each of Ando's next 
   const ando = fuse("storm");
   const e1 = enemy("e1"); // single enemy -> every 'random' pick is e1 (deterministic)
   const state = makeState([ando], [e1]);
-  fund(state);
   startRound(state); // Ando is now Blinded (irrelevant to Tempest's random targeting)
+  fund(state); // fund AFTER startRound — it wipes pools to an empty fresh-battle start
 
   performAction(state, { unit: "ando", skillId: "andostorm1", targets: [] });
   // Immediate: Tempest 15 + Erratic Programming's 10 Piercing (Tempest is Harmful) = 25.
