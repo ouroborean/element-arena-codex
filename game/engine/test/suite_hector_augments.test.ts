@@ -66,9 +66,9 @@ function setup(augId?: string, enemyOver: Partial<Unit> = {}) {
   if (augId) applyAugment(hector, augmentById(augId)!);
   const enemy = makeUnit({ id: "e1", team: "B", kind: "hero", hp: 100, maxHp: 100, ...enemyOver });
   const state = makeState([hector], [enemy]);
-  state.teams.A.energy = { generic: 400, poison: 400 }; // fund BEFORE startRound so round-start casts can pay
-  state.teams.B.energy = { generic: 400, fire: 400 };
   startRound(state, "A"); // fires Hector's round-start passive (summons Dennis) + any augment round-start triggers
+  state.teams.A.energy = { generic: 400, poison: 400 }; // fund AFTER startRound — it wipes pools to an empty fresh-battle start; round-start casts (useSkill) are free anyway
+  state.teams.B.energy = { generic: 400, fire: 400 };
   return { state, hector, enemy, dennis: getDennis(state) };
 }
 

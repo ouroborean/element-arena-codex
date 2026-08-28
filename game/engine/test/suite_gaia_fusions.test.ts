@@ -73,9 +73,9 @@ function fuse(element: string, opts: { allies?: Unit[]; enemies?: Unit[] } = {})
   const allies = opts.allies ?? [];
   const enemies = opts.enemies ?? [makeUnit({ id: "e", team: "B", hp: 200, maxHp: 200 })];
   const st = makeState([g, ...allies], enemies);
-  st.teams.A.energy = { generic: 40, [element]: 40 };
-  st.teams.B.energy = { generic: 40 };
   startRound(st, "A"); // fires roundStart (installs the form's round-start passive: Mushroom/Channel-Vitality re-author/Sacred Grove regen)
+  st.teams.A.energy = { generic: 40, [element]: 40 }; // fund AFTER startRound — it now wipes pools to an empty fresh-battle start
+  st.teams.B.energy = { generic: 40 };
   return { g, st, enemies, allies };
 }
 

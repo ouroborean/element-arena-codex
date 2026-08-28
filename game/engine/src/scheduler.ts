@@ -87,6 +87,13 @@ export function startRound(state: MatchState, firstTeam: TeamId = "A"): void {
   // for now leave the field as-is (summon passives are a later increment).
   // Fresh battle: clear last round's minions; round-start passives re-summon them.
   removeMinionsWhere(state, () => true);
+  // Fresh battle: energy pools start EMPTY every round. Nothing carries over — not generic,
+  // and not leftover element energy from a form the team has since fused away (that stale
+  // energy was the source of the phantom-colour pool display). Income re-accrues from turn
+  // one; round-start passives (summons, useSkill auto-casts) are free and never draw the
+  // pool, so an empty pool at round start doesn't suppress them.
+  state.teams.A.energy = {};
+  state.teams.B.energy = {};
   state.activeTeam = firstTeam;
   state.log.push(`round ${state.round} start`);
   emit(state, { type: "roundStart" });

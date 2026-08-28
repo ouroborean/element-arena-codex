@@ -258,8 +258,9 @@ test("Everything Must Go: the arm RESETS each round — after a fresh round, fal
   assert.ok(performAction(state, { unit: "s", skillId: "scratch1", targets: ["t1"] }).ok);
   assert.ok(hasMark(t1, "Boon: Save Your Friends"), "round 1: cascade fired");
 
-  // Fresh battle round: HP/statuses reset, the once-per-round lock clears.
+  // Fresh battle round: HP/statuses reset, the once-per-round lock clears, energy pools empty.
   startRound(state, "A");
+  state.teams.A.energy = ENERGY(); // re-fund — a fresh round starts with empty pools
   const t2 = makeUnit({ id: "t2", team: "A", kind: "hero" });
   state.units["t2"] = t2; state.teams.A.units.push("t2");
   dropScratchBelow30(state);
