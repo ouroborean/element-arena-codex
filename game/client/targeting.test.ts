@@ -114,9 +114,11 @@ test("the single-target-PICK flag follows effective targeting — a widened Oath
   // STATIC skill.targeting to decide whether to force a single click. isSingleTargetPick reads effectiveTargeting.
   const sk = bkSkill("blackknight1");
   const bare = makeUnit({ id: "bk", team: "A", kind: "hero", skills: [sk] });
-  assert.equal(isSingleTargetPick(bare, sk), true, "normally single-target — one click");
+  const bareState = makeState([bare], [makeUnit({ id: "e", team: "B", kind: "hero" })]);
+  assert.equal(isSingleTargetPick(bareState, bare, sk), true, "normally single-target — one click");
   const widened = makeUnit({ id: "bk2", team: "A", kind: "hero", skills: [sk], statuses: [overrideOathbreaker("all-enemies")] });
-  assert.equal(isSingleTargetPick(widened, sk), false, "under the ultimate it auto-resolves the AoE (no forced single click)");
+  const widenedState = makeState([widened], [makeUnit({ id: "e", team: "B", kind: "hero" })]);
+  assert.equal(isSingleTargetPick(widenedState, widened, sk), false, "under the ultimate it auto-resolves the AoE (no forced single click)");
 });
 
 // The OTHER skill_targeting_override producer: Taryn's zealot Banner of Harmony (bannerAffectsAllEnemies) widens
@@ -130,9 +132,148 @@ test("Taryn's Banner override widens Banner of Harmony's offering to ALL enemies
   assert.equal(sk.targeting, "single", "content: Banner of Harmony is authored single-target");
   const t = makeUnit({ id: "t", team: "A", kind: "hero", skills: [sk], statuses: [status("skill_targeting_override", { skillId: "taryn1", name: "all-enemies", duration: 1 })] });
   const state = makeState([t], [makeUnit({ id: "e1", team: "B", kind: "hero" }), makeUnit({ id: "e2", team: "B", kind: "hero" })]);
-  assert.equal(isSingleTargetPick(t, sk), false, "no longer forces a single click while the Banner override is up");
+  assert.equal(isSingleTargetPick(state, t, sk), false, "no longer forces a single click while the Banner override is up");
   assert.deepEqual(telegraphFor(state, { unit: "t", skillId: "taryn1" }).sort(), ["e1", "e2"], "the plan telegraphs BOTH enemies (pre-fix: only the caster)");
   assert.deepEqual([...highlightFor(state, t, sk)].sort(), ["e1", "e2"], "and both enemies are highlighted");
+});
+
+// ── Class A (self-target mismatch): a no-pick self action authored targeting:"single" is offered to the whole
+// ── board. blackknight5 was the exemplar; the audit found blackknight4 (its sibling) + others. Guard the
+// ── base-hero ones behaviorally: they must highlight ONLY the caster. ─────────────────────────────────── //
+test("Class A: self-buff skills highlight only the caster, never the board (targeting must be 'self')", () => {
+  for (const id of ["saya4", "saya5", "sera4", "dennis5", "blackknight4"]) {
+    const owner = ROSTER.find((h) => (h.skills ?? []).some((s) => s.id === id))!;
+    const sk: SkillInstance = { ...(owner.skills!.find((s) => s.id === id) as SkillInstance), currentCd: 0 };
+    assert.equal(sk.targeting, "self", `${id} is authored self-target`);
+    const caster = makeUnit({ id: "c", team: "A", kind: "hero", skills: [sk] });
+    const state = makeState([caster, makeUnit({ id: "al", team: "A", kind: "hero" })], [makeUnit({ id: "e", team: "B", kind: "hero" })]);
+    assert.deepEqual([...highlightFor(state, caster, sk)], ["c"], `${id} highlights only the caster`);
+  }
+});
+
+// ── Class B2 (over-highlight): a natively group-targeted skill must light up EXACTLY what its effects reach
+// ── (honoring includeSelf / kind / status filters), not the raw living-team set. Driven through the real
+// ── shipped skills so the effect tree and the highlight can't drift. ──────────────────────────────────── //
+const anySkill = (id: string): SkillInstance => {
+  for (const h of ROSTER) for (const s of h.skills ?? []) if (s.id === id) return { ...(s as SkillInstance), currentCd: 0 };
+  for (const f of FUSIONS) if ((f.skill as SkillInstance | undefined)?.id === id) return { ...(f.skill as SkillInstance), currentCd: 0 };
+  throw new Error(`skill ${id} not found`);
+};
+
+test("Class B2: roland5 Fissure ('all', includeSelf:false) highlights everyone EXCEPT the caster", () => {
+  const sk = anySkill("roland5");
+  const r = makeUnit({ id: "r", team: "A", kind: "hero", skills: [sk] });
+  const st = makeState([r, makeUnit({ id: "al", team: "A", kind: "hero" })], [makeUnit({ id: "e", team: "B", kind: "hero" })]);
+  const hi = highlightFor(st, r, sk);
+  assert.ok(hi.has("al") && hi.has("e"), "the ally and enemy are highlighted");
+  assert.ok(!hi.has("r"), "the caster (Roland) is NOT highlighted (includeSelf:false)");
+});
+
+test("Class B2: pyrrhasun1 Scorched Earth ('all-enemies', kind:hero) does NOT highlight enemy minions", () => {
+  const sk = anySkill("pyrrhasun1");
+  const p = makeUnit({ id: "p", team: "A", kind: "hero", skills: [sk] });
+  const st = makeState([p], [makeUnit({ id: "eh", team: "B", kind: "hero" }), makeUnit({ id: "em", team: "B", kind: "minion" })]);
+  const hi = highlightFor(st, p, sk);
+  assert.ok(hi.has("eh"), "the enemy hero is highlighted");
+  assert.ok(!hi.has("em"), "the enemy MINION is NOT highlighted (kind:hero)");
+});
+
+test("Class B2: jarrik3 Call Cinders ('all-enemies', with mark Cinders) highlights only Cinders-marked enemies", () => {
+  const sk = anySkill("jarrik3");
+  const j = makeUnit({ id: "j", team: "A", kind: "hero", skills: [sk] });
+  const marked = makeUnit({ id: "em", team: "B", kind: "hero", statuses: [status("mark", { name: "Cinders" })] });
+  const clean = makeUnit({ id: "ec", team: "B", kind: "hero" });
+  const st = makeState([j], [marked, clean]);
+  const hi = highlightFor(st, j, sk);
+  assert.ok(hi.has("em"), "the Cinders-marked enemy is highlighted");
+  assert.ok(!hi.has("ec"), "the un-marked enemy is NOT highlighted (with:{mark:Cinders})");
+});
+
+test("Class B1 (client seam): a widenTargeting skill stops forcing a single-target click while its live condition holds", () => {
+  const sk = anySkill("maggie3"); // Thornburst — widens to all-enemies at 3+ Curse of Thorns stacks
+  const mk = (stacks: number) => {
+    const c = makeUnit({ id: "m", team: "A", kind: "hero", skills: [sk], statuses: stacks ? [status("stack", { name: "Curse of Thorns", magnitude: stacks })] : [] });
+    return { c, st: makeState([c], [makeUnit({ id: "e", team: "B", kind: "hero" })]) };
+  };
+  { const { c, st } = mk(3); assert.equal(isSingleTargetPick(st, c, sk), false, "3+ Curse stacks -> AoE, no forced single click"); }
+  { const { c, st } = mk(2); assert.equal(isSingleTargetPick(st, c, sk), true, "2 stacks -> still a single-target pick"); }
+});
+
+test("Class B2 (regression): an all-enemies skill with a self-cleanup/self-buff rider does NOT highlight the caster", () => {
+  // affectedUnits unions every affecting op's target, incl. from:self / to:self bookkeeping riders — the
+  // category filter (reachInCategory) drops units outside the targeting faction so the caster's own portrait
+  // never lights up on an enemy AoE (gommar2 clears Frost-Covered from itself).
+  const sk = anySkill("gommar2");
+  assert.equal(sk.targeting, "all-enemies", "content: gommar2 is authored all-enemies");
+  const g = makeUnit({ id: "g", team: "A", kind: "hero", skills: [sk] });
+  const st = makeState([g], [makeUnit({ id: "e1", team: "B", kind: "hero" }), makeUnit({ id: "e2", team: "B", kind: "hero" })]);
+  const hi = highlightFor(st, g, sk);
+  assert.deepEqual([...hi].sort(), ["e1", "e2"], "only the enemies are highlighted");
+  assert.ok(!hi.has("g"), "the caster is NOT highlighted despite its from:self cleanup");
+});
+
+// ── Class B2 (custom-op skills): affectedUnits can't walk a custom/useSkill reach, so these carry an explicit
+// ── authored highlightSelector. Verify each narrows to exactly what it affects. ───────────────────────── //
+test("Class B2 (highlightSelector): tarynsanctuary1 highlights allied heroes only", () => {
+  const sk = anySkill("tarynsanctuary1");
+  const t = makeUnit({ id: "t", team: "A", kind: "hero", skills: [sk] });
+  const st = makeState([t, makeUnit({ id: "ah", team: "A", kind: "hero" }), makeUnit({ id: "am", team: "A", kind: "minion" })], [makeUnit({ id: "e", team: "B", kind: "hero" })]);
+  assert.deepEqual([...highlightFor(st, t, sk)].sort(), ["ah", "t"], "Taryn + ally hero; not the ally minion or the enemy");
+});
+
+test("Class B2 (highlightSelector): hectorserum1 highlights the caster + all enemies", () => {
+  const sk = anySkill("hectorserum1");
+  const h = makeUnit({ id: "h", team: "A", kind: "hero", skills: [sk] });
+  const st = makeState([h, makeUnit({ id: "al", team: "A", kind: "hero" })], [makeUnit({ id: "e1", team: "B", kind: "hero" }), makeUnit({ id: "e2", team: "B", kind: "hero" })]);
+  assert.deepEqual([...highlightFor(st, h, sk)].sort(), ["e1", "e2", "h"], "Hector (self-buff) + enemies; not the other ally");
+});
+
+test("Class B2 (highlightSelector): rolandnomad1 highlights Mark-the-Path enemy heroes + ally Boulders (union reach)", () => {
+  const sk = anySkill("rolandnomad1");
+  const r = makeUnit({ id: "r", team: "A", kind: "hero", skills: [sk] });
+  const markedEnemy = makeUnit({ id: "me", team: "B", kind: "hero", statuses: [status("mark", { name: "Mark the Path" })] });
+  const st = makeState(
+    [r, makeUnit({ id: "b", team: "A", kind: "minion", name: "Boulder" }), makeUnit({ id: "om", team: "A", kind: "minion", name: "Slimeball" })],
+    [markedEnemy, makeUnit({ id: "ce", team: "B", kind: "hero" })],
+  );
+  assert.deepEqual([...highlightFor(st, r, sk)].sort(), ["b", "me"], "marked enemy hero + Boulder; not the clean enemy, other minion, or Roland");
+});
+
+test("Class B1 (spread telegraph): Supercharged Electroblade telegraphs ALL enemies while keeping its single pick", () => {
+  const sk = anySkill("ando1");
+  const a = makeUnit({ id: "a", team: "A", kind: "hero", skills: [sk], statuses: [status("mark", { name: "Supercharged" })] });
+  const st = makeState([a], [makeUnit({ id: "e1", team: "B", kind: "hero" }), makeUnit({ id: "e2", team: "B", kind: "hero" }), makeUnit({ id: "e3", team: "B", kind: "hero" })]);
+  assert.equal(isSingleTargetPick(st, a, sk), true, "still a single-target pick (magnet fusion's Charge Absorption needs the primary)");
+  assert.deepEqual(telegraphFor(st, { unit: "a", skillId: "ando1", targets: ["e1"] }).sort(), ["e1", "e2", "e3"], "but the plan telegraphs the whole spread");
+});
+
+test("Class B1 (spread telegraph): Dive Undertow telegraphs ALL enemies while keeping the single pick its stun needs", () => {
+  const sk = anySkill("riverdaughter2");
+  const r = makeUnit({ id: "r", team: "A", kind: "hero", skills: [sk], statuses: [status("mark", { name: "Dive Undertow" })] });
+  const st = makeState([r], [makeUnit({ id: "e1", team: "B", kind: "hero" }), makeUnit({ id: "e2", team: "B", kind: "hero" })]);
+  assert.equal(isSingleTargetPick(st, r, sk), true, "still a single pick (the Undertow stun targets the chosen enemy)");
+  assert.deepEqual(telegraphFor(st, { unit: "r", skillId: "riverdaughter2", targets: ["e1"] }).sort(), ["e1", "e2"], "the damage spread telegraphs both enemies");
+});
+
+test("spread telegraph: a plain single-target hit telegraphs ONLY its target (no spread)", () => {
+  const sk = skill("hit", [{ op: "damage", amount: 10, dtype: "normal", to: "target" }], { tags: ["Harmful"] });
+  const c = makeUnit({ id: "c", team: "A", kind: "hero", skills: [sk] });
+  const st = makeState([c], [makeUnit({ id: "e1", team: "B", kind: "hero" }), makeUnit({ id: "e2", team: "B", kind: "hero" })]);
+  assert.deepEqual(telegraphFor(st, { unit: "c", skillId: "hit", targets: ["e1"] }), ["e1"], "just the picked target");
+});
+
+test("spread telegraph: rolandsun1 (consumes its own Boulders) telegraphs only the enemy target, not the ally Boulder", () => {
+  const sk = anySkill("rolandsun1");
+  const r = makeUnit({ id: "r", team: "A", kind: "hero", skills: [sk] });
+  const st = makeState([r, makeUnit({ id: "bo", team: "A", kind: "minion", name: "Boulder" })], [makeUnit({ id: "e1", team: "B", kind: "hero" }), makeUnit({ id: "e2", team: "B", kind: "hero" })]);
+  assert.deepEqual(telegraphFor(st, { unit: "r", skillId: "rolandsun1", targets: ["e1"] }), ["e1"], "the consumed friendly Boulder is filtered out of the spread (Harmful pick → enemy faction only)");
+});
+
+test("spread telegraph: galazax2 (random secondary hit) telegraphs only the picked target, not a speculative random enemy", () => {
+  const sk = anySkill("galazax2");
+  const g = makeUnit({ id: "g", team: "A", kind: "hero", skills: [sk] });
+  const st = makeState([g], [makeUnit({ id: "e1", team: "B", kind: "hero" }), makeUnit({ id: "e2", team: "B", kind: "hero" }), makeUnit({ id: "e3", team: "B", kind: "hero" })]);
+  assert.deepEqual(telegraphFor(st, { unit: "g", skillId: "galazax2", targets: ["e1"] }), ["e1"], "a pick:random reach is non-stable → falls back to the pick, not a wrong pinned portrait");
 });
 
 // ── Data-driven guards over the real content (auto-cover future flagged skills) ──────────────────────── //

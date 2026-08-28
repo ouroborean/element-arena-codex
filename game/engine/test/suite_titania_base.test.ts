@@ -161,6 +161,21 @@ test("Laughing Powder spread: a THIRD unit that uses a skill on the powdered tar
   assert.equal(hasKind(ally, "stun"), false, "only the affliction spreads — NOT the Strategic stun");
 });
 
+test("Laughing Powder spread (regression): an AoE that hits the powdered target at a NON-first slot still afflicts the actor (index-0 fix)", () => {
+  const t = mkTitania();
+  const ally = makeUnit({ id: "a", team: "A", skills: [skill("aoe", [{ op: "damage", amount: 5, dtype: "normal", to: { faction: "enemies" } }], { targeting: "all-enemies", tags: ["Harmful"] })] });
+  const clean = makeUnit({ id: "e2", team: "B" });   // slot 0 — the FIRST declared target
+  const powdered = makeUnit({ id: "e", team: "B" });  // slot 1 — powdered, but NOT eventTargets[0]
+  const st = makeState([t, ally], [clean, powdered]);
+  fund(st);
+
+  performAction(st, { unit: "t", skillId: "titania2", targets: ["e"] }); // powder the 2nd-slot enemy
+  assert.ok(hasKind(powdered, "dot", "Laughing Powder"), "precondition: e is powdered");
+  performAction(st, { unit: "a", skillId: "aoe" }); // ally AoE hits [e2, e] — the powdered e is second
+  assert.ok(hasKind(ally, "dot", "Laughing Powder"),
+    "the actor is afflicted even though the powdered target was 2nd in the AoE (was missed under the eventTargets[0] read)");
+});
+
 test("Laughing Powder spread: using a skill on a DIFFERENT (un-powdered) character does NOT afflict the actor", () => {
   const t = mkTitania();
   const ally = makeUnit({ id: "a", team: "A", skills: [dmgSkill("ahit", 5)] });
@@ -261,6 +276,18 @@ test("Prance: the FIRST unit to use a new skill on Titania gains Elemental Essen
 
   performAction(st, { unit: "e2", skillId: "h2", targets: ["t"] }); // second to act on Titania
   assert.equal(hasKind(second, "elemental_essence"), false, "only the FIRST unit benefits — the second does not");
+});
+
+test("Prance (regression): an AoE that targets Titania at a NON-first slot still credits the actor (index-0 fix)", () => {
+  const t = mkTitania();
+  const al = makeUnit({ id: "al", team: "A" }); // slot 0 — precedes Titania in target order
+  const e = makeUnit({ id: "e", team: "B", skills: [skill("aoe", [{ op: "damage", amount: 5, dtype: "normal", to: { faction: "enemies" } }], { targeting: "all-enemies", tags: ["Harmful"] })] });
+  const st = makeState([al, t], [e]);
+  fund(st);
+  performAction(st, { unit: "t", skillId: "titania4", targets: ["t"] }); // arm Prance
+  performAction(st, { unit: "e", skillId: "aoe" }); // AoE hits [al, t] — Titania is NOT eventTargets[0]
+  assert.equal(hasKind(e, "elemental_essence"), true,
+    "the actor is credited even though Titania was 2nd in the AoE (was missed under the eventTargets[0] read)");
 });
 
 test("Prance: acting on a unit OTHER than Titania grants no Essence, and does not consume the watch", () => {

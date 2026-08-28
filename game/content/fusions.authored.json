@@ -2847,10 +2847,7 @@
         }
        },
        {
-        "sameUnit": [
-         "eventTargets",
-         "self"
-        ]
+        "declaredTargetsSelf": true
        },
        {
         "or": [
@@ -3739,7 +3736,7 @@
     "id": "gaiamyth1",
     "name": "Yggdrasil",
     "element": "myth",
-    "targeting": "single",
+    "targeting": "self",
     "klass": "fusion",
     "tags": [
      "Strategic",
@@ -6017,10 +6014,7 @@
      "on": "skillUsed",
      "source": "A Dash of Whimsy",
      "when": {
-      "sameUnit": [
-       "eventTargets",
-       "self"
-      ]
+      "declaredTargetsSelf": true
      },
      "effect": [
       {
@@ -6171,6 +6165,12 @@
     "name": "Avatar Serum",
     "element": "serum",
     "targeting": "all",
+    "highlightSelector": {
+     "any": [
+      { "faction": "enemies" },
+      "caster"
+     ]
+    },
     "klass": "fusion",
     "tags": [
      "Harmful",
@@ -10332,28 +10332,49 @@
        "to": "eventTarget"
       },
       {
-       "op": "applyStatus",
-       "to": "eventTarget",
-       "status": {
-        "kind": "dot",
-        "name": "Curse of Thorns",
-        "magnitude": {
-         "op": "mul",
-         "args": [
-          5,
-          {
-           "ref": "stackCount",
-           "name": "Curse of Thorns",
-           "of": "eventTarget"
-          }
-         ]
-        },
-        "dtype": "affliction",
-        "duration": null
-       }
+       "op": "if",
+       "cond": {
+        "not": {
+         "has": "dot",
+         "name": "Curse of Thorns",
+         "of": "eventTarget"
+        }
+       },
+       "then": [
+        {
+         "op": "applyStatus",
+         "to": "eventTarget",
+         "status": {
+          "kind": "dot",
+          "name": "Curse of Thorns",
+          "magnitude": {
+           "op": "mul",
+           "args": [
+            5,
+            {
+             "ref": "stackCount",
+             "name": "Curse of Thorns",
+             "of": "eventTarget"
+            }
+           ]
+          },
+          "dtype": "affliction",
+          "duration": null
+         }
+        }
+       ],
+       "else": [
+        {
+         "op": "modifyStatus",
+         "kind": "dot",
+         "name": "Curse of Thorns",
+         "magnitudeDelta": 5,
+         "from": "eventTarget"
+        }
+       ]
       }
      ],
-     "note": "While Maggie holds >= 5 Curse of Thorns stacks, every enemy she damages gains Curse of Thorns (a stack + a same-named affliction dot scaling 5 x that enemy's own stacks). Guard on eventSource == self keeps it to Maggie's own hits. Null (permanent) dots model the lasting status but do not tick under the engine's dot rule."
+     "note": "While Maggie holds >= 5 Curse of Thorns stacks, every enemy she damages gains Curse of Thorns (a stack + a same-named affliction dot scaling 5 x that enemy's own stacks). Guard on eventSource == self keeps it to Maggie's own hits. The dot is applied ONCE (magnitude 5) then GROWN by +5 via modifyStatus per subsequent hit — mirroring the base maggie0 fix — so re-applying it on a later hit never refreshes appliedTurn and trips tickDots' birth-turn guard (which would otherwise leave a repeatedly-struck enemy taking zero periodic Curse damage). magnitude stays = 5 x the enemy's Curse stacks."
     }
    ],
    "skill": {
@@ -11119,18 +11140,39 @@
      },
      "effect": [
       {
-       "op": "applyStatus",
-       "to": "eventTarget",
-       "status": {
-        "kind": "dot",
-        "name": "Alchemist's Fire",
-        "magnitude": 5,
-        "dtype": "affliction",
-        "duration": 4
-       }
+       "op": "if",
+       "cond": {
+        "not": {
+         "has": "dot",
+         "name": "Alchemist's Fire",
+         "of": "eventTarget"
+        }
+       },
+       "then": [
+        {
+         "op": "applyStatus",
+         "to": "eventTarget",
+         "status": {
+          "kind": "dot",
+          "name": "Alchemist's Fire",
+          "magnitude": 5,
+          "dtype": "affliction",
+          "duration": 4
+         }
+        }
+       ],
+       "else": [
+        {
+         "op": "modifyStatus",
+         "kind": "dot",
+         "name": "Alchemist's Fire",
+         "duration": 4,
+         "from": "eventTarget"
+        }
+       ]
       }
      ],
-     "note": "'Dealing damage to an enemy while Pyrrha has Bottled Flame' -> react to Pyrrha's own damageDealt (eventSource=self) on an enemy while she bears the Bottled Flame mark; 'an additional 5 Affliction damage for 4 turns' is a 5/turn affliction dot for 4 turns on the struck enemy. Bottled Flame = the mark the active grants. The dealing skill is irrelevant (prose is generic 'dealing damage'); her Fan the Flames dot ticks are also 'dealing damage' and re-arm this while Bottled Flame is up."
+     "note": "'Dealing damage to an enemy while Pyrrha has Bottled Flame' -> react to Pyrrha's own damageDealt (eventSource=self) on an enemy while she bears the Bottled Flame mark; 'an additional 5 Affliction damage for 4 turns' is a 5/turn affliction dot for 4 turns on the struck enemy. Applied ONCE, then each subsequent qualifying hit REFRESHES its window via modifyStatus duration:4 (an absolute set) rather than re-applyStatus — because re-applying would reset appliedTurn to the current turn and tickDots' birth-turn guard would then skip the tick every turn Pyrrha keeps striking the same enemy, leaving the dot dealing nothing during the Bottled Flame window. Bottled Flame = the mark the active grants; her Fan the Flames dot ticks also count as 'dealing damage' and re-arm this while it is up."
     }
    ],
    "skill": {
@@ -11497,6 +11539,17 @@
     "name": "Flame of Legends",
     "element": "dragon",
     "targeting": "single",
+    "widenTargeting": {
+     "when": {
+      "cmp": "<=",
+      "left": {
+       "ref": "currentHp",
+       "of": "caster"
+      },
+      "right": 30
+     },
+     "to": "all-enemies"
+    },
     "klass": "fusion",
     "tags": [
      "Harmful",
@@ -13913,6 +13966,15 @@
     "name": "FInal Warning",
     "element": "nomad",
     "targeting": "all",
+    "highlightSelector": {
+     "any": [
+      {
+       "filter": { "faction": "enemies", "kind": "hero" },
+       "with": { "kind": "mark", "name": "Mark the Path" }
+      },
+      { "faction": "allies", "kind": "minion", "template": "Boulder" }
+     ]
+    },
     "klass": "fusion",
     "tags": [
      "Harmful",
@@ -16394,9 +16456,8 @@
         "eventHasTag": "Harmful"
        },
        {
-        "has": "mark",
-        "name": "Inspiring Thrust",
-        "of": "eventTargets"
+        "eventTargetsHaveStatus": "mark",
+        "name": "Inspiring Thrust"
        }
       ]
      },
@@ -16859,6 +16920,11 @@
     "element": "sanctuary",
     "klass": "fusion",
     "targeting": "all",
+    "highlightSelector": {
+     "faction": "allies",
+     "kind": "hero",
+     "includeSelf": true
+    },
     "tags": [
      "Harmful",
      "Instant"
@@ -17419,10 +17485,7 @@
      "when": {
       "and": [
        {
-        "sameUnit": [
-         "eventTargets",
-         "self"
-        ]
+        "declaredTargetsSelf": true
        },
        {
         "has": "mark",
@@ -18003,9 +18066,8 @@
      "when": {
       "and": [
        {
-        "has": "dot",
-        "name": "Laughing Powder",
-        "of": "eventTargets"
+        "eventTargetsHaveStatus": "dot",
+        "name": "Laughing Powder"
        },
        {
         "not": {
@@ -19329,7 +19391,7 @@
     "name": "Waft",
     "element": "cloud",
     "klass": "fusion",
-    "targeting": "single",
+    "targeting": "self",
     "tags": [
      "Strategic",
      "Instant"

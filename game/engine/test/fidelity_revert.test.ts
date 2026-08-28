@@ -55,7 +55,7 @@ test("bannerAffectsAllEnemies: Banner targets all enemies for the window, then r
   const state = makeState([taryn], [e1, e2]);
 
   runEffects(state, [{ op: "custom", fn: "bannerAffectsAllEnemies", args: { skillId: "taryn1", turns: 1 } }], { caster: taryn, self: taryn, skillId: "tarynzealot" });
-  assert.equal(effectiveTargeting(taryn, taryn.skills[0]!), "all-enemies", "targeting widened for the window");
+  assert.equal(effectiveTargeting(state, taryn, taryn.skills[0]!), "all-enemies", "targeting widened for the window");
 
   performAction(state, { unit: "t", skillId: "taryn1" }); // resolves through the widened targeting → hits both
   assert.equal(e1.hp, 90, "enemy 1 hit");
@@ -63,7 +63,7 @@ test("bannerAffectsAllEnemies: Banner targets all enemies for the window, then r
 
   // Auto-revert: once the override lapses (a normal duration-1 status on Taryn), targeting is single again.
   removeStatus(taryn, "skill_targeting_override");
-  assert.equal(effectiveTargeting(taryn, taryn.skills[0]!), "single", "reverts to the base single targeting");
+  assert.equal(effectiveTargeting(state, taryn, taryn.skills[0]!), "single", "reverts to the base single targeting");
 });
 
 test("a widened Banner is a real AOE: it is NOT treated as single-target by split_incoming (cross-feature)", () => {

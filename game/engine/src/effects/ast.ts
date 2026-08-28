@@ -65,7 +65,8 @@ export type Selector =
   // filters minions by their template name (e.g. only Seedlings).
   | { faction: Faction; alive?: boolean; includeSelf?: boolean; kind?: "hero" | "minion"; template?: string }
   | { pick: "random" | "lowestHp" | "highestHp"; from: Selector; count?: number }
-  | { filter: Selector; with?: StatusMatch; without?: StatusMatch };
+  | { filter: Selector; with?: StatusMatch; without?: StatusMatch }
+  | { any: Selector[] }; // union of several selectors (deduped) — a skill affecting two disjoint groups
 
 // --------------------------------------------------------------------------- //
 //  Conditions.
@@ -85,6 +86,7 @@ export type Condition =
   | { skillOnCooldown: string } // the caster's own skill (by id) is currently on cooldown (zephyrex3 requires Wind Step down)
   | { declaredTargetsSelf: true } // (skillDeclared) the trigger owner is among the declared targets
   | { eventTargetsFaction: "allies" | "enemies" } // (skillUsed/Declared) any declared target is on self's team / the opposing team
+  | { eventTargetsHaveStatus: StatusKind; name?: string } // (skillUsed/Declared) ANY declared target holds this status — avoids the eventTargets[0] index-0 miss on an AoE
   | { eventHasTag: string } // (skillDeclared/skillUsed) the skill carries this class tag
   | { eventSkillId: string } // (skillUsed/skillDeclared/skillGranted/skillRedirected/counterFired) the event's skillId matches — scopes a skill-reaction to ONE skill
   | { eventStatusKind: string; name?: string } // (statusApplied/statusExpired) the event's status kind (+name) matches
@@ -155,7 +157,7 @@ export type Effect =
   | { op: "grantShield"; amount: Value; to?: Selector; duration?: number | null; id?: NodeId }
   | { op: "applyStatus"; status: StatusSpec; to?: Selector; id?: NodeId }
   | { op: "removeStatus"; kind: StatusKind; name?: string; from?: Selector; id?: NodeId }
-  | { op: "modifyStatus"; kind: StatusKind; name?: string; magnitudeDelta?: Value; durationDelta?: Value; from?: Selector; id?: NodeId }
+  | { op: "modifyStatus"; kind: StatusKind; name?: string; magnitudeDelta?: Value; durationDelta?: Value; duration?: Value; from?: Selector; id?: NodeId } // duration = absolute set (refresh a window without re-applying, which would reset appliedTurn)
   | { op: "addStack"; name: string; amount?: Value; duration?: Value | null; to?: Selector; id?: NodeId }
   | { op: "grantEnergy"; element: string; amount: Value; id?: NodeId }
   | { op: "modifyCooldown"; delta: Value; skillId?: string; of?: Selector; id?: NodeId }
@@ -179,6 +181,17 @@ export interface SkillDef {
   element: string;
   /** How the primary target(s) are chosen when cast. */
   targeting: "single" | "self" | "all-enemies" | "all-allies" | "all" | "none";
+  /** Live targeting widening: while `when` holds against the caster's state, effectiveTargeting reports `to`
+   *  instead of `targeting`, so a normally single-target skill that becomes a faction-wide AoE in some state
+   *  (Supercharged, 3+ Curse stacks, low HP, an active mark) is offered / telegraphed / auto-resolved as the
+   *  whole group instead of forcing a single-target click. The effect tree still drives the actual damage via
+   *  its own faction selectors; this only keeps the client + resolveTargets in sync with that widening. */
+  widenTargeting?: { when: Condition; to: SkillDef["targeting"] };
+  /** Explicit highlight/telegraph override for a group-targeted skill whose actual reach the effect-tree
+   *  walker (affectedUnits) can't determine — because a custom op or an inline useSkill hides it. Resolved
+   *  against the caster's live state; the client uses it verbatim instead of the coarse targeting category.
+   *  Only needed for the handful of custom-op skills; the walker covers everything else automatically. */
+  highlightSelector?: Selector;
   effects: Effect[];
   /** "This effect is Invisible": the skill is hidden from the opponent. The mechanical consumers are the
    *  eventHidden Condition (Sera's non-Invisible filter, Keeper's invisible-skill reader); the concealment

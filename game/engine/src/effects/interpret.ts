@@ -180,6 +180,13 @@ export function resolveSelector(sel: Selector, ctx: Ctx, admitUnderstudy = true)
     return sorted.slice(0, count);
   }
 
+  if ("any" in sel) {
+    const out: Unit[] = [];
+    const seen = new Set<string>();
+    for (const s of sel.any) for (const u of resolveSelector(s, ctx, admitUnderstudy)) if (!seen.has(u.id)) { seen.add(u.id); out.push(u); }
+    return out;
+  }
+
   // filter
   const base = resolveSelector(sel.filter, ctx, admitUnderstudy);
   return base.filter((u) => {
@@ -370,6 +377,16 @@ export function evalCondition(c: Condition, ctx: Ctx): boolean {
     return e.targets.some((id) => {
       const u = ctx.state.units[id];
       return !!u && (u.team === ctx.self.team) === wantAlly;
+    });
+  }
+  if ("eventTargetsHaveStatus" in c) {
+    // Does ANY declared target of the event's skill hold this status? Encodes "anyone who uses a skill on a
+    // [status]-marked character" without the eventTargets[0] index-0 miss when the skill hits several units.
+    const e = ctx.event;
+    if (!e || !("targets" in e)) return false;
+    return e.targets.some((id) => {
+      const u = ctx.state.units[id];
+      return !!u && u.statuses.some((s) => s.kind === c.eventTargetsHaveStatus && (c.name === undefined || s.name === c.name));
     });
   }
   if ("eventHasTag" in c) {
@@ -615,6 +632,13 @@ export function exec(effect: Effect, ctx: Ctx): void {
           const nextDur = s.duration + dDur;
           if (nextDur <= 0) u.statuses = u.statuses.filter((x) => x !== s);
           else s.duration = nextDur;
+        }
+        // Absolute duration set — refresh a finite window in place (leaves appliedTurn untouched, so the
+        // dot keeps ticking, unlike a re-applyStatus which resets appliedTurn and trips the birth-turn guard).
+        if (effect.duration !== undefined && s.duration !== null) {
+          const nd = applyRounding(evalValue(effect.duration, ctx));
+          if (nd <= 0) u.statuses = u.statuses.filter((x) => x !== s);
+          else s.duration = nd;
         }
       }
       return;
@@ -901,6 +925,82 @@ export function evalConditionReadOnly(state: MatchState, caster: Unit, cond: Con
   const bus = createBus(state, rng);
   const ctx: Ctx = { state, rng, caster, self: caster, targets: [], it: null, vars: {}, emit: bus.emit };
   return evalCondition(cond, ctx); // rng intentionally not written back
+}
+
+/**
+ * The units a skill's effects would AFFECT in the current state, computed WITHOUT applying anything — lets the
+ * client highlight/telegraph exactly what a group-targeted skill reaches (honoring includeSelf / kind / status
+ * filters) instead of the raw living-team set. Walks the effect tree, evaluating `if` conditions live and
+ * resolving each affecting op's target selector. `complete` is false when the reach is uncertain (a custom /
+ * useSkill op, an unbound chosen-target selector, or an affecting op with no explicit target) — callers then
+ * fall back to the coarse targeting category rather than risk UNDER-highlighting.
+ */
+export function affectedUnits(
+  state: MatchState,
+  caster: Unit,
+  skill: { effects: Effect[] },
+  chosen: string[] = [],
+): { units: Set<string>; complete: boolean } {
+  const rng = Rng.fromState(state.rngState);
+  const bus = createBus(state, rng);
+  const targetUnits = chosen.map((id) => state.units[id]).filter((u): u is Unit => !!u);
+  const ctx: Ctx = { state, rng, caster, self: caster, targets: targetUnits, it: null, vars: {}, emit: bus.emit };
+  const units = new Set<string>();
+  let complete = true;
+  // A random pick has no stable reach (its unit isn't decided until resolution, and the rng advances), so a
+  // selector containing one makes the reach uncertain — callers fall back rather than pin a wrong portrait.
+  const hasPick = (sel: Selector): boolean =>
+    typeof sel !== "string" && ("pick" in sel ? true : "filter" in sel ? hasPick(sel.filter) : "any" in sel ? sel.any.some(hasPick) : false);
+  const addSel = (sel: Selector | undefined): void => {
+    if (sel === undefined || sel === "it") { complete = false; return; } // unbound at preview
+    if (sel === "target" && targetUnits.length === 0) { complete = false; return; } // no chosen target bound
+    if (typeof sel !== "string" && hasPick(sel)) { complete = false; return; } // random reach — not stable
+    for (const u of resolveSelector(sel, ctx)) units.add(u.id);
+  };
+  const walk = (effects: Effect[]): void => {
+    for (const e of effects) {
+      switch (e.op) {
+        case "damage": case "heal": case "healthLoss": case "grantShield":
+        case "applyStatus": case "addStack": case "defeat": case "revive": case "transform":
+          addSel(e.to); break;
+        case "removeStatus": case "modifyStatus":
+          addSel(e.from); break;
+        case "modifyCooldown":
+          break; // cooldown change — not a portrait target for the aim highlight
+        case "if":
+          walk(evalCondition(e.cond, ctx) ? e.then : (e.else ?? [])); break;
+        case "forEach":
+          // the `each` set is the reach; its `do` acts on `it` (a subset already counted). A custom op inside
+          // `do`, or a random `each`, still makes the reach uncertain.
+          if (e.each === "target" || e.each === "it" || (typeof e.each !== "string" && hasPick(e.each))) complete = false;
+          else for (const u of resolveSelector(e.each, ctx)) units.add(u.id);
+          if (e.do.some((d) => d.op === "custom" || d.op === "useSkill")) complete = false;
+          break;
+        case "seq":
+          walk(e.steps); break;
+        case "schedule":
+          if (e.to) addSel(e.to); walk(e.effect); break;
+        case "summon": case "grantEnergy": case "swapPositions": case "shuffleTeam":
+          break; // no existing-unit reach to highlight
+        case "custom": case "useSkill":
+          complete = false; break;
+        default:
+          complete = false; break;
+      }
+    }
+  };
+  walk(skill.effects);
+  return { units, complete };
+}
+
+/** Resolve a skill's explicit highlightSelector against the caster's live state (read-only) — the units a
+ *  group-targeted custom-op skill actually reaches, for the client highlight/telegraph when affectedUnits
+ *  can't walk the reach. */
+export function resolveHighlightSelector(state: MatchState, caster: Unit, sel: Selector): Set<string> {
+  const rng = Rng.fromState(state.rngState);
+  const bus = createBus(state, rng);
+  const ctx: Ctx = { state, rng, caster, self: caster, targets: [], it: null, vars: {}, emit: bus.emit };
+  return new Set(resolveSelector(sel, ctx).filter((u) => u.alive).map((u) => u.id));
 }
 
 /** Evaluate a per-candidate target predicate (SkillInstance.targetFilter) with `candidate` bound as the

@@ -308,6 +308,26 @@ test("devil/Asmodeus's Promise: at >=5 Curse stacks Maggie applies Curse of Thor
   }
 });
 
+test("devil/Asmodeus's Promise (regression): the spread Curse KEEPS ticking on an enemy Maggie re-strikes each turn — a re-apply must not reset the dot's birth turn", () => {
+  const maggie = fuse("devil");
+  seedCurse(maggie, 5);
+  const e = makeUnit({ id: "e", team: "B", hp: 200, maxHp: 200 });
+  const state = makeState([maggie], [e]);
+  state.teams.A.energy = energy("devil");
+  // Turn 1: Maggie strikes e -> Curse dot applied (stack 1, mag 5).
+  assert.ok(performAction(state, { unit: "maggie", skillId: "maggie1", targets: ["e"] }).ok);
+  assert.ok(hasCurseDot(e), "the Curse dot lands on the struck enemy");
+  endTurn(state); // turn 1 A (the dot's birth turn — no tick)
+  endTurn(state); // turn 2 B
+  state.teams.A.energy = energy("devil");
+  // Turn 3: Maggie re-strikes the SAME enemy — the case that used to reset appliedTurn and kill the tick.
+  assert.ok(performAction(state, { unit: "maggie", skillId: "maggie1", targets: ["e"] }).ok);
+  const beforeTick = e.hp;
+  endTurn(state); // turn 3 A -> the Curse dot MUST tick despite the re-strike this turn
+  assert.ok(e.hp < beforeTick, "the spread Curse still deals periodic Affliction even though Maggie re-struck this turn");
+  assert.equal(beforeTick - e.hp, 10, "2 enemy Curse stacks => 10 Affliction ticks (was 0 under the appliedTurn-reset bug)");
+});
+
 // ===========================================================================================
 // FORM: evil
 // ===========================================================================================

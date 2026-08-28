@@ -412,7 +412,7 @@ test("Merciless + The Nightmare Rides: evil-fused Oathbreaker AoE hits the WHOLE
   const s1 = k.skills!.find((s) => s.id === "blackknight1")!;
 
   performAction(state, { unit: "b", skillId: "blackknight5" });
-  assert.equal(effectiveTargeting(k, s1), "all", "evil-fused ultimate widens Oathbreaker to ALL (allies + enemies) for the UI");
+  assert.equal(effectiveTargeting(state, k, s1), "all", "evil-fused ultimate widens Oathbreaker to ALL (allies + enemies) for the UI");
   performAction(state, { unit: "b", skillId: "blackknight1", targets: ["e1"] });
   assert.equal(e1.hp, 75, "enemy 1 hit for 25");
   assert.equal(e2.hp, 75, "enemy 2 hit for 25 (whole enemy team)");
@@ -430,7 +430,7 @@ test("Control: the BASE (un-fused) ultimate AoE widens to enemies only and never
   const s1 = k.skills!.find((s) => s.id === "blackknight1")!;
 
   performAction(state, { unit: "b", skillId: "blackknight5" });
-  assert.equal(effectiveTargeting(k, s1), "all-enemies", "base ultimate widens to enemies only");
+  assert.equal(effectiveTargeting(state, k, s1), "all-enemies", "base ultimate widens to enemies only");
   performAction(state, { unit: "b", skillId: "blackknight1", targets: ["e1"] });
   assert.equal(e1.hp, 75); assert.equal(e2.hp, 75, "both enemies hit");
   assert.equal(al.hp, 100, "the ally is NOT hit in the base form (ally hit is evil-only)");
