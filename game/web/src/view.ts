@@ -210,13 +210,16 @@ function tagText(tags?: string[]): string {
 function skillTile(state: MatchState, u: Unit, ui: UiState, s: SkillInstance | null, big = false): string {
   const base = big ? "tile tile-ult" : "tile";
   if (!s) return `<div class="${base} locked" title="${big ? "No ultimate" : "Empty skill slot"}">🔒</div>`;
-  const ok = canUsePlanned(state, u, s, [...ui.planned.values()]);
   const chosen = ui.plannedSkill.get(u.id) === s.id;
+  // A hero acts at most once per turn: once one of its skills is queued, the OTHERS gray out (the queued one
+  // stays highlighted). Dequeue it (click its icon over the target) to pick a different one.
+  const actedOther = ui.plannedSkill.has(u.id) && !chosen;
+  const ok = canUsePlanned(state, u, s, [...ui.planned.values()]) && !actedOther;
   const cost = effectiveCost(u, s, state);
   const costStr = [cost.generic ? `${cost.generic} generic` : "", cost.specific ? `${cost.specific} ${s.element}` : ""].filter(Boolean).join(" + ") || "free";
   const text = SKILL_TEXT[s.id];
-  const tip = `${text?.n ?? s.name}${tagText(s.tags)} — ${costStr}${s.currentCd > 0 ? ` — on cooldown (${s.currentCd})` : ""}${text?.d ? `\n${text.d}` : ""}`;
-  const cls = [base, ok ? "" : "off", chosen ? "chosen" : ""].filter(Boolean).join(" ");
+  const tip = `${text?.n ?? s.name}${tagText(s.tags)} — ${costStr}${s.currentCd > 0 ? ` — on cooldown (${s.currentCd})` : ""}${actedOther ? " — already queued a skill this turn" : ""}${text?.d ? `\n${text.d}` : ""}`;
+  const cls = [base, ok ? "" : "off", chosen ? "chosen" : "", actedOther ? "acted" : ""].filter(Boolean).join(" ");
   const ic = iconOf(s.id, u.heroId ?? undefined);
   // Abbr behind the icon: a failed icon load (missing file / flaky env) reveals the abbr instead of a blank tile.
   return `<button class="${cls}" data-owner="${u.id}" data-skill="${s.id}" title="${esc(tip)}"><span class="tile-abbr">${esc(s.name.slice(0, 3))}</span>${ic ? `<img src="${ic}" alt="${esc(s.name)}" onerror="this.remove()" />` : ""}${s.currentCd > 0 ? `<span class="cdbadge">${s.currentCd}</span>` : ""}</button>`;
