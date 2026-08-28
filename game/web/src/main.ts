@@ -606,13 +606,16 @@ app.addEventListener("click", (e) => {
     ui.inspectUnit = undefined; // picking a skill takes over the upper area from any open inspector
     const u = state.units[d.owner]!;
     const skill = (u.skills ?? []).find((s) => s.id === d.skill)!;
-    if (canUsePlanned(state, u, skill, [...ui.planned.values()])) {
+    // A hero acts once per turn: if it already queued a DIFFERENT skill, this one is not usable (remove the
+    // queued one first). Re-clicking the queued skill itself still re-targets it (canUsePlanned excludes it).
+    const actedOther = ui.plannedSkill.has(u.id) && ui.plannedSkill.get(u.id) !== skill.id;
+    if (!actedOther && canUsePlanned(state, u, skill, [...ui.planned.values()])) {
       ui.examine = undefined;
       ui.targeting = { unitId: u.id, skillId: skill.id, skillName: skill.name, single: isSingleTargetPick(state, u, skill) };
       ui.legalTargets = highlightSet(u, skill);
-    } else { // on cooldown / unaffordable / no target → show its detail, but do NOT enter targeting
+    } else { // already acted / on cooldown / unaffordable / no target → show its detail, but do NOT enter targeting
       ui.targeting = undefined; ui.legalTargets = new Set();
-      ui.examine = { unitId: u.id, skillId: skill.id, reason: unusableReason(u, skill) };
+      ui.examine = { unitId: u.id, skillId: skill.id, reason: actedOther ? "Already queued a skill this turn — remove it (click its icon over the target) to pick another." : unusableReason(u, skill) };
     }
     render();
   } else if (d.target && ui.targeting) { // click a highlighted portrait to commit the skill
