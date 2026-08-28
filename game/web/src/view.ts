@@ -193,6 +193,17 @@ function costIcons(cost: { generic: number; specific: number }, element: string)
   return all ? `<span class="cost-ics">${all}</span>` : `<span class="cost-free">Free</span>`;
 }
 
+/** Small class/tag chips for a skill — Strategic / Harmful / Helpful / Instant / Channel / Affliction … — shown
+ *  on every skill display so a player can read a skill's classes at a glance. */
+function tagChips(tags?: string[]): string {
+  if (!tags || !tags.length) return "";
+  return `<span class="sk-tags">${tags.map((t) => `<span class="sk-tag t-${esc(t.toLowerCase())}">${esc(t)}</span>`).join("")}</span>`;
+}
+/** Plain-text version of the classes for a native title tooltip (small tiles). */
+function tagText(tags?: string[]): string {
+  return tags && tags.length ? ` [${tags.join(", ")}]` : "";
+}
+
 /** One skill tile. `s` null → a locked/grayed empty slot (a hero's kit shows a fixed set of slots; ones with
  *  no skill yet are locked). `big` → the larger Ultimate slot. A tile is always clickable — an unusable skill
  *  opens its detail (examine) rather than entering targeting; a locked slot is inert (no data-* hooks). */
@@ -204,7 +215,7 @@ function skillTile(state: MatchState, u: Unit, ui: UiState, s: SkillInstance | n
   const cost = effectiveCost(u, s, state);
   const costStr = [cost.generic ? `${cost.generic} generic` : "", cost.specific ? `${cost.specific} ${s.element}` : ""].filter(Boolean).join(" + ") || "free";
   const text = SKILL_TEXT[s.id];
-  const tip = `${text?.n ?? s.name} — ${costStr}${s.currentCd > 0 ? ` — on cooldown (${s.currentCd})` : ""}${text?.d ? `\n${text.d}` : ""}`;
+  const tip = `${text?.n ?? s.name}${tagText(s.tags)} — ${costStr}${s.currentCd > 0 ? ` — on cooldown (${s.currentCd})` : ""}${text?.d ? `\n${text.d}` : ""}`;
   const cls = [base, ok ? "" : "off", chosen ? "chosen" : ""].filter(Boolean).join(" ");
   const ic = iconOf(s.id, u.heroId ?? undefined);
   // Abbr behind the icon: a failed icon load (missing file / flaky env) reveals the abbr instead of a blank tile.
@@ -389,7 +400,7 @@ function skillPanel(state: MatchState, ui: UiState): string {
   return `<div class="skillpanel${examining ? " examine" : ""}">
     ${ic ? `<img class="sp-icon" src="${ic}" ${IMG_FALLBACK} />` : ""}
     <div class="sp-body">
-      <div class="sp-name">${esc(name)} <span class="sp-cost">${costEl}</span></div>
+      <div class="sp-name">${esc(name)} <span class="sp-cost">${costEl}</span>${tagChips(skill?.tags)}</div>
       <div class="sp-desc">${descHtml(text?.d ?? "")}</div>
       <div class="sp-foot">${foot}</div>
     </div>
@@ -410,7 +421,7 @@ function unitInspectPanel(state: MatchState, ui: UiState): string {
   const rows = (u.skills ?? []).map((s) => {
     const t = SKILL_TEXT[s.id];
     const cd = s.cooldown > 0 ? (s.currentCd > 0 ? `on cooldown (${s.currentCd})` : `${s.cooldown}-turn cooldown`) : "";
-    return skillInspectRow(iconOf(s.id, u.heroId ?? undefined), t?.n ?? s.name, costIcons(effectiveCost(u, s, state), s.element), cd, t?.d ?? "");
+    return skillInspectRow(iconOf(s.id, u.heroId ?? undefined), t?.n ?? s.name, costIcons(effectiveCost(u, s, state), s.element), cd, t?.d ?? "", s.tags);
   }).join("");
   // A floating popup over the board — NOT part of the top bar — so opening it never reflows the layout. Its
   // backdrop (ui-backdrop) dismisses on click, as does the ✕.
@@ -422,12 +433,12 @@ function unitInspectPanel(state: MatchState, ui: UiState): string {
 
 /** One row of the unit-inspect panel: icon, name + cost/cooldown meta, description. `cost` is pre-rendered HTML
  *  (energy pips or ""); `cd` is a plain label (e.g. "Passive", "2-turn cooldown"). */
-function skillInspectRow(ic: string | null, name: string, cost: string, cd: string, desc: string): string {
+function skillInspectRow(ic: string | null, name: string, cost: string, cd: string, desc: string, tags: string[] = []): string {
   const meta = [cost, cd ? `<span class="ui-cd">${esc(cd)}</span>` : ""].filter(Boolean).join(`<span class="ui-dot">·</span>`);
   return `<div class="ui-sk">
     ${ic ? `<img class="ui-sk-ic" src="${ic}" ${IMG_FALLBACK} />` : `<div class="ui-sk-ic"></div>`}
     <div class="ui-sk-body">
-      <div class="ui-sk-top"><b class="ui-sk-name">${esc(name)}</b>${meta ? `<span class="ui-sk-meta">${meta}</span>` : ""}</div>
+      <div class="ui-sk-top"><b class="ui-sk-name">${esc(name)}</b>${meta ? `<span class="ui-sk-meta">${meta}</span>` : ""}${tagChips(tags)}</div>
       <div class="ui-sk-desc">${descHtml(desc)}</div>
     </div>
   </div>`;
@@ -530,16 +541,18 @@ function draftOptions(state: MatchState, u: Unit, pick?: DraftChoice): string {
     ? forms.map((f) => {
         const passIc = iconOf(`${hid}${f.key}0`, hid);
         const sk = f.skill, skText = SKILL_TEXT[sk.id], skIc = iconOf(sk.id, hid);
-        const block = (label: string, ic: string | null, name: string, desc: string) =>
+        const block = (label: string, ic: string | null, name: string, desc: string, meta = "") =>
           `<span class="fc-block"><span class="fc-label">${label}</span>
             <span class="fc-line">${ic ? `<img src="${ic}" ${IMG_FALLBACK} />` : ""}<b>${esc(name)}</b></span>
+            ${meta}
             <span class="fc-desc">${descHtml(desc)}</span></span>`;
+        const skMeta = `<span class="fc-meta">${costIcons(sk.cost, sk.element)}<span class="fc-cd">${sk.cooldown > 0 ? `${sk.cooldown}-turn cooldown` : "No cooldown"}</span>${tagChips(sk.tags)}</span>`;
         return `<button class="do-card fusion-card${fuseOn(f.key)}" data-fuse-unit="${u.id}" data-fuse-form="${esc(f.key)}">
           <img class="fc-port" src="${heroPortrait(hid, f.key)}" ${IMG_FALLBACK} />
           <span class="fc-body">
             <span class="fc-head">${fusionHead(u.baseElement, f)}</span>
             ${block("New passive", passIc, f.passive.name, f.passive.description)}
-            ${block("New skill", skIc, skText?.n ?? sk.name, skText?.d ?? "")}
+            ${block("New skill", skIc, skText?.n ?? sk.name, skText?.d ?? "", skMeta)}
           </span></button>`;
       }).join("")
     : `<div class="do-note">No fusion available — needs a teammate whose element forms a recipe.</div>`;
@@ -660,7 +673,7 @@ export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: 
     const t = SKILL_TEXT[id], isPassive = id === `${def.id}0`;
     const sk = (def.skills ?? []).find((s) => s.id === id);
     const meta = [isPassive ? "Passive" : cap(sk?.klass ?? ""), isPassive || !sk ? "" : sk.cooldown > 0 ? `${sk.cooldown}-turn cooldown` : "no cooldown"].filter(Boolean).join(" · ");
-    return `<button class="cs-sicon" data-skname="${esc(t?.n ?? id)}" data-skmeta="${esc(meta)}" data-skdesc="${esc(t?.d ?? "")}" data-skgen="${sk?.cost.generic ?? 0}" data-skspec="${sk?.cost.specific ?? 0}" data-skel="${esc(sk?.element ?? "")}" title="${esc(t?.n ?? id)}"><img src="${iconOf(id, def.id) ?? ""}" ${IMG_FALLBACK} /></button>`;
+    return `<button class="cs-sicon" data-skname="${esc(t?.n ?? id)}" data-skmeta="${esc(meta)}" data-sktags="${esc((sk?.tags ?? []).join(","))}" data-skdesc="${esc(t?.d ?? "")}" data-skgen="${sk?.cost.generic ?? 0}" data-skspec="${sk?.cost.specific ?? 0}" data-skel="${esc(sk?.element ?? "")}" title="${esc(t?.n ?? id)}${tagText(sk?.tags)}"><img src="${iconOf(id, def.id) ?? ""}" ${IMG_FALLBACK} /></button>`;
   };
   const byClass = (k: string) => (def?.skills ?? []).filter((s) => s.klass === k).map((s) => skTile(s.id)).join("");
   // Render a section only when the hero actually has that class of skill (Trinity has no defensive/ultimate;
@@ -750,7 +763,7 @@ function augFuseModal(heroId: string): string {
   const fusion = forms.map((f) => {
     const sk = f.skill, skText = SKILL_TEXT[sk.id];
     const cd = sk.cooldown > 0 ? `${sk.cooldown}-turn cooldown` : "no cooldown";
-    const skMeta = `<span class="fc-meta">${costIcons(sk.cost, sk.element)}<span class="fc-cd">${esc(cd)}</span></span>`;
+    const skMeta = `<span class="fc-meta">${costIcons(sk.cost, sk.element)}<span class="fc-cd">${esc(cd)}</span>${tagChips(sk.tags)}</span>`;
     return `<div class="do-card fusion-card">
       <img class="fc-port" src="${heroPortrait(heroId, f.key)}" ${IMG_FALLBACK} />
       <span class="fc-body">

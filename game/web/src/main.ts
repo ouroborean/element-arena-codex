@@ -248,7 +248,14 @@ function showSkpop(el: HTMLElement): void {
   for (let i = 0; i < spec; i++) pip(cel);
   for (let i = 0; i < gen; i++) pip("generic");
   const desc = document.createElement("div"); desc.className = "skpop-desc"; renderTokens(desc, d.skdesc || "No description.");
-  skpop.append(name, meta, desc);
+  skpop.append(name, meta);
+  const tags = (d.sktags ?? "").split(",").map((s) => s.trim()).filter(Boolean);
+  if (tags.length) {
+    const tagRow = document.createElement("div"); tagRow.className = "skpop-tags";
+    for (const t of tags) { const c = document.createElement("span"); c.className = "sk-tag t-" + t.toLowerCase(); c.textContent = t; tagRow.append(c); }
+    skpop.append(tagRow);
+  }
+  skpop.append(desc);
   skpop.hidden = false;
   const r = el.getBoundingClientRect(), pw = skpop.offsetWidth, ph = skpop.offsetHeight;
   const top = r.top - ph - 8 >= 6 ? r.top - ph - 8 : r.bottom + 8; // above the icon, flipping below if no room
