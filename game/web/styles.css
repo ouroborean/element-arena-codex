@@ -55,8 +55,14 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 /* A hero row: framed portrait + (only for YOUR living heroes) the element-themed skill kit beside it. */
 .unit { display: flex; align-items: center; gap: 12px; }
 .unit.dead { opacity: .35; filter: grayscale(1); }
-.unit.targetable .frame { outline: 2px solid var(--foe); cursor: crosshair; animation: pulse 1s infinite; }
-@keyframes pulse { 50% { outline-color: #fff; } }
+.unit.targetable .frame { outline: 4px solid var(--foe); outline-offset: 2px; cursor: crosshair; animation: pulse 1.1s ease-in-out infinite; }
+@keyframes pulse {
+  0%, 100% { outline-color: var(--foe); box-shadow: 0 0 0 2px var(--foe), 0 0 16px 4px color-mix(in srgb, var(--foe) 55%, transparent), var(--shadow); }
+  50%      { outline-color: #fff;       box-shadow: 0 0 0 3px #fff,       0 0 30px 10px color-mix(in srgb, var(--foe) 85%, transparent), var(--shadow); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .unit.targetable .frame { animation: none; outline-color: var(--foe); box-shadow: 0 0 0 3px var(--foe), 0 0 26px 8px color-mix(in srgb, var(--foe) 75%, transparent), var(--shadow); }
+}
 /* A minion row is compact: small portrait with its (few) skill tiles stacked beneath. */
 .minioncol .unit { flex-direction: column; align-items: center; gap: 5px; }
 
