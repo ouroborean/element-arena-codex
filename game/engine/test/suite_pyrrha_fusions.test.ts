@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { loadHero } from "../content/hero.ts";
 import { heroById } from "../content/match.ts";
-import { performAction } from "../src/scheduler.ts";
+import { performAction, endTurn } from "../src/scheduler.ts";
 import { emit } from "../src/effects/interpret.ts";
 import { applyFusion } from "../content/fusion.ts";
 import { fusionForm } from "../content/fusions.generated.ts";
@@ -152,6 +152,23 @@ test("Alchemist's Fire: NO extra dot when Pyrrha lacks Bottled Flame (control)",
   const e = enemies[0]!;
   assert.equal(performAction(state, { unit: "p", skillId: "pyrrha1", targets: ["e1"] }).ok, true);
   assert.ok(!dotOf(e, "Alchemist's Fire"), "no Alchemist's Fire without the Bottled Flame mark");
+});
+
+test("Alchemist's Fire (regression): the dot KEEPS ticking on an enemy Pyrrha re-strikes each turn — a re-apply refreshes the window without resetting its birth turn", () => {
+  const { p, state, enemies } = fuse("alchemy");
+  const e = enemies[0]!;
+  e.hp = 200; e.maxHp = 200;
+  p.statuses.push({ kind: "mark", name: "Bottled Flame", duration: 9, appliedBy: "p", appliedTurn: 0 });
+  // Turn 1: Pyrrha damages e -> Alchemist's Fire dot applied (birth turn = 1).
+  emit(state, { type: "damageDealt", source: "p", target: "e1", amount: 10, dtype: "normal", isNew: true });
+  assert.ok(dotOf(e, "Alchemist's Fire"), "the dot lands");
+  endTurn(state); // turn 1 A (birth turn — no tick)
+  endTurn(state); // turn 2 B
+  // Turn 3: Pyrrha re-strikes the SAME enemy — the case that used to reset appliedTurn and kill the tick.
+  emit(state, { type: "damageDealt", source: "p", target: "e1", amount: 10, dtype: "normal", isNew: true });
+  const before = e.hp;
+  endTurn(state); // turn 3 A -> the dot MUST tick despite the re-strike this turn
+  assert.equal(before - e.hp, 5, "5 Affliction still ticks the turn Pyrrha re-struck (was 0 under the appliedTurn-reset bug)");
 });
 
 // --------------------------------------------------------------------------- //

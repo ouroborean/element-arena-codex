@@ -341,7 +341,7 @@ export const MINIONS: MinionTemplate[] = [
     "id": "sayareanimationminion1",
     "name": "Busy Work",
     "element": "reanimation",
-    "targeting": "single",
+    "targeting": "self",
     "klass": "basic",
     "tags": [
      "Helpful",
@@ -922,7 +922,7 @@ export const MINIONS: MinionTemplate[] = [
     "id": "titaniaminion1",
     "name": "Curry Favor",
     "element": "poison",
-    "targeting": "single",
+    "targeting": "self",
     "klass": "basic",
     "tags": [
      "Helpful",
@@ -1447,7 +1447,7 @@ export const MINIONS: MinionTemplate[] = [
     "id": "blackknightgraveminion1",
     "name": "Arise!",
     "element": "grave",
-    "targeting": "single",
+    "targeting": "self",
     "klass": "basic",
     "tags": [
      "Strategic",
@@ -2863,6 +2863,14 @@ export const ROSTER: HeroDef[] = [
     "name": "Blade of Ashes",
     "element": "fire",
     "targeting": "single",
+    "widenTargeting": {
+     "when": {
+      "has": "mark",
+      "name": "Dancing Lights",
+      "of": "caster"
+     },
+     "to": "all-enemies"
+    },
     "klass": "basic",
     "tags": [
      "Harmful",
@@ -5151,7 +5159,7 @@ export const ROSTER: HeroDef[] = [
     "isHidden": true,
     "name": "Plasma Shield",
     "element": "lightning",
-    "targeting": "single",
+    "targeting": "self",
     "klass": "defensive",
     "tags": [
      "Strategic",
@@ -5210,7 +5218,7 @@ export const ROSTER: HeroDef[] = [
     "id": "saya5",
     "name": "Stroke of Genius",
     "element": "lightning",
-    "targeting": "single",
+    "targeting": "self",
     "klass": "ultimate",
     "tags": [
      "Strategic",
@@ -6854,7 +6862,7 @@ export const ROSTER: HeroDef[] = [
     "id": "syl5",
     "name": "Leyline Nest",
     "element": "wind",
-    "targeting": "single",
+    "targeting": "self",
     "klass": "ultimate",
     "tags": [
      "Strategic",
@@ -7814,7 +7822,7 @@ export const ROSTER: HeroDef[] = [
     "id": "dennis5",
     "name": "HS-88 Reconstitution Serum",
     "element": "serum",
-    "targeting": "single",
+    "targeting": "self",
     "klass": "defensive",
     "tags": [
      "Strategic",
@@ -8296,9 +8304,8 @@ export const ROSTER: HeroDef[] = [
     "when": {
      "and": [
       {
-       "has": "dot",
-       "name": "Laughing Powder",
-       "of": "eventTargets"
+       "eventTargetsHaveStatus": "dot",
+       "name": "Laughing Powder"
       },
       {
        "not": {
@@ -8330,10 +8337,7 @@ export const ROSTER: HeroDef[] = [
     "when": {
      "and": [
       {
-       "sameUnit": [
-        "eventTargets",
-        "self"
-       ]
+       "declaredTargetsSelf": true
       },
       {
        "has": "taunt",
@@ -8355,10 +8359,7 @@ export const ROSTER: HeroDef[] = [
     "when": {
      "and": [
       {
-       "sameUnit": [
-        "eventTargets",
-        "self"
-       ]
+       "declaredTargetsSelf": true
       },
       {
        "has": "mark",
@@ -10063,9 +10064,8 @@ export const ROSTER: HeroDef[] = [
        "eventHasTag": "Harmful"
       },
       {
-       "has": "mark",
-       "name": "Inspiring Thrust",
-       "of": "eventTargets"
+       "eventTargetsHaveStatus": "mark",
+       "name": "Inspiring Thrust"
       }
      ]
     },
@@ -10336,7 +10336,7 @@ export const ROSTER: HeroDef[] = [
     "isHidden": true,
     "name": "Dead or Alive",
     "element": "unholy",
-    "targeting": "single",
+    "targeting": "self",
     "klass": "defensive",
     "tags": [
      "Strategic",
@@ -10612,6 +10612,18 @@ export const ROSTER: HeroDef[] = [
     "name": "Thornburst",
     "element": "unholy",
     "targeting": "single",
+    "widenTargeting": {
+     "when": {
+      "cmp": ">=",
+      "left": {
+       "ref": "stackCount",
+       "name": "Curse of Thorns",
+       "of": "self"
+      },
+      "right": 3
+     },
+     "to": "all-enemies"
+    },
     "klass": "basic",
     "tags": [
      "Harmful",
@@ -13605,7 +13617,7 @@ export const ROSTER: HeroDef[] = [
     "isHidden": true,
     "name": "Scan of the All-Knowing",
     "element": "vengeance",
-    "targeting": "single",
+    "targeting": "self",
     "klass": "fusion",
     "tags": [
      "Strategic",

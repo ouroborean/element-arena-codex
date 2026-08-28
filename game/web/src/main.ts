@@ -601,7 +601,7 @@ app.addEventListener("click", (e) => {
     const skill = (u.skills ?? []).find((s) => s.id === d.skill)!;
     if (canUsePlanned(state, u, skill, [...ui.planned.values()])) {
       ui.examine = undefined;
-      ui.targeting = { unitId: u.id, skillId: skill.id, skillName: skill.name, single: isSingleTargetPick(u, skill) };
+      ui.targeting = { unitId: u.id, skillId: skill.id, skillName: skill.name, single: isSingleTargetPick(state, u, skill) };
       ui.legalTargets = highlightSet(u, skill);
     } else { // on cooldown / unaffordable / no target → show its detail, but do NOT enter targeting
       ui.targeting = undefined; ui.legalTargets = new Set();

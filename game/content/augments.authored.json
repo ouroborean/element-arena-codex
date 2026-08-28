@@ -3400,10 +3400,7 @@
       "when": {
        "and": [
         {
-         "sameUnit": [
-          "eventTargets",
-          "self"
-         ]
+         "declaredTargetsSelf": true
         },
         {
          "has": "taunt",
@@ -3557,10 +3554,7 @@
       "when": {
        "and": [
         {
-         "sameUnit": [
-          "eventTargets",
-          "self"
-         ]
+         "declaredTargetsSelf": true
         },
         {
          "has": "mark",

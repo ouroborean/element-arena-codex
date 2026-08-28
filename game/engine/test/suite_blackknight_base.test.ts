@@ -319,10 +319,10 @@ test("The Nightmare Rides: Oathbreaker targets ALL enemies and is always enhance
 
 test("The Nightmare Rides is SELF-target: effectiveTargeting is 'self' so the client aims it at the caster only (regression: was authored 'single', which fell through to offering the whole board)", () => {
   const k = bk("A", "b");
-  makeState([k], [makeUnit({ id: "e", team: "B", kind: "hero" })]);
+  const state = makeState([k], [makeUnit({ id: "e", team: "B", kind: "hero" })]);
   const ult = k.skills!.find((s) => s.id === "blackknight5")!;
   assert.equal(ult.targeting, "self", "authored targeting is 'self'");
-  assert.equal(effectiveTargeting(k, ult), "self", "the ultimate resolves to self-only for the UI");
+  assert.equal(effectiveTargeting(state, k, ult), "self", "the ultimate resolves to self-only for the UI");
 });
 
 test("While the ultimate is active, Oathbreaker Strike's effective targeting widens to 'all-enemies' — the seam the client reads to offer/telegraph the AoE (regression: client read the static 'single' and still offered one target)", () => {
@@ -330,9 +330,9 @@ test("While the ultimate is active, Oathbreaker Strike's effective targeting wid
   const state = makeState([k], [makeUnit({ id: "e1", team: "B", kind: "hero" }), makeUnit({ id: "e2", team: "B", kind: "hero" })]);
   fund(state);
   const s1 = k.skills!.find((s) => s.id === "blackknight1")!;
-  assert.equal(effectiveTargeting(k, s1), "single", "single-target before the ultimate");
+  assert.equal(effectiveTargeting(state, k, s1), "single", "single-target before the ultimate");
   performAction(state, { unit: "b", skillId: "blackknight5" });
-  assert.equal(effectiveTargeting(k, s1), "all-enemies", "the ultimate widens Oathbreaker to all enemies");
+  assert.equal(effectiveTargeting(state, k, s1), "all-enemies", "the ultimate widens Oathbreaker to all enemies");
 });
 
 test("Nightmare control: without it, Oathbreaker (un-enhanced) hits one enemy for 15", () => {

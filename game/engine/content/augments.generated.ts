@@ -3334,10 +3334,7 @@ export const AUGMENTS: Augment[] = [
      "when": {
       "and": [
        {
-        "sameUnit": [
-         "eventTargets",
-         "self"
-        ]
+        "declaredTargetsSelf": true
        },
        {
         "has": "taunt",
@@ -3490,10 +3487,7 @@ export const AUGMENTS: Augment[] = [
      "when": {
       "and": [
        {
-        "sameUnit": [
-         "eventTargets",
-         "self"
-        ]
+        "declaredTargetsSelf": true
        },
        {
         "has": "mark",

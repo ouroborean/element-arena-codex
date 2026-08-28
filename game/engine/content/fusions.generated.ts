@@ -2820,10 +2820,7 @@ export const FUSIONS: FusionForm[] = [
        }
       },
       {
-       "sameUnit": [
-        "eventTargets",
-        "self"
-       ]
+       "declaredTargetsSelf": true
       },
       {
        "or": [
@@ -3711,7 +3708,7 @@ export const FUSIONS: FusionForm[] = [
    "id": "gaiamyth1",
    "name": "Yggdrasil",
    "element": "myth",
-   "targeting": "single",
+   "targeting": "self",
    "klass": "fusion",
    "tags": [
     "Strategic",
@@ -5953,10 +5950,7 @@ export const FUSIONS: FusionForm[] = [
     "on": "skillUsed",
     "source": "A Dash of Whimsy",
     "when": {
-     "sameUnit": [
-      "eventTargets",
-      "self"
-     ]
+     "declaredTargetsSelf": true
     },
     "effect": [
      {
@@ -6101,6 +6095,14 @@ export const FUSIONS: FusionForm[] = [
    "name": "Avatar Serum",
    "element": "serum",
    "targeting": "all",
+   "highlightSelector": {
+    "any": [
+     {
+      "faction": "enemies"
+     },
+     "caster"
+    ]
+   },
    "klass": "fusion",
    "tags": [
     "Harmful",
@@ -10174,25 +10176,46 @@ export const FUSIONS: FusionForm[] = [
       "to": "eventTarget"
      },
      {
-      "op": "applyStatus",
-      "to": "eventTarget",
-      "status": {
-       "kind": "dot",
-       "name": "Curse of Thorns",
-       "magnitude": {
-        "op": "mul",
-        "args": [
-         5,
-         {
-          "ref": "stackCount",
-          "name": "Curse of Thorns",
-          "of": "eventTarget"
-         }
-        ]
-       },
-       "dtype": "affliction",
-       "duration": null
-      }
+      "op": "if",
+      "cond": {
+       "not": {
+        "has": "dot",
+        "name": "Curse of Thorns",
+        "of": "eventTarget"
+       }
+      },
+      "then": [
+       {
+        "op": "applyStatus",
+        "to": "eventTarget",
+        "status": {
+         "kind": "dot",
+         "name": "Curse of Thorns",
+         "magnitude": {
+          "op": "mul",
+          "args": [
+           5,
+           {
+            "ref": "stackCount",
+            "name": "Curse of Thorns",
+            "of": "eventTarget"
+           }
+          ]
+         },
+         "dtype": "affliction",
+         "duration": null
+        }
+       }
+      ],
+      "else": [
+       {
+        "op": "modifyStatus",
+        "kind": "dot",
+        "name": "Curse of Thorns",
+        "magnitudeDelta": 5,
+        "from": "eventTarget"
+       }
+      ]
      }
     ]
    }
@@ -10949,15 +10972,36 @@ export const FUSIONS: FusionForm[] = [
     },
     "effect": [
      {
-      "op": "applyStatus",
-      "to": "eventTarget",
-      "status": {
-       "kind": "dot",
-       "name": "Alchemist's Fire",
-       "magnitude": 5,
-       "dtype": "affliction",
-       "duration": 4
-      }
+      "op": "if",
+      "cond": {
+       "not": {
+        "has": "dot",
+        "name": "Alchemist's Fire",
+        "of": "eventTarget"
+       }
+      },
+      "then": [
+       {
+        "op": "applyStatus",
+        "to": "eventTarget",
+        "status": {
+         "kind": "dot",
+         "name": "Alchemist's Fire",
+         "magnitude": 5,
+         "dtype": "affliction",
+         "duration": 4
+        }
+       }
+      ],
+      "else": [
+       {
+        "op": "modifyStatus",
+        "kind": "dot",
+        "name": "Alchemist's Fire",
+        "duration": 4,
+        "from": "eventTarget"
+       }
+      ]
      }
     ]
    }
@@ -11313,6 +11357,17 @@ export const FUSIONS: FusionForm[] = [
    "name": "Flame of Legends",
    "element": "dragon",
    "targeting": "single",
+   "widenTargeting": {
+    "when": {
+     "cmp": "<=",
+     "left": {
+      "ref": "currentHp",
+      "of": "caster"
+     },
+     "right": 30
+    },
+    "to": "all-enemies"
+   },
    "klass": "fusion",
    "tags": [
     "Harmful",
@@ -13672,6 +13727,25 @@ export const FUSIONS: FusionForm[] = [
    "name": "FInal Warning",
    "element": "nomad",
    "targeting": "all",
+   "highlightSelector": {
+    "any": [
+     {
+      "filter": {
+       "faction": "enemies",
+       "kind": "hero"
+      },
+      "with": {
+       "kind": "mark",
+       "name": "Mark the Path"
+      }
+     },
+     {
+      "faction": "allies",
+      "kind": "minion",
+      "template": "Boulder"
+     }
+    ]
+   },
    "klass": "fusion",
    "tags": [
     "Harmful",
@@ -16105,9 +16179,8 @@ export const FUSIONS: FusionForm[] = [
        "eventHasTag": "Harmful"
       },
       {
-       "has": "mark",
-       "name": "Inspiring Thrust",
-       "of": "eventTargets"
+       "eventTargetsHaveStatus": "mark",
+       "name": "Inspiring Thrust"
       }
      ]
     },
@@ -16560,6 +16633,11 @@ export const FUSIONS: FusionForm[] = [
    "element": "sanctuary",
    "klass": "fusion",
    "targeting": "all",
+   "highlightSelector": {
+    "faction": "allies",
+    "kind": "hero",
+    "includeSelf": true
+   },
    "tags": [
     "Harmful",
     "Instant"
@@ -17105,10 +17183,7 @@ export const FUSIONS: FusionForm[] = [
     "when": {
      "and": [
       {
-       "sameUnit": [
-        "eventTargets",
-        "self"
-       ]
+       "declaredTargetsSelf": true
       },
       {
        "has": "mark",
@@ -17678,9 +17753,8 @@ export const FUSIONS: FusionForm[] = [
     "when": {
      "and": [
       {
-       "has": "dot",
-       "name": "Laughing Powder",
-       "of": "eventTargets"
+       "eventTargetsHaveStatus": "dot",
+       "name": "Laughing Powder"
       },
       {
        "not": {
@@ -18981,7 +19055,7 @@ export const FUSIONS: FusionForm[] = [
    "name": "Waft",
    "element": "cloud",
    "klass": "fusion",
-   "targeting": "single",
+   "targeting": "self",
    "tags": [
     "Strategic",
     "Instant"
