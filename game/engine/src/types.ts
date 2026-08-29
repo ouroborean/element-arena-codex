@@ -292,6 +292,10 @@ export interface MatchState {
   /** When present, `emit` pushes every GameEvent here in order — an opt-in tap the client sets around a turn's
    *  resolution to drive a step-by-step animation. Off (undefined) everywhere else, so it costs nothing. */
   eventSink?: GameEvent[];
+  /** When present, a deep-clone of the board is pushed here at each `skillUsed` (the point a skill's effects
+   *  have landed) — so the client's animation can render the board AFTER each skill, in step. Opt-in, off by
+   *  default. Excluded from its own clones to avoid recursion. */
+  snapshotSink?: MatchState[];
 }
 
 /** A deferred effect: fires after `turns` of the caster's turn-ends elapse. */

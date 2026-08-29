@@ -887,6 +887,13 @@ export function createBus(state: MatchState, rng: Rng): Bus {
     emit(event: GameEvent) {
       state.eventSink?.push(event); // opt-in ordered tap for the client's turn animation — captures EVERY event
       // (effect-op damage/heal/status included, since those go through this bus), off by default so it costs nothing.
+      if (event.type === "skillUsed" && state.snapshotSink) {
+        // Deep-clone the board AFTER this skill's effects have landed (skillUsed fires post-effects, before this
+        // skill's own reactions — which emit their own skillUsed and get their own snapshot), so the animation can
+        // render the board in step with each skill. Exclude the sinks themselves to avoid cloning the growing arrays.
+        const { eventSink: _e, snapshotSink: _s, ...board } = state;
+        state.snapshotSink.push(structuredClone(board) as MatchState);
+      }
       if (depth >= MAX_TRIGGER_DEPTH) {
         state.log.push(`trigger depth cap hit at ${event.type}`);
         return;

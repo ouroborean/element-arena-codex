@@ -1,10 +1,11 @@
 /**
  * Turn playback — the step-by-step "what just happened" animation. The loop taps every GameEvent of a turn
- * (state.eventSink) and hands them here AFTER the board has resolved; we replay them over the final board:
- * each skill in turn gets a slide-in "[Hero] used [Skill] on [targets]" panel with floating damage/heal text
- * and small flashes on the affected units, then the end-of-turn dot ticks resolve quickly with no panel.
- * Purely cosmetic: it reads the resolved state + the event list, never mutates game state. Click anywhere to
- * skip to the end.
+ * (state.eventSink) plus a board snapshot after each skill (state.snapshotSink), and hands them here AFTER the
+ * board has resolved. We repaint the board in step with each skill so HP bars and effect chips manifest one
+ * skill at a time (not all at once at the end): each skill gets a slide-in "[Hero] used [Skill] on [targets]"
+ * panel, then its snapshot is painted (HP/effects update) with floating damage/heal text and small flashes on
+ * the affected units; finally the end-of-turn dot ticks resolve quickly over the final board with no panel.
+ * Purely cosmetic: it reads the snapshots + the event list, never mutates game state. Click anywhere to skip.
  */
 import type { MatchState, TeamId } from "../../engine/src/types.ts";
 import type { GameEvent } from "../../engine/src/events.ts";
@@ -79,10 +80,16 @@ function showPanel(html: string): () => void {
 type Fx = Extract<GameEvent, { type: "damageDealt" | "healReceived" | "statusApplied" | "unitDied" }>;
 interface Segment { skill: Extract<GameEvent, { type: "skillUsed" }>; fx: Fx[]; showPop: boolean }
 
-/** Play a resolved turn's events over the final board. Cosmetic only. `skillUsed` fires AFTER a skill's effects,
- *  so we buffer effect events and flush them into a segment when its `skillUsed` closes it. Dot ticks (isTick)
- *  and any effects not closed by a skill resolve in a quick, panel-less tail. */
-export async function playTurn(state: MatchState, side: TeamId, events: GameEvent[], you: TeamId): Promise<void> {
+/** Play a resolved turn back in step. Cosmetic only. `skillUsed` fires AFTER a skill's effects, so we buffer
+ *  effect events and flush them into a segment when its `skillUsed` closes it; `snapshots` holds the board
+ *  BEFORE the turn ([0]) and after each skill ([i] = after the i-th `skillUsed`), so a segment's snapshot is
+ *  painted the moment its panel is up — HP/effects appear in step. Dot ticks (isTick) and any effects not
+ *  closed by a skill resolve in a quick, panel-less tail over the final board (`state`).
+ *  `paint(s)` re-renders the board from an arbitrary snapshot (redacted for the local seat by the caller). */
+export async function playTurn(
+  state: MatchState, side: TeamId, events: GameEvent[], you: TeamId,
+  snapshots: MatchState[] = [], paint: (s: MatchState) => void = () => {},
+): Promise<void> {
   const segments: Segment[] = [];
   const ticks: Fx[] = [];
   let buf: Fx[] = [];
@@ -99,11 +106,18 @@ export async function playTurn(state: MatchState, side: TeamId, events: GameEven
   ticks.push(...buf); // effects not closed by a skill (passive procs, etc.) resolve in the panel-less tail
   if (!segments.length && !ticks.length) return; // nothing worth animating (e.g. a pure Strategic no-op)
 
+  // snapshots[i+1] is the board just after segment i resolved; fall back to the final board if a snapshot is
+  // missing (e.g. PvP, where the client didn't run resolution and gets no snapshots — then this degrades to the
+  // old "replay over the final board" behavior).
+  const boardAfter = (i: number): MatchState => snapshots[i + 1] ?? state;
   armSkip();
   const onClick = (e: MouseEvent) => { e.stopPropagation(); fireSkip(); }; // a click fast-forwards, nothing else
   document.addEventListener("click", onClick, true);
   try {
-    for (const seg of segments) {
+    paint(snapshots[0] ?? state); // the pre-turn board — the starting point the skills mutate from
+    for (let i = 0; i < segments.length; i++) {
+      if (skip) break;
+      const seg = segments[i]!;
       let remove: (() => void) | null = null;
       if (seg.showPop) {
         const caster = state.units[seg.skill.caster];
@@ -124,21 +138,26 @@ export async function playTurn(state: MatchState, side: TeamId, events: GameEven
           + (tgtNames.length ? `<div class="ap-tgt">on ${esc(tgtNames.join(", "))}</div>` : ""),
         );
       }
-      flashUnit(seg.skill.caster, "af-buff");
+      // Let the panel announce the skill, THEN manifest its outcome: paint the post-skill board (HP bars drop,
+      // effect chips appear) and float the numbers over the freshly-painted frames.
       await wait(seg.showPop ? 460 : 150);
+      paint(boardAfter(i));
+      flashUnit(seg.skill.caster, "af-buff");
       applyFx(seg.fx);
       await wait(seg.showPop ? 1250 : 560);
       remove?.();
       await wait(180);
     }
-    // End-of-turn ticks: quick, no panel.
-    if (ticks.length) {
+    // End-of-turn ticks: quick, no panel — paint the final (post-tick) board and float the tick numbers.
+    if (!skip && ticks.length) {
       await wait(180);
+      paint(state);
       applyFx(ticks);
       await wait(760);
     }
   } finally {
     document.removeEventListener("click", onClick, true);
+    paint(state); // settle on the final board (covers a skip mid-way and the normal end)
     if (skip) layer().querySelectorAll(".af-float, .anim-pop").forEach((n) => n.remove());
   }
 }

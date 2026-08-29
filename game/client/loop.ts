@@ -16,7 +16,7 @@ export type AsyncProvider = (state: MatchState, side: TeamId) => Action[] | Prom
 export interface LoopHooks {
   onRoundStart?(state: MatchState): void;
   onTurnStart?(state: MatchState, side: TeamId): void | Promise<void>;
-  onResults?(state: MatchState, side: TeamId, results: ActionResult[], newLog: string[], events: GameEvent[]): void | Promise<void>;
+  onResults?(state: MatchState, side: TeamId, results: ActionResult[], newLog: string[], events: GameEvent[], snapshots: MatchState[]): void | Promise<void>;
   onRoundEnd?(state: MatchState, winner: TeamId): void;
 }
 
@@ -24,6 +24,10 @@ export interface RunOpts {
   roundsToWin?: number;
   maxTurns?: number;
   hooks?: LoopHooks;
+  /** Capture per-skill board snapshots (pre-turn + after each skill) for the client's step-by-step turn
+   *  animation — the web client opts in. Off by default so headless callers (server, cli, tests) skip the
+   *  per-turn deep-clones they would never use; their onResults then receives an empty snapshots array. */
+  animate?: boolean;
   /** The between-round AUGMENT_OR_FUSE seam (apply upgrades that carry into the next battle). */
   onBetweenRounds?(state: MatchState, roundWinner: TeamId): void | Promise<void>;
 }
@@ -44,13 +48,24 @@ export async function runMatch(state: MatchState, provide: AsyncProvider, opts: 
       await hooks.onTurnStart?.(state, side);
       const logStart = state.log.length;
       state.eventSink = []; // tap this turn's events (skills + ticks) for the client's step-by-step animation
+      // When animating, ALSO snapshot the board before the turn + after each skill, so the client can replay
+      // HP/effects in step with each skill (not all at once at the end). Opt-in only — the deep-clones are skipped
+      // for headless callers. snapshots[0] is the pre-turn board, [i] the board after the i-th skill.
+      let preTurn: MatchState | null = null;
+      if (opts.animate) {
+        const { eventSink: _e, snapshotSink: _s, ...preBoard } = state;
+        preTurn = structuredClone(preBoard) as MatchState;
+        state.snapshotSink = [];
+      }
       const results = resolveTurn(state, await provide(state, side));
       roundWon = roundWinner(state);
       if (roundWon === null) endTurn(state); // hand over; a wipe ends the round immediately (its ticks skipped)
-      const events = state.eventSink; state.eventSink = undefined;
-      // onResults runs AFTER endTurn now, so it can animate the whole turn (skills then ticks) over the final
-      // board; it may be async (the animation), and the loop awaits it before the next turn begins.
-      await hooks.onResults?.(state, side, results, state.log.slice(logStart), events);
+      const events = state.eventSink; const skillSnaps = state.snapshotSink;
+      state.eventSink = undefined; state.snapshotSink = undefined;
+      // onResults runs AFTER endTurn now, so it can animate the whole turn (skills then ticks); it may be async
+      // (the animation), and the loop awaits it before the next turn begins. The live `state` is the final
+      // (post-tick) board; snapshots is empty unless animating.
+      await hooks.onResults?.(state, side, results, state.log.slice(logStart), events, preTurn ? [preTurn, ...(skillSnaps ?? [])] : []);
     }
     if (roundWon === null) {
       return { winner: null, rounds: state.round, roundsWon: { A: state.teams.A.roundsWon, B: state.teams.B.roundsWon } };

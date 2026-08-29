@@ -11035,7 +11035,6 @@ export const FUSIONS: FusionForm[] = [
     {
      "op": "removeStatus",
      "kind": "dot",
-     "firstTickNextTurn": true,
      "name": "Fan the Flames",
      "from": "target"
     },
