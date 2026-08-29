@@ -878,6 +878,8 @@ export function createBus(state: MatchState, rng: Rng): Bus {
   let depth = 0;
   const bus: Bus = {
     emit(event: GameEvent) {
+      state.eventSink?.push(event); // opt-in ordered tap for the client's turn animation — captures EVERY event
+      // (effect-op damage/heal/status included, since those go through this bus), off by default so it costs nothing.
       if (depth >= MAX_TRIGGER_DEPTH) {
         state.log.push(`trigger depth cap hit at ${event.type}`);
         return;

@@ -5,6 +5,7 @@
  * provider, keeping this file free of any I/O — a scripted provider drives it in tests.
  */
 import type { MatchState, TeamId } from "../engine/src/types.ts";
+import type { GameEvent } from "../engine/src/events.ts";
 import type { Action, ActionResult } from "../engine/src/scheduler.ts";
 import { startRound, startTurn, resolveTurn, endTurn, roundWinner, endRound } from "../engine/src/scheduler.ts";
 import type { MatchOutcome } from "../engine/content/match.ts";
@@ -15,7 +16,7 @@ export type AsyncProvider = (state: MatchState, side: TeamId) => Action[] | Prom
 export interface LoopHooks {
   onRoundStart?(state: MatchState): void;
   onTurnStart?(state: MatchState, side: TeamId): void | Promise<void>;
-  onResults?(state: MatchState, side: TeamId, results: ActionResult[], newLog: string[]): void;
+  onResults?(state: MatchState, side: TeamId, results: ActionResult[], newLog: string[], events: GameEvent[]): void | Promise<void>;
   onRoundEnd?(state: MatchState, winner: TeamId): void;
 }
 
@@ -42,10 +43,14 @@ export async function runMatch(state: MatchState, provide: AsyncProvider, opts: 
       const side = state.activeTeam;
       await hooks.onTurnStart?.(state, side);
       const logStart = state.log.length;
+      state.eventSink = []; // tap this turn's events (skills + ticks) for the client's step-by-step animation
       const results = resolveTurn(state, await provide(state, side));
-      hooks.onResults?.(state, side, results, state.log.slice(logStart));
       roundWon = roundWinner(state);
-      if (roundWon === null) endTurn(state); // hand over; a wipe ends the round immediately
+      if (roundWon === null) endTurn(state); // hand over; a wipe ends the round immediately (its ticks skipped)
+      const events = state.eventSink; state.eventSink = undefined;
+      // onResults runs AFTER endTurn now, so it can animate the whole turn (skills then ticks) over the final
+      // board; it may be async (the animation), and the loop awaits it before the next turn begins.
+      await hooks.onResults?.(state, side, results, state.log.slice(logStart), events);
     }
     if (roundWon === null) {
       return { winner: null, rounds: state.round, roundsWon: { A: state.teams.A.roundsWon, B: state.teams.B.roundsWon } };

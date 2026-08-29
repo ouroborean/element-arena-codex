@@ -13,7 +13,7 @@ import type { Condition, Effect, Selector } from "./effects/ast.ts";
 import type { DamageType, TeamId, UnitId } from "./types.ts";
 
 export type GameEvent =
-  | { type: "damageDealt"; source: UnitId | null; target: UnitId; amount: number; dtype: DamageType; sourceId?: string; isNew?: boolean }
+  | { type: "damageDealt"; source: UnitId | null; target: UnitId; amount: number; dtype: DamageType; sourceId?: string; isNew?: boolean; isTick?: boolean }
   | { type: "shieldDamaged"; unit: UnitId; source: UnitId | null; amount: number }
   | { type: "shieldBroken"; unit: UnitId; source: UnitId | null }
   | { type: "shieldGranted"; unit: UnitId; source: UnitId | null; amount: number } // Shield banked (keeper:winter Crackling Hearth)

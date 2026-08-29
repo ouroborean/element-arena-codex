@@ -15,6 +15,7 @@ import { runMatch, type AsyncProvider } from "../../client/loop.ts";
 import { autoDraft, applyDraftChoices, hasDraftOptions, draftableHeroes, type DraftChoice } from "../../client/draft.ts";
 import { highlightFor, isSingleTargetPick } from "../../client/targeting.ts";
 import { renderApp, renderSetup, renderLogin, renderClaim } from "./view.ts";
+import { playTurn } from "./anim.ts";
 import { energyIcon, elementRank, avatarUrl } from "./assets.ts";
 import { ELEMENT_BY_ID } from "./elementid.generated.ts";
 import { cbEnabled, cbEnergyEl, toggleColorblind } from "./colorblind.ts";
@@ -829,7 +830,9 @@ async function startMatch(draft: Draft): Promise<void> {
     roundsToWin: 2,
     hooks: {
       onRoundStart: () => render(), // renders the board synchronously at round 1 (no "Round 0" frame, no delay)
-      onResults: () => render(),
+      // Render the resolved board, then play the turn back step by step (each skill, then the dot ticks). The
+      // playback is purely cosmetic — guard it so an animation hiccup can never wedge the match loop.
+      onResults: async (st, sideActed, _results, _log, events) => { render(); try { await playTurn(st, sideActed, events, ui.you); } catch { /* animation only */ } },
       onRoundEnd: (st, w) => { ui.phaseLabel = `Round ${st.round} — Team ${w} wins`; render(); },
     },
     onBetweenRounds: async (st, w) => {
