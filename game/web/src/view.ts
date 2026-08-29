@@ -10,6 +10,7 @@ import { availableFusions, availableAugments } from "../../engine/content/metaga
 import { fusionsFor } from "../../engine/content/fusions.generated.ts";
 import { fusionResult } from "../../engine/content/recipes.generated.ts";
 import { augmentsFor } from "../../engine/content/augments.generated.ts";
+import type { Augment } from "../../engine/content/augment.ts";
 import type { FusionForm } from "../../engine/content/fusion.ts";
 import { draftableHeroes, type DraftChoice } from "../../client/draft.ts";
 import { telegraphFor } from "../../client/targeting.ts";
@@ -533,6 +534,25 @@ function fusionHead(base: string, f: FusionForm): string {
 /** The fusion/augment options for one hero — fused portraits + new element + passive for each fusion form,
  *  and name + prose for each untaken augment. Clicking one selects it as THIS hero's upgrade (click again to
  *  un-choose); `pick` is the hero's currently-selected upgrade, highlighted. */
+/** An augment has no effects of its own — its behavior lives in `patches` that modify another skill. To give
+ *  a chosen augment a hover/tap effect tooltip, source it from the most sensical skill: the first skill its
+ *  patches modify, else the hero's passive (${heroId}0) for trigger-only/custom augments. Rendered as a
+ *  `.cs-sicon` so the existing skpop tooltip (main.ts) fires; the span (not a button) nests safely inside the
+ *  augment card's own button, and a tap on it pops the info while a tap on the card still selects the augment. */
+function augSkillIcon(a: Augment, heroId: string, skills: readonly SkillInstance[]): string {
+  let src = `${heroId}0`; // fallback: the hero's passive
+  for (const p of a.patches as ReadonlyArray<Record<string, unknown>>) {
+    const sid = typeof p.skillId === "string" ? p.skillId
+      : p.op === "addSkill" ? (p.skill as { id?: string } | undefined)?.id : undefined;
+    if (sid && SKILL_TEXT[sid]) { src = sid; break; }
+  }
+  const t = SKILL_TEXT[src];
+  const sk = skills.find((s) => s.id === src);
+  const isPassive = src === `${heroId}0`;
+  const meta = [isPassive ? "Passive" : cap(sk?.klass ?? ""), isPassive || !sk ? "" : sk.cooldown > 0 ? `${sk.cooldown}-turn cooldown` : "no cooldown"].filter(Boolean).join(" · ");
+  return `<span class="cs-sicon aug-sicon" data-skname="${esc(t?.n ?? src)}" data-skmeta="${esc(meta)}" data-sktags="${esc((sk?.tags ?? []).join(","))}" data-skdesc="${esc(t?.d ?? "")}" data-skgen="${sk?.cost.generic ?? 0}" data-skspec="${sk?.cost.specific ?? 0}" data-skel="${esc(sk?.element ?? "")}"><img src="${iconOf(src, heroId) ?? ""}" ${IMG_FALLBACK} /></span>`;
+}
+
 function draftOptions(state: MatchState, u: Unit, pick?: DraftChoice): string {
   const hid = u.heroId ?? "";
   const forms = orderFusions(u.baseElement, availableFusions(state, u));
@@ -561,8 +581,8 @@ function draftOptions(state: MatchState, u: Unit, pick?: DraftChoice): string {
       }).join("")
     : `<div class="do-note">No fusion available — needs a teammate whose element forms a recipe.</div>`;
   const augment = augs.length
-    ? augs.map((a) => `<button class="do-card${augOn(a.id)}" data-aug-unit="${u.id}" data-aug-id="${esc(a.id)}">
-        <span class="do-txt"><span class="do-name">★ ${esc(a.name)}</span><span class="do-desc">${descHtml(a.description)}</span></span></button>`).join("")
+    ? augs.map((a) => `<button class="do-card aug-card${augOn(a.id)}" data-aug-unit="${u.id}" data-aug-id="${esc(a.id)}">
+        ${augSkillIcon(a, hid, u.skills ?? [])}<span class="do-txt"><span class="do-name">★ ${esc(a.name)}</span><span class="do-desc">${descHtml(a.description)}</span></span></button>`).join("")
     : `<div class="do-note">All of this hero's augments are taken.</div>`;
   return `<div class="do-sec fusion"><h4>Fusion <span>(re-elements the hero, new passive + skill)</span></h4>${fusion}</div>
     <div class="do-sec augment"><h4>Augments <span>(a permanent tweak; cumulative)</span></h4>${augment}</div>`;
@@ -776,7 +796,7 @@ function augFuseModal(heroId: string): string {
         ${block("New skill", iconOf(sk.id, heroId), skText?.n ?? sk.name, skMeta, skText?.d ?? "")}
       </span></div>`;
   }).join("");
-  const augment = augs.map((a) => `<div class="do-card"><span class="do-txt"><span class="do-name">★ ${esc(a.name)}</span><span class="do-desc">${descHtml(a.description)}</span></span></div>`).join("");
+  const augment = augs.map((a) => `<div class="do-card aug-card">${augSkillIcon(a, heroId, def.skills ?? [])}<span class="do-txt"><span class="do-name">★ ${esc(a.name)}</span><span class="do-desc">${descHtml(a.description)}</span></span></div>`).join("");
   return `<div class="overlay"><div class="modal draft-modal augfuse-modal">
     <h2>${esc(shortName(def.name))} — Fusions &amp; Augments</h2>
     <p class="draft-sub">Every fusion form (one per partner element) and every augment this hero can take.</p>

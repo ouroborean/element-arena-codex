@@ -235,6 +235,29 @@ test("Stalwart Shield on SELF does NOT reflect an ally's incoming harm (control 
   assert.equal(taryn.hp, 100, "Taryn does not intercept it");
 });
 
+// Frozen: "reflects all HARMFUL skills from the target to himself." Refrain (taryn2) is dual-tagged
+// Harmful+Helpful. Taryn casting Refrain's HELPFUL heal-buff onto the guarded ally must NOT be reflected
+// back onto himself — only an ENEMY's harmful skill is. (Regression: the reflect gate lacked a source guard.)
+test("Stalwart Shield: Taryn's own Refrain on the guarded ally lands on the ALLY, not reflected onto Taryn", () => {
+  const { taryn, ally, state } = board(50);
+  performAction(state, { unit: "taryn", skillId: "taryn4", targets: ["a2"] }); // guard the ally (installs the reflect mark)
+  const r = performAction(state, { unit: "taryn", skillId: "taryn2", targets: ["a2"] }); // Refrain (Harmful+Helpful) on the ally
+  assert.equal(r.ok, true, "Refrain resolves");
+  assert.ok(!rewarded(taryn), "Protector of the Song does NOT fire — nothing was reflected onto Taryn");
+  performAction(state, { unit: "a2", skillId: "ahit", targets: ["e"] }); // the ally uses a skill
+  assert.equal(ally.hp, 65, "the ally carries Refrain's heal-on-skill buff (50 -> 65), so Refrain landed on the ally");
+});
+
+// The ally reflect must be finite (frozen gives no duration; modeled as 1 turn) — a null-duration mark made
+// the protection outlive Taryn's shield, reading as permanent.
+test("Stalwart Shield on an ally: the reflect mark is finite (1 turn), not permanent", () => {
+  const { ally, state } = board();
+  performAction(state, { unit: "taryn", skillId: "taryn4", targets: ["a2"] });
+  const mark = ally.statuses.find((s) => s.kind === "mark" && s.name === "Stalwart Shield");
+  assert.ok(mark, "the ally carries the Stalwart Shield reflect mark");
+  assert.equal(mark!.duration, 1, "the ally reflect lasts 1 turn, not round-permanent (null)");
+});
+
 // Frozen: "This skill's target is invisible." Casting Stalwart Shield on an ally installs the
 // "Stalwart Shield" mark that IS the target (the only persistent artifact identifying whom Taryn
 // protected). For the target to be invisible, the opponent's redacted view must not reveal it —

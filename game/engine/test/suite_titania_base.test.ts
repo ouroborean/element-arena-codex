@@ -75,6 +75,22 @@ test("Thorn Prick: applies a permanent (non-expiring) affliction DoT named 'Thor
   assert.equal(dot!.duration, null, "'permanently' = a non-expiring (null-duration) effect");
 });
 
+// FROZEN: "5 affliction damage permanently" applies on EACH cast, so repeated casts stack the DoT (5 -> 10 ->
+// 15). Modeled on Maggie's Curse of Thorns: the dot grows +5 per later cast (magnitude never resets appliedTurn)
+// and a parallel 'Thorn Prick' stack carries the count the web display renders.
+test("Thorn Prick: repeated casts STACK the affliction DoT (+5 each) and carry a matching stack count", () => {
+  const t = mkTitania();
+  const e = makeUnit({ id: "e", team: "B" });
+  const st = makeState([t], [e]);
+  fund(st);
+  performAction(st, { unit: "t", skillId: "titania1", targets: ["e"] });
+  performAction(st, { unit: "t", skillId: "titania1", targets: ["e"] });
+  const dot = e.statuses.find((s) => s.kind === "dot" && s.name === "Thorn Prick");
+  assert.equal(dot!.magnitude, 10, "two casts stack the affliction DoT to 10/turn (5 + 5)");
+  const stk = e.statuses.find((s) => s.kind === "stack" && s.name === "Thorn Prick");
+  assert.equal(stk?.magnitude, 2, "a parallel 'Thorn Prick' stack of 2 drives the display's x-count");
+});
+
 // FROZEN: "5 affliction damage permanently" — a permanent per-turn affliction. Faithfully, the DoT must
 // keep dealing 5/turn. The engine's tickDots() skips null-duration DoTs, so this permanent tick never fires.
 test("Thorn Prick: the permanent affliction DoT deals 5 per turn (null-duration DoTs tick)", () => {

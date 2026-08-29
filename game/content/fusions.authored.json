@@ -3379,6 +3379,18 @@
    },
    "passiveTriggers": [
     {
+     "on": "roundStart",
+     "source": "Yggdrasil's Bounty",
+     "note": "Retains the base 'Yggdrasil's Bounty' passive: fusing keeps Gaia's two Seedlings (only Shroomtender replaces them). applyFusion defaults passiveMode to 'replace', which would otherwise drop the base seedling summon.",
+     "effect": [
+      {
+       "op": "summon",
+       "template": "Seedling",
+       "count": 2
+      }
+     ]
+    },
+    {
      "on": "unitDied",
      "source": "Rotten Vitality",
      "when": {
@@ -3446,6 +3458,18 @@
     "note": "Realized as a 'Roiling Life' dot (10, normal) applied to the struck enemy, duration = 1 + Gaia's Channel Earth stacks (each stack = one extra turn). The dot ticks at Gaia's (applier) turn-end, i.e. 'the following turn'. 'Damaged by Worldfist' is scoped via {eventSourceId:'gaia2'} (the damageDealt event's sourceId falls back to the casting skill id), so only Worldfist hits seed the dot — the fusion active Overgrowth's own hit no longer does. The named dot doubles as the 'Roiling Life' marker Overgrowth reads."
    },
    "passiveTriggers": [
+    {
+     "on": "roundStart",
+     "source": "Yggdrasil's Bounty",
+     "note": "Retains the base 'Yggdrasil's Bounty' passive: fusing keeps Gaia's two Seedlings (only Shroomtender replaces them). applyFusion defaults passiveMode to 'replace', which would otherwise drop the base seedling summon.",
+     "effect": [
+      {
+       "op": "summon",
+       "template": "Seedling",
+       "count": 2
+      }
+     ]
+    },
     {
      "on": "damageDealt",
      "source": "Roiling Life",
@@ -3545,6 +3569,18 @@
    },
    "passiveTriggers": [
     {
+     "on": "roundStart",
+     "source": "Yggdrasil's Bounty",
+     "note": "Retains the base 'Yggdrasil's Bounty' passive: fusing keeps Gaia's two Seedlings (only Shroomtender replaces them). applyFusion defaults passiveMode to 'replace', which would otherwise drop the base seedling summon.",
+     "effect": [
+      {
+       "op": "summon",
+       "template": "Seedling",
+       "count": 2
+      }
+     ]
+    },
+    {
      "on": "shieldDamaged",
      "source": "Magnetic Shielding",
      "when": {
@@ -3611,6 +3647,18 @@
     "note": "Each time Gaia takes damage (damageDealt with eventTarget self) she gains a Rising Indignation stack; at 3 stacks Gaia's Fury (gaiamoon1) auto-casts (useSkill) and the stack resets. The load-bearing outcome (auto-cast at 3) is realized. All three 'during this time' clauses are now expressed (Reading A: every Gaia's Fury minion is enraged): (a) the per-stack [65] discount = costMods:{mul(stackCount('Rising Indignation'),-1)} on gaiamoon1 (1 stack -> 2 generic, 2 -> 1, 3 -> 0+auto-cast); (b) 'Moonspike may not be used' = gaiafury2.requires:{not has 'Enraged'} on the minion (which carries the Enraged mark); (c) the minion's +10 dealt/received = intrinsic outgoing_damage_mod/incoming_damage_mod +10 in the 'Gaia's Fury' template's new statuses[]."
    },
    "passiveTriggers": [
+    {
+     "on": "roundStart",
+     "source": "Yggdrasil's Bounty",
+     "note": "Retains the base 'Yggdrasil's Bounty' passive: fusing keeps Gaia's two Seedlings (only Shroomtender replaces them). applyFusion defaults passiveMode to 'replace', which would otherwise drop the base seedling summon.",
+     "effect": [
+      {
+       "op": "summon",
+       "template": "Seedling",
+       "count": 2
+      }
+     ]
+    },
     {
      "on": "damageDealt",
      "source": "Rising Indignation",
@@ -3723,6 +3771,18 @@
    "passiveTriggers": [
     {
      "on": "roundStart",
+     "source": "Yggdrasil's Bounty",
+     "note": "Retains the base 'Yggdrasil's Bounty' passive: fusing keeps Gaia's two Seedlings (only Shroomtender replaces them). applyFusion defaults passiveMode to 'replace', which would otherwise drop the base seedling summon.",
+     "effect": [
+      {
+       "op": "summon",
+       "template": "Seedling",
+       "count": 2
+      }
+     ]
+    },
+    {
+     "on": "roundStart",
      "source": "Branch of the World Tree",
      "effect": [
       {
@@ -3784,6 +3844,18 @@
     "note": "On turnEnd, every allied hero (incl. Gaia) lacking Elemental Essence gains it and heals 10. turnEnd fires for BOTH teams, so 'each turn' also fires on the enemy's turn-end (a known event-team-scoping limitation); the effect only touches Gaia's own team either way."
    },
    "passiveTriggers": [
+    {
+     "on": "roundStart",
+     "source": "Yggdrasil's Bounty",
+     "note": "Retains the base 'Yggdrasil's Bounty' passive: fusing keeps Gaia's two Seedlings (only Shroomtender replaces them). applyFusion defaults passiveMode to 'replace', which would otherwise drop the base seedling summon.",
+     "effect": [
+      {
+       "op": "summon",
+       "template": "Seedling",
+       "count": 2
+      }
+     ]
+    },
     {
      "on": "turnEnd",
      "source": "Oasis",
@@ -3865,6 +3937,18 @@
     "note": "At round start each allied hero gets a permanent 'Sacred Grove' regen (5/turn, ticking at Gaia's turn-end); when an ally declares a Harmful skill (skillDeclared + eventHasTag Harmful) that ally's regen is removed. Separately, when an ally still holding the regen is damaged, the attacker (eventSource) is marked 'Sacred Grove' (the mark Expel Intruders consumes)."
    },
    "passiveTriggers": [
+    {
+     "on": "roundStart",
+     "source": "Yggdrasil's Bounty",
+     "note": "Retains the base 'Yggdrasil's Bounty' passive: fusing keeps Gaia's two Seedlings (only Shroomtender replaces them). applyFusion defaults passiveMode to 'replace', which would otherwise drop the base seedling summon.",
+     "effect": [
+      {
+       "op": "summon",
+       "template": "Seedling",
+       "count": 2
+      }
+     ]
+    },
     {
      "on": "roundStart",
      "source": "Sacred Grove",
@@ -3996,6 +4080,18 @@
     "note": "'Gaia gains a Channel Earth stack' is proxied by 'an allied minion used a skill' (isKind minion + isFaction ally): the addStack effect emits no statusApplied event, and a Seedling's only skill (Channel Earth) is Gaia's canonical stack source, so a minion acting stands in for the stack gain (over-fires for a Worldsprout acting). Each allied minion at full HP grows +5 max HP (custom increaseMaxHp, which raises max and current), otherwise heals 5. The 'currentHp >= count-of-it' comparison is a count(it)==maxHp trick: count of a single-unit selector is 1, so this is really 'at full HP' -- see engine note; realized as currentHp>=maxHp via ref count of it giving the unit's own membership? Replaced below with a maxHp read."
    },
    "passiveTriggers": [
+    {
+     "on": "roundStart",
+     "source": "Yggdrasil's Bounty",
+     "note": "Retains the base 'Yggdrasil's Bounty' passive: fusing keeps Gaia's two Seedlings (only Shroomtender replaces them). applyFusion defaults passiveMode to 'replace', which would otherwise drop the base seedling summon.",
+     "effect": [
+      {
+       "op": "summon",
+       "template": "Seedling",
+       "count": 2
+      }
+     ]
+    },
     {
      "on": "statusApplied",
      "source": "Nutrient Sludge",
@@ -4179,6 +4275,18 @@
     "note": "On turnEnd, every allied Seedling minion gains +10 max HP (custom increaseMaxHp raises max and current). turnEnd fires for both teams; the selector is Gaia's own Seedlings, so an enemy turn-end would also grow them (event-team-scoping limitation). Sunbeam later resets these Seedlings' max HP to default."
    },
    "passiveTriggers": [
+    {
+     "on": "roundStart",
+     "source": "Yggdrasil's Bounty",
+     "note": "Retains the base 'Yggdrasil's Bounty' passive: fusing keeps Gaia's two Seedlings (only Shroomtender replaces them). applyFusion defaults passiveMode to 'replace', which would otherwise drop the base seedling summon.",
+     "effect": [
+      {
+       "op": "summon",
+       "template": "Seedling",
+       "count": 2
+      }
+     ]
+    },
     {
      "on": "turnEnd",
      "source": "Nurturing Light",

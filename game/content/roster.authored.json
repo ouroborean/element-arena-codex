@@ -6581,18 +6581,46 @@
        "id": "titania1"
       },
       {
-       "op": "applyStatus",
-       "to": "target",
-       "status": {
-        "kind": "dot",
-        "name": "Thorn Prick",
-        "magnitude": 5,
-        "dtype": "affliction",
-        "duration": null
-       }
+       "op": "addStack",
+       "name": "Thorn Prick",
+       "amount": 1,
+       "duration": null,
+       "to": "target"
+      },
+      {
+       "op": "if",
+       "cond": {
+        "not": {
+         "has": "dot",
+         "name": "Thorn Prick",
+         "of": "target"
+        }
+       },
+       "then": [
+        {
+         "op": "applyStatus",
+         "to": "target",
+         "status": {
+          "kind": "dot",
+          "name": "Thorn Prick",
+          "magnitude": 5,
+          "dtype": "affliction",
+          "duration": null
+         }
+        }
+       ],
+       "else": [
+        {
+         "op": "modifyStatus",
+         "kind": "dot",
+         "name": "Thorn Prick",
+         "magnitudeDelta": 5,
+         "from": "target"
+        }
+       ]
       }
      ],
-     "note": "'5 affliction damage permanently' = a permanent (duration null, round-scoped per the PERMANENT ruling) affliction DoT of 5/turn. NB: the current tickDots() guard skips duration===null dots, so under today's interpreter a null-duration DoT would not actually tick - flagged as a DSL-vs-interpreter tension; the DSL-correct transcription of 'permanently' is null."
+     "note": "'5 affliction damage permanently' = a permanent (duration null, round-scoped per the PERMANENT ruling) affliction DoT that STACKS per cast (frozen '5 affliction permanently' each use). Modeled on Maggie's Curse of Thorns (maggie0): the dot is applied ONCE at magnitude 5, then GROWN by +5 per later cast via modifyStatus (which never touches appliedTurn, so tickDots' birth-turn guard is not re-tripped and the permanent dot keeps ticking). The parallel 'Thorn Prick' addStack is the counter the web display reads to show the dot chip's stack count (x2, x3, ...)."
     },
     {
      "id": "titania2",
@@ -8659,6 +8687,10 @@
         "eventHasTag": "Harmful"
        },
        {
+        "isFaction": "eventSource",
+        "faction": "enemy"
+       },
+       {
         "not": {
          "sameUnit": [
           "eventTargets",
@@ -8668,7 +8700,7 @@
        }
       ]
      },
-     "note": "Realizes Stalwart Shield's 'reflects all harmful skills from the [ally] target to himself' (same protective-redirect pattern as blackknight4). Gated by the 'Stalwart Shield' mark taryn4 places on the protected ally; fires when a Harmful skill is declared against that ally and pulls it onto Taryn. `has ... of eventTargets` inspects the declared skill's first target (single-target harmful is the norm)."
+     "note": "Realizes Stalwart Shield's 'reflects all harmful skills from the [ally] target to himself' (same protective-redirect pattern as blackknight4). Gated by the 'Stalwart Shield' mark taryn4 places on the protected ally; fires when a Harmful skill is declared against that ally and pulls it onto Taryn. `has ... of eventTargets` inspects the declared skill's first target (single-target harmful is the norm). The isFaction eventSource=enemy guard restricts the reflect to ENEMY attacks: Refrain (taryn2) is dual-tagged Harmful+Helpful, so Taryn casting Refrain's helpful heal-buff on the guarded ally must NOT be reflected back onto Taryn."
     },
     {
      "on": "skillUsed",
@@ -8896,7 +8928,7 @@
          "status": {
           "kind": "mark",
           "name": "Stalwart Shield",
-          "duration": null,
+          "duration": 1,
           "invisible": true
          }
         }
@@ -8919,7 +8951,7 @@
        ]
       }
      ],
-     "note": "'May target Taryn or an ally. Grants Taryn 20 Shield, and if used on an ally, reflects all harmful skills from the target to himself. This skill's target is invisible.' Shield has no stated duration -> round-permanent (null). The ally reflect is realized via the 'Stalwart Shield' mark (applied only when target != self) that keys the standing 'Stalwart Shield' reflect trigger; its duration is unspecified in the oracle so modeled round-permanent (null). 'target is invisible' = the 'Stalwart Shield' mark on the protected ally carries invisible:true, so the opponent's redacted view cannot see whom Taryn protected (his own team still sees it via the owner short-circuit); the cast itself stays visible (hidden:false / hidden_targets:true). The trailing if is Radiant Glory's augment ('using Stalwart Shield will also use Refrain on the target')."
+     "note": "'May target Taryn or an ally. Grants Taryn 20 Shield, and if used on an ally, reflects all harmful skills from the target to himself. This skill's target is invisible.' Shield has no stated duration -> round-permanent (null). The ally reflect is realized via the 'Stalwart Shield' mark (applied only when target != self) that keys the standing 'Stalwart Shield' reflect trigger; its duration is unspecified in the oracle and modeled as 1 turn (a round-permanent null let the ally protection outlive Taryn's shield, which read as a bug). Taryn's own 20 Shield keeps its null (round-length, like most shields) so the Antidote fusion's 'when Stalwart Shield ends' shieldBroken hook still fires. 'target is invisible' = the 'Stalwart Shield' mark on the protected ally carries invisible:true, so the opponent's redacted view cannot see whom Taryn protected (his own team still sees it via the owner short-circuit); the cast itself stays visible (hidden:false / hidden_targets:true). The trailing if is Radiant Glory's augment ('using Stalwart Shield will also use Refrain on the target')."
     },
     {
      "id": "taryn5",
@@ -10080,7 +10112,7 @@
       "specific": 1
      },
      "cooldown": 2,
-     "channelTurns": 4,
+     "channelTurns": 3,
      "effects": [
       {
        "op": "forEach",
@@ -10125,7 +10157,7 @@
        ]
       }
      ],
-     "note": "Channel up to 4 turns ('Channel' class). Each channel turn: every ally gains 1 Deepening Shadows stack and heals 5, or heals 10 if they already had >=4 stacks (checked before this turn's stack). The per-turn effect is what the engine repeats for each of the up-to-4 channel turns."
+     "note": "Frozen 'Lasts up to 4 turns' = 4 total applications. The engine runs a Channel skill's effects once on cast PLUS channelTurns re-runs (see zephyrex2 note), so channelTurns is 3 (cast + 3 re-runs = 4). Each application: every ally gains 1 Deepening Shadows stack and heals 5, or heals 10 if they already had >=4 stacks (checked before this application's stack)."
     },
     {
      "id": "laria3",
@@ -10142,7 +10174,7 @@
       "specific": 1
      },
      "cooldown": 2,
-     "channelTurns": 4,
+     "channelTurns": 3,
      "effects": [
       {
        "op": "forEach",
@@ -10188,7 +10220,7 @@
        ]
       }
      ],
-     "note": "Channel up to 4 turns. Each channel turn: every enemy gains 1 Deepening Shadows stack and takes 5 damage; if they already had >=4 stacks the 5 is dealt as True damage. Effect repeats each channel turn."
+     "note": "Frozen 'Lasts up to 4 turns' = 4 total applications. The engine runs a Channel skill's effects once on cast PLUS channelTurns re-runs (see zephyrex2 note), so channelTurns is 3 (cast + 3 re-runs = 4). Each application: every enemy gains 1 Deepening Shadows stack and takes 5 damage; if they already had >=4 stacks the 5 is dealt as True damage."
     },
     {
      "id": "laria4",
