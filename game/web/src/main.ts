@@ -283,11 +283,12 @@ function render(): void {
     if (el) el.scrollTop = draftScroll;
   }
   tutorialAfterRender();
+  fitBattle(); // mobile-landscape: scale the fresh board to fit the screen
 }
 // Paint the board from an ARBITRARY snapshot (redacted for the local seat), used by the turn animation to step
 // HP/effects one skill at a time. Lean by design: just the board — no fx-hide / gloss / draft-scroll / tutorial
 // housekeeping (that's render()'s job, called once the playback settles on the final board).
-function paintState(s: MatchState): void { app.innerHTML = renderApp(redactState(s, ui.you), ui, playerPanel()); }
+function paintState(s: MatchState): void { app.innerHTML = renderApp(redactState(s, ui.you), ui, playerPanel()); fitBattle(); }
 /** The team-select screen (its player panel reads the profile) plus the avatar picker when open. */
 function renderSetupScreen(): void { closeTransientGloss(); app.innerHTML = renderSetup(setup!, playerPanel()) + avatarPickerHtml() + (claimForm ? renderClaim(claimForm) : ""); fitCharSelect(); }
 // Remember the team just taken into a match so returning to team select (after the match's page reload)
@@ -332,6 +333,29 @@ function fitCharSelect(): void {
   stage.style.transform = `translateX(${dx}px) scale(${s})`;
 }
 window.addEventListener("resize", () => { if (setup) fitCharSelect(); });
+
+/** Mobile-landscape: scale the whole battle board down so the entire scene fits the screen with no panning,
+ *  leaving native pinch-zoom for detail. Only in landscape on a short/touch viewport (a desktop with room shows
+ *  the board 1:1; portrait reflows to a column instead — see the media query in styles.css). Re-run after every
+ *  board paint and on resize/orientation change. `zoom` (not transform) so the page's scroll box shrinks too. */
+function fitBattle(): void {
+  const arena = app.querySelector<HTMLElement>(".arena");
+  const landscape = window.matchMedia("(orientation: landscape)").matches;
+  const mobileish = window.innerHeight <= 600 || window.matchMedia("(pointer: coarse)").matches;
+  if (!arena || !(landscape && mobileish)) { // desktop / portrait / no board → leave the board at natural size
+    app.classList.remove("fit");
+    arena?.style.removeProperty("--fit");
+    return;
+  }
+  app.classList.add("fit");
+  arena.style.setProperty("--fit", "1"); // measure the natural (unscaled) extent at the fit-mode layout
+  const nw = arena.scrollWidth, nh = arena.scrollHeight;
+  const M = 8; // a few px of breathing room so borders never clip against the edges
+  const fit = Math.min((window.innerWidth - M) / nw, (window.innerHeight - M) / nh, 1);
+  arena.style.setProperty("--fit", String(fit));
+}
+window.addEventListener("resize", fitBattle);
+window.addEventListener("orientationchange", () => { fitBattle(); setTimeout(fitBattle, 200); });
 // <img>s are natively draggable — a few px of mouse movement while clicking a button starts a native image
 // drag and swallows the click, making the icon/character buttons hard to press. Suppress it app-wide.
 window.addEventListener("dragstart", (e) => { if ((e.target as Element | null)?.tagName === "IMG") e.preventDefault(); });
