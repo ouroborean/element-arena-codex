@@ -66,3 +66,15 @@ test("an UNFUSED hero shows only its native passive chip (control)", () => {
   assert.match(html, /data-fxtitle="Yggdrasil/, "native passive shown");
   assert.doesNotMatch(html, /data-fxtitle="Rotten Vitality"/, "no fusion passive chip when unfused");
 });
+
+test("a chosen augment shows an effect chip on the hero, icon-sourced from the skill it modifies (Balm -> Soothe)", () => {
+  // River Daughter's "Balm" (riverdaughter2): "When Soothe expires, it jumps…" — a trigger-only augment whose
+  // patches name no skill, so the icon is sourced from the skill NAMED in its description (Soothe = riverdaughter4),
+  // not the hero's passive. The tooltip carries the augment's own name + description so both players can read it.
+  const u = makeUnit({ id: "rd", team: "A", kind: "hero", heroId: "riverdaughter", augments: ["riverdaughter2"], statuses: [] });
+  const state = makeState([u], [makeUnit({ id: "e", team: "B" })]);
+  const html = effectIcons(state, u);
+  assert.match(html, /class="fx augment"[^>]*data-fxtitle="Balm"/, "an augment chip titled Balm is shown");
+  assert.match(html, /data-fxbody="When Soothe expires/, "its tooltip body is the augment's own description");
+  assert.match(html, /riverdaughter4\.png/, "the icon is sourced from Soothe (riverdaughter4), matched from the description — not the passive");
+});
