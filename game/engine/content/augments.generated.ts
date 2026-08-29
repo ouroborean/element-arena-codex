@@ -129,7 +129,6 @@ export const AUGMENTS: Augment[] = [
        {
         "op": "removeStatus",
         "kind": "dot",
-        "firstTickNextTurn": true,
         "name": "Fan the Flames",
         "from": "target"
        }

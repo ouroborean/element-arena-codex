@@ -284,6 +284,10 @@ function render(): void {
   }
   tutorialAfterRender();
 }
+// Paint the board from an ARBITRARY snapshot (redacted for the local seat), used by the turn animation to step
+// HP/effects one skill at a time. Lean by design: just the board — no fx-hide / gloss / draft-scroll / tutorial
+// housekeeping (that's render()'s job, called once the playback settles on the final board).
+function paintState(s: MatchState): void { app.innerHTML = renderApp(redactState(s, ui.you), ui, playerPanel()); }
 /** The team-select screen (its player panel reads the profile) plus the avatar picker when open. */
 function renderSetupScreen(): void { closeTransientGloss(); app.innerHTML = renderSetup(setup!, playerPanel()) + avatarPickerHtml() + (claimForm ? renderClaim(claimForm) : ""); fitCharSelect(); }
 // Remember the team just taken into a match so returning to team select (after the match's page reload)
@@ -828,11 +832,13 @@ async function startMatch(draft: Draft): Promise<void> {
   // so we skip the momentary "Round 0" frame.
   const outcome = await runMatch(state, (st, side) => (side === ui.you ? human(st, side) : ai(st, side)), {
     roundsToWin: 2,
+    animate: true, // capture per-skill board snapshots so the turn plays back in step (see onResults)
     hooks: {
       onRoundStart: () => render(), // renders the board synchronously at round 1 (no "Round 0" frame, no delay)
-      // Render the resolved board, then play the turn back step by step (each skill, then the dot ticks). The
-      // playback is purely cosmetic — guard it so an animation hiccup can never wedge the match loop.
-      onResults: async (st, sideActed, _results, _log, events) => { render(); try { await playTurn(st, sideActed, events, ui.you); } catch { /* animation only */ } },
+      // Play the turn back step by step: the board starts at the pre-turn snapshot and updates one skill at a
+      // time (HP/effects manifest in step), then the dot ticks resolve; render() settles the final board after.
+      // The playback is purely cosmetic — guard it so an animation hiccup can never wedge the match loop.
+      onResults: async (st, sideActed, _results, _log, events, snaps) => { try { await playTurn(st, sideActed, events, ui.you, snaps, paintState); } catch { /* animation only */ } finally { render(); } },
       onRoundEnd: (st, w) => { ui.phaseLabel = `Round ${st.round} — Team ${w} wins`; render(); },
     },
     onBetweenRounds: async (st, w) => {

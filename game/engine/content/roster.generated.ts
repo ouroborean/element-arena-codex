@@ -2709,7 +2709,6 @@ export const ROSTER: HeroDef[] = [
        {
         "op": "modifyStatus",
         "kind": "dot",
-        "firstTickNextTurn": true,
         "name": "Fan the Flames",
         "magnitudeDelta": 5,
         "from": "target"
