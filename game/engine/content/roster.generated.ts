@@ -2820,7 +2820,8 @@ export const ROSTER: HeroDef[] = [
        "duration": null
       }
      }
-    ]
+    ],
+    "origin": "passive"
    },
    {
     "on": "unitDied",
@@ -2843,7 +2844,8 @@ export const ROSTER: HeroDef[] = [
        "without": "untargetable"
       }
      }
-    ]
+    ],
+    "origin": "passive"
    }
   ]
  },
@@ -3319,7 +3321,8 @@ export const ROSTER: HeroDef[] = [
       "name": "Cinders Proc Lock",
       "from": "self"
      }
-    ]
+    ],
+    "origin": "passive"
    }
   ]
  },
@@ -3644,7 +3647,8 @@ export const ROSTER: HeroDef[] = [
        "duration": null
       }
      }
-    ]
+    ],
+    "origin": "passive"
    },
    {
     "on": "damageDealt",
@@ -3677,7 +3681,8 @@ export const ROSTER: HeroDef[] = [
        "duration": null
       }
      }
-    ]
+    ],
+    "origin": "passive"
    }
   ]
  },
@@ -3945,7 +3950,8 @@ export const ROSTER: HeroDef[] = [
       "to": "self",
       "duration": null
      }
-    ]
+    ],
+    "origin": "passive"
    },
    {
     "on": "skillUsed",
@@ -4354,7 +4360,8 @@ export const ROSTER: HeroDef[] = [
       "to": "self"
      }
     ],
-    "source": "Healing Tears (riverdaughter0)"
+    "source": "Healing Tears (riverdaughter0)",
+    "origin": "passive"
    },
    {
     "on": "statusApplied",
@@ -4394,7 +4401,8 @@ export const ROSTER: HeroDef[] = [
       "to": "self"
      }
     ],
-    "source": "Healing Tears (riverdaughter0)"
+    "source": "Healing Tears (riverdaughter0)",
+    "origin": "passive"
    },
    {
     "on": "skillDeclared",
@@ -4841,7 +4849,8 @@ export const ROSTER: HeroDef[] = [
       "to": "self"
      }
     ],
-    "source": "Oceans Gather (zevkir0)"
+    "source": "Oceans Gather (zevkir0)",
+    "origin": "passive"
    },
    {
     "on": "skillUsed",
@@ -5431,7 +5440,8 @@ export const ROSTER: HeroDef[] = [
        "duration": null
       }
      }
-    ]
+    ],
+    "origin": "passive"
    },
    {
     "on": "turnEnd",
@@ -6276,7 +6286,8 @@ export const ROSTER: HeroDef[] = [
        }
       ]
      }
-    ]
+    ],
+    "origin": "passive"
    },
    {
     "on": "skillUsed",
@@ -6641,7 +6652,8 @@ export const ROSTER: HeroDef[] = [
      }
     ],
     "kind": "react",
-    "source": "Biting Wind"
+    "source": "Biting Wind",
+    "origin": "passive"
    },
    {
     "on": "skillGranted",
@@ -6937,7 +6949,7 @@ export const ROSTER: HeroDef[] = [
   "triggers": [
    {
     "on": "roundStart",
-    "origin": "innate",
+    "origin": "passive",
     "effect": [
      {
       "op": "summon",
@@ -6949,7 +6961,7 @@ export const ROSTER: HeroDef[] = [
    },
    {
     "on": "skillUsed",
-    "origin": "innate",
+    "origin": "passive",
     "when": {
      "sameUnit": [
       "eventSource",
@@ -7012,7 +7024,7 @@ export const ROSTER: HeroDef[] = [
    },
    {
     "on": "skillUsed",
-    "origin": "innate",
+    "origin": "passive",
     "when": {
      "and": [
       {
@@ -7553,7 +7565,8 @@ export const ROSTER: HeroDef[] = [
       "op": "summon",
       "template": "Dennis the Apprentice"
      }
-    ]
+    ],
+    "origin": "passive"
    },
    {
     "on": "skillUsed",
@@ -7589,7 +7602,8 @@ export const ROSTER: HeroDef[] = [
        "duration": null
       }
      }
-    ]
+    ],
+    "origin": "passive"
    },
    {
     "on": "skillDeclared",
@@ -8023,7 +8037,8 @@ export const ROSTER: HeroDef[] = [
        }
       ]
      }
-    ]
+    ],
+    "origin": "passive"
    },
    {
     "on": "damageDealt",
@@ -8324,7 +8339,8 @@ export const ROSTER: HeroDef[] = [
        "duration": null
       }
      }
-    ]
+    ],
+    "origin": "passive"
    },
    {
     "on": "skillUsed",
@@ -8643,7 +8659,8 @@ export const ROSTER: HeroDef[] = [
       "template": "Seedling",
       "count": 2
      }
-    ]
+    ],
+    "origin": "passive"
    },
    {
     "on": "skillUsed",
@@ -9057,7 +9074,8 @@ export const ROSTER: HeroDef[] = [
        }
       ]
      }
-    ]
+    ],
+    "origin": "passive"
    },
    {
     "on": "shieldBroken",
@@ -9082,7 +9100,8 @@ export const ROSTER: HeroDef[] = [
       "name": "Living Stone",
       "from": "eventUnit"
      }
-    ]
+    ],
+    "origin": "passive"
    },
    {
     "on": "roundStart",
@@ -9604,7 +9623,8 @@ export const ROSTER: HeroDef[] = [
        }
       ]
      }
-    ]
+    ],
+    "origin": "passive"
    },
    {
     "on": "unitDied",
@@ -9686,7 +9706,8 @@ export const ROSTER: HeroDef[] = [
        }
       ]
      }
-    ]
+    ],
+    "origin": "passive"
    },
    {
     "on": "damageDealt",
@@ -10007,7 +10028,8 @@ export const ROSTER: HeroDef[] = [
        "duration": null
       }
      }
-    ]
+    ],
+    "origin": "passive"
    },
    {
     "on": "skillDeclared",
@@ -10489,7 +10511,7 @@ export const ROSTER: HeroDef[] = [
    {
     "on": "turnEnd",
     "source": "Exile",
-    "origin": "innate",
+    "origin": "passive",
     "effect": [
      {
       "op": "custom",
@@ -10866,7 +10888,8 @@ export const ROSTER: HeroDef[] = [
       ]
      }
     ],
-    "source": "maggie0"
+    "source": "maggie0",
+    "origin": "passive"
    },
    {
     "on": "skillUsed",
@@ -11337,7 +11360,8 @@ export const ROSTER: HeroDef[] = [
       "to": "self"
      }
     ],
-    "source": "laria0"
+    "source": "laria0",
+    "origin": "passive"
    },
    {
     "on": "skillUsed",
@@ -11593,7 +11617,8 @@ export const ROSTER: HeroDef[] = [
        "duration": null
       }
      }
-    ]
+    ],
+    "origin": "passive"
    },
    {
     "on": "skillDeclared",
@@ -11890,7 +11915,8 @@ export const ROSTER: HeroDef[] = [
        "unitRef": "self"
       }
      }
-    ]
+    ],
+    "origin": "passive"
    },
    {
     "on": "turnStart",
@@ -11933,7 +11959,8 @@ export const ROSTER: HeroDef[] = [
        }
       ]
      }
-    ]
+    ],
+    "origin": "passive"
    },
    {
     "on": "turnStart",
@@ -11975,7 +12002,8 @@ export const ROSTER: HeroDef[] = [
        }
       ]
      }
-    ]
+    ],
+    "origin": "passive"
    },
    {
     "on": "skillUsed",
@@ -13295,7 +13323,8 @@ export const ROSTER: HeroDef[] = [
        "duration": null
       }
      }
-    ]
+    ],
+    "origin": "passive"
    },
    {
     "source": "Mirage Trap (across -> non-Strategic)",
@@ -13816,7 +13845,8 @@ export const ROSTER: HeroDef[] = [
       "to": "eventSource",
       "duration": null
      }
-    ]
+    ],
+    "origin": "passive"
    },
    {
     "on": "skillUsed",
@@ -14250,7 +14280,8 @@ export const ROSTER: HeroDef[] = [
       "to": "eventTarget",
       "duration": null
      }
-    ]
+    ],
+    "origin": "passive"
    },
    {
     "on": "skillDeclared",
@@ -14278,7 +14309,8 @@ export const ROSTER: HeroDef[] = [
        "duration": null
       }
      }
-    ]
+    ],
+    "origin": "passive"
    }
   ]
  },
@@ -14402,7 +14434,8 @@ export const ROSTER: HeroDef[] = [
       "template": "Prisma Saffron",
       "count": 1
      }
-    ]
+    ],
+    "origin": "passive"
    }
   ]
  }

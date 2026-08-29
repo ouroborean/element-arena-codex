@@ -457,6 +457,10 @@ test("myth King's Saddle: stuns Bjorn for 3 turns and redirects damage Gommar wo
   const state = makeState([g], [e]); bag(state); bag(state, "B");
   emit(state, { type: "roundStart" });
   const bjorn = minionOf(state)!;
+  // Base passive re-grants Frost-Covered at round start; strip it so King's Saddle does not consume it and
+  // fire Sovereign's Howl (whose -5 outgoing debuff on the enemy would blunt the redirected hit). This test
+  // isolates the stun + redirect behavior.
+  g.statuses = g.statuses.filter((s) => !(s.kind === "mark" && s.name === "Frost-Covered"));
 
   performAction(state, { unit: "g", skillId: "gommarmyth1", targets: [] });
   assert.equal(stunOf(bjorn)[0]?.duration, 3, "Bjorn is stunned for 3 turns");
@@ -494,6 +498,9 @@ test("myth King's Saddle control: WITHOUT Frost-Covered, Bjorn does NOT cast Sov
   const state = makeState([g], [e]); bag(state);
   emit(state, { type: "roundStart" });
   const bjorn = minionOf(state)!;
+  // Base passive re-grants Frost-Covered at round start; this control needs Gommar WITHOUT it so King's
+  // Saddle does not consume Frost-Covered and Bjorn does not cast Sovereign's Howl.
+  g.statuses = g.statuses.filter((s) => !(s.kind === "mark" && s.name === "Frost-Covered"));
 
   performAction(state, { unit: "g", skillId: "gommarmyth1", targets: [] });
   assert.equal(e.statuses.some((s) => s.name === "Sovereign's Howl"), false, "no Frost consumed -> no Sovereign's Howl");

@@ -169,7 +169,7 @@ test("blight/Bog Witch's Bargain timeout: a marked enemy that does NOT act is st
   endTurn(state); // B ends turn 2 (e declines to act)
   endTurn(state); // A ends turn 3 -> window closes
   assert.equal(hasStun(e), true, "the idle marked enemy is stunned for 1 turn");
-  assert.equal(maggie.hp, 85, "Maggie heals 35 when the enemy fails to act");
+  assert.equal(maggie.hp, 80, "Maggie heals 35 when the enemy fails to act, minus one 5-damage Curse of Thorns self-DoT tick from casting Bargain (a skill use): 50 - 5 + 35 = 80");
 });
 
 // ===========================================================================================
@@ -280,7 +280,7 @@ test("devil/Lust for Power: Maggie gains 1 Curse of Thorns stack and Elemental E
   state.teams.A.energy = energy("devil");
   assert.equal(hasEssence(maggie), false, "precondition: no Essence yet");
   assert.ok(performAction(state, { unit: "maggie", skillId: "maggiedevil1", targets: ["maggie"] }).ok, "Lust for Power (self)");
-  assert.equal(curse(maggie), 3, "gains exactly 1 Curse of Thorns stack (2 -> 3)");
+  assert.equal(curse(maggie), 4, "gains 2 Curse of Thorns stacks (2 -> 4): +1 from the form's explicit grant and +1 from the base Curse of Thorns skill-use passive, which now persists after fusing");
   assert.equal(hasEssence(maggie), true, "gains Elemental Essence");
 });
 
@@ -489,7 +489,7 @@ test("grave/Bloodrose Offering: if the marked ally dies within the window, Maggi
   {
     const maggie = fuse("grave");
     maggie.hp = 40;
-    seedCurse(maggie, 3); // heal = 10 x 3 = 30
+    seedCurse(maggie, 3); // 3 seeded + 1 from casting the Offering (base skill-use passive) => heal = 10 x 4 = 40
     const ally = makeUnit({ id: "ally", team: "A", hp: 10 });
     const killer = makeUnit({ id: "k", team: "B", skills: [enemyHit(50)] });
     const state = makeState([maggie, ally], [killer]);
@@ -498,7 +498,7 @@ test("grave/Bloodrose Offering: if the marked ally dies within the window, Maggi
     assert.ok(performAction(state, { unit: "maggie", skillId: "maggiegrave1", targets: ["ally"] }).ok, "Offering marks ally");
     assert.ok(performAction(state, { unit: "k", skillId: "ehit", targets: ["ally"] }).ok, "ally is killed");
     assert.equal(ally.alive, false, "the marked ally died");
-    assert.equal(maggie.hp, 70, "Maggie heals 10 x 3 Curse stacks = 30");
+    assert.equal(maggie.hp, 80, "Maggie heals 10 x 4 Curse stacks = 40 (3 seeded + 1 from casting Bloodrose Offering, a skill use, via the base Curse of Thorns passive)");
   }
   // CONTROL — an UNMARKED ally dying heals Maggie nothing.
   {

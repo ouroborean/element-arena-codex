@@ -94,29 +94,45 @@ test("fusion is once per match", () => {
   assert.throws(() => applyFusion(a, STORM), /already fused/);
 });
 
-test("the fusion passive replaces the base passive's triggers", () => {
-  const a = ando();
-  const baseSources = new Set((a.triggers ?? []).map((t) => t.source));
-  applyFusion(a, STORM);
+test("by DEFAULT the fusion passive is ADDED — the native PASSIVE persists (base SKILL triggers do not)", () => {
+  const a = ando(); // base triggers: "Stored Charge" (passive) + "Overclock" (base skill-reactive)
+  applyFusion(a, STORM); // default passiveMode is now "add"
   const sources = new Set((a.triggers ?? []).map((t) => t.source));
   assert.ok(sources.has("Storm"), "fusion triggers installed");
-  assert.ok(!(a.triggers ?? []).some((t) => baseSources.has(t.source) && t.source !== "Storm"), "base passive triggers gone");
+  assert.ok(sources.has("Stored Charge"), "the native PASSIVE persists (fusion ADDS, never disables the passive)");
+  assert.ok(!sources.has("Overclock"), "a base SKILL-reactive trigger is dropped (fused forms re-author the base skills)");
   assert.ok((a.triggers ?? []).every((t) => t.owner === "a1"), "triggers re-owned to the unit");
 });
 
-test("fusing after augmenting keeps the augment's triggers, drops only the base passive's", () => {
+test('passiveMode "replace" drops the native passive too (opt-in legacy behavior)', () => {
   const a = ando();
-  const baseSources = new Set((a.triggers ?? []).map((t) => t.source));
+  applyFusion(a, { ...STORM, passiveMode: "replace" });
+  const sources = new Set((a.triggers ?? []).map((t) => t.source));
+  assert.ok(sources.has("Storm"), "fusion triggers installed");
+  assert.ok(!sources.has("Stored Charge"), "the native passive is dropped under replace");
+});
+
+test("suppressesBaseTriggers drops the NAMED native-passive trigger (for an 'instead of' form)", () => {
+  const a = ando();
+  applyFusion(a, { ...STORM, suppressesBaseTriggers: ["Stored Charge"] });
+  const sources = new Set((a.triggers ?? []).map((t) => t.source));
+  assert.ok(!sources.has("Stored Charge"), "the suppressed native-passive trigger is dropped");
+  assert.ok(sources.has("Storm"), "fusion triggers installed");
+});
+
+test("fusing after augmenting keeps the augment's triggers AND (by default) the native passive", () => {
+  const a = ando();
   // Round 1: an augment adds a persistent trigger.
   applyAugment(a, { id: "andoX", name: "X", description: "", patches: [
     { op: "addTrigger", trigger: { on: "turnStart", source: "AugKeep", effect: [{ op: "heal", amount: 3, to: "self" }] } },
   ] });
-  // Round 2: the hero fuses (default replace).
+  // Round 2: the hero fuses (default add).
   applyFusion(a, STORM);
 
-  assert.ok((a.triggers ?? []).some((t) => t.source === "AugKeep"), "the augment trigger survives fusion");
-  assert.ok((a.triggers ?? []).some((t) => t.source === "Storm"), "the fusion passive is installed");
-  assert.ok(!(a.triggers ?? []).some((t) => baseSources.has(t.source)), "the base passive's triggers are gone");
+  const sources = new Set((a.triggers ?? []).map((t) => t.source));
+  assert.ok(sources.has("AugKeep"), "the augment trigger survives fusion");
+  assert.ok(sources.has("Storm"), "the fusion passive is installed");
+  assert.ok(sources.has("Stored Charge"), "the native passive persists too (fusion adds)");
 });
 
 test("Syl's innate Eagle-summon trigger survives fusion (replace mode) and the Eagle summons each round", () => {

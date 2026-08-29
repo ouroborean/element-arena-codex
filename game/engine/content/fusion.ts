@@ -22,10 +22,18 @@ export interface FusionForm {
   passive: PassiveDef;
   passiveTriggers?: HeroTrigger[];
   /**
-   * Does the fusion passive REPLACE the base passive's triggers (default) or ADD to them? Either
-   * way, augment-added triggers (origin "augment") are always kept — fusion doesn't undo augments.
+   * Does the fusion passive ADD to the base passive's triggers (DEFAULT) or REPLACE them? A fused hero
+   * keeps its full native kit — the base passive is integral and must persist — so the fusion passive layers
+   * on top, exactly like the fusion skill. "replace" (legacy, rarely needed) drops the ENTIRE base passive.
+   * Either way, augment-added triggers (origin "augment") and innate ones are always kept.
    */
   passiveMode?: "replace" | "add";
+  /**
+   * For an "instead of X" form (e.g. Shroomtender: "Instead of Seedling minions…"): the SOURCE strings of the
+   * specific base-passive triggers to drop, while keeping the rest of the base passive. Surgical alternative to
+   * the blunt "replace". Ignored in "replace" mode (which already drops all base triggers).
+   */
+  suppressesBaseTriggers?: string[];
   /** The fusion active skill gained on fusing. */
   skill: SkillInstance;
   /** Insertion index for the fusion skill (default 3 = the 4th slot, after the 3 basics). */
@@ -41,7 +49,7 @@ export function canFuse(unit: Unit): boolean {
 
 /**
  * Fuse a hero into `form` (once per match). Re-elements it, inserts the fusion skill at its slot,
- * and installs the fusion passive's triggers (replacing the base passive's by default). Throws on
+ * and installs the fusion passive's triggers ON TOP of the native passive (add is the default). Throws on
  * a second fusion — a re-fuse is a caller bug, not a silent no-op.
  */
 export function applyFusion(unit: Unit, form: FusionForm): void {
@@ -57,11 +65,18 @@ export function applyFusion(unit: Unit, form: FusionForm): void {
 
   const fusedTriggers = (form.passiveTriggers ?? []).map((t) => ({ ...clone(t), owner: unit.id, origin: "fusion" as const }));
   const existing = unit.triggers ?? [];
-  // "replace" swaps out the BASE PASSIVE's triggers but KEEPS augment-added ones (an early-round
-  // augment is not undone by a later fusion); "add" layers the fusion passive on top of everything.
-  unit.triggers = (form.passiveMode ?? "replace") === "add"
-    ? [...existing, ...fusedTriggers]
-    : [...existing.filter((t) => t.origin === "augment" || t.origin === "innate"), ...fusedTriggers];
+  // DEFAULT "add": the fusion passive LAYERS onto the NATIVE PASSIVE — origin "passive" triggers persist (the
+  // passive is integral to the hero), minus any an "instead of" form names in suppressesBaseTriggers. Base
+  // SKILL-reactive triggers (origin undefined) are still dropped, as fused forms re-author the base skills and
+  // re-implement what they need. Augment/innate triggers are always kept (a fusion doesn't undo an augment).
+  // Legacy "replace" drops the native passive too (only augment/innate survive).
+  const suppressed = new Set(form.suppressesBaseTriggers ?? []);
+  const keepUnderAdd = (t: HeroTrigger) =>
+    t.origin === "augment" || t.origin === "innate" ||
+    (t.origin === "passive" && !suppressed.has(t.source ?? ""));
+  unit.triggers = (form.passiveMode ?? "add") === "replace"
+    ? [...existing.filter((t) => t.origin === "augment" || t.origin === "innate"), ...fusedTriggers]
+    : [...existing.filter(keepUnderAdd), ...fusedTriggers];
 
   unit.fused = form.key;
 }

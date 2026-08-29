@@ -601,7 +601,7 @@ test("Not Today: Harmful skills aimed at the target ally are reflected onto Tary
   performAction(state, { unit: "taryn", skillId: "tarynvengeance1", targets: ["a1"] });
   performAction(state, { unit: "e", skillId: "ehit", targets: ["a1"] });
   assert.equal(a1.hp, 100, "the target ally took no damage");
-  assert.equal(t.hp, 80, "Taryn absorbed the reflected skill (took the 20)");
+  assert.equal(t.hp, 90, "Taryn absorbed the reflected skill, blunted by Protector of the Song's retained 10 DR (took 10, 100 -> 90)");
 });
 
 test("Not Today control: without it, the ally takes the hit and Taryn does not", () => {

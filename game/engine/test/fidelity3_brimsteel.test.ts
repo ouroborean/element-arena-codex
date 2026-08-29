@@ -35,7 +35,7 @@ test("Brimsteel Scabbard triples the next Blade of Ashes and reverts; a FRESH en
 
   const hp2 = enemy.hp;
   performAction(state, { unit: "j", skillId: "jarrik1", targets: ["e"] });
-  assert.equal(hp2 - enemy.hp, 10, "the next Blade of Ashes is a normal 10");
+  assert.equal(hp2 - enemy.hp, 20, "10 base + the kept base Cinders passive's 10 Affliction (the enemy now bears Cinders from the first strike)");
 });
 
 test("Brimsteel Scabbard DOES summon a Cinderling when the struck enemy already bears Cinders", () => {

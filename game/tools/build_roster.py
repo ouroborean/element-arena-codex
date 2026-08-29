@@ -74,6 +74,16 @@ def main():
         triggers = norm_triggers(h.get("triggers"), passive.get("name") or "passive")
         if isinstance(passive.get("trigger"), dict):
             triggers.extend(norm_triggers([passive["trigger"]], passive.get("name") or "passive"))
+        # Tag the base-PASSIVE triggers (source == the passive's name / id) with origin "passive". This lets
+        # fusion's add-default KEEP the native passive (integral to the hero) while still dropping base-SKILL
+        # triggers as before (a fused hero's re-authored skills re-implement what they need). Source convention
+        # varies (passive name, "{id}0", or "{name} ({id}0)"), so match all three.
+        pname = passive.get("name") or "passive"
+        pid = f"{h['id']}0"
+        passive_srcs = {pname, pid, f"{pname} ({pid})"}
+        for t in triggers:
+            if t.get("source") in passive_srcs:
+                t["origin"] = "passive"
         passive_def = {"name": passive.get("name", "Passive"), "description": passive.get("description", "")}
         if passive.get("note"):
             passive_def["pending"] = passive["note"]
