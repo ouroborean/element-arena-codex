@@ -251,7 +251,7 @@ test("Brimsteel Scabbard: the next Blade of Ashes deals TRIPLE (10 → 30) then 
 
   const before2 = e.hp;
   performAction(st, { unit: "j", skillId: "jarrik1", targets: ["e"] });
-  assert.equal(before2 - e.hp, 10, "one-shot: the next Blade of Ashes is a normal 10");
+  assert.equal(before2 - e.hp, 20, "one-shot: the blade reverts to 10, but the now-Cinders enemy also eats the base passive's 10 = 20");
 });
 
 test("Brimsteel Scabbard: a Cinders-affected strike auto-creates a Cinderling; a fresh one does not", () => {
@@ -301,7 +301,7 @@ test("Belphegor's Blade: at its own turn-end, an IDLE Cinders enemy takes 15 Aff
   const st = makeState([j], [marked]);
 
   emit(st, { type: "turnEnd", team: "B" });
-  assert.equal(marked.hp, 85, "the idle Cinders enemy takes 15 Affliction at its own turn-end");
+  assert.equal(marked.hp, 75, "15 Belphegor Affliction + base Cinders passive's 10 = 25 at its own turn-end");
 });
 
 test("Belphegor's Blade control: an UNMARKED enemy is not punished", () => {
@@ -583,7 +583,7 @@ test("Pop Off: 10 Affliction; consumes Cinders on a marked enemy, applies Cinder
     fund(st);
     emit(st, { type: "roundStart" });
     performAction(st, { unit: "j", skillId: "jarrikmechanic1", targets: ["e"] });
-    assert.equal(e.hp, 90, "10 Affliction damage");
+    assert.equal(e.hp, 80, "10 Pop Off Affliction + the persisted base Cinders passive's 10 (target was already Cinders) = 20");
     assert.ok(!hasMark(e, "Cinders"), "a marked target's Cinders is consumed");
   }
 });
@@ -684,7 +684,7 @@ test("Scythe of Cinders: requires >=60 Ritual Power — refused below, allowed a
   assert.ok(hasMark(e, "Cinders"), "the target is marked with Cinders");
 });
 
-test("Scythe of Cinders: at exactly 120 Ritual Power it strikes twice (50 total)", () => {
+test("Scythe of Cinders: at exactly 120 Ritual Power it strikes twice (60 total)", () => {
   const j = jarrik(); fuse(j, "ritual");
   const e = enemy("e", [], { hp: 300, maxHp: 300 });
   const st = makeState([j], [e]);
@@ -693,7 +693,7 @@ test("Scythe of Cinders: at exactly 120 Ritual Power it strikes twice (50 total)
 
   const hp = e.hp;
   performAction(st, { unit: "j", skillId: "jarrikritual1", targets: ["e"] });
-  assert.equal(hp - e.hp, 50, "two 25-Piercing strikes at 120 power");
+  assert.equal(hp - e.hp, 60, "two 25-Piercing strikes (50) + base Cinders passive's 10 on the second, now-Cinders strike = 60");
 });
 
 // ============================================================================

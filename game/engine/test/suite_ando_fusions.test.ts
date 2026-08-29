@@ -176,16 +176,16 @@ test("Rev: 15 damage and an escalating number of Capacitor stacks per use (1, th
 
   performAction(state, { unit: "ando", skillId: "andobattery1", targets: ["e1"] });
   assert.equal(e1.hp, 85, "Rev deals 15");
-  assert.equal(stackCount(ando, "Capacitor Upgrade"), 1, "1st Rev generates 1 Capacitor stack");
+  assert.equal(stackCount(ando, "Capacitor Upgrade"), 2, "1st Rev: 1 explicit + 1 from base Stored Charge granting Charged");
 
   performAction(state, { unit: "ando", skillId: "andobattery1", targets: ["e1"] });
-  assert.equal(stackCount(ando, "Capacitor Upgrade"), 3, "2nd Rev generates 2 more (total 3)");
+  assert.equal(stackCount(ando, "Capacitor Upgrade"), 5, "2nd Rev: +2 explicit + 1 from Stored Charge advancing to Supercharged (total 5)");
 
   performAction(state, { unit: "ando", skillId: "andobattery1", targets: ["e1"] });
-  assert.equal(stackCount(ando, "Capacitor Upgrade"), 6, "3rd Rev generates 3 more (total 6)");
+  assert.equal(stackCount(ando, "Capacitor Upgrade"), 8, "3rd Rev: +3 explicit, already Supercharged so no charge-gain stack (total 8)");
 
   performAction(state, { unit: "ando", skillId: "andobattery1", targets: ["e1"] });
-  assert.equal(stackCount(ando, "Capacitor Upgrade"), 9, "4th Rev is capped at 3 per use (total 9, not 10)");
+  assert.equal(stackCount(ando, "Capacitor Upgrade"), 11, "4th Rev: +3 explicit (capped), still Supercharged (total 11)");
   assert.equal(e1.hp, 40, "each Rev dealt 15 (4 * 15 = 60)");
 });
 
@@ -232,6 +232,9 @@ test("Rising Geyser: 20 damage + a 3-turn Rising Geyser mark; marked targets rep
   assert.equal(hasMark(e2, "Rising Geyser"), true, "e2 is now also marked");
 
   const e1Before = e1.hp, e2Before = e2.hp, e3Before = e3.hp;
+  // Two Rising Geyser casts advanced Ando to Supercharged via the persisted base Stored Charge passive; drop
+  // that charge so Electroblade is a clean single-target 15 (isolating replication, not the Supercharged AoE branch).
+  ando.statuses = ando.statuses.filter((s) => !(s.kind === "mark" && (s.name === "Charged" || s.name === "Supercharged")));
   // A fresh, independent damage on e1 (Electroblade, 15) must replicate to the other marked target e2.
   performAction(state, { unit: "ando", skillId: "ando1", targets: ["e1"] });
   assert.equal(e1Before - e1.hp, 15, "e1 takes the direct 15");

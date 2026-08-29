@@ -2478,6 +2478,9 @@
    "key": "curse",
    "hero": "blackknight",
    "element": "curse",
+   "suppressesBaseTriggers": [
+    "Exile"
+   ],
    "passive": {
     "name": "The Onyx Legion",
     "description": "Allies affected by Curse of Fealty never count as acting when determining if The Black Knight is acting alone.",
@@ -3379,18 +3382,6 @@
    },
    "passiveTriggers": [
     {
-     "on": "roundStart",
-     "source": "Yggdrasil's Bounty",
-     "note": "Retains the base 'Yggdrasil's Bounty' passive: fusing keeps Gaia's two Seedlings (only Shroomtender replaces them). applyFusion defaults passiveMode to 'replace', which would otherwise drop the base seedling summon.",
-     "effect": [
-      {
-       "op": "summon",
-       "template": "Seedling",
-       "count": 2
-      }
-     ]
-    },
-    {
      "on": "unitDied",
      "source": "Rotten Vitality",
      "when": {
@@ -3458,18 +3449,6 @@
     "note": "Realized as a 'Roiling Life' dot (10, normal) applied to the struck enemy, duration = 1 + Gaia's Channel Earth stacks (each stack = one extra turn). The dot ticks at Gaia's (applier) turn-end, i.e. 'the following turn'. 'Damaged by Worldfist' is scoped via {eventSourceId:'gaia2'} (the damageDealt event's sourceId falls back to the casting skill id), so only Worldfist hits seed the dot — the fusion active Overgrowth's own hit no longer does. The named dot doubles as the 'Roiling Life' marker Overgrowth reads."
    },
    "passiveTriggers": [
-    {
-     "on": "roundStart",
-     "source": "Yggdrasil's Bounty",
-     "note": "Retains the base 'Yggdrasil's Bounty' passive: fusing keeps Gaia's two Seedlings (only Shroomtender replaces them). applyFusion defaults passiveMode to 'replace', which would otherwise drop the base seedling summon.",
-     "effect": [
-      {
-       "op": "summon",
-       "template": "Seedling",
-       "count": 2
-      }
-     ]
-    },
     {
      "on": "damageDealt",
      "source": "Roiling Life",
@@ -3569,18 +3548,6 @@
    },
    "passiveTriggers": [
     {
-     "on": "roundStart",
-     "source": "Yggdrasil's Bounty",
-     "note": "Retains the base 'Yggdrasil's Bounty' passive: fusing keeps Gaia's two Seedlings (only Shroomtender replaces them). applyFusion defaults passiveMode to 'replace', which would otherwise drop the base seedling summon.",
-     "effect": [
-      {
-       "op": "summon",
-       "template": "Seedling",
-       "count": 2
-      }
-     ]
-    },
-    {
      "on": "shieldDamaged",
      "source": "Magnetic Shielding",
      "when": {
@@ -3647,18 +3614,6 @@
     "note": "Each time Gaia takes damage (damageDealt with eventTarget self) she gains a Rising Indignation stack; at 3 stacks Gaia's Fury (gaiamoon1) auto-casts (useSkill) and the stack resets. The load-bearing outcome (auto-cast at 3) is realized. All three 'during this time' clauses are now expressed (Reading A: every Gaia's Fury minion is enraged): (a) the per-stack [65] discount = costMods:{mul(stackCount('Rising Indignation'),-1)} on gaiamoon1 (1 stack -> 2 generic, 2 -> 1, 3 -> 0+auto-cast); (b) 'Moonspike may not be used' = gaiafury2.requires:{not has 'Enraged'} on the minion (which carries the Enraged mark); (c) the minion's +10 dealt/received = intrinsic outgoing_damage_mod/incoming_damage_mod +10 in the 'Gaia's Fury' template's new statuses[]."
    },
    "passiveTriggers": [
-    {
-     "on": "roundStart",
-     "source": "Yggdrasil's Bounty",
-     "note": "Retains the base 'Yggdrasil's Bounty' passive: fusing keeps Gaia's two Seedlings (only Shroomtender replaces them). applyFusion defaults passiveMode to 'replace', which would otherwise drop the base seedling summon.",
-     "effect": [
-      {
-       "op": "summon",
-       "template": "Seedling",
-       "count": 2
-      }
-     ]
-    },
     {
      "on": "damageDealt",
      "source": "Rising Indignation",
@@ -3771,18 +3726,6 @@
    "passiveTriggers": [
     {
      "on": "roundStart",
-     "source": "Yggdrasil's Bounty",
-     "note": "Retains the base 'Yggdrasil's Bounty' passive: fusing keeps Gaia's two Seedlings (only Shroomtender replaces them). applyFusion defaults passiveMode to 'replace', which would otherwise drop the base seedling summon.",
-     "effect": [
-      {
-       "op": "summon",
-       "template": "Seedling",
-       "count": 2
-      }
-     ]
-    },
-    {
-     "on": "roundStart",
      "source": "Branch of the World Tree",
      "effect": [
       {
@@ -3844,18 +3787,6 @@
     "note": "On turnEnd, every allied hero (incl. Gaia) lacking Elemental Essence gains it and heals 10. turnEnd fires for BOTH teams, so 'each turn' also fires on the enemy's turn-end (a known event-team-scoping limitation); the effect only touches Gaia's own team either way."
    },
    "passiveTriggers": [
-    {
-     "on": "roundStart",
-     "source": "Yggdrasil's Bounty",
-     "note": "Retains the base 'Yggdrasil's Bounty' passive: fusing keeps Gaia's two Seedlings (only Shroomtender replaces them). applyFusion defaults passiveMode to 'replace', which would otherwise drop the base seedling summon.",
-     "effect": [
-      {
-       "op": "summon",
-       "template": "Seedling",
-       "count": 2
-      }
-     ]
-    },
     {
      "on": "turnEnd",
      "source": "Oasis",
@@ -3937,18 +3868,6 @@
     "note": "At round start each allied hero gets a permanent 'Sacred Grove' regen (5/turn, ticking at Gaia's turn-end); when an ally declares a Harmful skill (skillDeclared + eventHasTag Harmful) that ally's regen is removed. Separately, when an ally still holding the regen is damaged, the attacker (eventSource) is marked 'Sacred Grove' (the mark Expel Intruders consumes)."
    },
    "passiveTriggers": [
-    {
-     "on": "roundStart",
-     "source": "Yggdrasil's Bounty",
-     "note": "Retains the base 'Yggdrasil's Bounty' passive: fusing keeps Gaia's two Seedlings (only Shroomtender replaces them). applyFusion defaults passiveMode to 'replace', which would otherwise drop the base seedling summon.",
-     "effect": [
-      {
-       "op": "summon",
-       "template": "Seedling",
-       "count": 2
-      }
-     ]
-    },
     {
      "on": "roundStart",
      "source": "Sacred Grove",
@@ -4081,18 +4000,6 @@
    },
    "passiveTriggers": [
     {
-     "on": "roundStart",
-     "source": "Yggdrasil's Bounty",
-     "note": "Retains the base 'Yggdrasil's Bounty' passive: fusing keeps Gaia's two Seedlings (only Shroomtender replaces them). applyFusion defaults passiveMode to 'replace', which would otherwise drop the base seedling summon.",
-     "effect": [
-      {
-       "op": "summon",
-       "template": "Seedling",
-       "count": 2
-      }
-     ]
-    },
-    {
      "on": "statusApplied",
      "source": "Nutrient Sludge",
      "when": {
@@ -4200,10 +4107,13 @@
    "key": "spore",
    "hero": "gaia",
    "element": "spore",
+   "suppressesBaseTriggers": [
+    "Yggdrasil's Bounty"
+   ],
    "passive": {
     "name": "Shroomtender",
     "description": "Instead of Seedling minions, Gaia now begins play with one Mushroom minion.",
-    "note": "This form's passive REPLACES the base 'Yggdrasil's Bounty' (start with two Seedlings): at round start Gaia summons one Mushroom instead. 'Begins play' = start of each fresh-battle round -> a roundStart summon."
+    "note": "'Instead of Seedling minions' — the ONLY Gaia form that replaces the base seedlings. Fusion now ADDS its passive by default (the base 'Yggdrasil's Bounty' persists for every other form), so this form surgically suppresses just the 'Yggdrasil's Bounty' base trigger (via suppressesBaseTriggers) and summons one Mushroom instead. Gaia's Channel Vitality skill triggers are untouched."
    },
    "passiveTriggers": [
     {
@@ -4275,18 +4185,6 @@
     "note": "On turnEnd, every allied Seedling minion gains +10 max HP (custom increaseMaxHp raises max and current). turnEnd fires for both teams; the selector is Gaia's own Seedlings, so an enemy turn-end would also grow them (event-team-scoping limitation). Sunbeam later resets these Seedlings' max HP to default."
    },
    "passiveTriggers": [
-    {
-     "on": "roundStart",
-     "source": "Yggdrasil's Bounty",
-     "note": "Retains the base 'Yggdrasil's Bounty' passive: fusing keeps Gaia's two Seedlings (only Shroomtender replaces them). applyFusion defaults passiveMode to 'replace', which would otherwise drop the base seedling summon.",
-     "effect": [
-      {
-       "op": "summon",
-       "template": "Seedling",
-       "count": 2
-      }
-     ]
-    },
     {
      "on": "turnEnd",
      "source": "Nurturing Light",
@@ -11132,6 +11030,9 @@
    "key": "zealot",
    "hero": "maggie",
    "element": "zealot",
+   "suppressesBaseTriggers": [
+    "maggie0"
+   ],
    "passive": {
     "name": "Sanguine Craving",
     "description": "Maggie now receives an additional stack of Curse of Thorns when she uses a skill, and will receive 1 stack if she does not act on her turn."
@@ -12442,6 +12343,9 @@
    "key": "blood",
    "hero": "riverdaughter",
    "element": "blood",
+   "suppressesBaseTriggers": [
+    "Healing Tears (riverdaughter0)"
+   ],
    "passive": {
     "name": "Blood in the Water",
     "description": "River Daughter stores all of the damage she deals to the enemy team. Whenever Healing Tears triggers, she heals her team for 10 additional health for every 40 damage stored, emptying the stored damage."
@@ -12667,6 +12571,9 @@
    "key": "current",
    "hero": "riverdaughter",
    "element": "current",
+   "suppressesBaseTriggers": [
+    "Healing Tears (riverdaughter0)"
+   ],
    "passive": {
     "name": "Conducted Emotion",
     "description": "Healing Tears now lasts one turn and heals 10 health, but it also activates whenever she gains Elemental Essence from another source. Triggering Healing Tears this way will not give River Daughter Elemental Essence."
@@ -13158,6 +13065,9 @@
    "key": "ocean",
    "hero": "riverdaughter",
    "element": "ocean",
+   "suppressesBaseTriggers": [
+    "Healing Tears (riverdaughter0)"
+   ],
    "passive": {
     "name": "Triton's Blessing",
     "description": "Healing Tears is now triggered whenever an enemy uses a Strategic skill. Heroes can only have one heal-over-time effect from Triton's Blessing at a time."
@@ -16684,6 +16594,9 @@
    "key": "divine",
    "hero": "taryn",
    "element": "divine",
+   "suppressesBaseTriggers": [
+    "Protector of the Song"
+   ],
    "passive": {
     "name": "Divine Hymn",
     "description": "The Damage Reduction from Protector of the Song now lasts for 2 turns and affects both of Taryn's allies as well."
@@ -17278,6 +17191,9 @@
    "key": "zealot",
    "hero": "taryn",
    "element": "zealot",
+   "suppressesBaseTriggers": [
+    "Protector of the Song"
+   ],
    "passive": {
     "name": "Flag of Inquisition",
     "description": "Protector of the Song no longer gives Taryn Damage Reduction, instead increasing his damage by 10 until the end of his next turn. This effect can stack."
@@ -18625,6 +18541,9 @@
    "key": "dimension",
    "hero": "xyris",
    "element": "dimension",
+   "suppressesBaseTriggers": [
+    "Dream Body"
+   ],
    "passive": {
     "name": "Dreamform Paradox",
     "description": "Whenever Dream Body triggers, the cooldown on Astral Rejection and Somnic Apparition are reduced by 1."
@@ -19673,6 +19592,9 @@
    "key": "ghost",
    "hero": "zephyrex",
    "element": "ghost",
+   "suppressesBaseTriggers": [
+    "Biting Wind"
+   ],
    "passive": {
     "name": "Fell Wind",
     "description": "Biting Wind now causes health loss, which does not count as any form of damage."
@@ -19744,6 +19666,9 @@
    "key": "mechanic",
    "hero": "zephyrex",
    "element": "mechanic",
+   "suppressesBaseTriggers": [
+    "Biting Wind"
+   ],
    "passive": {
     "name": "Winds of Summer",
     "description": "Biting Wind and Elegant Sweep now deal Affliction damage."
@@ -19942,6 +19867,9 @@
    "key": "ninja",
    "hero": "zephyrex",
    "element": "ninja",
+   "suppressesBaseTriggers": [
+    "Biting Wind"
+   ],
    "passive": {
     "name": "Vacuum Blade",
     "description": "Any time Biting Wind or Wind Step triggers, Elegant Sweep permanently deals 5 more damage."

@@ -72,6 +72,8 @@ def clean_form(f):
     }
     if f.get("passiveMode"):
         out["passiveMode"] = f["passiveMode"]
+    if f.get("suppressesBaseTriggers"):
+        out["suppressesBaseTriggers"] = f["suppressesBaseTriggers"]
     if f.get("slot") is not None:
         out["slot"] = f["slot"]
     return out

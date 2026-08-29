@@ -191,9 +191,9 @@ test("grave Rotten Vitality: only a dead Seedling returns — a dead Worldsprout
   assert.equal(minions(st, "A", "Seedling").length, before, "a non-Seedling death must not return a Seedling");
 });
 
-// Fusion re-elements Gaia and swaps in a new passive, but her base "Yggdrasil's Bounty" (start each round with
-// two Seedlings) persists for every form EXCEPT Shroomtender, which explicitly replaces them ("Instead of
-// Seedling minions..."). Regression: applyFusion defaults to REPLACING the base passive, which dropped them.
+// Fusion re-elements Gaia and ADDS a new passive, but her base "Yggdrasil's Bounty" (start each round with two
+// Seedlings) persists for every form EXCEPT Shroomtender, which explicitly replaces them ("Instead of Seedling
+// minions...") via suppressesBaseTriggers. Regression: fusion must not silently disable the native passive.
 test("fusing Gaia keeps her two starting Seedlings for every form except Shroomtender", () => {
   for (const key of ["grave", "life", "magnet", "moon", "myth", "nomad", "sanctuary", "slime", "sun"]) {
     const { st } = fuse(key);

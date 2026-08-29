@@ -131,6 +131,15 @@ function statusSource(state: MatchState, s: Status): string | undefined {
   return by?.heroId ? `${by.heroId}${by.fused ?? ""}0` : undefined;
 }
 
+/** The passive(s) to surface for a hero: its native passive ALWAYS, plus its fusion-form passive once fused —
+ *  fusion ADDS a passive, it never removes the native one. Filtered to those with describable text. */
+function passiveIds(u: Unit): string[] {
+  if (!u.heroId) return [];
+  const ids = [`${u.heroId}0`];
+  if (u.fused) ids.push(`${u.heroId}${u.fused}0`);
+  return ids.filter((id) => SKILL_TEXT[id]?.d);
+}
+
 /** Status icons on a portrait: the source skill's art, each hover-describable. Exported for view tests. */
 export function effectIcons(state: MatchState, u: Unit): string {
   const shown = (s: Status) => !HIDDEN_KINDS.has(s.kind) && !(s.name && EFFECT_HIDE.has(s.name));
@@ -165,16 +174,15 @@ export function effectIcons(state: MatchState, u: Unit): string {
     const nBadge = s.kind === "stack" && (s.magnitude ?? 0) > 1 ? s.magnitude! : (s.name ? carrierCount.get(s.name) ?? 0 : 0);
     out.push(`<span class="fx ${tone}" data-fxtitle="${esc(title)}" data-fxbody="${esc(body)}" data-fxdur="${esc(dur)}">${abbr}${icon ? `<img src="${icon}" onerror="this.remove()" />` : ""}${nBadge > 1 ? `<span class="fx-n">${nBadge}</span>` : ""}</span>`);
   }
-  // Passives have no skill slot in a match, so surface each hero's CURRENT passive (base or fusion form) as a
-  // permanent, hover-describable chip — its effect is otherwise invisible mid-match.
-  const pid = u.heroId ? `${u.heroId}${u.fused ?? ""}0` : "";
-  const pt = pid ? SKILL_TEXT[pid] : undefined;
-  let passive = "";
-  if (pt?.d) {
+  // Passives have no skill slot in a match, so surface each of the hero's ACTIVE passives (native + fusion form)
+  // as permanent, hover-describable chips — their effects are otherwise invisible mid-match, and the opponent
+  // needs to see a fusion passive too.
+  const passiveChips = passiveIds(u).map((pid) => {
+    const pt = SKILL_TEXT[pid]!;
     const pic = iconOf(pid, u.heroId);
-    passive = `<span class="fx passive" data-fxtitle="${esc(pt.n)}" data-fxbody="${esc(pt.d)}" data-fxdur=""><span class="fx-abbr">${esc((pt.n[0] ?? "P").toUpperCase())}</span>${pic ? `<img src="${pic}" onerror="this.remove()" />` : ""}</span>`;
-  }
-  const chips = passive ? [passive, ...out] : out;
+    return `<span class="fx passive" data-fxtitle="${esc(pt.n)}" data-fxbody="${esc(pt.d)}" data-fxdur=""><span class="fx-abbr">${esc((pt.n[0] ?? "P").toUpperCase())}</span>${pic ? `<img src="${pic}" onerror="this.remove()" />` : ""}</span>`;
+  });
+  const chips = [...passiveChips, ...out];
   return chips.length ? `<div class="fxrow">${chips.slice(0, 7).join("")}</div>` : "";
 }
 
@@ -419,10 +427,12 @@ function unitInspectPanel(state: MatchState, ui: UiState): string {
   const u = state.units[ui.inspectUnit!];
   if (!u) return "";
   const side = u.team === ui.you ? "you" : "foe";
-  // The hero's current passive (base or fusion form) has no skill slot in a match, so surface it first.
-  const pid = u.heroId ? `${u.heroId}${u.fused ?? ""}0` : "";
-  const pt = pid ? SKILL_TEXT[pid] : undefined;
-  const rowP = pt?.d ? skillInspectRow(iconOf(pid, u.heroId), pt.n, "", "Passive", pt.d) : "";
+  // The hero's active passives (native + fusion form) have no skill slot in a match, so surface them first —
+  // fusion adds a passive, so a fused hero lists BOTH here.
+  const rowP = passiveIds(u).map((pid) => {
+    const pt = SKILL_TEXT[pid]!;
+    return skillInspectRow(iconOf(pid, u.heroId), pt.n, "", u.fused && pid === `${u.heroId}${u.fused}0` ? "Fusion passive" : "Passive", pt.d);
+  }).join("");
   const rows = (u.skills ?? []).map((s) => {
     const t = SKILL_TEXT[s.id];
     const cd = s.cooldown > 0 ? (s.currentCd > 0 ? `on cooldown (${s.currentCd})` : `${s.cooldown}-turn cooldown`) : "";

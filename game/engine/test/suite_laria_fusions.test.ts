@@ -695,12 +695,12 @@ test("ritual/Ritual of Culling Night control: below 50 Ritual Power, no 45-damag
   const laria = fuse("ritual");
   laria.statuses = [ds(1), { kind: "stack", name: "Ritual Power", magnitude: 40, duration: null, appliedBy: "seed", appliedTurn: 0 }];
   laria.hp = 100;
-  const e1 = enemy("e1", { hp: 100 }); // field total 1 -> RP hits 41 (< 50)
+  const e1 = enemy("e1", { hp: 100 }); // base passive adds a DS stack (1->2) at turn-end -> field total 2 -> RP hits 42 (< 50)
   const state = makeState([laria], [e1]);
   state.activeTeam = "A";
 
   endTurn(state);
-  assert.equal(st(laria, "stack", "Ritual Power")?.magnitude, 41, "Ritual Power accrues to 41, not consumed");
+  assert.equal(st(laria, "stack", "Ritual Power")?.magnitude, 42, "Ritual Power accrues to 42 (40 + 2 field stacks after the base passive adds one), not consumed");
   assert.equal(e1.hp, 100, "no detonation below 50 Ritual Power");
 });
 
