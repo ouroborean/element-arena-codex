@@ -116,6 +116,8 @@ export interface StatusSpec {
   ignoreKinds?: string[];
   /** For a damage_ignore: ignore only PERIODIC (dot-tick) damage, not new/direct hits. */
   periodicOnly?: boolean;
+  /** For a dot/regen whose FIRST tick is next turn, not the apply turn ("then N for the NEXT M turns"). */
+  firstTickNextTurn?: boolean;
   /** Re-applying this status ACCUMULATES magnitude (+refreshes duration) instead of the default refresh
    *  ("This effect stacks" named dots/effects). */
   stacks?: boolean;

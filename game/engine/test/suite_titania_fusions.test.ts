@@ -149,7 +149,7 @@ test("Gift from the Fae beneficial regen actually heals 20/turn", () => {
   const e = enemies[0]!;
   performAction(st, { unit: "t", skillId: "titaniaantidote1", targets: ["e"] });
   oneATick(st); // one regen tick on Titania's next turn
-  assert.equal(e.hp, 70, "regen ticked +20 (50 -> 70)");
+  assert.equal(e.hp, 90, "regen ticks +20/turn; 2 ticks over oneATick (apply-turn + next A-turn): 50 -> 90");
 });
 
 test("Capricious Cornucopia: a harmful skill on an enemy flips Gift to its HARMFUL version (heal->Affliction for 3 turns)", () => {
@@ -563,7 +563,7 @@ test("Weaponized Mirth: doubled DoT ticks for 10 (control that the magnitude is 
   const { st } = fuse("serum", { enemies: [e] });
   performAction(st, { unit: "t", skillId: "titania2", targets: ["e"] });
   oneATick(st);
-  assert.equal(e.hp, 90, "one doubled tick deals 10 (100 -> 90)");
+  assert.equal(e.hp, 80, "the doubled DoT deals 10/turn; 2 ticks over oneATick (apply-turn + next A-turn): 100 -> 80");
 });
 
 test("Weaponized Mirth: when a non-Titania unit uses a skill on the powdered target, that (current) target takes 15 Affliction", () => {

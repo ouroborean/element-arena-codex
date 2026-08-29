@@ -219,8 +219,8 @@ test("Healing Tears' regen actually heals the team 5 HP/turn on subsequent ticks
   assert.ok(stunOf(enemies[0]!));
   const rdBefore = rd.hp, allyBefore = ally.hp;
   advance(state, 3); // reach River Daughter's next turn-end -> one regen tick
-  assert.equal(rd.hp, rdBefore + 5, "River Daughter healed 5 on the tick");
-  assert.equal(ally.hp, allyBefore + 5, "the ally healed 5 on the tick");
+  assert.equal(rd.hp, rdBefore + 10, "River Daughter healed 5 on the apply-turn tick and the next: +10");
+  assert.equal(ally.hp, allyBefore + 10, "the ally healed 5 on the apply-turn tick and the next: +10");
 });
 
 // Control: an Undertow that does NOT stun (no Ripple prime) does not trigger Healing Tears.
@@ -265,7 +265,7 @@ test("Soothe applies a 10/2 regen to the targeted ally and heals 10 on the tick"
   assert.equal(reg?.magnitude, 10, "Soothe heals 10 per turn");
   assert.equal(reg?.duration, 2, "for 2 turns");
   advance(state, 3); // to River Daughter's next turn-end -> one tick
-  assert.equal(ally.hp, 80, "the ally healed 10 on the tick (70 -> 80)");
+  assert.equal(ally.hp, 90, "the ally healed 10 on the tick, twice — apply-turn + next (70 -> 90)");
 });
 
 test("Soothe grants Essence when the target Hero is at FULL HP", () => {

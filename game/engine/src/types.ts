@@ -112,6 +112,10 @@ export interface Status {
   /** For a damage_ignore: ignore only PERIODIC (dot-tick) damage, not new/direct hits (gommar:lich Icy Blood
    *  "ignores periodic Affliction damage"). */
   periodicOnly?: boolean;
+  /** For a dot/regen: its FIRST tick lands on the FOLLOWING turn, not the apply turn — for effects whose prose
+   *  explicitly starts next turn ("then N damage for the NEXT M turns", "the following turn ..."). WITHOUT this,
+   *  a ticking effect counts the turn it was applied (the default). */
+  firstTickNextTurn?: boolean;
   /** Re-applying this status ACCUMULATES its magnitude (and refreshes duration) instead of the default refresh
    *  — for named dots/effects whose frozen text says "This effect stacks" (keeper Tale of a Distant Future,
    *  pyrrha Festering Burns' Fan the Flames). */

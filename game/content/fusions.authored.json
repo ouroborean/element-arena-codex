@@ -3475,6 +3475,7 @@
        "to": "eventTarget",
        "status": {
         "kind": "dot",
+        "firstTickNextTurn": true,
         "name": "Roiling Life",
         "magnitude": 10,
         "dtype": "normal",
@@ -11203,6 +11204,7 @@
      {
       "op": "removeStatus",
       "kind": "dot",
+      "firstTickNextTurn": true,
       "name": "Fan the Flames",
       "from": "target",
       "note": "'Removes Fan the Flames from target enemy.'"
@@ -11370,6 +11372,7 @@
        "to": "eventSource",
        "status": {
         "kind": "dot",
+        "firstTickNextTurn": true,
         "name": "Fan the Flames",
         "magnitude": 5,
         "dtype": "affliction",
@@ -11599,6 +11602,7 @@
           "to": "it",
           "status": {
            "kind": "dot",
+           "firstTickNextTurn": true,
            "name": "Fan the Flames",
            "magnitude": 5,
            "dtype": "affliction",
@@ -11620,6 +11624,7 @@
         "to": "target",
         "status": {
          "kind": "dot",
+         "firstTickNextTurn": true,
          "name": "Fan the Flames",
          "magnitude": 5,
          "dtype": "affliction",
@@ -12330,6 +12335,7 @@
       },
       "status": {
        "kind": "regen",
+       "firstTickNextTurn": true,
        "name": "Waters of Life",
        "magnitude": 10,
        "duration": 3
@@ -16776,6 +16782,7 @@
       "to": "target",
       "status": {
        "kind": "dot",
+       "firstTickNextTurn": true,
        "name": "Trial by Fire",
        "magnitude": 15,
        "dtype": "normal",

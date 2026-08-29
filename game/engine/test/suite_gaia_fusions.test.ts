@@ -444,7 +444,7 @@ test("Sandstorm: applies a 5-damage, 4-turn hit to every enemy", () => {
     assert.equal(d!.duration, 4, "for 4 turns");
   }
   oneATick(st);
-  assert.equal(e1.hp, 195, "the 5 ticks on a Gaia turn (200 -> 195)");
+  assert.equal(e1.hp, 190, "the 5 ticks on the apply turn and the next Gaia turn (200 -> 190)");
 });
 
 test("Sandstorm auras: during it, Rampart costs generic and Worldfist Blinds", () => {
@@ -485,7 +485,7 @@ test("Sacred Grove: allied heroes get a 5/turn regen; using a Harmful skill ends
   assert.ok(regenOf(ally, "Sacred Grove"), "the allied hero has it too");
   ally.hp = 50;
   oneATick(st);
-  assert.equal(ally.hp, 55, "the regen heals 5 on a Gaia turn (50 -> 55)");
+  assert.equal(ally.hp, 60, "the regen heals 5 on the apply turn and the next Gaia turn (50 -> 60)");
 
   performAction(st, { unit: "a", skillId: "ahit", targets: ["e"] }); // ally uses a Harmful skill
   assert.equal(regenOf(ally, "Sacred Grove"), undefined, "using a Harmful skill removes that hero's Sacred Grove regen");

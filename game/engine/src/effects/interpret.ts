@@ -485,6 +485,7 @@ function buildStatus(spec: StatusSpec, ctx: Ctx) {
     dtypes: spec.dtypes,
     ignoreKinds: spec.ignoreKinds,
     periodicOnly: spec.periodicOnly,
+    firstTickNextTurn: spec.firstTickNextTurn,
     stacks: spec.stacks,
     scope: spec.scope,
     genericDelta: spec.genericDelta,
@@ -627,7 +628,13 @@ export function exec(effect: Effect, ctx: Ctx): void {
           (x) => x.kind === effect.kind && (effect.name === undefined || x.name === effect.name),
         );
         if (!s) continue;
-        if (dMag) s.magnitude = (s.magnitude ?? 0) + dMag;
+        if (dMag) {
+          s.magnitude = (s.magnitude ?? 0) + dMag;
+          // A STACK consumed to nothing is gone — don't leave a phantom 0-magnitude carrier behind (its chip
+          // would still render and a `has stack` gate would still read true, so the mark reads as "not
+          // consumed"). Mirrors the duration<=0 removal below. Consuming stacks (e.g. Sera's Eyes of Vengeance).
+          if (s.kind === "stack" && (s.magnitude ?? 0) <= 0) { u.statuses = u.statuses.filter((x) => x !== s); continue; }
+        }
         if (dDur && s.duration !== null) {
           const nextDur = s.duration + dDur;
           if (nextDur <= 0) u.statuses = u.statuses.filter((x) => x !== s);

@@ -146,6 +146,20 @@ test("sera1 (marked target): consumes 1 stack, deals 10 extra (25 total), and gr
   assert.equal(totalShield(sera), 0, "base Synthetic Skyblade grants Sera no Shield");
 });
 
+test("sera1 (last stack): consuming the final Eyes stack REMOVES the mark entirely (no phantom 0-stack)", () => {
+  const { state, enemy } = fresh();
+  seedEyes(enemy, 1);
+  performAction(state, { unit: "s", skillId: "sera1", targets: ["e"] });
+  assert.equal(eyes(enemy), 0, "the stack is consumed to 0");
+  // Regression: a fully-consumed stack must be DELETED, not left as a magnitude-0 carrier (whose chip would
+  // still show and whose `has stack` would still read true — the mark reading as "not consumed").
+  assert.equal(enemy.statuses.filter((s) => s.name === "Eyes of Vengeance").length, 0, "no lingering Eyes of Vengeance status remains");
+  // A second Skyblade now deals only its base 15 (no bonus, no re-consume).
+  const hp = enemy.hp;
+  performAction(state, { unit: "s", skillId: "sera1", targets: ["e"] });
+  assert.equal(hp - enemy.hp, 15, "with the mark gone, the next Skyblade is a plain 15");
+});
+
 // ---------------------------------------------------------------------------
 // sera2 — Energized Wingstorm
 // ---------------------------------------------------------------------------

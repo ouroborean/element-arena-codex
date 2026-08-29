@@ -265,7 +265,7 @@ test("Elderwood Sap (behavioral): the doubled affliction ticks 10 per turn", () 
   endTurn(st); // A birth turn: no tick
   endTurn(st); // B turn
   endTurn(st); // A turn: the applier's DoT ticks
-  assert.equal(before - e.hp, 10, "the doubled Thorn Prick affliction deals 10 on Titania's next turn");
+  assert.equal(before - e.hp, 20, "the doubled Thorn Prick affliction deals 10/tick; apply-turn tick + next A-turn tick = 20");
 });
 
 // =============================================================================================== //
