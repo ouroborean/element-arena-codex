@@ -140,8 +140,9 @@ function passiveIds(u: Unit): string[] {
   return ids.filter((id) => SKILL_TEXT[id]?.d);
 }
 
-/** Status icons on a portrait: the source skill's art, each hover-describable. Exported for view tests. */
-export function effectIcons(state: MatchState, u: Unit): string {
+/** Status icons for a unit: the source skill's art, each hover-describable. Exported for view tests.
+ *  `side` lays them out as a compact two-row grid (beside the portrait) instead of the on-portrait corner strip. */
+export function effectIcons(state: MatchState, u: Unit, side = false): string {
   const shown = (s: Status) => !HIDDEN_KINDS.has(s.kind) && !(s.name && EFFECT_HIDE.has(s.name));
   // A stack/mark is a carrier; when the same NAME also manifests as a concrete effect (a dot, a damage
   // mod, …), that concrete chip already tells the story, so the carrier chip is redundant — drop it.
@@ -185,7 +186,8 @@ export function effectIcons(state: MatchState, u: Unit): string {
   // Chosen augments are passive-like: surface each as a permanent chip too, so both players see it's active.
   const augChips = unitAugments(u).map((a) => augmentChip(a, u.heroId!));
   const chips = [...passiveChips, ...augChips, ...out];
-  return chips.length ? `<div class="fxrow">${chips.slice(0, 7).join("")}</div>` : "";
+  // The side layout is a 2-row grid (fits ~8 in two rows); the on-portrait corner strip stays capped at 7.
+  return chips.length ? `<div class="fxrow${side ? " side" : ""}">${chips.slice(0, side ? 8 : 7).join("")}</div>` : "";
 }
 
 function hpBar(u: Unit): string {
@@ -278,8 +280,9 @@ function targetingRow(state: MatchState, incoming: Incoming[]): string {
   return `<div class="tgtrow">${icons}</div>`;
 }
 
-/** The portrait column (queued-skill row, framed portrait with effects + name, HP bar). Shared by both teams. */
-function portraitCol(state: MatchState, u: Unit, ui: UiState, incoming: Map<string, Incoming[]>): string {
+/** The portrait column (queued-skill row, framed portrait with effects + name, HP bar). Shared by both teams.
+ *  `chipsInside` = false omits the on-portrait effect chips — the caller (a player hero) renders them beside it. */
+function portraitCol(state: MatchState, u: Unit, ui: UiState, incoming: Map<string, Incoming[]>, chipsInside = true): string {
   const targetable = ui.phase === "plan" && !!ui.targeting && ui.legalTargets.has(u.id);
   const mart = u.kind === "minion" ? minionPortrait(u.name) : null;
   const portrait = u.heroId
@@ -289,7 +292,7 @@ function portraitCol(state: MatchState, u: Unit, ui: UiState, incoming: Map<stri
     : `<div class="portrait minion-art">${esc(shortName(u.name))}</div>`;
   return `<div class="pcol">
     ${targetingRow(state, incoming.get(u.id) ?? [])}
-    <div class="frame" style="--el:${elColor(u.currentElement)}" data-inspect-unit="${u.id}" ${targetable ? `data-target="${u.id}"` : ""}>${portrait}${effectIcons(state, u)}<div class="name">${esc(shortName(u.name))}</div></div>
+    <div class="frame" style="--el:${elColor(u.currentElement)}" data-inspect-unit="${u.id}" ${targetable ? `data-target="${u.id}"` : ""}>${portrait}${chipsInside ? effectIcons(state, u) : ""}<div class="name">${esc(shortName(u.name))}</div></div>
     ${hpBar(u)}
   </div>`;
 }
@@ -317,6 +320,11 @@ function unitRow(state: MatchState, u: Unit, ui: UiState, isYou: boolean, incomi
   // Heroes get the full element-themed kit (five normal skill slots + an ultimate slot, no passive); a
   // controllable minion gets only a flat row of its bare skill tiles (minions have only basic skills).
   const controls = isYou && u.alive ? (u.kind === "hero" ? kit(state, u, ui) : skillTiles(state, u, ui)) : "";
+  // Your living heroes: lift the effect chips OFF the portrait into the empty space to its right — a compact
+  // two-row grid above the kit — so they never cover the character art. Everyone else keeps the corner strip.
+  if (isYou && u.kind === "hero" && u.alive) {
+    return `<div class="${cls}">${portraitCol(state, u, ui, incoming, false)}<div class="rightcol">${effectIcons(state, u, true)}${controls}</div></div>`;
+  }
   return `<div class="${cls}">${portraitCol(state, u, ui, incoming)}${controls}</div>`;
 }
 
