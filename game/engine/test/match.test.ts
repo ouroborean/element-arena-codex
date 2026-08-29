@@ -30,6 +30,21 @@ test("heroById rejects an unknown draft pick", () => {
   assert.throws(() => heroById("not-a-hero"), /no such hero/);
 });
 
+// The bot must not inject Hector's Serums (Strategic, neither Harmful nor Helpful) into an enemy — a
+// non-Harmful single-target skill only wastes the turn or helps the foe. defaultPolicy routes every
+// non-Harmful single-target pick to a friendly unit.
+test("defaultPolicy: the Hector bot injects its Serum into an ally, never an enemy", () => {
+  const state = buildMatch({ A: ["hector", "pyrrha", "gaia"], B: ["gommar", "keeper", "blackknight"], seed: 3 });
+  startRound(state); // Hector's round-start passive summons Dennis
+  state.teams.A.energy = { generic: 40, poison: 40 }; // fund so a Serum is usable
+  const actions = defaultPolicy(state, "A");
+  const hectorAction = actions.find((a) => a.unit === "a1"); // Hector is the first A pick
+  assert.ok(hectorAction, "Hector takes an action");
+  const target = hectorAction!.targets?.[0];
+  assert.ok(target, "Hector's chosen Serum is single-target");
+  assert.equal(state.units[target!]!.team, "A", "the Serum is injected into a friendly unit, not an enemy");
+});
+
 test("playMatch drives a drafted 3v3 to a best-of-N winner, fully deterministically", () => {
   const run = () => {
     const state = buildMatch({ A: ["blackknight", "gommar", "saya"], B: ["pyrrha", "gaia", "keeper"], seed: 42 });

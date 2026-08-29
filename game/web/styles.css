@@ -407,6 +407,9 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .do-sec.fusion .do-card:hover { border-color: var(--acc); background: color-mix(in srgb, var(--acc) 13%, var(--bg2)); }
 .do-sec.augment .do-card:hover { border-color: var(--mid); background: color-mix(in srgb, var(--mid) 13%, var(--bg2)); }
 .do-port { width: 46px; height: 60px; flex: 0 0 46px; border-radius: var(--radius); object-fit: cover; object-position: top center; background: var(--panel); }
+/* An augment card's source-skill icon (hover/tap → the modified skill's effect tooltip). Smaller than a
+   char-select cs-sicon (66px), and it must not shrink under the card's flex row. */
+.aug-sicon { width: 42px; height: 42px; flex: 0 0 42px; }
 .do-txt { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .do-name { font-weight: 800; font-size: 13px; color: var(--ink); }
 .do-sub { font-size: 11.5px; color: var(--acc); font-weight: 600; }

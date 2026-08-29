@@ -82,6 +82,9 @@ function fuse(element: string, opts: { allies?: Unit[]; enemies?: Unit[] } = {})
 const sk = (u: Unit, id: string) => u.skills!.find((s) => s.id === id)!;
 const minions = (st: MatchState, team: string, name?: string): Unit[] =>
   Object.values(st.units).filter((u) => u.kind === "minion" && u.team === team && u.alive && (name === undefined || u.name === name));
+// Fused Gaia now starts each round with her two base Seedlings (Yggdrasil's Bounty persists through fusion —
+// only Shroomtender replaces them). Tests that need an exact/zero Seedling count clear the auto-summoned pair.
+const clearSeedlings = (st: MatchState) => { for (const s of minions(st, "A", "Seedling")) { s.alive = false; s.hp = 0; } };
 const stackMag = (u: Unit, name: string): number => u.statuses.find((s) => s.kind === "stack" && s.name === name)?.magnitude ?? 0;
 const dotOf = (u: Unit, name: string): Status | undefined => u.statuses.find((s) => s.kind === "dot" && s.name === name);
 const regenOf = (u: Unit, name: string): Status | undefined => u.statuses.find((s) => s.kind === "regen" && s.name === name);
@@ -166,24 +169,39 @@ test("Decompose: health loss is NOT damage — ignores Shield AND full damage-ig
 
 test("Rotten Vitality: a dead Seedling returns to the battlefield 1 Gaia-turn later", () => {
   const { g, st } = fuse("grave");
-  performAction(st, { unit: GAIA, skillId: "gaia1", targets: [] }); // Sprout one Seedling
-  const seed = minions(st, "A", "Seedling")[0]!;
+  const seeds = minions(st, "A", "Seedling");
+  assert.equal(seeds.length, 2, "fused Gaia starts with her two base Seedlings");
+  const seed = seeds[0]!;
   seed.hp = 0; seed.alive = false;
   emit(st, { type: "unitDied", unit: seed.id, killer: "e" });
-  assert.equal(minions(st, "A", "Seedling").length, 0, "control: no Seedling on the field the instant it dies");
+  assert.equal(minions(st, "A", "Seedling").length, 1, "the dead Seedling leaves the field; the other remains");
   oneATick(st); // one Gaia turn-end later
-  assert.equal(minions(st, "A", "Seedling").length, 1, "a fresh Seedling returns exactly one Gaia-turn after death");
+  assert.equal(minions(st, "A", "Seedling").length, 2, "a fresh Seedling returns exactly one Gaia-turn after death");
 });
 
 test("grave Rotten Vitality: only a dead Seedling returns — a dead Worldsprout does not", () => {
   const { g, st } = fuse("grave");
+  const before = minions(st, "A", "Seedling").length; // Gaia's two base Seedlings
   const ws = mkMinion("ws", "Worldsprout", "A");
   st.units["ws"] = ws; st.teams.A.units.push("ws");
   ws.hp = 0; ws.alive = false;
   emit(st, { type: "unitDied", unit: "ws", killer: "e" });
   oneATick(st);
   // Frozen: only SEEDLING minions return. A Worldsprout dying must not spawn a Seedling.
-  assert.equal(minions(st, "A", "Seedling").length, 0, "a non-Seedling death must not return a Seedling");
+  assert.equal(minions(st, "A", "Seedling").length, before, "a non-Seedling death must not return a Seedling");
+});
+
+// Fusion re-elements Gaia and swaps in a new passive, but her base "Yggdrasil's Bounty" (start each round with
+// two Seedlings) persists for every form EXCEPT Shroomtender, which explicitly replaces them ("Instead of
+// Seedling minions..."). Regression: applyFusion defaults to REPLACING the base passive, which dropped them.
+test("fusing Gaia keeps her two starting Seedlings for every form except Shroomtender", () => {
+  for (const key of ["grave", "life", "magnet", "moon", "myth", "nomad", "sanctuary", "slime", "sun"]) {
+    const { st } = fuse(key);
+    assert.equal(minions(st, "A", "Seedling").length, 2, `${key}-fused Gaia still starts with her two Seedlings`);
+  }
+  const { st } = fuse("spore"); // Shroomtender
+  assert.equal(minions(st, "A", "Seedling").length, 0, "Shroomtender replaces the Seedlings ('Instead of Seedling minions')");
+  assert.equal(minions(st, "A", "Mushroom").length, 1, "Shroomtender begins play with one Mushroom instead");
 });
 
 // =============================================================================================== //
@@ -371,6 +389,7 @@ test("Branch of the World Tree: Channel Vitality now costs 1 generic, heals all 
 
 test("Yggdrasil: summons a World Tree minion (base cost 4 myth)", () => {
   const { g, st } = fuse("myth");
+  clearSeedlings(st); // isolate the 0-Seedling base cost from Gaia's two starting Seedlings
   assert.deepEqual(sk(g, "gaiamyth1").cost, { generic: 0, specific: 4 }, "base cost is 4 specific");
   const my0 = st.teams.A.energy.myth!;
   const r = performAction(st, { unit: GAIA, skillId: "gaiamyth1", targets: [] });
@@ -383,8 +402,7 @@ test("Yggdrasil: summons a World Tree minion (base cost 4 myth)", () => {
 
 test("Yggdrasil costs [39] less per Seedling — 2 Seedlings drop its cost to 2 myth", () => {
   const { g, st } = fuse("myth");
-  performAction(st, { unit: GAIA, skillId: "gaia1", targets: [] });
-  performAction(st, { unit: GAIA, skillId: "gaia1", targets: [] });
+  // Gaia's two base Seedlings are exactly the 2 this test needs — no manual sprouting required.
   assert.equal(minions(st, "A", "Seedling").length, 2, "Gaia controls 2 Seedlings");
   const my0 = st.teams.A.energy.myth!;
   performAction(st, { unit: GAIA, skillId: "gaiamyth1", targets: [] });
@@ -631,6 +649,7 @@ test("Nurturing Light: at the end of Gaia's turn, active Seedlings gain 10 max H
 test("Sunbeam: 15 + 10 per 20 HP among Seedlings, then resets their max HP to default", () => {
   const { g, st, enemies } = fuse("sun");
   const e = enemies[0]!;
+  clearSeedlings(st); // isolate the scaling to a single sprouted Seedling, not Gaia's two starting ones
   performAction(st, { unit: GAIA, skillId: "gaia1", targets: [] });
   const seed = minions(st, "A", "Seedling")[0]!;
   endTurn(st); // Nurturing Light: maxHp 25 -> 35, hp 35
@@ -647,6 +666,7 @@ test("Sunbeam: 15 + 10 per 20 HP among Seedlings, then resets their max HP to de
 test("Sunbeam: with no Seedlings it deals only its 15 base", () => {
   const { g, st, enemies } = fuse("sun");
   const e = enemies[0]!;
+  clearSeedlings(st); // remove Gaia's two starting Seedlings to test the no-Seedling floor
   assert.equal(minions(st, "A", "Seedling").length, 0, "control: no Seedlings");
   const hp0 = e.hp;
   performAction(st, { unit: GAIA, skillId: "gaiasun1", targets: ["e"] });

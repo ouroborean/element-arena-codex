@@ -149,9 +149,10 @@ function living(state: MatchState, side: TeamId): Unit[] {
 
 /**
  * A simple deterministic bot: each living unit (heroes AND acting minions like Rangers/Eagles)
- * takes its first usable skill, preferring an offensive one, aimed at the first living enemy
- * (Helpful skills fall to the lowest-HP ally). Good enough to drive a match to completion for
- * tests/replays; not a strong AI.
+ * takes its first usable skill, preferring an offensive one. Only a HARMFUL single-target skill is
+ * aimed at an enemy; every other single-target skill (Helpful OR a neither-tagged utility like
+ * Hector's Serums) aims at the lowest-HP ally — a non-Harmful skill on an enemy only wastes the turn
+ * or helps them. Good enough to drive a match to completion for tests/replays; not a strong AI.
  */
 export function defaultPolicy(state: MatchState, side: TeamId): Action[] {
   const enemies = living(state, side === "A" ? "B" : "A");
@@ -163,14 +164,16 @@ export function defaultPolicy(state: MatchState, side: TeamId): Action[] {
     const pick = usable.find((s) => s.tags.includes("Harmful")) ?? usable[0]!;
     let targets: string[] | undefined;
     if (pick.targeting === "single") {
-      if (pick.tags.includes("Helpful")) {
-        const allies = living(state, side).filter((u) => u.id !== actor.id);
-        const ally = allies.slice().sort((a, b) => a.hp - b.hp)[0] ?? actor;
-        targets = [ally.id];
-      } else {
+      if (pick.tags.includes("Harmful")) {
         const enemy = enemies[0];
         if (!enemy) continue; // nothing to hit
         targets = [enemy.id];
+      } else {
+        // Helpful OR a neither-tagged Strategic/utility skill (Hector's Serums "inject Dennis", not the enemy):
+        // aim at a friendly unit, never an enemy.
+        const allies = living(state, side).filter((u) => u.id !== actor.id);
+        const ally = allies.slice().sort((a, b) => a.hp - b.hp)[0] ?? actor;
+        targets = [ally.id];
       }
     }
     actions.push({ unit: actor.id, skillId: pick.id, targets });

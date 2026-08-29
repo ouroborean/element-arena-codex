@@ -222,6 +222,20 @@ test("laria2: the channel persists and re-applies on Laria's next turn (Lasts up
   assert.equal(a0.hp, 50, "tick 2: another +5 HP");
 });
 
+// Frozen "Lasts up to 4 turns" = exactly 4 applications. The engine runs a channel's effects on cast PLUS
+// channelTurns re-runs, so channelTurns must be 3 (cast + 3 = 4). A regression to 4 would apply a 5th stack.
+test("laria2: a full channel applies EXACTLY 4 Deepening Shadows to an ally (cast + 3 re-runs), never a 5th", () => {
+  const laria = loadHero(heroById("laria"), "A", "la");
+  const a0 = makeUnit({ id: "a0", team: "A", hp: 40, maxHp: 100 });
+  const enemy = makeUnit({ id: "e1", team: "B", hp: 100 });
+  const state = makeState([laria, a0], [enemy]);
+  fund(state);
+
+  performAction(state, { unit: "la", skillId: "laria2", targets: [] }); // application 1 (cast)
+  for (let i = 0; i < 4; i++) { state.activeTeam = "A"; startTurn(state); } // drive 4 more Laria turns
+  assert.equal(dsCount(a0), 4, "cast + 3 channel re-runs = 4 stacks; the 4th extra turn adds nothing (channel exhausted)");
+});
+
 // ===========================================================================
 // laria3 — Suffocating Night (Channel)
 // ===========================================================================

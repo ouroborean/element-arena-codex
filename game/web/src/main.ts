@@ -268,7 +268,21 @@ function hideSkpop(): void { skpop.hidden = true; }
 // In PvP the server already redacted `state`, so this is idempotent; in local vs-bot play (where `state` is
 // the full authoritative board the engine loop runs on) this is what actually hides the bot's Invisible
 // effects from the human. We redact only the render copy — the live `state` the loop mutates stays whole.
-function render(): void { hideFx(); closeTransientGloss(); app.innerHTML = renderApp(redactState(state, ui.you), ui, playerPanel()); tutorialAfterRender(); }
+function render(): void {
+  hideFx();
+  closeTransientGloss();
+  // Preserve the between-round draft panel's scroll across the wholesale innerHTML replace. Without this,
+  // clicking an augment (which re-renders) snaps the pane back to the top; for a non-fused hero the augment
+  // cards sit below tall fusion cards, so the just-picked augment scrolls out of view and a second click
+  // (to find it again) toggles the pick back off — reading as "can't select an augment". (view.ts:draftOptions)
+  const draftScroll = app.querySelector<HTMLElement>(".draft-options")?.scrollTop;
+  app.innerHTML = renderApp(redactState(state, ui.you), ui, playerPanel());
+  if (draftScroll != null) {
+    const el = app.querySelector<HTMLElement>(".draft-options");
+    if (el) el.scrollTop = draftScroll;
+  }
+  tutorialAfterRender();
+}
 /** The team-select screen (its player panel reads the profile) plus the avatar picker when open. */
 function renderSetupScreen(): void { closeTransientGloss(); app.innerHTML = renderSetup(setup!, playerPanel()) + avatarPickerHtml() + (claimForm ? renderClaim(claimForm) : ""); fitCharSelect(); }
 // Remember the team just taken into a match so returning to team select (after the match's page reload)

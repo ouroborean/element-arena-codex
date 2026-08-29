@@ -291,17 +291,17 @@
  },
  "Dive Ripple": {
   "confidence": "high",
-  "description": "Next turn, Ripple lasts two turns, Undertow targets all enemies, and River Clone costs 1 {generic}.",
+  "description": "Ripple lasts two turns.",
   "hide": false
  },
  "Dive River Clone": {
   "confidence": "high",
-  "description": "Next turn, River Clone costs 1 {generic}.",
+  "description": "River Clone costs 1 {generic}.",
   "hide": false
  },
  "Dive Undertow": {
   "confidence": "medium",
-  "description": "Next turn, Ripple lasts two turns, Undertow hits all enemies, and River Clone costs 1 {generic}.",
+  "description": "Undertow targets all enemies.",
   "hide": false
  },
  "Divine Ire": {

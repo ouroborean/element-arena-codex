@@ -8122,15 +8122,43 @@ export const ROSTER: HeroDef[] = [
       "id": "titania1"
      },
      {
-      "op": "applyStatus",
-      "to": "target",
-      "status": {
-       "kind": "dot",
-       "name": "Thorn Prick",
-       "magnitude": 5,
-       "dtype": "affliction",
-       "duration": null
-      }
+      "op": "addStack",
+      "name": "Thorn Prick",
+      "amount": 1,
+      "duration": null,
+      "to": "target"
+     },
+     {
+      "op": "if",
+      "cond": {
+       "not": {
+        "has": "dot",
+        "name": "Thorn Prick",
+        "of": "target"
+       }
+      },
+      "then": [
+       {
+        "op": "applyStatus",
+        "to": "target",
+        "status": {
+         "kind": "dot",
+         "name": "Thorn Prick",
+         "magnitude": 5,
+         "dtype": "affliction",
+         "duration": null
+        }
+       }
+      ],
+      "else": [
+       {
+        "op": "modifyStatus",
+        "kind": "dot",
+        "name": "Thorn Prick",
+        "magnitudeDelta": 5,
+        "from": "target"
+       }
+      ]
      }
     ],
     "currentCd": 0
@@ -9900,7 +9928,7 @@ export const ROSTER: HeroDef[] = [
         "status": {
          "kind": "mark",
          "name": "Stalwart Shield",
-         "duration": null,
+         "duration": 1,
          "invisible": true
         }
        }
@@ -10022,6 +10050,10 @@ export const ROSTER: HeroDef[] = [
       },
       {
        "eventHasTag": "Harmful"
+      },
+      {
+       "isFaction": "eventSource",
+       "faction": "enemy"
       },
       {
        "not": {
@@ -11056,7 +11088,7 @@ export const ROSTER: HeroDef[] = [
      "specific": 1
     },
     "cooldown": 2,
-    "channelTurns": 4,
+    "channelTurns": 3,
     "effects": [
      {
       "op": "forEach",
@@ -11118,7 +11150,7 @@ export const ROSTER: HeroDef[] = [
      "specific": 1
     },
     "cooldown": 2,
-    "channelTurns": 4,
+    "channelTurns": 3,
     "effects": [
      {
       "op": "forEach",

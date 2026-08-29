@@ -3347,6 +3347,17 @@ export const FUSIONS: FusionForm[] = [
   },
   "passiveTriggers": [
    {
+    "on": "roundStart",
+    "source": "Yggdrasil's Bounty",
+    "effect": [
+     {
+      "op": "summon",
+      "template": "Seedling",
+      "count": 2
+     }
+    ]
+   },
+   {
     "on": "unitDied",
     "source": "Rotten Vitality",
     "when": {
@@ -3414,6 +3425,17 @@ export const FUSIONS: FusionForm[] = [
    "description": "Enemies damaged by Worldfist take 10 damage on the following turn. This effect lasts one additional turn with each time Channel Earth has been used."
   },
   "passiveTriggers": [
+   {
+    "on": "roundStart",
+    "source": "Yggdrasil's Bounty",
+    "effect": [
+     {
+      "op": "summon",
+      "template": "Seedling",
+      "count": 2
+     }
+    ]
+   },
    {
     "on": "damageDealt",
     "source": "Roiling Life",
@@ -3513,6 +3535,17 @@ export const FUSIONS: FusionForm[] = [
   },
   "passiveTriggers": [
    {
+    "on": "roundStart",
+    "source": "Yggdrasil's Bounty",
+    "effect": [
+     {
+      "op": "summon",
+      "template": "Seedling",
+      "count": 2
+     }
+    ]
+   },
+   {
     "on": "shieldDamaged",
     "source": "Magnetic Shielding",
     "when": {
@@ -3579,6 +3612,17 @@ export const FUSIONS: FusionForm[] = [
    "description": "Whenever Gaia receives new damage, the cost of Gaia's Fury is reduced by [65], stacking. At 3 stacks, Gaia's Fury is automatically cast. During this time, Moonspike may not be used, and the Gaia's Fury minion deals and receives 10 additional damage."
   },
   "passiveTriggers": [
+   {
+    "on": "roundStart",
+    "source": "Yggdrasil's Bounty",
+    "effect": [
+     {
+      "op": "summon",
+      "template": "Seedling",
+      "count": 2
+     }
+    ]
+   },
    {
     "on": "damageDealt",
     "source": "Rising Indignation",
@@ -3695,6 +3739,17 @@ export const FUSIONS: FusionForm[] = [
   "passiveTriggers": [
    {
     "on": "roundStart",
+    "source": "Yggdrasil's Bounty",
+    "effect": [
+     {
+      "op": "summon",
+      "template": "Seedling",
+      "count": 2
+     }
+    ]
+   },
+   {
+    "on": "roundStart",
     "source": "Branch of the World Tree",
     "effect": [
      {
@@ -3756,6 +3811,17 @@ export const FUSIONS: FusionForm[] = [
    "description": "At the end of each turn, if Gaia or her allied Heroes did not have Elemental Essence, they gain Elemental Essence and heal 10 HP."
   },
   "passiveTriggers": [
+   {
+    "on": "roundStart",
+    "source": "Yggdrasil's Bounty",
+    "effect": [
+     {
+      "op": "summon",
+      "template": "Seedling",
+      "count": 2
+     }
+    ]
+   },
    {
     "on": "turnEnd",
     "source": "Oasis",
@@ -3839,6 +3905,17 @@ export const FUSIONS: FusionForm[] = [
    "description": "Until they use a Harmful skill, the allied Heroes heal for 5 health per turn. If an ally under this effect is damaged, the attacker is marked by Sacred Grove."
   },
   "passiveTriggers": [
+   {
+    "on": "roundStart",
+    "source": "Yggdrasil's Bounty",
+    "effect": [
+     {
+      "op": "summon",
+      "template": "Seedling",
+      "count": 2
+     }
+    ]
+   },
    {
     "on": "roundStart",
     "source": "Sacred Grove",
@@ -3969,6 +4046,17 @@ export const FUSIONS: FusionForm[] = [
    "description": "Whenever Gaia gains a stack of Channel Earth, she heals all allied minions 5 HP. If they are at max HP, they gain 5 max HP."
   },
   "passiveTriggers": [
+   {
+    "on": "roundStart",
+    "source": "Yggdrasil's Bounty",
+    "effect": [
+     {
+      "op": "summon",
+      "template": "Seedling",
+      "count": 2
+     }
+    ]
+   },
    {
     "on": "statusApplied",
     "source": "Nutrient Sludge",
@@ -4150,6 +4238,17 @@ export const FUSIONS: FusionForm[] = [
    "description": "At the end of her turn, all active Seedling minions gain 10 max HP."
   },
   "passiveTriggers": [
+   {
+    "on": "roundStart",
+    "source": "Yggdrasil's Bounty",
+    "effect": [
+     {
+      "op": "summon",
+      "template": "Seedling",
+      "count": 2
+     }
+    ]
+   },
    {
     "on": "turnEnd",
     "source": "Nurturing Light",
