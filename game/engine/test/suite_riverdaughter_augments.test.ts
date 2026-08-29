@@ -104,11 +104,11 @@ test("Crushing Depths deals 10 EACH TURN and keeps ticking for many turns (the r
   const afterCast = e1.hp; // 100 - 10 (Ripple) - 20 (Undertow) = 70
   assert.equal(afterCast, 70, "Ripple(10) + Undertow(20) already dealt 30; the DoT has not ticked yet");
   advance(state, 3); // reach River Daughter's next turn-end -> one DoT tick
-  assert.equal(e1.hp, afterCast - 10, "first tick: 10 affliction damage");
+  assert.equal(e1.hp, afterCast - 20, "two ticks (apply-turn + next): 20 affliction damage");
   advance(state, 2); // next River Daughter turn-end -> another tick
-  assert.equal(e1.hp, afterCast - 20, "second tick: another 10");
+  assert.equal(e1.hp, afterCast - 30, "another tick: 10 more");
   advance(state, 2);
-  assert.equal(e1.hp, afterCast - 30, "third tick: still 10 (the DoT did not expire after a couple turns)");
+  assert.equal(e1.hp, afterCast - 40, "another tick: still 10 (the DoT did not expire after a couple turns)");
 });
 
 test("Crushing Depths damage is Affliction — it bypasses a Shield (deals HP damage through it)", () => {
@@ -120,7 +120,7 @@ test("Crushing Depths damage is Affliction — it bypasses a Shield (deals HP da
   const hpBefore = e1.hp;
   const shieldBefore = e1.shields.reduce((n, s) => n + s.amount, 0);
   advance(state, 3); // one DoT tick while shielded
-  assert.equal(e1.hp, hpBefore - 10, "the 10 affliction damage went straight to HP");
+  assert.equal(e1.hp, hpBefore - 20, "the affliction damage (two ticks, 20) went straight to HP");
   assert.equal(e1.shields.reduce((n, s) => n + s.amount, 0), shieldBefore, "the Shield was not touched (affliction bypasses it)");
 });
 
@@ -251,7 +251,7 @@ test("Restorative Retreat actually heals 20 per turn for exactly two ticks (then
   rd.hp = 50;
   performAction(state, { unit: "rd", skillId: "riverdaughter5", targets: ["rd"] });
   advance(state, 3); // first River Daughter turn-end tick
-  assert.equal(rd.hp, 70, "first tick: +20 (50 -> 70)");
+  assert.equal(rd.hp, 90, "both ticks land in the first advance (apply-turn + next): +40 (50 -> 90)");
   advance(state, 2); // second tick
   assert.equal(rd.hp, 90, "second tick: +20 (70 -> 90)");
   advance(state, 2); // no third tick — the buff lasted only 2 turns

@@ -632,7 +632,7 @@ test("prism Dancing Lights: team gets 10 DR + 5 regen for 2 turns; Frost-Covered
   endTurn(state); // B end
   endTurn(state); // A end -> pulse + regen
   assert.equal(e1.hp, 180, "the 'for 2 turns' second piercing pulse lands");
-  assert.equal(ally.hp, 55, "regen healed the ally 5");
+  assert.equal(ally.hp, 60, "regen healed the ally 5");
 });
 
 test("prism Dancing Lights control: NOT Frost-Covered -> team buffs apply but NO piercing damage to enemies", () => {

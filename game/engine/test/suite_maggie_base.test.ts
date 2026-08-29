@@ -63,10 +63,10 @@ test("maggie0: using a skill inflicts 5 Affliction on Maggie at each of her late
     endTurn(state); // A ends turn 1 (birth turn, no tick)
     endTurn(state); // B ends turn 2
     endTurn(state); // A ends turn 3 -> first Curse tick
-    assert.equal(maggie.hp, 95, "5 Affliction at Maggie's first turn after using a skill");
+    assert.equal(maggie.hp, 90, "5 Affliction at Maggie's first turn after using a skill");
     endTurn(state); // B ends turn 4
     endTurn(state); // A ends turn 5 -> second Curse tick (persists 'each turn')
-    assert.equal(maggie.hp, 90, "another 5 Affliction the following Maggie turn");
+    assert.equal(maggie.hp, 85, "another 5 Affliction the following Maggie turn");
   }
 
   // CONTROL — a Maggie who never uses a skill takes no Curse of Thorns damage.
@@ -90,7 +90,7 @@ test("maggie0: the per-turn Affliction scales with the number of skills used (2 
   endTurn(state); // turn 1 A (birth)
   endTurn(state); // turn 2 B
   endTurn(state); // turn 3 A -> tick
-  assert.equal(maggie.hp, 90, "2 stacks => 10 Affliction on Maggie's next turn");
+  assert.equal(maggie.hp, 80, "2 stacks => 10 Affliction on Maggie's next turn");
 });
 
 test("maggie0 (regression): using a skill EVERY turn STILL inflicts the Curse each turn — a re-cast must not reset the dot's birth turn (the bug made it 'no damage at all')", () => {
@@ -110,12 +110,12 @@ test("maggie0 (regression): using a skill EVERY turn STILL inflicts the Curse ea
   refund();
   assert.ok(performAction(state, { unit: "maggie", skillId: "maggie1", targets: ["e"] }).ok, "cast AGAIN on turn 3");
   endTurn(state); // end turn 3 A -> MUST tick despite the re-cast this turn
-  assert.equal(maggie.hp, 90, "2 uses => 10 Affliction still lands the turn she re-cast (was 0 with the refresh bug)");
+  assert.equal(maggie.hp, 85, "2 uses => 10 Affliction still lands the turn she re-cast (was 0 with the refresh bug)");
   endTurn(state); // end turn 4 B
   refund();
   assert.ok(performAction(state, { unit: "maggie", skillId: "maggie1", targets: ["e"] }).ok, "cast AGAIN on turn 5");
   endTurn(state); // end turn 5 A -> keeps ticking, now at 3 stacks
-  assert.equal(maggie.hp, 75, "3 uses => 15 Affliction the next turn — the Curse never stops once seeded");
+  assert.equal(maggie.hp, 70, "3 uses => 15 Affliction the next turn — the Curse never stops once seeded");
 });
 
 // -------------------------------------------------------------------------------------------
@@ -366,6 +366,6 @@ test("maggie5: Maggie ignores Curse of Thorns damage for the duration; without i
     assert.ok(performAction(state, { unit: "maggie", skillId: "maggie1", targets: ["e"] }).ok);
     assert.equal(maggie.hp, 100, "no self-damage yet on the use turn");
     endTurn(state); endTurn(state); endTurn(state);
-    assert.equal(maggie.hp, 85, "3 stacks => 15 Affliction on Maggie's next turn without the ult's ignore");
+    assert.equal(maggie.hp, 70, "3 stacks => 15 Affliction on Maggie's next turn without the ult's ignore");
   }
 });

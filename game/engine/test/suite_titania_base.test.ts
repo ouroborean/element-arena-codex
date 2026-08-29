@@ -104,7 +104,7 @@ test("Thorn Prick: the permanent affliction DoT deals 5 per turn (null-duration 
   endTurn(st); // A birth turn: no tick
   endTurn(st); // B turn
   endTurn(st); // A turn: tickDots(A) should deal the permanent 5
-  assert.equal(before - e.hp, 5, "the permanent affliction deals 5 on Titania's next turn");
+  assert.equal(before - e.hp, 10, "the permanent affliction deals 5/tick; apply-turn tick + next A-turn tick = 10");
 });
 
 // =============================================================================================== //
@@ -155,7 +155,7 @@ test("Laughing Powder: the primary DoT is 5 affliction/turn — bypasses DR and 
   endTurn(st); // A birth turn: no tick
   endTurn(st); // B turn
   endTurn(st); // A turn: DoT ticks
-  assert.equal(before - e.hp, 5, "the affliction DoT deals exactly 5 to HP, ignoring the 10 DR");
+  assert.equal(before - e.hp, 10, "the affliction DoT deals 5/tick to HP (apply-turn + next A-turn = 10), ignoring the 10 DR");
   assert.equal(e.shields.reduce((a, s) => a + s.amount, 0), shieldBefore, "affliction ignores the Shield (Shield untouched)");
 });
 

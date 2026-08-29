@@ -120,7 +120,13 @@ export function tickDurationsForTeam(state: MatchState, team: TeamId): ExpiredSt
     for (const s of unit.statuses) {
       const owner = state.units[s.appliedBy];
       const appliedByTeam = owner ? owner.team === team : false;
-      if (appliedByTeam && s.duration !== null && s.appliedTurn < state.turn) {
+      // A dot/regen ticks on its apply turn (tickDots counts it too), so its duration must decrement then as
+      // well — otherwise a duration-N ticking effect would land N+1 ticks. A firstTickNextTurn dot/regen skips
+      // the apply turn (and so does its duration). Every OTHER status keeps the birth-turn skip (a 1-turn
+      // mark/buff applied this turn must survive into the next turn, not expire now).
+      const countsApplyTurn = (s.kind === "dot" || s.kind === "regen") && !s.firstTickNextTurn;
+      const started = countsApplyTurn ? s.appliedTurn <= state.turn : s.appliedTurn < state.turn;
+      if (appliedByTeam && s.duration !== null && started) {
         const next = s.duration - 1;
         if (next <= 0) {
           expired.push({ unitId: unit.id, status: s });

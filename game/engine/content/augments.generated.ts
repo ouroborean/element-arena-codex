@@ -41,6 +41,7 @@ export const AUGMENTS: Augment[] = [
        "id": "fan.dot",
        "status": {
         "kind": "dot",
+        "firstTickNextTurn": true,
         "name": "Fan the Flames",
         "magnitude": 10,
         "dtype": "affliction",
@@ -70,6 +71,7 @@ export const AUGMENTS: Augment[] = [
        "fn": "healIfExpiredStatusNamed",
        "args": {
         "kind": "dot",
+        "firstTickNextTurn": true,
         "name": "Fan the Flames",
         "to": "self",
         "amount": 10
@@ -89,6 +91,7 @@ export const AUGMENTS: Augment[] = [
        "fn": "healIfExpiredStatusNamed",
        "args": {
         "kind": "dot",
+        "firstTickNextTurn": true,
         "name": "Fan the Flames",
         "to": "self",
         "amount": 10
@@ -126,6 +129,7 @@ export const AUGMENTS: Augment[] = [
        {
         "op": "removeStatus",
         "kind": "dot",
+        "firstTickNextTurn": true,
         "name": "Fan the Flames",
         "from": "target"
        }
@@ -7347,7 +7351,7 @@ export const AUGMENTS: Augment[] = [
   "owner": "sera",
   "patches": [
    {
-    "op": "appendEffect",
+    "op": "prependEffect",
     "skillId": "sera2",
     "effect": [
      {

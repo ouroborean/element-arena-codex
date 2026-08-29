@@ -357,12 +357,12 @@ test("Laser Edge: an Electroblade-marked enemy takes 5 Affliction each of Ando's
   assert.equal(e1.hp, 85, "the direct Electroblade hit for 15");
   assert.ok(e1.statuses.some((s) => s.kind === "dot" && s.name === "Laser Edge"), "marked enemy carries the Laser Edge dot");
 
-  // The dot ticks at Ando's (team A) turn-ends, skipping its birth turn. Cycle to Ando's next turn.
-  endTurn(state); // end A turn 1 (birth turn — no tick)
+  // The dot ticks at Ando's (team A) turn-ends, counting its birth turn. Cycle through Ando's turns.
+  endTurn(state); // end A turn 1 (birth turn — Laser Edge ticks 5)
   endTurn(state); // end B turn 2
-  assert.equal(e1.hp, 85, "no tick on the birth turn / opponent's turn");
+  assert.equal(e1.hp, 80, "Laser Edge ticked once on its birth turn's end; the opponent's turn does not tick");
   endTurn(state); // end A turn 3 (Ando's next turn) — Laser Edge deals 5 Affliction
-  assert.equal(e1.hp, 80, "marked enemy takes 5 Affliction on Ando's turn");
+  assert.equal(e1.hp, 75, "marked enemy takes another 5 Affliction on Ando's next turn (10 total)");
   assert.equal(e2.hp, 100, "an unmarked enemy takes no Laser Edge damage");
 });
 

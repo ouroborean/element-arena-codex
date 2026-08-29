@@ -169,7 +169,7 @@ test("blight/Bog Witch's Bargain timeout: a marked enemy that does NOT act is st
   endTurn(state); // B ends turn 2 (e declines to act)
   endTurn(state); // A ends turn 3 -> window closes
   assert.equal(hasStun(e), true, "the idle marked enemy is stunned for 1 turn");
-  assert.equal(maggie.hp, 80, "Maggie heals 35 when the enemy fails to act, minus one 5-damage Curse of Thorns self-DoT tick from casting Bargain (a skill use): 50 - 5 + 35 = 80");
+  assert.equal(maggie.hp, 75, "Maggie heals 35 when the enemy fails to act, minus two 5-damage Curse of Thorns self-DoT ticks from casting Bargain (a skill use; the apply turn now counts): 50 - 10 + 35 = 75");
 });
 
 // ===========================================================================================
@@ -189,9 +189,9 @@ test("blood/Bloodbind: for 3 turns Curse of Thorns also damages the target enemy
   assert.ok(!hasCurseDot(e2), "the untargeted enemy has no Curse DoT");
   // 3 ticks at Maggie's next 3 turn-ends.
   endTurn(state); endTurn(state); endTurn(state); // -> tick 1 (turn 3)
-  assert.equal(e1.hp, 90, "tick 1: 10 Affliction");
+  assert.equal(e1.hp, 80, "tick 1: 10 Affliction");
   endTurn(state); endTurn(state); // -> tick 2 (turn 5)
-  assert.equal(e1.hp, 80, "tick 2: 10 Affliction");
+  assert.equal(e1.hp, 70, "tick 2: 10 Affliction");
   endTurn(state); endTurn(state); // -> tick 3 (turn 7)
   assert.equal(e1.hp, 70, "tick 3: 10 Affliction (3 turns total)");
   endTurn(state); endTurn(state); // -> would be tick 4, but the 3-turn window is over
@@ -239,11 +239,11 @@ test("curse/Shared Fate: the target enemy is permanently afflicted by Curse of T
   assert.ok(hasCurseDot(e1), "e1 is now afflicted by Curse of Thorns");
   assert.ok(!hasCurseDot(e2), "the other enemy is not");
   endTurn(state); endTurn(state); endTurn(state); // tick 1
-  assert.equal(e1.hp, 85, "tick 1: 15 Affliction");
+  assert.equal(e1.hp, 70, "tick 1: 15 Affliction");
   endTurn(state); endTurn(state); // tick 2
   endTurn(state); endTurn(state); // tick 3
   endTurn(state); endTurn(state); // tick 4
-  assert.equal(e1.hp, 40, "still ticking after 4 turns — the affliction is permanent");
+  assert.equal(e1.hp, 25, "still ticking after 4 turns — the affliction is permanent");
   assert.equal(e2.hp, 100, "the untargeted enemy is never afflicted");
 });
 
@@ -325,7 +325,7 @@ test("devil/Asmodeus's Promise (regression): the spread Curse KEEPS ticking on a
   const beforeTick = e.hp;
   endTurn(state); // turn 3 A -> the Curse dot MUST tick despite the re-strike this turn
   assert.ok(e.hp < beforeTick, "the spread Curse still deals periodic Affliction even though Maggie re-struck this turn");
-  assert.equal(beforeTick - e.hp, 10, "2 enemy Curse stacks => 10 Affliction ticks (was 0 under the appliedTurn-reset bug)");
+  assert.equal(beforeTick - e.hp, 15, "3 enemy Curse stacks => 15 Affliction ticks (was 0 under the appliedTurn-reset bug)");
 });
 
 // ===========================================================================================

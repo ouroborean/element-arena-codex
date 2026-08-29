@@ -40,6 +40,7 @@
         "id": "fan.dot",
         "status": {
          "kind": "dot",
+         "firstTickNextTurn": true,
          "name": "Fan the Flames",
          "magnitude": 10,
          "dtype": "affliction",
@@ -69,6 +70,7 @@
         "fn": "healIfExpiredStatusNamed",
         "args": {
          "kind": "dot",
+         "firstTickNextTurn": true,
          "name": "Fan the Flames",
          "to": "self",
          "amount": 10
@@ -88,6 +90,7 @@
         "fn": "healIfExpiredStatusNamed",
         "args": {
          "kind": "dot",
+         "firstTickNextTurn": true,
          "name": "Fan the Flames",
          "to": "self",
          "amount": 10
@@ -126,6 +129,7 @@
         {
          "op": "removeStatus",
          "kind": "dot",
+         "firstTickNextTurn": true,
          "name": "Fan the Flames",
          "from": "target"
         }
@@ -7473,10 +7477,10 @@
    "owner": "sera",
    "name": "Ire of the Storm",
    "description": "If Energized Wingstorm consumes 3 or more stacks of Eyes of Vengeance, it will deal an additional 15 Piercing damage to each target the following turn.",
-   "note": "Appends to Energized Wingstorm (sera2). Wingstorm consumes exactly 1 Eyes of Vengeance stack per marked enemy, so '3 or more stacks consumed' == '3 or more enemies were marked at cast', tested by counting enemies carrying the Eyes of Vengeance stack. modifyStatus does not delete a stack at magnitude 0, so this count is stable after the base skill's consume (a pre-existing magnitude-0 stack could overcount — noted). 'each target' = all enemies; 'the following turn' = schedule delayTurns 1.",
+   "note": "PREPENDS to Energized Wingstorm (sera2). Wingstorm consumes exactly 1 Eyes of Vengeance stack per marked enemy, so '3 or more stacks consumed' == '3 or more enemies marked AT CAST' — counted BEFORE the base skill consumes them (prepend), which is robust now that a fully-consumed stack is deleted (modifyStatus removes a stack at magnitude<=0). 'each target' = all enemies; 'the following turn' = schedule delayTurns 1.",
    "patches": [
     {
-     "op": "appendEffect",
+     "op": "prependEffect",
      "skillId": "sera2",
      "effect": [
       {

@@ -3443,6 +3443,7 @@ export const FUSIONS: FusionForm[] = [
       "to": "eventTarget",
       "status": {
        "kind": "dot",
+       "firstTickNextTurn": true,
        "name": "Roiling Life",
        "magnitude": 10,
        "dtype": "normal",
@@ -11034,6 +11035,7 @@ export const FUSIONS: FusionForm[] = [
     {
      "op": "removeStatus",
      "kind": "dot",
+     "firstTickNextTurn": true,
      "name": "Fan the Flames",
      "from": "target"
     },
@@ -11195,6 +11197,7 @@ export const FUSIONS: FusionForm[] = [
       "to": "eventSource",
       "status": {
        "kind": "dot",
+       "firstTickNextTurn": true,
        "name": "Fan the Flames",
        "magnitude": 5,
        "dtype": "affliction",
@@ -11417,6 +11420,7 @@ export const FUSIONS: FusionForm[] = [
          "to": "it",
          "status": {
           "kind": "dot",
+          "firstTickNextTurn": true,
           "name": "Fan the Flames",
           "magnitude": 5,
           "dtype": "affliction",
@@ -11438,6 +11442,7 @@ export const FUSIONS: FusionForm[] = [
        "to": "target",
        "status": {
         "kind": "dot",
+        "firstTickNextTurn": true,
         "name": "Fan the Flames",
         "magnitude": 5,
         "dtype": "affliction",
@@ -12127,6 +12132,7 @@ export const FUSIONS: FusionForm[] = [
      },
      "status": {
       "kind": "regen",
+      "firstTickNextTurn": true,
       "name": "Waters of Life",
       "magnitude": 10,
       "duration": 3
@@ -16493,6 +16499,7 @@ export const FUSIONS: FusionForm[] = [
      "to": "target",
      "status": {
       "kind": "dot",
+      "firstTickNextTurn": true,
       "name": "Trial by Fire",
       "magnitude": 15,
       "dtype": "normal",

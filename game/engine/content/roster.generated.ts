@@ -2589,6 +2589,7 @@ export const ROSTER: HeroDef[] = [
       "id": "fan.dot",
       "status": {
        "kind": "dot",
+       "firstTickNextTurn": true,
        "name": "Fan the Flames",
        "magnitude": 5,
        "dtype": "affliction",
@@ -2682,6 +2683,7 @@ export const ROSTER: HeroDef[] = [
         "to": "target",
         "status": {
          "kind": "dot",
+         "firstTickNextTurn": true,
          "name": "Fan the Flames",
          "magnitude": 5,
          "dtype": "affliction",
@@ -2707,6 +2709,7 @@ export const ROSTER: HeroDef[] = [
        {
         "op": "modifyStatus",
         "kind": "dot",
+        "firstTickNextTurn": true,
         "name": "Fan the Flames",
         "magnitudeDelta": 5,
         "from": "target"

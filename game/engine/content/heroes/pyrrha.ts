@@ -17,7 +17,7 @@ const fanTheFlames: Effect[] = [
     op: "applyStatus",
     to: "target",
     id: "fan.dot",
-    status: { kind: "dot", name: "Fan the Flames", magnitude: 5, dtype: "affliction", duration: 3 },
+    status: { kind: "dot", name: "Fan the Flames", magnitude: 5, dtype: "affliction", duration: 3, firstTickNextTurn: true },
   },
 ];
 
