@@ -9,6 +9,7 @@
 import type { MatchState, TeamId } from "../../engine/src/types.ts";
 import type { GameEvent } from "../../engine/src/events.ts";
 import { SKILL_TEXT } from "./skilltext.generated.ts";
+import { heroPortrait, minionPortrait, iconOf } from "./assets.ts";
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
 const shortName = (name: string) => name.split(",")[0]!.trim();
@@ -111,24 +112,30 @@ export async function playTurn(state: MatchState, side: TeamId, events: GameEven
         const tgtIds = seg.skill.targets.length ? seg.skill.targets : (seg.skill.affected ?? []).filter((id) => id !== seg.skill.caster);
         const tgtNames = [...new Set(tgtIds.map((id) => state.units[id]?.name).filter(Boolean).map((n) => shortName(n!)))];
         const foe = caster && caster.team !== you;
+        // Show it, don't read it: the acting character's portrait + the skill's icon (slightly smaller) beside it.
+        const portrait = caster ? (caster.heroId ? heroPortrait(caster.heroId, caster.fused) : minionPortrait(caster.name)) : null;
+        const skIcon = iconOf(seg.skill.skillId, caster?.heroId ?? undefined);
         remove = showPanel(
-          `<div class="ap-head ${foe ? "foe" : "you"}"><b>${esc(casterName)}</b> used <b class="ap-skill">${esc(t?.n ?? seg.skill.skillId)}</b></div>`
-          + (tgtNames.length ? `<div class="ap-tgt">on ${esc(tgtNames.join(", "))}</div>` : "")
-          + (t?.d ? `<div class="ap-desc">${esc(t.d)}</div>` : ""),
+          `<div class="ap-art">`
+          + (portrait ? `<img class="ap-portrait" src="${portrait}" onerror="this.style.visibility='hidden'" />` : "")
+          + (skIcon ? `<img class="ap-skill-ic" src="${skIcon}" onerror="this.style.visibility='hidden'" />` : "")
+          + `</div>`
+          + `<div class="ap-head ${foe ? "foe" : "you"}"><b>${esc(casterName)}</b> used <b class="ap-skill">${esc(t?.n ?? seg.skill.skillId)}</b></div>`
+          + (tgtNames.length ? `<div class="ap-tgt">on ${esc(tgtNames.join(", "))}</div>` : ""),
         );
       }
       flashUnit(seg.skill.caster, "af-buff");
-      await wait(seg.showPop ? 260 : 100);
+      await wait(seg.showPop ? 460 : 150);
       applyFx(seg.fx);
-      await wait(seg.showPop ? 680 : 380);
+      await wait(seg.showPop ? 1250 : 560);
       remove?.();
-      await wait(120);
+      await wait(180);
     }
     // End-of-turn ticks: quick, no panel.
     if (ticks.length) {
-      await wait(120);
+      await wait(180);
       applyFx(ticks);
-      await wait(560);
+      await wait(760);
     }
   } finally {
     document.removeEventListener("click", onClick, true);
