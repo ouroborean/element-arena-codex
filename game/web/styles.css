@@ -300,7 +300,7 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .sp-icon { width: 46px; height: 46px; flex: 0 0 46px; border-radius: var(--radius); object-fit: cover; background: var(--panel2); border: 1px solid var(--acc); }
 .sp-body { min-width: 0; flex: 1; }
 .sp-name { font-weight: 800; font-size: 14.5px; color: var(--you); }
-.sp-cost { display: inline-flex; align-items: center; gap: 3px; margin-left: 8px; vertical-align: middle; }
+.sp-cost { display: inline-flex; align-items: center; gap: 3px; margin: 0 8px; vertical-align: middle; } /* symmetric gap: name ↔ cost ↔ class tags */
 .sp-desc { color: var(--ink); font-size: 12px; line-height: 1.45; margin: 3px 0 5px; }
 .sp-foot { display: flex; gap: 10px; align-items: center; color: var(--dim); font-size: 11px; }
 .tile-abbr { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: var(--dim); text-transform: capitalize; }
