@@ -48,3 +48,21 @@ test("BUG 3a guard: a name carrying TWO concrete effects is left un-badged (avoi
   const state = makeState([u], [makeUnit({ id: "e", team: "B" })]);
   assert.doesNotMatch(effectIcons(state, u), /class="fx-n"/, "multi-concrete name is not badged");
 });
+
+test("a FUSED hero surfaces BOTH passives (native + fusion form) as hover-describable chips", () => {
+  // Fusion ADDS its passive; the native passive is not disabled. Gaia fused to grave (Rotten Vitality) must
+  // show her native "Yggdrasil's Bounty" chip AND the "Rotten Vitality" fusion-passive chip.
+  const u = makeUnit({ id: "g", team: "A", kind: "hero", heroId: "gaia", fused: "grave", statuses: [] });
+  const state = makeState([u], [makeUnit({ id: "e", team: "B" })]);
+  const html = effectIcons(state, u);
+  assert.match(html, /class="fx passive"[^>]*data-fxtitle="Yggdrasil/, "the native passive chip persists after fusing");
+  assert.match(html, /class="fx passive"[^>]*data-fxtitle="Rotten Vitality"/, "the fusion-form passive chip is also shown");
+});
+
+test("an UNFUSED hero shows only its native passive chip (control)", () => {
+  const u = makeUnit({ id: "g", team: "A", kind: "hero", heroId: "gaia", statuses: [] });
+  const state = makeState([u], [makeUnit({ id: "e", team: "B" })]);
+  const html = effectIcons(state, u);
+  assert.match(html, /data-fxtitle="Yggdrasil/, "native passive shown");
+  assert.doesNotMatch(html, /data-fxtitle="Rotten Vitality"/, "no fusion passive chip when unfused");
+});
