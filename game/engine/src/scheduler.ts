@@ -260,7 +260,7 @@ export function tickDots(state: MatchState, id: TeamId): void {
       // this DoT's damage type too — DoT ticks don't pass through the damage op, so apply it here.
       const dtype = (owner ? outgoingDtypeOverride(owner) : undefined) ?? s.dtype ?? "affliction";
       const r = applyDamage(u, { amount: s.magnitude ?? 0, type: dtype, sourceId: s.name });
-      emit(state, { type: "damageDealt", source: s.appliedBy, target: u.id, amount: r.hpLost, dtype, sourceId: s.name });
+      emit(state, { type: "damageDealt", source: s.appliedBy, target: u.id, amount: r.hpLost, dtype, sourceId: s.name, isTick: true });
       if (wasAlive && r.lethal) emit(state, { type: "unitDied", unit: u.id, killer: s.appliedBy });
     }
   }
@@ -300,7 +300,7 @@ function applyOneTick(state: MatchState, unitId: string, s: Status): void {
   const wasAlive = u.alive;
   const dtype = (owner ? outgoingDtypeOverride(owner) : undefined) ?? s.dtype ?? "affliction";
   const r = applyDamage(u, { amount: s.magnitude ?? 0, type: dtype, sourceId: s.name });
-  emit(state, { type: "damageDealt", source: s.appliedBy, target: u.id, amount: r.hpLost, dtype, sourceId: s.name });
+  emit(state, { type: "damageDealt", source: s.appliedBy, target: u.id, amount: r.hpLost, dtype, sourceId: s.name, isTick: true });
   if (wasAlive && r.lethal) emit(state, { type: "unitDied", unit: u.id, killer: s.appliedBy });
 }
 

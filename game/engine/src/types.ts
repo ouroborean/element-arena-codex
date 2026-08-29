@@ -8,7 +8,7 @@
  */
 
 import type { SkillInstance } from "./skill.ts";
-import type { TriggeredEffect } from "./events.ts";
+import type { TriggeredEffect, GameEvent } from "./events.ts";
 import type { Effect, NodeId } from "./effects/ast.ts";
 
 /** An augment patch whose target skill lives on this hero's minion TEMPLATES, not the hero itself
@@ -285,6 +285,9 @@ export interface MatchState {
    *  round to the opponent. Cleared by startRound so it never bleeds into the next round. */
   concededRound?: TeamId;
   log: string[];
+  /** When present, `emit` pushes every GameEvent here in order — an opt-in tap the client sets around a turn's
+   *  resolution to drive a step-by-step animation. Off (undefined) everywhere else, so it costs nothing. */
+  eventSink?: GameEvent[];
 }
 
 /** A deferred effect: fires after `turns` of the caster's turn-ends elapse. */
