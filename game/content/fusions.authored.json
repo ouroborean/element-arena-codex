@@ -12979,9 +12979,9 @@
        "status": {
         "kind": "mark",
         "name": "Dive",
-        "duration": null
+        "duration": 1
        },
-       "note": "River Daughter starts each round under Dive (a stance mark) WITHOUT invulnerability. duration null = lasts the round; Shallow Slash reactivates/refreshes it. roundStart fires for both teams; should apply only on River Daughter's side."
+       "note": "River Daughter starts each round under Dive (a stance mark) WITHOUT invulnerability. duration 1 mirrors base Dive's own marks (all duration 1) — the Dive stance is not permanent; Shallow Slash reactivates/refreshes it (also to duration 1). roundStart fires for both teams; should apply only on River Daughter's side."
       }
      ]
     },
@@ -13052,11 +13052,11 @@
         "status": {
          "kind": "mark",
          "name": "Dive",
-         "duration": null
+         "duration": 1
         }
        }
       ],
-      "note": "If used from Dive, reactivates (refreshes) the Dive stance."
+      "note": "If used from Dive, reactivates (refreshes) the Dive stance — re-applied at duration 1, consistent with base Dive's marks (not a permanent stance)."
      }
     ]
    }

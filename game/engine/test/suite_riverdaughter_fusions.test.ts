@@ -414,6 +414,14 @@ test("Mist/Shallows Dance: at round start she is under Dive but NOT invulnerable
   assert.equal(rd.statuses.some((s) => s.kind === "invulnerable"), false, "Dive no longer grants invulnerability");
 });
 
+// Base Dive's marks are all duration 1; the Shallows Dance stance must hold that consistent — it is a 1-turn
+// Dive, NOT a permanent round-long stance (regression: it was authored duration null). Shallow Slash refreshes it.
+test("Mist/Shallows Dance: the Dive stance lasts 1 turn (matches base Dive), not the whole round", () => {
+  const { state, rd } = setup("mist", { enemies: 1 });
+  emit(state, { type: "roundStart" });
+  assert.equal(markOf(rd, "Dive")?.duration, 1, "the Dive stance mark is duration 1, consistent with base Dive");
+});
+
 // "Instead, while Dive is active, River Daughter deals 10 piercing damage to any enemy that uses a harmful skill."
 test("Mist/Shallows Dance: while under Dive, an enemy's Harmful skill takes 10 piercing back; a non-harmful skill does not", () => {
   // Positive — enemy uses a Harmful skill.

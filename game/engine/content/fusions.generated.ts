@@ -12760,7 +12760,7 @@ export const FUSIONS: FusionForm[] = [
       "status": {
        "kind": "mark",
        "name": "Dive",
-       "duration": null
+       "duration": 1
       }
      }
     ]
@@ -12831,7 +12831,7 @@ export const FUSIONS: FusionForm[] = [
        "status": {
         "kind": "mark",
         "name": "Dive",
-        "duration": null
+        "duration": 1
        }
       }
      ]
