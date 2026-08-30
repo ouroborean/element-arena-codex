@@ -265,6 +265,27 @@ function showSkpop(el: HTMLElement): void {
 }
 function hideSkpop(): void { skpop.hidden = true; }
 
+// Scroll containers that must survive a wholesale innerHTML re-render — clicking a control should NEVER jump
+// the view (e.g. picking a hero in team-select must not snap the roster back to the top). All are singletons,
+// so a class selector reliably re-finds the same container after the re-render.
+const SCROLL_SELECTORS = [".cs", ".roster-grid", ".detail", ".av-grid", ".draft-options", ".ui-skills", ".ro-list", ".control .sp-desc"];
+/** Run a re-render (`mutate`) with every scroll position — the app's scroll containers and the window —
+ *  captured beforehand and restored after, so interacting with UI never moves the scroll. */
+function preserveScroll(mutate: () => void): void {
+  const saved: [string, number, number][] = [];
+  for (const sel of SCROLL_SELECTORS) {
+    const el = document.querySelector<HTMLElement>(sel);
+    if (el && (el.scrollTop || el.scrollLeft)) saved.push([sel, el.scrollTop, el.scrollLeft]);
+  }
+  const wx = window.scrollX, wy = window.scrollY;
+  mutate();
+  for (const [sel, top, left] of saved) {
+    const el = document.querySelector<HTMLElement>(sel);
+    if (el) { el.scrollTop = top; el.scrollLeft = left; }
+  }
+  if (wx || wy) window.scrollTo(wx, wy);
+}
+
 // Render the board from the LOCAL seat's perspective: an opponent's Invisible effects are stripped here.
 // In PvP the server already redacted `state`, so this is idempotent; in local vs-bot play (where `state` is
 // the full authoritative board the engine loop runs on) this is what actually hides the bot's Invisible
@@ -272,25 +293,19 @@ function hideSkpop(): void { skpop.hidden = true; }
 function render(): void {
   hideFx();
   closeTransientGloss();
-  // Preserve the between-round draft panel's scroll across the wholesale innerHTML replace. Without this,
-  // clicking an augment (which re-renders) snaps the pane back to the top; for a non-fused hero the augment
-  // cards sit below tall fusion cards, so the just-picked augment scrolls out of view and a second click
-  // (to find it again) toggles the pick back off — reading as "can't select an augment". (view.ts:draftOptions)
-  const draftScroll = app.querySelector<HTMLElement>(".draft-options")?.scrollTop;
-  app.innerHTML = renderApp(redactState(state, ui.you), ui, playerPanel());
-  if (draftScroll != null) {
-    const el = app.querySelector<HTMLElement>(".draft-options");
-    if (el) el.scrollTop = draftScroll;
-  }
+  // Wholesale innerHTML replace resets every scroll container (the between-round draft panel, the inspect
+  // skill list, …); preserveScroll keeps them put so clicking a control never snaps the view. (This is what
+  // kept a just-picked augment — which sits below tall fusion cards — from scrolling out of view.)
+  preserveScroll(() => { app.innerHTML = renderApp(redactState(state, ui.you), ui, playerPanel()); });
   tutorialAfterRender();
-  fitBattle(); // mobile-landscape: scale the fresh board to fit the screen
+  scheduleFit(); // mobile-landscape: scale the fresh board to fit the screen
 }
 // Paint the board from an ARBITRARY snapshot (redacted for the local seat), used by the turn animation to step
 // HP/effects one skill at a time. Lean by design: just the board — no fx-hide / gloss / draft-scroll / tutorial
 // housekeeping (that's render()'s job, called once the playback settles on the final board).
-function paintState(s: MatchState): void { app.innerHTML = renderApp(redactState(s, ui.you), ui, playerPanel()); fitBattle(); }
+function paintState(s: MatchState): void { app.innerHTML = renderApp(redactState(s, ui.you), ui, playerPanel()); scheduleFit(); }
 /** The team-select screen (its player panel reads the profile) plus the avatar picker when open. */
-function renderSetupScreen(): void { closeTransientGloss(); app.innerHTML = renderSetup(setup!, playerPanel()) + avatarPickerHtml() + (claimForm ? renderClaim(claimForm) : ""); fitCharSelect(); }
+function renderSetupScreen(): void { closeTransientGloss(); preserveScroll(() => { app.innerHTML = renderSetup(setup!, playerPanel()) + avatarPickerHtml() + (claimForm ? renderClaim(claimForm) : ""); }); fitCharSelect(); }
 // Remember the team just taken into a match so returning to team select (after the match's page reload)
 // can repopulate "Your Team" — requeuing with the same team then takes no re-picking.
 const LAST_TEAM_KEY = "arenaLastTeam";
@@ -334,28 +349,47 @@ function fitCharSelect(): void {
 }
 window.addEventListener("resize", () => { if (setup) fitCharSelect(); });
 
-/** Mobile-landscape: scale the whole battle board down so the entire scene fits the screen with no panning,
- *  leaving native pinch-zoom for detail. Only in landscape on a short/touch viewport (a desktop with room shows
- *  the board 1:1; portrait reflows to a column instead — see the media query in styles.css). Re-run after every
- *  board paint and on resize/orientation change. `zoom` (not transform) so the page's scroll box shrinks too. */
+/** Mobile-landscape: scale the whole battle board down so the ENTIRE scene fits the screen with no panning,
+ *  leaving native pinch-zoom for detail. Applies in landscape on a phone/tablet or a small window whenever the
+ *  board is bigger than the viewport — even if that means a very small display; if it already fits we leave it
+ *  1:1. Portrait reflows to a column instead (see the media query in styles.css). Re-run after every board paint
+ *  and on resize/orientation change. `zoom` (set INLINE, not via a CSS var — `zoom: var()` doesn't apply in
+ *  every engine) scales the layout box too, so the page never grows a scroll region behind the shrunk board. */
 function fitBattle(): void {
   const arena = app.querySelector<HTMLElement>(".arena");
   const landscape = window.matchMedia("(orientation: landscape)").matches;
-  const mobileish = window.innerHeight <= 600 || window.matchMedia("(pointer: coarse)").matches;
-  if (!arena || !(landscape && mobileish)) { // desktop / portrait / no board → leave the board at natural size
+  // Touch device, or any narrow window — the contexts where fitting the whole board beats panning it.
+  const mobileish = window.matchMedia("(pointer: coarse)").matches || window.innerWidth <= 1024;
+  if (!arena || !(landscape && mobileish)) { // roomy desktop / portrait / no board → leave the board at 1:1
     app.classList.remove("fit");
-    arena?.style.removeProperty("--fit");
+    arena?.style.removeProperty("zoom");
     return;
   }
-  app.classList.add("fit");
-  arena.style.setProperty("--fit", "1"); // measure the natural (unscaled) extent at the fit-mode layout
-  const nw = arena.scrollWidth, nh = arena.scrollHeight;
-  const M = 8; // a few px of breathing room so borders never clip against the edges
+  app.classList.add("fit"); // fit layout: the board sizes to its own content so `zoom` can shrink the whole of it
+  arena.style.zoom = "1"; // measure the natural (unscaled) extent
+  const nw = Math.max(arena.scrollWidth, arena.offsetWidth);
+  const nh = Math.max(arena.scrollHeight, arena.offsetHeight);
+  const M = 6; // a few px of breathing room so borders never clip against the edges
   const fit = Math.min((window.innerWidth - M) / nw, (window.innerHeight - M) / nh, 1);
-  arena.style.setProperty("--fit", String(fit));
+  if (fit >= 0.999) { // already fits at 1:1 → drop the fit layout entirely, no scaling
+    app.classList.remove("fit");
+    arena.style.removeProperty("zoom");
+  } else {
+    arena.style.zoom = String(fit); // e.g. 0.42 — the whole board, shrunk to the screen
+  }
 }
-window.addEventListener("resize", fitBattle);
-window.addEventListener("orientationchange", () => { fitBattle(); setTimeout(fitBattle, 200); });
+// Re-fit now, then once more next frame (so a late layout settle — fonts/portraits — can't leave the board
+// slightly too big and clip the bottom row). Cheap: the synchronous pass already fits before the first paint.
+let fitQueued = false;
+function scheduleFit(): void {
+  fitBattle();
+  if (fitQueued) return;
+  fitQueued = true;
+  requestAnimationFrame(() => { fitQueued = false; fitBattle(); });
+}
+window.addEventListener("resize", scheduleFit);
+window.addEventListener("load", () => scheduleFit());
+window.addEventListener("orientationchange", () => { scheduleFit(); setTimeout(fitBattle, 250); });
 // <img>s are natively draggable — a few px of mouse movement while clicking a button starts a native image
 // drag and swallows the click, making the icon/character buttons hard to press. Suppress it app-wide.
 window.addEventListener("dragstart", (e) => { if ((e.target as Element | null)?.tagName === "IMG") e.preventDefault(); });
