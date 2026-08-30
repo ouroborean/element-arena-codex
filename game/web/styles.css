@@ -74,11 +74,12 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
   .side.foe { flex-direction: row-reverse; justify-content: flex-start; }
   .unit { flex-wrap: wrap; } /* a kit that can't fit beside its portrait drops below it */
 }
-/* Mobile-landscape fit: main.ts adds #app.fit and sets --fit so the entire side-by-side board scales down to
-   the screen (no panning); native pinch-zoom stays available for zooming into detail. `zoom` scales the layout
-   box too, so the page never grows a scrollbar behind the shrunk board. */
+/* Mobile-landscape fit: main.ts adds #app.fit and sets the arena's `zoom` inline so the entire side-by-side
+   board scales down to the screen (no panning); native pinch-zoom stays available for zooming into detail.
+   `zoom` scales the layout box too, so the page never grows a scrollbar behind the shrunk board. width:max-content
+   lets the board size to its own content first, so `zoom` then shrinks the whole of it. */
 #app.fit { padding: 0; min-height: 0; max-width: none; }
-#app.fit .arena { width: max-content; margin: 0 auto; zoom: var(--fit, 1); }
+#app.fit .arena { width: max-content; margin: 0 auto; }
 
 .pcol { position: relative; display: flex; flex-direction: column; align-items: center; width: 146px; }
 .frame { position: relative; width: 100%; aspect-ratio: 3/4; border-radius: var(--radius); overflow: hidden; border: 2px solid color-mix(in srgb, var(--el, #556) 60%, #000); background: var(--bg); box-shadow: var(--shadow); }
