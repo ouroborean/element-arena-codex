@@ -198,6 +198,15 @@ const clearFxHide = () => { if (fxHideT) { clearTimeout(fxHideT); fxHideT = null
 const scheduleHideFx = () => { clearFxHide(); fxHideT = setTimeout(hideFx, 180); };
 fxpop.addEventListener("mouseenter", clearFxHide);
 fxpop.addEventListener("mouseleave", scheduleHideFx);
+// Touch vs. mouse. A tap fires a SYNTHETIC mouseover/mouseout as well as the click; the mouseover would open the
+// hover popup and the click's toggle would immediately shut it again — so on mobile an effect tooltip flashes and
+// never stays up. Track the last pointer type and skip the hover handlers for touch, letting the click handler
+// own tap-to-toggle. `fxShownFor` remembers which icon the popup is describing, so tapping a different one
+// SWITCHES to it rather than just closing.
+let touchInput = false;
+window.addEventListener("pointerdown", (e) => { touchInput = e.pointerType !== "mouse"; }, true);
+window.addEventListener("touchstart", () => { touchInput = true; }, { capture: true, passive: true }); // fires before any synthetic mouseover
+let fxShownFor: HTMLElement | null = null;
 // Render authored text into `el`, turning {generic}/{fire}/… name tokens AND [<id>] element-id energy
 // refs (e.g. [65] = generic) into inline energy icons; unknown ids stay as literal text.
 function renderTokens(el: HTMLElement, text: string): void {
@@ -219,11 +228,12 @@ function showFx(el: HTMLElement): void {
   const dur = el.dataset.fxdur;
   if (dur) { const d = document.createElement("div"); d.className = "fxdur"; d.textContent = `⏳ ${dur}`; fxpop.append(d); }
   fxpop.hidden = false;
+  fxShownFor = el;
   const r = el.getBoundingClientRect(), pw = fxpop.offsetWidth;
   fxpop.style.left = `${Math.max(6, Math.min(window.innerWidth - pw - 6, r.left + r.width / 2 - pw / 2))}px`;
   fxpop.style.top = `${r.bottom + 6}px`;
 }
-function hideFx(): void { fxpop.hidden = true; }
+function hideFx(): void { fxpop.hidden = true; fxShownFor = null; }
 
 // A floating skill-info popup for character select — pops off a skill icon on hover/tap (no layout shift).
 const skpop = document.createElement("div");
@@ -508,10 +518,11 @@ app.addEventListener("click", (e) => {
   const tgtEl = (e.target as HTMLElement).closest<HTMLElement>(".tgt");
   if (tgtEl) { const c = tgtEl.dataset.dequeue; if (c) { ui.planned.delete(c); ui.plannedSkill.delete(c); render(); } return; } // click a targeting icon → dequeue that skill
   const fxEl = (e.target as HTMLElement).closest<HTMLElement>(".fx");
-  if (fxEl) { if (fxpop.hidden) showFx(fxEl); else hideFx(); return; } // tap an effect icon to toggle its description
+  if (fxEl) { if (fxShownFor === fxEl) hideFx(); else showFx(fxEl); return; } // tap an effect icon → its description (tap again / another to switch or close)
   const skEl = (e.target as HTMLElement).closest<HTMLElement>(".cs-sicon");
   if (skEl) { showSkpop(skEl); return; } // tap a skill icon → pop off its info
   hideSkpop(); // any other click dismisses the skill popup
+  if (!fxpop.hidden) hideFx(); // …and the effect popup (so tapping empty space closes it on touch)
 
   // In-match: close the unit inspector, or click any portrait (outside targeting / no modal) to inspect its
   // kit in the upper area — works for the ENEMY team too, so you can check their current skills.
@@ -700,13 +711,16 @@ app.addEventListener("click", (e) => {
   }
 });
 
-// desktop hover: show the effect/targeting-skill description popup
+// desktop hover: show the effect/targeting-skill description popup. Skipped for touch (touchInput) — a tap's
+// synthetic mouseover/mouseout would flash the popup open then shut it; on touch the click handler drives it.
 app.addEventListener("mouseover", (e) => {
+  if (touchInput) return;
   const t = e.target as HTMLElement;
   const el = t.closest<HTMLElement>(".fx, .tgt"); if (el) showFx(el);
   const sk = t.closest<HTMLElement>(".cs-sicon"); if (sk) showSkpop(sk);
 });
 app.addEventListener("mouseout", (e) => {
+  if (touchInput) return;
   const t = e.target as HTMLElement;
   if (t.closest(".fx, .tgt")) scheduleHideFx(); // delayed so the cursor can travel into the (now interactive) popup
   if (t.closest(".cs-sicon")) scheduleHideSkpop();
