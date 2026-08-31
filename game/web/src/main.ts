@@ -11,6 +11,7 @@ import { canPay, effectiveCost, canUsePlanned, canPayAfter, reserveEnergy, pendi
 import { redactState } from "../../engine/src/visibility.ts";
 import { buildMatch, defaultPolicy, type Draft } from "../../engine/content/match.ts";
 import { ROSTER } from "../../engine/content/roster.generated.ts";
+import { asProgress, creditWin } from "../../engine/content/progression.ts";
 import { runMatch, type AsyncProvider } from "../../client/loop.ts";
 import { autoDraft, applyDraftChoices, hasDraftOptions, draftableHeroes, type DraftChoice } from "../../client/draft.ts";
 import { highlightFor, isSingleTargetPick } from "../../client/targeting.ts";
@@ -160,6 +161,16 @@ function hasStoredIdentity(): boolean {
 function syncProfile(patch: { name?: string; avatar?: string; progress?: unknown }): void {
   const id = identity();
   void saveProfile(id.playerId, id.secret, patch).then((p) => { if (p) profile = p; });
+}
+/** On a WIN (any match type — vs-bot and PvP both count), credit unlock progress for the heroes YOU fielded:
+ *  every augment each had equipped this match and its fusion element. Update `profile.progress` optimistically
+ *  (so gates/UI see it at once) and persist to the account. A guest without a profile simply earns nothing. */
+function awardOnWin(won: boolean): void {
+  if (!won || !profile) return;
+  const mine = Object.values(state.units).filter((u) => u.team === ui.you);
+  const next = creditWin(asProgress(profile.progress), mine);
+  profile = { ...profile, progress: next };
+  syncProfile({ progress: next });
 }
 /** Sign out: drop the stored identity + local prefs and return to the login screen. */
 function logout(): void {
@@ -928,6 +939,7 @@ async function startMatch(draft: Draft): Promise<void> {
   });
   ui.phase = "over";
   const won = outcome.winner === ui.you;
+  awardOnWin(won); // credit unlock progress for a vs-bot win
   ui.overlay = `<div class="overlay"><div class="modal">
     <h2>${outcome.winner === null ? "Stalemate" : won ? "Victory 🏆" : "Defeat"}</h2>
     <p>Team ${outcome.winner ?? "—"} wins ${outcome.roundsWon.A}–${outcome.roundsWon.B} over ${outcome.rounds} rounds.</p>
@@ -1177,6 +1189,7 @@ function handleServerMsg(msg: ServerMsg): void {
     case "matchEnd": {
       pvp.over = true; clearStoredMatch(); ui.notice = undefined;
       const won = msg.outcome.winner === msg.you;
+      awardOnWin(won); // credit unlock progress for a PvP win (read off the client's final board mirror)
       const title = msg.outcome.winner === null ? "Stalemate" : won ? "Victory 🏆" : "Defeat";
       const why = msg.reason === "opponent-left" ? " Your opponent left the match." : msg.reason === "forfeit" ? " (by surrender)" : "";
       const rating = msg.rating
