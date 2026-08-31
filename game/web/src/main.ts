@@ -49,6 +49,8 @@ export interface UiState {
   /** The opponent's display name in a networked match (shown in the midbar). */
   opponentName?: string;
   resolveTurn?: (actions: Action[]) => void;
+  /** The local player's unlock progress, refreshed each render so the draft panel can lock/annotate options. */
+  progress?: Progress;
 }
 
 /** One row of the resolution-order panel: a queued skill, or one of this turn's pending dot/regen ticks. */
@@ -316,6 +318,7 @@ function preserveScroll(mutate: () => void): void {
 function render(): void {
   hideFx();
   closeTransientGloss();
+  ui.progress = myProgress(); // refresh so the draft panel locks/annotates advanced augments & Fusion
   // Wholesale innerHTML replace resets every scroll container (the between-round draft panel, the inspect
   // skill list, …); preserveScroll keeps them put so clicking a control never snaps the view. (This is what
   // kept a just-picked augment — which sits below tall fusion cards — from scrolling out of view.)

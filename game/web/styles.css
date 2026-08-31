@@ -427,6 +427,12 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .do-sub { font-size: 11.5px; color: var(--acc); font-weight: 600; }
 .do-desc { font-size: 11.5px; color: var(--dim); line-height: 1.45; }
 .do-note { font-size: 11.5px; color: var(--dim); font-style: italic; padding: 4px 2px; }
+/* Locked draft options (advanced augments, or a not-yet-earned Fusion): shown but inert, with the requirement. */
+.draft-modal .do-card.locked { cursor: default; opacity: .75; border-style: dashed; }
+.draft-modal .do-card.locked:hover { background: var(--bg2); border-color: var(--line); } /* no hover affordance — it isn't clickable */
+.draft-modal .do-card.locked .do-name { color: var(--dim); }
+.do-note.locked { color: var(--acc); font-style: normal; font-weight: 600; border: 1px dashed color-mix(in srgb, var(--acc) 45%, var(--line)); border-radius: var(--radius); background: color-mix(in srgb, var(--acc) 8%, transparent); padding: 8px 10px; }
+.do-lockreq { display: block; margin-top: 6px; font-size: 11.5px; font-weight: 600; color: var(--acc); font-style: normal; }
 /* Fusion cards are larger: a prominent fused portrait beside the new passive AND the new skill. */
 .draft-modal .do-card.fusion-card { align-items: stretch; gap: 14px; padding: 12px 14px; }
 .fc-port { width: 96px; height: 128px; flex: 0 0 96px; border-radius: var(--radius); object-fit: cover; object-position: top center; background: var(--panel); }
