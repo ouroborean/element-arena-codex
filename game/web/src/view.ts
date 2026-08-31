@@ -10,7 +10,7 @@ import { availableFusions, availableAugments } from "../../engine/content/metaga
 import { fusionsFor } from "../../engine/content/fusions.generated.ts";
 import { fusionResult } from "../../engine/content/recipes.generated.ts";
 import { augmentsFor, augmentById } from "../../engine/content/augments.generated.ts";
-import { heroUnlocked, FUSION_ELEMENT_HEROES, FUSION_ELEM_WINS_REQUIRED, type Progress } from "../../engine/content/progression.ts";
+import { heroUnlocked, augmentUnlocked, fusionUnlocked, advancedAugmentsUnlocked, emptyProgress, FUSION_ELEMENT_HEROES, FUSION_ELEM_WINS_REQUIRED, type Progress } from "../../engine/content/progression.ts";
 import type { Augment } from "../../engine/content/augment.ts";
 import type { FusionForm } from "../../engine/content/fusion.ts";
 import { draftableHeroes, type DraftChoice } from "../../client/draft.ts";
@@ -589,7 +589,22 @@ function unitAugments(u: Unit): Augment[] {
   return (u.augments ?? []).map((id) => augmentById(id)).filter((a): a is Augment => !!a?.description);
 }
 
-function draftOptions(state: MatchState, u: Unit, pick?: DraftChoice): string {
+/** How many of a hero's augments in `[from..to]` have earned a win (for "X/N" requirement readouts). */
+function augWinsDone(hero: string, p: Progress, from: number, to: number): number {
+  let n = 0; for (let i = from; i <= to; i++) if ((p.augWins[`${hero}${i}`] ?? 0) >= 1) n++; return n;
+}
+/** Requirement line for a hero's locked 4th/5th augments: a win with each of augments 1, 2 & 3. */
+function advancedAugReq(hero: string, p: Progress): string {
+  return `Win a match with each of augments 1, 2 & 3 — ${augWinsDone(hero, p, 1, 3)}/3`;
+}
+/** Requirement line for a hero's locked Fusion: unlock the advanced augments, then win with augments 4 & 5. */
+function fusionAbilityReq(hero: string, p: Progress): string {
+  return advancedAugmentsUnlocked(p, hero)
+    ? `Win a match with each of augments 4 & 5 — ${augWinsDone(hero, p, 4, 5)}/2`
+    : `First unlock the advanced augments (win with 1, 2 & 3 — ${augWinsDone(hero, p, 1, 3)}/3), then win with 4 & 5`;
+}
+
+function draftOptions(state: MatchState, u: Unit, pick: DraftChoice | undefined, progress: Progress): string {
   const hid = u.heroId ?? "";
   const forms = orderFusions(u.baseElement, availableFusions(state, u));
   const augs = availableAugments(u);
@@ -597,6 +612,8 @@ function draftOptions(state: MatchState, u: Unit, pick?: DraftChoice): string {
   const augOn = (id: string) => pick?.kind === "augment" && pick.augmentId === id ? " chosen" : "";
   const fusion = u.fused
     ? `<div class="do-note">Already fused into <b>${esc(cap(u.fused))}</b> — a hero fuses once per match.</div>`
+    : !fusionUnlocked(progress, hid) // the Fusion ability itself is locked until earned
+    ? `<div class="do-note locked">🔒 Fusion locked — ${esc(fusionAbilityReq(hid, progress))}.</div>`
     : forms.length
     ? forms.map((f) => {
         const passIc = iconOf(`${hid}${f.key}0`, hid);
@@ -617,8 +634,12 @@ function draftOptions(state: MatchState, u: Unit, pick?: DraftChoice): string {
       }).join("")
     : `<div class="do-note">No fusion available — needs a teammate whose element forms a recipe.</div>`;
   const augment = augs.length
-    ? augs.map((a) => `<button class="do-card${augOn(a.id)}" data-aug-unit="${u.id}" data-aug-id="${esc(a.id)}">
-        <span class="do-txt"><span class="do-name">★ ${esc(a.name)}</span><span class="do-desc">${descHtml(a.description)}</span></span></button>`).join("")
+    ? augs.map((a) => augmentUnlocked(progress, a.id)
+        ? `<button class="do-card${augOn(a.id)}" data-aug-unit="${u.id}" data-aug-id="${esc(a.id)}">
+            <span class="do-txt"><span class="do-name">★ ${esc(a.name)}</span><span class="do-desc">${descHtml(a.description)}</span></span></button>`
+        : `<div class="do-card locked" title="${esc(advancedAugReq(hid, progress))}">
+            <span class="do-txt"><span class="do-name">🔒 ★ ${esc(a.name)}</span><span class="do-desc">${descHtml(a.description)}</span>
+            <span class="do-lockreq">${esc(advancedAugReq(hid, progress))}</span></span></div>`).join("")
     : `<div class="do-note">All of this hero's augments are taken.</div>`;
   return `<div class="do-sec fusion"><h4>Fusion <span>(re-elements the hero, new passive + skill)</span></h4>${fusion}</div>
     <div class="do-sec augment"><h4>Augments <span>(a permanent tweak; cumulative)</span></h4>${augment}</div>`;
@@ -627,12 +648,14 @@ function draftOptions(state: MatchState, u: Unit, pick?: DraftChoice): string {
 /** The between-round draft modal: pick a fusion/augment for EACH hero (or leave some), then confirm the batch. */
 function draftPanel(state: MatchState, ui: UiState): string {
   const d = ui.draft!;
+  const progress = ui.progress ?? emptyProgress();
   const heroes = draftableHeroes(state, d.side);
   const sel = heroes.find((h) => h.id === d.inspect) ?? heroes[0];
   const pickLabel = (p?: DraftChoice) => p?.kind === "fuse" ? `⚛ ${esc(cap(p.formKey))}` : p?.kind === "augment" ? "★ augment" : "";
   const heroList = heroes.map((h) => {
-    const nf = h.fused ? 0 : availableFusions(state, h).length;
-    const na = availableAugments(h).length;
+    // Counts reflect what's actually PICKABLE now — Fusion drops to 0 until unlocked, locked augments don't count.
+    const nf = h.fused || !fusionUnlocked(progress, h.heroId ?? "") ? 0 : availableFusions(state, h).length;
+    const na = availableAugments(h).filter((a) => augmentUnlocked(progress, a.id)).length;
     const p = d.picks.get(h.id);
     const opts = p ? `<b class="dh-pick">${pickLabel(p)}</b>` : `${h.fused ? `fused: ${esc(cap(h.fused))}` : `${nf} ⚛`} · ${na} ★`;
     return `<button class="dh ${sel?.id === h.id ? "on" : ""}${p ? " picked" : ""}" data-draft-inspect="${h.id}">
@@ -646,7 +669,7 @@ function draftPanel(state: MatchState, ui: UiState): string {
     <p class="draft-sub">Pick a fusion or augment for <b>each</b> hero (click a selected one again to un-choose), then confirm. Unpicked heroes hold.</p>
     <div class="draft-body">
       <div class="draft-heroes">${heroList}</div>
-      <div class="draft-options">${sel ? draftOptions(state, sel, d.picks.get(sel.id)) : ""}</div>
+      <div class="draft-options">${sel ? draftOptions(state, sel, d.picks.get(sel.id), progress) : ""}</div>
     </div>
     <div class="modal-foot"><button class="resolve" data-draft-confirm="1">Confirm ${n ? `${n} upgrade${n > 1 ? "s" : ""}` : "— hold all"} ▶</button></div>
   </div></div>`;
