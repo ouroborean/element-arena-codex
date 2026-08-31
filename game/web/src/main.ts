@@ -11,7 +11,7 @@ import { canPay, effectiveCost, canUsePlanned, canPayAfter, reserveEnergy, pendi
 import { redactState } from "../../engine/src/visibility.ts";
 import { buildMatch, defaultPolicy, type Draft } from "../../engine/content/match.ts";
 import { ROSTER } from "../../engine/content/roster.generated.ts";
-import { asProgress, creditWin } from "../../engine/content/progression.ts";
+import { asProgress, creditWin, heroUnlocked, type Progress } from "../../engine/content/progression.ts";
 import { runMatch, type AsyncProvider } from "../../client/loop.ts";
 import { autoDraft, applyDraftChoices, hasDraftOptions, draftableHeroes, type DraftChoice } from "../../client/draft.ts";
 import { highlightFor, isSingleTargetPick } from "../../client/targeting.ts";
@@ -165,6 +165,8 @@ function syncProfile(patch: { name?: string; avatar?: string; progress?: unknown
 /** On a WIN (any match type — vs-bot and PvP both count), credit unlock progress for the heroes YOU fielded:
  *  every augment each had equipped this match and its fusion element. Update `profile.progress` optimistically
  *  (so gates/UI see it at once) and persist to the account. A guest without a profile simply earns nothing. */
+/** The local player's unlock progress, coerced from the account blob (empty for a guest with no profile). */
+function myProgress(): Progress { return asProgress(profile?.progress); }
 function awardOnWin(won: boolean): void {
   if (!won || !profile) return;
   const mine = Object.values(state.units).filter((u) => u.team === ui.you);
@@ -326,7 +328,7 @@ function render(): void {
 // housekeeping (that's render()'s job, called once the playback settles on the final board).
 function paintState(s: MatchState): void { app.innerHTML = renderApp(redactState(s, ui.you), ui, playerPanel()); scheduleFit(); }
 /** The team-select screen (its player panel reads the profile) plus the avatar picker when open. */
-function renderSetupScreen(): void { closeTransientGloss(); preserveScroll(() => { app.innerHTML = renderSetup(setup!, playerPanel()) + avatarPickerHtml() + (claimForm ? renderClaim(claimForm) : ""); }); fitCharSelect(); }
+function renderSetupScreen(): void { closeTransientGloss(); preserveScroll(() => { app.innerHTML = renderSetup(setup!, playerPanel(), myProgress()) + avatarPickerHtml() + (claimForm ? renderClaim(claimForm) : ""); }); fitCharSelect(); }
 // Remember the team just taken into a match so returning to team select (after the match's page reload)
 // can repopulate "Your Team" — requeuing with the same team then takes no re-picking.
 const LAST_TEAM_KEY = "arenaLastTeam";
@@ -657,14 +659,14 @@ app.addEventListener("click", (e) => {
       if (setup.inspect === d.inspect) {
         const i = setup.picked.indexOf(d.inspect);
         if (i >= 0) setup.picked.splice(i, 1);
-        else if (setup.picked.length < 3) setup.picked.push(d.inspect);
+        else if (setup.picked.length < 3 && heroUnlocked(myProgress(), d.inspect)) setup.picked.push(d.inspect); // locked heroes stay inspectable, not pickable
       } else setup.inspect = d.inspect;
       renderSetupScreen();
     }
     else if (d.pick) { // add / remove (detail button or a tray slot)
       const i = setup.picked.indexOf(d.pick);
       if (i >= 0) setup.picked.splice(i, 1);
-      else if (setup.picked.length < 3) setup.picked.push(d.pick);
+      else if (setup.picked.length < 3 && heroUnlocked(myProgress(), d.pick)) setup.picked.push(d.pick);
       renderSetupScreen();
     } else if (d.reroll) {
       setup.oppo = randomTeam(setup.picked);
