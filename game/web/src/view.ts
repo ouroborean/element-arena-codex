@@ -842,15 +842,16 @@ export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: 
       <div class="cs-roster right">${panelRows(RIGHT_ROWS)}</div>
     </div>
     </div>
-  </div>${setup.augfuse && inspectId ? augFuseModal(inspectId) : ""}`;
+  </div>${setup.augfuse && inspectId ? augFuseModal(inspectId, progress) : ""}`;
 }
 
 /** A read-only modal previewing every fusion form (by partner element) and every augment a base hero
  *  can take — the character-select "Fusions & Augments" view. Reuses the between-round draft card styles. */
-function augFuseModal(heroId: string): string {
+function augFuseModal(heroId: string, progress: Progress): string {
   const def = ROSTER.find((h) => h.id === heroId)!;
   const forms = orderFusions(def.element, fusionsFor(heroId));
   const augs = augmentsFor(heroId);
+  const fusionLocked = forms.length > 0 && !fusionUnlocked(progress, heroId); // the one Fusion unlock gates every form
   const block = (label: string, ic: string | null, name: string, meta: string, desc: string) =>
     `<span class="fc-block"><span class="fc-label">${label}</span>
       <span class="fc-line">${ic ? `<img src="${ic}" ${IMG_FALLBACK} />` : ""}<b>${esc(name)}</b></span>
@@ -867,12 +868,15 @@ function augFuseModal(heroId: string): string {
         ${block("New skill", iconOf(sk.id, heroId), skText?.n ?? sk.name, skMeta, skText?.d ?? "")}
       </span></div>`;
   }).join("");
-  const augment = augs.map((a) => `<div class="do-card"><span class="do-txt"><span class="do-name">★ ${esc(a.name)}</span><span class="do-desc">${descHtml(a.description)}</span></span></div>`).join("");
+  const augment = augs.map((a) => {
+    const locked = !augmentUnlocked(progress, a.id); // an advanced (4th/5th) augment not yet earned
+    return `<div class="do-card${locked ? " locked" : ""}"><span class="do-txt"><span class="do-name">${locked ? "🔒 " : ""}★ ${esc(a.name)}</span><span class="do-desc">${descHtml(a.description)}</span>${locked ? `<span class="do-lockreq">Locked — ${esc(advancedAugReq(heroId, progress))}</span>` : ""}</span></div>`;
+  }).join("");
   return `<div class="overlay"><div class="modal draft-modal augfuse-modal">
     <h2>${esc(shortName(def.name))} — Fusions &amp; Augments</h2>
-    <p class="draft-sub">Every fusion form (one per partner element) and every augment this hero can take.</p>
+    <p class="draft-sub">Every fusion form (one per partner element) and every augment this hero can take. Locked ones are shown so you can see what you're working toward.</p>
     <div class="draft-options">
-      <div class="do-sec fusion"><h4>Fusion forms <span>(${forms.length})</span></h4>${fusion || `<div class="do-note">None.</div>`}</div>
+      <div class="do-sec fusion"><h4>Fusion forms <span>(${forms.length})</span></h4>${fusionLocked ? `<div class="do-note locked">🔒 Fusion locked — ${esc(fusionAbilityReq(heroId, progress))}.</div>` : ""}${fusion || `<div class="do-note">None.</div>`}</div>
       <div class="do-sec augment"><h4>Augments <span>(${augs.length})</span></h4>${augment || `<div class="do-note">None.</div>`}</div>
     </div>
     <div class="modal-foot"><button class="mini" data-augfuse-close="1">Close</button></div>
