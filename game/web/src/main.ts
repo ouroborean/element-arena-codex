@@ -11,7 +11,8 @@ import { canPay, effectiveCost, canUsePlanned, canPayAfter, reserveEnergy, pendi
 import { redactState } from "../../engine/src/visibility.ts";
 import { buildMatch, defaultPolicy, type Draft } from "../../engine/content/match.ts";
 import { ROSTER } from "../../engine/content/roster.generated.ts";
-import { asProgress, creditWin, heroUnlocked, type Progress } from "../../engine/content/progression.ts";
+import { asProgress, creditWin, heroUnlocked, fusionUnlocked, advancedAugmentsUnlocked, type Progress } from "../../engine/content/progression.ts";
+import { HERO_META } from "./herometa.generated.ts";
 import { runMatch, type AsyncProvider } from "../../client/loop.ts";
 import { autoDraft, applyDraftChoices, hasDraftOptions, draftableHeroes, type DraftChoice } from "../../client/draft.ts";
 import { highlightFor, isSingleTargetPick } from "../../client/targeting.ts";
@@ -169,12 +170,32 @@ function syncProfile(patch: { name?: string; avatar?: string; progress?: unknown
  *  (so gates/UI see it at once) and persist to the account. A guest without a profile simply earns nothing. */
 /** The local player's unlock progress, coerced from the account blob (empty for a guest with no profile). */
 function myProgress(): Progress { return asProgress(profile?.progress); }
-function awardOnWin(won: boolean): void {
-  if (!won || !profile) return;
+function awardOnWin(won: boolean): string[] {
+  if (!won || !profile) return [];
+  const before = asProgress(profile.progress);
   const mine = Object.values(state.units).filter((u) => u.team === ui.you);
-  const next = creditWin(asProgress(profile.progress), mine);
+  const next = creditWin(before, mine);
   profile = { ...profile, progress: next };
   syncProfile({ progress: next });
+  return newUnlocks(before, next);
+}
+/** What a win just unlocked, as human-readable lines (for the victory screen). Single-element heroes never flip
+ *  heroUnlocked; a hero's advanced-augments and Fusion unlocks can't both land in one win, so they don't double. */
+function newUnlocks(before: Progress, after: Progress): string[] {
+  const out: string[] = [];
+  const name = (id: string) => HERO_META[id]?.name ?? id;
+  for (const h of ROSTER) {
+    if (!heroUnlocked(before, h.id) && heroUnlocked(after, h.id)) out.push(`${name(h.id)} — new character!`);
+    if (!fusionUnlocked(before, h.id) && fusionUnlocked(after, h.id)) out.push(`${name(h.id)}: Fusion`);
+    else if (!advancedAugmentsUnlocked(before, h.id) && advancedAugmentsUnlocked(after, h.id)) out.push(`${name(h.id)}: advanced augments`);
+  }
+  return out;
+}
+/** Victory-screen banner listing what a win unlocked (empty string when nothing new). */
+function unlockBanner(unlocks: string[]): string {
+  return unlocks.length
+    ? `<div class="unlock-banner"><h3>🎉 Unlocked</h3><ul>${unlocks.map((u) => `<li>${escHtml(u)}</li>`).join("")}</ul></div>`
+    : "";
 }
 /** Sign out: drop the stored identity + local prefs and return to the login screen. */
 function logout(): void {
@@ -944,10 +965,11 @@ async function startMatch(draft: Draft): Promise<void> {
   });
   ui.phase = "over";
   const won = outcome.winner === ui.you;
-  awardOnWin(won); // credit unlock progress for a vs-bot win
+  const unlocked = awardOnWin(won); // credit unlock progress for a vs-bot win
   ui.overlay = `<div class="overlay"><div class="modal">
     <h2>${outcome.winner === null ? "Stalemate" : won ? "Victory 🏆" : "Defeat"}</h2>
     <p>Team ${outcome.winner ?? "—"} wins ${outcome.roundsWon.A}–${outcome.roundsWon.B} over ${outcome.rounds} rounds.</p>
+    ${unlockBanner(unlocked)}
     <button onclick="location.reload()">New team</button>
   </div></div>`;
   ui.phaseLabel = "match over";
@@ -1194,7 +1216,7 @@ function handleServerMsg(msg: ServerMsg): void {
     case "matchEnd": {
       pvp.over = true; clearStoredMatch(); ui.notice = undefined;
       const won = msg.outcome.winner === msg.you;
-      awardOnWin(won); // credit unlock progress for a PvP win (read off the client's final board mirror)
+      const unlocked = awardOnWin(won); // credit unlock progress for a PvP win (read off the client's final board mirror)
       const title = msg.outcome.winner === null ? "Stalemate" : won ? "Victory 🏆" : "Defeat";
       const why = msg.reason === "opponent-left" ? " Your opponent left the match." : msg.reason === "forfeit" ? " (by surrender)" : "";
       const rating = msg.rating
@@ -1203,6 +1225,7 @@ function handleServerMsg(msg: ServerMsg): void {
       showModal(`<h2>${title}</h2>
         <p>Team ${msg.outcome.winner ?? "—"} wins ${msg.outcome.roundsWon.A}–${msg.outcome.roundsWon.B} over ${msg.outcome.rounds} round${msg.outcome.rounds === 1 ? "" : "s"}.${why}</p>
         ${rating}
+        ${unlockBanner(unlocked)}
         <button onclick="location.reload()">Back to team select</button>`);
       pvp.sock.close();
       break;
