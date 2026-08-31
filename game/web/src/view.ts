@@ -10,6 +10,7 @@ import { availableFusions, availableAugments } from "../../engine/content/metaga
 import { fusionsFor } from "../../engine/content/fusions.generated.ts";
 import { fusionResult } from "../../engine/content/recipes.generated.ts";
 import { augmentsFor, augmentById } from "../../engine/content/augments.generated.ts";
+import { heroUnlocked, FUSION_ELEMENT_HEROES, FUSION_ELEM_WINS_REQUIRED, type Progress } from "../../engine/content/progression.ts";
 import type { Augment } from "../../engine/content/augment.ts";
 import type { FusionForm } from "../../engine/content/fusion.ts";
 import { draftableHeroes, type DraftChoice } from "../../client/draft.ts";
@@ -719,7 +720,15 @@ export function renderClaim(s: { error?: string; busy?: boolean }): string {
   </div></div>`;
 }
 
-export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: string | null; augfuse?: boolean }, player: { name: string; sub: string; avatar: string; username?: string }): string {
+/** The unlock requirement line for a locked fusion-element hero: 3 wins with a hero fused into its element. */
+function fusionHeroReq(id: string, p: Progress): string {
+  const el = FUSION_ELEMENT_HEROES.get(id);
+  if (!el) return "";
+  const w = Math.min(p.fusedWins[el] ?? 0, FUSION_ELEM_WINS_REQUIRED);
+  return `Win ${FUSION_ELEM_WINS_REQUIRED} matches with a hero fused to ${cap(el)} — ${w}/${FUSION_ELEM_WINS_REQUIRED}`;
+}
+
+export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: string | null; augfuse?: boolean }, player: { name: string; sub: string; avatar: string; username?: string }, progress: Progress): string {
   const inspectId = setup.inspect;                                  // null until the player clicks a hero — nothing selected on load
   const def = inspectId ? ROSTER.find((h) => h.id === inspectId) ?? null : null;
   const on = def ? setup.picked.includes(def.id) : false;
@@ -741,8 +750,9 @@ export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: 
 
   const heroCard = (id: string) => {
     const h = ROSTER.find((x) => x.id === id)!;
-    return `<button class="cs-hero ${setup.picked.includes(id) ? "on" : ""} ${inspectId === id ? "sel" : ""}" data-inspect="${id}" style="--el:${elColor(h.element)}" title="${esc(shortName(h.name))}">
-      <img src="${characterButton(id)}" alt="${esc(shortName(h.name))}" ${IMG_FALLBACK} />${setup.picked.includes(id) ? '<span class="cs-check">✓</span>' : ""}</button>`;
+    const locked = !heroUnlocked(progress, id); // a fusion-element hero not yet earned
+    return `<button class="cs-hero ${setup.picked.includes(id) ? "on" : ""} ${inspectId === id ? "sel" : ""} ${locked ? "locked" : ""}" data-inspect="${id}" style="--el:${elColor(h.element)}" title="${esc(shortName(h.name))}${locked ? " — locked" : ""}">
+      <img src="${characterButton(id)}" alt="${esc(shortName(h.name))}" ${IMG_FALLBACK} />${setup.picked.includes(id) ? '<span class="cs-check">✓</span>' : ""}${locked ? '<span class="cs-lock">🔒</span>' : ""}</button>`;
   };
   const panelRows = (rows: string[][]) => rows.map((row) => `<div class="cs-rrow">${row.map(heroCard).join("")}</div>`).join("");
 
@@ -773,7 +783,10 @@ export function renderSetup(setup: { picked: string[]; oppo: string[]; inspect: 
         <div class="cs-hname">${esc(HERO_META[def.id]?.name ?? shortName(def.name))}</div>
         ${HERO_META[def.id]?.title ? `<div class="cs-htitle">${esc(HERO_META[def.id]!.title)}</div>` : ""}
         <div class="cs-hel">${esc(cap(def.element))} Element</div>
-        <button class="cs-abtn ${on ? "rem" : ""}" data-pick="${def.id}" ${!on && full ? "disabled" : ""}>${on ? "Remove Hero" : "Add to Team"}</button>
+        ${!heroUnlocked(progress, def.id)
+          ? `<button class="cs-abtn locked" disabled>🔒 Locked</button>
+             <div class="cs-lockreq">${esc(fusionHeroReq(def.id, progress))}</div>`
+          : `<button class="cs-abtn ${on ? "rem" : ""}" data-pick="${def.id}" ${!on && full ? "disabled" : ""}>${on ? "Remove Hero" : "Add to Team"}</button>`}
         <button class="cs-abtn" disabled title="Not available yet">Mastery</button>
         <button class="cs-abtn" data-augfuse="1" title="Preview this hero's fusion forms and augments">Fusions &amp; Augments</button>
       </div>

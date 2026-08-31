@@ -636,6 +636,12 @@ header { display: flex; justify-content: space-between; align-items: baseline; p
 .cs-hero:hover { transform: translateY(-3px) scale(1.06); z-index: 3; }
 .cs-hero.on::after { content: ""; position: absolute; inset: 0; box-shadow: inset 0 0 0 2px var(--you); }
 .cs-check { position: absolute; top: 2px; right: 5px; color: var(--you); font-weight: 800; font-size: 13px; text-shadow: 0 1px 2px #000; }
+/* Locked (not-yet-earned) fusion-element hero: dimmed + grayscaled art with a lock badge; still inspectable. */
+.cs-hero.locked img { filter: grayscale(1) brightness(.5); }
+.cs-hero.locked:hover { transform: none; } /* it doesn't lift on hover — it isn't addable */
+.cs-lock { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 26px; text-shadow: 0 1px 3px #000; pointer-events: none; }
+.cs-abtn.locked { background: var(--panel); border-color: var(--line); color: var(--dim); }
+.cs-lockreq { font-size: 13px; font-weight: 600; color: var(--dim); text-align: center; margin-top: 6px; line-height: 1.35; }
 
 .cs-mid { display: flex; flex-direction: column; align-items: center; gap: 8px; padding-bottom: 4px; }
 .cs-modes { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; width: 340px; }
