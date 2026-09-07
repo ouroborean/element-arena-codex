@@ -1835,22 +1835,31 @@
      "when": {
       "and": [
        {
-        "sameUnit": [
-         "eventSource",
-         "self"
-        ]
-       },
-       {
-        "has": "regen",
-        "name": "Consecrate",
-        "of": "eventUnit"
-       },
-       {
         "not": {
-         "has": "mark",
-         "name": "Hallowed Proc Lock",
-         "of": "self"
+         "eventSourceId": "Consecrate"
         }
+       },
+       {
+        "and": [
+         {
+          "sameUnit": [
+           "eventSource",
+           "self"
+          ]
+         },
+         {
+          "has": "regen",
+          "name": "Consecrate",
+          "of": "eventUnit"
+         },
+         {
+          "not": {
+           "has": "mark",
+           "name": "Hallowed Proc Lock",
+           "of": "self"
+          }
+         }
+        ]
        }
       ]
      },
@@ -3679,7 +3688,11 @@
       "magnitude": {
        "op": "mul",
        "args": [
-        { "ref": "stackCount", "name": "Rising Indignation", "of": "self" },
+        {
+         "ref": "stackCount",
+         "name": "Rising Indignation",
+         "of": "self"
+        },
         -1
        ]
       }
@@ -3853,7 +3866,10 @@
      {
       "op": "custom",
       "fn": "worldfistAuras",
-      "args": { "turns": 4, "rampartId": "gaia4" }
+      "args": {
+       "turns": 4,
+       "rampartId": "gaia4"
+      }
      }
     ],
     "note": "'Deals 5 to the enemy team for 4 turns' = a 4-turn, magnitude-5 dot on each enemy. The two 'during this time' auras are installed by worldfistAuras: (1) 'Rampart costs [65]' = a 4-turn cost_currency_remap on gaia4 (moves its single [earth] onto generic, i.e. 1 generic = [65], any color pays; auto-reverts); (2) 'enemies damaged by Worldfist are Blinded 1 turn' = a 4-turn self-owned watch on Gaia's damageDealt vs enemies (the Sandstorm dot ticks carry source=Gaia, so they blind too)."
@@ -6174,7 +6190,9 @@
     "targeting": "all",
     "highlightSelector": {
      "any": [
-      { "faction": "enemies" },
+      {
+       "faction": "enemies"
+      },
       "caster"
      ]
     },
@@ -7670,7 +7688,11 @@
       "magnitude": {
        "op": "mul",
        "args": [
-        { "ref": "stackCount", "name": "Chronicle Fragments", "of": "self" },
+        {
+         "ref": "stackCount",
+         "name": "Chronicle Fragments",
+         "of": "self"
+        },
         -1
        ]
       }
@@ -8873,7 +8895,11 @@
      {
       "op": "custom",
       "fn": "removeMarkOnSkillUse",
-      "args": { "mark": "Curse of Darkness", "window": 3, "owner": "target" },
+      "args": {
+       "mark": "Curse of Darkness",
+       "window": 3,
+       "owner": "target"
+      },
       "note": "Cancel: if the cursed holder uses ANY skill during the 3-turn window, strip the Curse of Darkness MARK via removeStatus (which does NOT fire onExpire), so no copy is made. owner:'target' parks the watch on the HOLDER (not Laria), so acting cancels the copy even if Laria has died and even if the holder is stealthed; its expiry stays anchored to Laria, in lockstep with the mark."
      }
     ],
@@ -13992,10 +14018,20 @@
     "highlightSelector": {
      "any": [
       {
-       "filter": { "faction": "enemies", "kind": "hero" },
-       "with": { "kind": "mark", "name": "Mark the Path" }
+       "filter": {
+        "faction": "enemies",
+        "kind": "hero"
+       },
+       "with": {
+        "kind": "mark",
+        "name": "Mark the Path"
+       }
       },
-      { "faction": "allies", "kind": "minion", "template": "Boulder" }
+      {
+       "faction": "allies",
+       "kind": "minion",
+       "template": "Boulder"
+      }
      ]
     },
     "klass": "fusion",
@@ -16147,7 +16183,14 @@
       },
       "note": "Deals 15 damage to the target (doubles to 30 vs a Scavenger's Pile). If the hit kills the target, the same custom grants Syl's team one Elemental Essence — so kill-essence lives in ONE place (a plain authored `if currentHp==0` grant here would double it now that essence is a countable resource)."
      }
-    ]
+    ],
+    "targetSpec": {
+     "faction": "enemies",
+     "extend": {
+      "isNamed": "target",
+      "name": "sylnomadminion"
+     }
+    }
    }
   },
   {

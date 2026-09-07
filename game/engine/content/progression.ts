@@ -22,10 +22,18 @@ export interface Progress {
   v: 1;
   augWins: Record<string, number>;   // augmentId (`<hero><1..5>`) -> wins with it equipped
   fusedWins: Record<string, number>; // fusion element name        -> wins with a hero fused into it
+  /** Escape hatch: everything reads as unlocked. Transient/UI-only (e.g. the tutorial, which scripts a fuse) —
+   *  never written to the persisted blob (asProgress never sets it, so an award can never carry it). */
+  all?: boolean;
 }
 
 export function emptyProgress(): Progress {
   return { v: 1, augWins: {}, fusedWins: {} };
+}
+
+/** A progress value where everything is unlocked — for contexts that must bypass the gates (the tutorial). */
+export function unlockedProgress(): Progress {
+  return { v: 1, all: true, augWins: {}, fusedWins: {} };
 }
 
 /** Coerce the untrusted stored blob (`Profile.progress` is `unknown`) into a well-formed Progress — drops any
@@ -57,12 +65,13 @@ const N = (rec: Record<string, number>, k: string): number => rec[k] ?? 0;
 
 /** A hero's advanced (4th & 5th) augments — unlocked by a win with each of augments 1, 2 and 3. */
 export function advancedAugmentsUnlocked(p: Progress, hero: string): boolean {
-  return N(p.augWins, `${hero}1`) >= 1 && N(p.augWins, `${hero}2`) >= 1 && N(p.augWins, `${hero}3`) >= 1;
+  return p.all === true || (N(p.augWins, `${hero}1`) >= 1 && N(p.augWins, `${hero}2`) >= 1 && N(p.augWins, `${hero}3`) >= 1);
 }
 
 /** Is one augment unlocked? Augments 1–3 are always available; 4 & 5 need the hero's advanced unlock. An id that
  *  doesn't parse as `<hero><n>` is left ungated (fail-open). */
 export function augmentUnlocked(p: Progress, augId: string): boolean {
+  if (p.all === true) return true;
   const m = /^([a-z]+)([1-9]\d*)$/.exec(augId);
   if (!m) return true;
   return Number(m[2]) <= 3 || advancedAugmentsUnlocked(p, m[1]!);
@@ -70,7 +79,7 @@ export function augmentUnlocked(p: Progress, augId: string): boolean {
 
 /** A single-element hero's Fusion ability — unlocked (after its advanced augments) by a win with each of 4 & 5. */
 export function fusionUnlocked(p: Progress, hero: string): boolean {
-  return advancedAugmentsUnlocked(p, hero) && N(p.augWins, `${hero}4`) >= 1 && N(p.augWins, `${hero}5`) >= 1;
+  return p.all === true || (advancedAugmentsUnlocked(p, hero) && N(p.augWins, `${hero}4`) >= 1 && N(p.augWins, `${hero}5`) >= 1);
 }
 
 /** Wins with a hero fused into a fusion element needed to unlock that element's (fusion-element) hero. */
@@ -79,6 +88,7 @@ export const FUSION_ELEM_WINS_REQUIRED = 3;
 /** Is a hero pickable at team-select? Single-element heroes always are; a fusion-element hero unlocks after
  *  FUSION_ELEM_WINS_REQUIRED wins with a hero fused into its element. */
 export function heroUnlocked(p: Progress, hero: string): boolean {
+  if (p.all === true) return true;
   const el = FUSION_ELEMENT_HEROES.get(hero);
   return el === undefined || N(p.fusedWins, el) >= FUSION_ELEM_WINS_REQUIRED;
 }

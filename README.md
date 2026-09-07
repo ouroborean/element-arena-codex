@@ -1,4 +1,12 @@
-# Anima Arena — data export
+# Element Arena
+
+For the multiplayer web game, start with [game/README.md](game/README.md) and the current [architecture guide](game/ARCHITECTURE.md).
+
+From the repository root, use Node 24.18+ and Python 3.12+: `npm ci`, then `npm run check` and `npm run build`.
+
+Deployment/CI: [paired release runbook](game/ops/README.md). `deploy-arena.ps1 -BuildOnly` creates a checked client/server artifact; deployment is an explicit separate promotion.
+
+## Original data-export tooling
 
 Scripts that extract the game's data out of the Godot project (`.tscn` / `.tres`
 / `.gd` source) into a clean, engine-independent JSON database. Nothing here

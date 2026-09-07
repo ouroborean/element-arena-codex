@@ -2,7 +2,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { loadHero } from "../content/hero.ts"; // side-effect: registers handlers
 import { heroById } from "../content/match.ts";
-import { performAction, startRound, endTurn, canUse } from "../src/scheduler.ts";
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
+import { startRound, endTurn, canUse } from "../src/scheduler.ts";
 import { emit } from "../src/effects/interpret.ts";
 import { applyFusion } from "../content/fusion.ts";
 import { fusionForm } from "../content/fusions.generated.ts";

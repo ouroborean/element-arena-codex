@@ -1,7 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { emit } from "../src/effects/interpret.ts";
-import { performAction, canUse } from "../src/scheduler.ts";
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
+import { canUse } from "../src/scheduler.ts";
 import { loadHero } from "../content/hero.ts"; // side-effect: registers handlers + hero/augment triggers
 import { heroById } from "../content/match.ts";
 import { applyAugment } from "../content/augment.ts";

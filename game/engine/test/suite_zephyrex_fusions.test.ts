@@ -1,14 +1,12 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { emit } from "../src/effects/interpret.ts";
-import {
-  performAction,
-  startTurn,
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
+import { startTurn,
   endTurn,
   startRound,
   legalTargets,
-  effectiveCost,
-} from "../src/scheduler.ts";
+  effectiveCost } from "../src/scheduler.ts";
 import { totalShield } from "../src/damage.ts";
 import { applyStatus, removeStatus } from "../src/status.ts";
 import { Rng } from "../src/rng.ts";

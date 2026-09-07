@@ -2639,7 +2639,11 @@
        "magnitude": {
         "op": "mul",
         "args": [
-         { "ref": "stackCount", "name": "Call Tides", "of": "self" },
+         {
+          "ref": "stackCount",
+          "name": "Call Tides",
+          "of": "self"
+         },
          -1
         ]
        }
@@ -2830,7 +2834,37 @@
          {
           "op": "mul",
           "args": [
-           { "op": "add", "args": [10, { "op": "mul", "args": [{ "ref": "statusMag", "kind": "coil_damage_bonus", "of": "self" }, { "op": "add", "args": [{ "ref": "stackCount", "name": "Saya Coil", "of": "self" }, { "ref": "stackCount", "name": "Enhanced Saya Coil", "of": "self" }] }] }] },
+           {
+            "op": "add",
+            "args": [
+             10,
+             {
+              "op": "mul",
+              "args": [
+               {
+                "ref": "statusMag",
+                "kind": "coil_damage_bonus",
+                "of": "self"
+               },
+               {
+                "op": "add",
+                "args": [
+                 {
+                  "ref": "stackCount",
+                  "name": "Saya Coil",
+                  "of": "self"
+                 },
+                 {
+                  "ref": "stackCount",
+                  "name": "Enhanced Saya Coil",
+                  "of": "self"
+                 }
+                ]
+               }
+              ]
+             }
+            ]
+           },
            {
             "ref": "stackCount",
             "name": "Saya Coil",
@@ -2841,7 +2875,37 @@
          {
           "op": "mul",
           "args": [
-           { "op": "add", "args": [20, { "op": "mul", "args": [{ "ref": "statusMag", "kind": "coil_damage_bonus", "of": "self" }, { "op": "add", "args": [{ "ref": "stackCount", "name": "Saya Coil", "of": "self" }, { "ref": "stackCount", "name": "Enhanced Saya Coil", "of": "self" }] }] }] },
+           {
+            "op": "add",
+            "args": [
+             20,
+             {
+              "op": "mul",
+              "args": [
+               {
+                "ref": "statusMag",
+                "kind": "coil_damage_bonus",
+                "of": "self"
+               },
+               {
+                "op": "add",
+                "args": [
+                 {
+                  "ref": "stackCount",
+                  "name": "Saya Coil",
+                  "of": "self"
+                 },
+                 {
+                  "ref": "stackCount",
+                  "name": "Enhanced Saya Coil",
+                  "of": "self"
+                 }
+                ]
+               }
+              ]
+             }
+            ]
+           },
            {
             "ref": "stackCount",
             "name": "Enhanced Saya Coil",
@@ -5034,7 +5098,14 @@
           }
          ]
         }
-       ]
+       ],
+       "targetSpec": {
+        "faction": "enemies",
+        "extend": {
+         "isNamed": "target",
+         "name": "sylnomadminion"
+        }
+       }
       }
      ]
     },
@@ -5096,7 +5167,14 @@
           }
          ]
         }
-       ]
+       ],
+       "targetSpec": {
+        "faction": "enemies",
+        "extend": {
+         "isNamed": "target",
+         "name": "sylnomadminion"
+        }
+       }
       },
       {
        "id": "sylminion2",
@@ -5137,7 +5215,34 @@
           }
          ]
         }
-       ]
+       ],
+       "targetSpec": {
+        "faction": "enemies",
+        "extend": {
+         "and": [
+          {
+           "fused": "winter",
+           "of": "summoner"
+          },
+          {
+           "isFaction": "target",
+           "faction": "ally"
+          },
+          {
+           "has": "stun",
+           "of": "target"
+          },
+          {
+           "not": {
+            "sameUnit": [
+             "target",
+             "self"
+            ]
+           }
+          }
+         ]
+        }
+       }
       }
      ]
     },
@@ -5199,7 +5304,14 @@
           }
          ]
         }
-       ]
+       ],
+       "targetSpec": {
+        "faction": "enemies",
+        "extend": {
+         "isNamed": "target",
+         "name": "sylnomadminion"
+        }
+       }
       },
       {
        "id": "sylminion2",
@@ -5240,7 +5352,34 @@
           }
          ]
         }
-       ]
+       ],
+       "targetSpec": {
+        "faction": "enemies",
+        "extend": {
+         "and": [
+          {
+           "fused": "winter",
+           "of": "summoner"
+          },
+          {
+           "isFaction": "target",
+           "faction": "ally"
+          },
+          {
+           "has": "stun",
+           "of": "target"
+          },
+          {
+           "not": {
+            "sameUnit": [
+             "target",
+             "self"
+            ]
+           }
+          }
+         ]
+        }
+       }
       },
       {
        "id": "sylminion3",
@@ -6010,7 +6149,11 @@
          "op": "mul",
          "args": [
           5,
-          { "ref": "stackCount", "name": "Pain Tolerance", "of": "self" }
+          {
+           "ref": "stackCount",
+           "name": "Pain Tolerance",
+           "of": "self"
+          }
          ]
         },
         "duration": null
@@ -6026,7 +6169,11 @@
          "op": "if",
          "cond": {
           "cmp": ">=",
-          "left": { "ref": "stackCount", "name": "Pain Tolerance", "of": "self" },
+          "left": {
+           "ref": "stackCount",
+           "name": "Pain Tolerance",
+           "of": "self"
+          },
           "right": 1
          },
          "then": [
@@ -6049,7 +6196,11 @@
            "op": "mul",
            "args": [
             5,
-            { "ref": "stackCount", "name": "Pain Tolerance", "of": "self" }
+            {
+             "ref": "stackCount",
+             "name": "Pain Tolerance",
+             "of": "self"
+            }
            ]
           },
           "duration": null
@@ -7618,7 +7769,41 @@
         }
        ]
       }
-     ]
+     ],
+     "targetSpec": {
+      "faction": "enemies",
+      "extend": {
+       "and": [
+        {
+         "isFaction": "target",
+         "faction": "ally"
+        },
+        {
+         "isKind": "target",
+         "kind": "minion"
+        },
+        {
+         "or": [
+          {
+           "isNamed": "target",
+           "name": "Boulder"
+          },
+          {
+           "and": [
+            {
+             "fused": "spore"
+            },
+            {
+             "isNamed": "target",
+             "name": "Stonecap Mushroom"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     }
     },
     {
      "id": "roland2",
@@ -9129,7 +9314,33 @@
        ]
       }
      ],
-     "note": "'Deals 15 damage to 1 enemy. While enhanced, deals 10 more damage and becomes piercing.' Enhanced = acting alone = {has mark 'Exile'}. The outer branch is blackknight5's ultimate override ('during The Nightmare Rides, Oathbreaker Strike targets all enemies and is always enhanced') -> 25 piercing to all enemies."
+     "note": "'Deals 15 damage to 1 enemy. While enhanced, deals 10 more damage and becomes piercing.' Enhanced = acting alone = {has mark 'Exile'}. The outer branch is blackknight5's ultimate override ('during The Nightmare Rides, Oathbreaker Strike targets all enemies and is always enhanced') -> 25 piercing to all enemies.",
+     "targetSpec": {
+      "faction": "enemies",
+      "extend": {
+       "and": [
+        {
+         "fused": "evil"
+        },
+        {
+         "isFaction": "target",
+         "faction": "ally"
+        },
+        {
+         "isKind": "target",
+         "kind": "hero"
+        },
+        {
+         "not": {
+          "sameUnit": [
+           "target",
+           "self"
+          ]
+         }
+        }
+       ]
+      }
+     }
     },
     {
      "id": "blackknight2",
@@ -10097,7 +10308,10 @@
        "to": "target"
       }
      ],
-     "note": "Enemy -> 10 damage, ally -> 10 heal, each +5 per Deepening Shadows stack on the target (measured before the new stack is added). If target holds Elemental Essence, Laria gains Elemental Essence. Then places 1 Deepening Shadows stack on the target."
+     "note": "Enemy -> 10 damage, ally -> 10 heal, each +5 per Deepening Shadows stack on the target (measured before the new stack is added). If target holds Elemental Essence, Laria gains Elemental Essence. Then places 1 Deepening Shadows stack on the target.",
+     "targetSpec": {
+      "faction": "either"
+     }
     },
     {
      "id": "laria2",
@@ -11703,7 +11917,10 @@
        "name": "Faustian Bargain",
        "from": "caster"
       }
-     ]
+     ],
+     "targetSpec": {
+      "faction": "either"
+     }
     },
     {
      "id": "scratch2",
@@ -11805,7 +12022,10 @@
        "name": "Faustian Bargain",
        "from": "caster"
       }
-     ]
+     ],
+     "targetSpec": {
+      "faction": "either"
+     }
     },
     {
      "id": "scratch3",
@@ -11908,7 +12128,10 @@
        "name": "Faustian Bargain",
        "from": "caster"
       }
-     ]
+     ],
+     "targetSpec": {
+      "faction": "either"
+     }
     },
     {
      "id": "scratch4",
@@ -12022,7 +12245,10 @@
         ]
        }
       }
-     ]
+     ],
+     "targetSpec": {
+      "faction": "either"
+     }
     }
    ]
   },
@@ -13631,7 +13857,51 @@
          ]
         }
        ],
-       "note": "Oracle: 'Deals 15 damage to target enemy.' Plus the Prisma Vault rider: '+15 more damage to enemies marked by Prisma Vault' (total 30 if marked). May be aimed at a lensing Ranger to be reflected at the Lens target."
+       "note": "Oracle: 'Deals 15 damage to target enemy.' Plus the Prisma Vault rider: '+15 more damage to enemies marked by Prisma Vault' (total 30 if marked). May be aimed at a lensing Ranger to be reflected at the Lens target.",
+       "targetSpec": {
+        "faction": "enemies",
+        "extend": {
+         "and": [
+          {
+           "isFaction": "target",
+           "faction": "ally"
+          },
+          {
+           "isKind": "target",
+           "kind": "minion"
+          },
+          {
+           "unitIn": [
+            "target",
+            {
+             "any": [
+              {
+               "faction": "allies",
+               "template": "Prisma Crimson"
+              },
+              {
+               "faction": "allies",
+               "template": "Prisma Azure"
+              },
+              {
+               "faction": "allies",
+               "template": "Prisma Saffron"
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "not": {
+            "sameUnit": [
+             "target",
+             "self"
+            ]
+           }
+          }
+         ]
+        }
+       }
       }
      ],
      "triggers": [
@@ -13954,7 +14224,51 @@
          }
         }
        ],
-       "note": "Oracle: 'Deals 10 Piercing damage to target enemy and stuns their Strategic skills for 1 turn.' Scoped stun (mode 'only' on the Strategic tag) stops only the target's Strategic skills. May be reflected via a lensing Ranger."
+       "note": "Oracle: 'Deals 10 Piercing damage to target enemy and stuns their Strategic skills for 1 turn.' Scoped stun (mode 'only' on the Strategic tag) stops only the target's Strategic skills. May be reflected via a lensing Ranger.",
+       "targetSpec": {
+        "faction": "enemies",
+        "extend": {
+         "and": [
+          {
+           "isFaction": "target",
+           "faction": "ally"
+          },
+          {
+           "isKind": "target",
+           "kind": "minion"
+          },
+          {
+           "unitIn": [
+            "target",
+            {
+             "any": [
+              {
+               "faction": "allies",
+               "template": "Prisma Crimson"
+              },
+              {
+               "faction": "allies",
+               "template": "Prisma Azure"
+              },
+              {
+               "faction": "allies",
+               "template": "Prisma Saffron"
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "not": {
+            "sameUnit": [
+             "target",
+             "self"
+            ]
+           }
+          }
+         ]
+        }
+       }
       }
      ],
      "triggers": [
@@ -14257,7 +14571,51 @@
          }
         }
        ],
-       "note": "Oracle: 'Deals 10 damage to target enemy and Taunts them for 1 turn.' Taunt forces the target onto Saffron (unitRef 'self'). May be reflected via a lensing Ranger."
+       "note": "Oracle: 'Deals 10 damage to target enemy and Taunts them for 1 turn.' Taunt forces the target onto Saffron (unitRef 'self'). May be reflected via a lensing Ranger.",
+       "targetSpec": {
+        "faction": "enemies",
+        "extend": {
+         "and": [
+          {
+           "isFaction": "target",
+           "faction": "ally"
+          },
+          {
+           "isKind": "target",
+           "kind": "minion"
+          },
+          {
+           "unitIn": [
+            "target",
+            {
+             "any": [
+              {
+               "faction": "allies",
+               "template": "Prisma Crimson"
+              },
+              {
+               "faction": "allies",
+               "template": "Prisma Azure"
+              },
+              {
+               "faction": "allies",
+               "template": "Prisma Saffron"
+              }
+             ]
+            }
+           ]
+          },
+          {
+           "not": {
+            "sameUnit": [
+             "target",
+             "self"
+            ]
+           }
+          }
+         ]
+        }
+       }
       }
      ],
      "triggers": [

@@ -89,7 +89,10 @@ def v_selector(s, path):
             err(path, f"invalid selector '{s}'")
         return
     if isinstance(s, dict):
-        if "faction" in s:
+        if "any" in s:
+            for i, child in enumerate(s["any"]):
+                v_selector(child, f"{path}.any[{i}]")
+        elif "faction" in s:
             if s["faction"] not in {"allies", "enemies", "all"}:
                 err(path, f"invalid faction '{s['faction']}'")
             if s.get("kind") and s["kind"] not in {"hero", "minion"}:
@@ -138,6 +141,16 @@ def v_condition(c, path):
         v_selector(c["isKind"], path + ".isKind")
         if c.get("kind") not in {"hero", "minion"}:
             err(path, f"invalid isKind '{c.get('kind')}'")
+    elif "hasEssenceIncome" in c:
+        v_selector(c["hasEssenceIncome"], path + ".hasEssenceIncome")
+    elif "fused" in c:
+        if not isinstance(c["fused"], str):
+            err(path, "fused must be a form key")
+        if "of" in c:
+            v_selector(c["of"], path + ".of")
+    elif "eventTargetsHaveStatus" in c:
+        if c["eventTargetsHaveStatus"] not in STATUS_KINDS:
+            err(path, "invalid event target status kind")
     elif "skillOnCooldown" in c:
         if not isinstance(c["skillOnCooldown"], str):
             err(path, "skillOnCooldown must be a skill id string")
@@ -226,6 +239,12 @@ def v_trigger(t, path):
         v_selector(t["redirectTo"], path + ".redirectTo")
 
 def v_skill(s, path):
+    if "targetSpec" in s:
+        spec = s["targetSpec"]
+        if not isinstance(spec, dict) or spec.get("faction") not in {"allies", "enemies", "either"}:
+            err(path + ".targetSpec", "expected an explicit allies/enemies/either faction")
+        elif "extend" in spec:
+            v_condition(spec["extend"], path + ".targetSpec.extend")
     if s.get("targeting") not in TARGETING:
         err(path, f"invalid targeting '{s.get('targeting')}'")
     if s.get("klass") not in KLASS:

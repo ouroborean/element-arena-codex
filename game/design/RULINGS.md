@@ -9,9 +9,10 @@ one later is a rewrite.
 
 So every open question gets **one named constant, one chosen default, and its
 evidence**, recorded here and in [`../content/rulings.json`](../content/rulings.json).
-Code reads the JSON; golden replay tests are parameterized over it. Flipping a
-default is a one-line change that produces a **measurable diff** in the test
-snapshots — not an archaeology project.
+`tools/build_rulings.py` generates runtime constants from `rulings.json.runtime`.
+Tests exercise those constants and engine invariants. Numerical policies such as
+round limits are configurable; descriptive policies such as HP reset are not
+automatic runtime switches and require corresponding implementation/test changes.
 
 > **Oracle = faithful reconstruction** (see [DECISIONS.md](DECISIONS.md) · D1). These
 > defaults are **provisional** — they exist to unblock *engine scaffolding*, not to
@@ -53,8 +54,8 @@ Legend: **✔ = designer-confirmed (authoritative)** · ● = still on the desig
 | `MITIGATION_ORDER` | mods → ignore → DR → shield | MED | — |
 | `DAMAGE_CHANNELS` | **two** channels: incoming-mods vs DR | HIGH | — |
 | `IS_NEW` | a skill instance initiated this resolution | MED | — |
-| `ROUNDS_PER_MATCH` | up to 5, first to majority (exact N open) | LOW | ● |
-| `FIRST_PLAYER` | simultaneous commit; seeded tie-break | LOW | ● |
+| `ROUNDS_PER_MATCH` | headless API default first to 3; interactive clients first to 2 (named presets) | current implementation | — |
+| `FIRST_PLAYER` | alternating turns; team A opens each fresh round; network seats randomized | current implementation | — |
 | `ACCUMULATORS_READ` | post-mitigation | LOW | ● |
 | `FUSION_PARTNER_RULES` | fuse once/match ✔; partner-alive/cost open | MED | ● |
 | `DEFAULT_STACK_POLICY` | refresh unless text says "stacks" | MED | — |

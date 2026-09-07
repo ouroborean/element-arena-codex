@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { performAction, endTurn } from "../src/scheduler.ts";
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
+import { endTurn } from "../src/scheduler.ts";
 import { redactState } from "../src/visibility.ts";
 import { emit } from "../src/effects/interpret.ts";
 import { loadHero } from "../content/hero.ts"; // side-effect: registers handlers

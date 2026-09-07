@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { performAction, startTurn, endTurn } from "../src/scheduler.ts";
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
+import { startTurn, endTurn } from "../src/scheduler.ts";
 import { emit, runEffects } from "../src/effects/interpret.ts";
 import { applyAugment } from "../content/augment.ts";
 import { augmentById } from "../content/augments.generated.ts";

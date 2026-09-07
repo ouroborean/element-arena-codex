@@ -1,3 +1,4 @@
+import { MINIONS } from "../engine/content/roster.generated.ts";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { targetPool } from "./cli.ts";
@@ -9,7 +10,7 @@ import { makeState, makeUnit, skill } from "../engine/test/helpers.ts";
 
 test("Swoop offers stunned allies (+ enemies) only when the Eagle's summoner is winter-fused", () => {
   const syl = makeUnit({ id: "s", team: "A", kind: "hero", fused: "winter" });
-  const eagle = makeUnit({ id: "eg", team: "A", kind: "minion", summoner: "s", skills: [skill("sylminion2", [], { tags: ["Harmful"] })] });
+  const eagle = makeUnit({ id: "eg", team: "A", kind: "minion", summoner: "s", skills: [structuredClone(MINIONS.find(m => m.name === "Adult Eagle")!.skills!.find(s => s.id === "sylminion2")!)] });
   const stunnedAlly = makeUnit({ id: "al", team: "A", kind: "hero", statuses: [{ kind: "stun", duration: 1, appliedBy: "e", appliedTurn: 0 }] });
   const wellAlly = makeUnit({ id: "ok", team: "A", kind: "hero" });
   const enemy = makeUnit({ id: "e", team: "B", kind: "hero" });
@@ -23,7 +24,7 @@ test("Swoop offers stunned allies (+ enemies) only when the Eagle's summoner is 
 
 test("without Mountain Rescue Team, Swoop offers only enemies", () => {
   const syl = makeUnit({ id: "s", team: "A", kind: "hero" }); // not fused
-  const eagle = makeUnit({ id: "eg", team: "A", kind: "minion", summoner: "s", skills: [skill("sylminion2", [], { tags: ["Harmful"] })] });
+  const eagle = makeUnit({ id: "eg", team: "A", kind: "minion", summoner: "s", skills: [structuredClone(MINIONS.find(m => m.name === "Adult Eagle")!.skills!.find(s => s.id === "sylminion2")!)] });
   const stunnedAlly = makeUnit({ id: "al", team: "A", kind: "hero", statuses: [{ kind: "stun", duration: 1, appliedBy: "e", appliedTurn: 0 }] });
   const enemy = makeUnit({ id: "e", team: "B", kind: "hero" });
   const state = makeState([syl, eagle, stunnedAlly], [enemy]);

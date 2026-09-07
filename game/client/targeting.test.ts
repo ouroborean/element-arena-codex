@@ -10,10 +10,12 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { poolFor, highlightFor, telegraphFor, isSingleTargetPick } from "./targeting.ts";
-import { makeState, makeUnit, skill, status } from "../engine/test/helpers.ts";
+import { makeState, makeUnit, skill as fixtureSkill, status } from "../engine/test/helpers.ts";
 import { ROSTER } from "../engine/content/roster.generated.ts";
 import { FUSIONS } from "../engine/content/fusions.generated.ts";
 import type { SkillInstance } from "../engine/src/skill.ts";
+
+const skill: typeof fixtureSkill = (id, effects, over = {}) => fixtureSkill(id, effects, { targetSpec: undefined, ...over });
 
 /** A caster on team A with `sk`, plus an ally and an enemy; returns the OFFERED target ids. */
 function offered(sk: SkillInstance, casterOver: Partial<Parameters<typeof makeUnit>[0]> = {}): string[] {
@@ -54,7 +56,7 @@ test("a skill with neither Harmful nor Helpful offers both factions (Strategic s
 });
 
 test("Merciless (blackknight1 while evil-fused): Oathbreaker Strike offers enemies + allied HEROES, not self or minions", () => {
-  const caster = makeUnit({ id: "bk", team: "A", kind: "hero", fused: "evil", skills: [skill("blackknight1", [], { tags: ["Harmful"] })] });
+  const caster = makeUnit({ id: "bk", team: "A", kind: "hero", fused: "evil", skills: [structuredClone(ROSTER.find(h => h.id === "blackknight")!.skills.find(s => s.id === "blackknight1")!)] });
   const allyHero = makeUnit({ id: "ah", team: "A", kind: "hero" });
   const allyMinion = makeUnit({ id: "am", team: "A", kind: "minion" });
   const enemy = makeUnit({ id: "e", team: "B", kind: "hero" });

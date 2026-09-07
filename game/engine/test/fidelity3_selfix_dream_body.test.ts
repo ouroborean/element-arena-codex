@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { performAction } from "../src/scheduler.ts";
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
 import { loadHero } from "../content/hero.ts"; // side-effect: registers handlers
 import { heroById } from "../content/match.ts";
 import { makeState, makeUnit } from "./helpers.ts";
@@ -24,7 +24,8 @@ test("Dream Body: a single-target skill whose SOLE target is Xyris grants him El
 
   assert.ok(!xyris.statuses.some((s) => s.kind === "elemental_essence"), "precondition: Xyris starts with no Essence");
 
-  // A single-target skill (Reveal Hidden Truth) declared with Xyris himself as the one and only target.
+  // An explicitly cross-faction test skill exercises the self-targeted passive without an illegal hostile selection.
+  xyris.skills![0] = { ...xyris.skills![0]!, effects: [], targetSpec: { faction: "either" } };
   const res = performAction(state, { unit: "x", skillId: "xyris1", targets: ["x"] });
   assert.ok(res.ok, `the self-targeted cast resolved (${JSON.stringify(res)})`);
 

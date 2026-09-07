@@ -3,7 +3,8 @@ import assert from "node:assert/strict";
 import { loadHero } from "../content/hero.ts"; // side-effect: registers handlers
 import { heroById } from "../content/match.ts";
 import { makeState, makeUnit } from "./helpers.ts";
-import { performAction, startRound } from "../src/scheduler.ts";
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
+import { startRound } from "../src/scheduler.ts";
 import { applyAugment } from "../content/augment.ts";
 import { augmentById } from "../content/augments.generated.ts";
 import { getMinionTemplate } from "../src/minions.ts";

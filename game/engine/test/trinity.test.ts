@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { runEffects } from "../src/effects/interpret.ts";
-import { performAction } from "../src/scheduler.ts";
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
 import { registerMinion } from "../src/minions.ts";
 import { stackCount } from "../src/status.ts";
 import type { Unit } from "../src/types.ts";

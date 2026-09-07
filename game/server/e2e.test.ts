@@ -53,7 +53,7 @@ function connect(url: string): Promise<{ ws: WebSocket; msgs: ServerMsg[]; wait:
 }
 
 test("two real WebSocket clients are matched and driven to a result over TCP", async () => {
-  const { stop, http } = startServer(0);
+  const { stop, http, server } = startServer(0);
   await once(http, "listening");
   const port = (http.address() as AddressInfo).port;
   const url = `ws://127.0.0.1:${port}`;
@@ -76,6 +76,12 @@ test("two real WebSocket clients are matched and driven to a result over TCP", a
 
     // Team A always takes the first turn; that player surrenders, so Team B must win by forfeit.
     const firstMover = s1.you === "A" ? p1 : p2;
+    server.setDraining(true);
+    const drain = await fetch(`http://127.0.0.1:${port}/healthz`).then(r => r.json()) as { draining: boolean; activeMatches: number; ready: boolean; protocolVersion: number };
+    assert.equal(drain.draining, true);
+    assert.equal(drain.activeMatches, 1);
+    assert.equal(drain.ready, false);
+    assert.equal(drain.protocolVersion, PROTOCOL_VERSION);
     await firstMover.wait("yourTurn");
     firstMover.ws.send(JSON.stringify({ t: "surrender" }));
 
@@ -83,12 +89,33 @@ test("two real WebSocket clients are matched and driven to a result over TCP", a
     const e2 = (await p2.wait("matchEnd")) as Extract<ServerMsg, { t: "matchEnd" }>;
     assert.equal(e1.outcome.winner, e2.outcome.winner, "both clients agree on the winner");
     assert.equal(e1.outcome.winner, "B", "the surrendering first-mover (Team A) loses to Team B");
+    assert.equal(server.deploymentStatus().activeMatches, 0, "an existing match can finish during drain");
+    server.setDraining(false);
+    assert.equal(server.deploymentStatus().draining, false);
     assert.equal(e1.reason, "forfeit", "a surrender is a forfeit");
   } finally {
     p1?.ws.close();
     p2?.ws.close();
     stop();
   }
+});
+
+test("deployment drain rejects new matchmaking and can be cancelled without a restart", { timeout: 5000 }, async () => {
+  const { stop, http, server } = startServer(0);
+  await once(http, "listening");
+  const port = (http.address() as AddressInfo).port;
+  const client = await connect(`ws://127.0.0.1:${port}`);
+  try {
+    server.setDraining(true);
+    await authQueue(client, ["pyrrha", "saya", "roland"], "drain-player", "secret-drain", "Guest");
+    const rejected = await client.wait("error") as Extract<ServerMsg, { t: "error" }>;
+    assert.match(rejected.message, /update in progress/);
+    assert.equal(server.queueSize(), 0);
+    server.setDraining(false);
+    client.ws.send(JSON.stringify({ t: "queue", team: ["pyrrha", "saya", "roland"], protocolVersion: PROTOCOL_VERSION }));
+    await client.wait("queued");
+    assert.equal(server.queueSize(), 1);
+  } finally { client.ws.close(); stop(); }
 });
 
 test("one identity can't hold two concurrent ranked queue entries (rating-clobber guard)", async () => {

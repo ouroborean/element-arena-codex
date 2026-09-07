@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { effectiveCost, performAction, startTurn, endTurn } from "../src/scheduler.ts";
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
+import { effectiveCost, startTurn, endTurn } from "../src/scheduler.ts";
 import { runEffects, emit } from "../src/effects/interpret.ts";
 import { spendShield, totalShield } from "../src/damage.ts";
 import { loadHero } from "../content/hero.ts"; // side-effect: registers custom handlers

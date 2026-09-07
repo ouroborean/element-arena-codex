@@ -12,6 +12,7 @@
 import * as readline from "node:readline";
 import { stdin, stdout, argv, env, exit } from "node:process";
 import type { MatchState, TeamId, Unit } from "../engine/src/types.ts";
+import { RULINGS } from "../engine/src/rulings.generated.ts";
 import type { Action } from "../engine/src/scheduler.ts";
 import type { SkillInstance } from "../engine/src/skill.ts";
 import { buildMatch, defaultPolicy, heroById } from "../engine/content/match.ts";
@@ -122,7 +123,7 @@ async function main(): Promise<void> {
     : (st, side) => (side === you ? human(st, side) : defaultPolicy(st, side));
 
   const outcome = await runMatch(state, provide, {
-    roundsToWin: 2,
+    roundsToWin: RULINGS.INTERACTIVE_ROUNDS_TO_WIN,
     hooks: {
       onTurnStart: (st, side) => { if (side !== you || demo) stdout.write(R.dim(`\n— Team ${side} (AI) acts —\n`)); },
       onResults: (st, side, _res, newLog) => {

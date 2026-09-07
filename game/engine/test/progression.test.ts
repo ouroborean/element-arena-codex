@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  emptyProgress, asProgress, creditWin, FUSION_ELEMENT_HEROES, FUSION_ELEM_WINS_REQUIRED,
+  emptyProgress, asProgress, creditWin, unlockedProgress, FUSION_ELEMENT_HEROES, FUSION_ELEM_WINS_REQUIRED,
   advancedAugmentsUnlocked, augmentUnlocked, fusionUnlocked, heroUnlocked, type Progress,
 } from "../content/progression.ts";
 
@@ -71,6 +71,19 @@ test("creditWin ignores minions and non-hero units, and is pure", () => {
   assert.deepEqual(before.augWins, {}, "input is not mutated");
   assert.deepEqual(after.augWins, { pyrrha1: 1 }, "the minion's fields are not counted");
   assert.deepEqual(after.fusedWins, {});
+});
+
+test("unlockedProgress (the `all` escape hatch) unlocks everything — the tutorial uses it", () => {
+  const p = unlockedProgress();
+  assert.equal(heroUnlocked(p, "dennis"), true, "even a fusion-element hero");
+  assert.equal(advancedAugmentsUnlocked(p, "pyrrha"), true);
+  assert.equal(augmentUnlocked(p, "pyrrha5"), true, "an advanced augment");
+  assert.equal(fusionUnlocked(p, "pyrrha"), true, "Fusion — what the tutorial needs");
+});
+
+test("asProgress never resurrects `all` from a stored blob (a saved all:true can't grant unlocks)", () => {
+  assert.equal(asProgress({ all: true, augWins: {}, fusedWins: {} }).all, undefined);
+  assert.equal(fusionUnlocked(asProgress({ all: true, augWins: {}, fusedWins: {} }), "pyrrha"), false);
 });
 
 test("asProgress coerces a corrupt / hand-edited blob into a clean Progress", () => {

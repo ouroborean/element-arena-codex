@@ -7,14 +7,15 @@
  * tests. Turn/draft timeouts auto-fill; a surrender forfeits immediately; a dropped socket starts a grace
  * window (onSeatDisconnect) so the player can reconnect (onSeatReconnect) instead of losing outright.
  */
-import { pendingTicks, type Action } from "../engine/src/scheduler.ts";
-import type { MatchState, TeamId, TurnResolutionItem } from "../engine/src/types.ts";
+import { randomInt } from "node:crypto";
+import { applyDraftChoices, autoDraft, hasDraftOptions, type DraftChoice } from "../application/draft.ts";
+import { runMatch } from "../application/loop.ts";
 import type { MatchOutcome } from "../engine/content/match.ts";
 import { buildMatch } from "../engine/content/match.ts";
-import { runMatch } from "../client/loop.ts";
-import { applyDraftChoices, autoDraft, hasDraftOptions, type DraftChoice } from "../client/draft.ts";
-import { ROUNDS_TO_WIN, TURN_MS, DRAFT_MS, RECONNECT_GRACE_MS, type ClientMsg, type ServerMsg, type EndReason, type WireTurnOrder } from "../net/protocol.ts";
-import { redactState } from "../engine/src/visibility.ts";
+import { pendingTicks, type Action } from "../engine/src/scheduler.ts";
+import type { MatchState, TeamId, TurnResolutionItem } from "../engine/src/types.ts";
+import { DRAFT_MS, RECONNECT_GRACE_MS, ROUNDS_TO_WIN, TURN_MS, type ClientMsg, type EndReason, type ServerMsg, type WireTurnOrder } from "../net/protocol.ts";
+import { publicState, type PublicMatchState } from "../net/public-state.ts";
 
 type TurnMsg = Extract<ClientMsg, { t: "turn" }>;
 type DraftMsg = Extract<ClientMsg, { t: "draftChoice" }>;
@@ -160,7 +161,7 @@ export class Match {
     this.draftMs = opts.draftMs ?? DRAFT_MS;
     this.graceMs = opts.graceMs ?? RECONNECT_GRACE_MS;
     // Random side assignment IS the first-move coin flip (Team A always takes a round's first turn).
-    const aIsA = Math.random() < 0.5;
+    const aIsA = randomInt(2) === 0;
     a.side = aIsA ? "A" : "B";
     b.side = aIsA ? "B" : "A";
     this.bySide = aIsA ? { A: a, B: b } : { A: b, B: a };
@@ -251,9 +252,8 @@ export class Match {
   /** State for the wire, projected for ONE seat: the opponent's Invisible effects are stripped (redactState)
    *  so a client can never see — or preview against — what it is not meant to know, THEN the unbounded match
    *  log is trimmed to its tail so re-broadcasting every phase doesn't grow O(turns^2) in bandwidth. */
-  private wireState(viewer: TeamId): MatchState {
-    const seen = redactState(this.state, viewer);
-    return seen.log.length > 8 ? { ...seen, log: seen.log.slice(-8) } : seen;
+  private wireState(viewer: TeamId): PublicMatchState {
+    return publicState(this.state, viewer);
   }
 
   async run(): Promise<void> {
@@ -265,13 +265,16 @@ export class Match {
       outcome = await runMatch(this.state, (_st, side) => this.provideTurn(side), {
         roundsToWin: ROUNDS_TO_WIN,
         hooks: {
-          onResults: () => this.broadcastState(), // both sides see the just-resolved turn before the next one
+          onResults: (_state, side, results) => {
+            for (const result of results) if (!result.ok) this.bySide[side].send({ t: "actionRejected", reason: result.reason ?? "invalid action" });
+            this.broadcastState();
+          }, // both sides see the just-resolved turn before the next one
           onRoundEnd: () => this.broadcastState(),
         },
         onBetweenRounds: (_st, winner) => this.runDraftPhase(other(winner)), // runMatch passes the WINNER; the loser drafts first
       });
-    } catch {
-      /* aborted, or an unexpected engine error — disambiguated by `this.aborted` below */
+    } catch (error) {
+      if (!this.aborted) console.error("[arena] match execution failed", error);
     }
 
     if (this.aborted) return this.end(this.forfeitOutcome(this.aborted.winner), this.aborted.reason);
@@ -300,7 +303,7 @@ export class Match {
       active.pendingTurn = (msg) => {
         clearTimeout(timer);
         this.state.genericPay = sanitizeGenericPay(msg.genericPay);
-        const actions = filterTurnActions(sanitizeActions(msg.actions), side, this.state.units);
+        const actions = sanitizeActions(msg.actions);
         this.state.turnOrder = rebuildTurnOrder(msg.order, actions, side, this.state); // explicit skill/tick interleave (or default)
         resolve(actions);
       };

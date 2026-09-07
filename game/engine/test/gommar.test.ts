@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { performAction } from "../src/scheduler.ts";
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
 import { ROSTER } from "../content/roster.generated.ts";
 import { makeState, makeUnit, status } from "./helpers.ts";
 

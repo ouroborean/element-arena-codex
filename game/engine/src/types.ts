@@ -7,9 +7,10 @@
  * the DOM or reaches outside it.
  */
 
-import type { SkillInstance } from "./skill.ts";
-import type { TriggeredEffect, GameEvent } from "./events.ts";
 import type { Effect, NodeId } from "./effects/ast.ts";
+import type { GameEvent, TriggeredEffect } from "./events.ts";
+import type { SkillInstance } from "./skill.ts";
+import type { StatusRules } from "./status-rules.ts";
 
 /** An augment patch whose target skill lives on this hero's minion TEMPLATES, not the hero itself
  *  (Trinity's "The Power of Friendship" appends to the Rangers' Ruby/Sapphire/Citrine Lens skills). It is
@@ -96,7 +97,12 @@ export interface StunScope {
 }
 
 export interface Status {
+  rules?: StatusRules;
   kind: StatusKind;
+  /** Explicit identity and merge behavior; omitted fields use the compatibility defaults in status.ts. */
+  stackKey?: string;
+  mergePolicy?: "refresh" | "replace" | "stack" | "coexist" | "charge";
+  appliedByTeam?: TeamId;
   /** Flat magnitude for DR / incoming-mod / stack count / dot tick. */
   magnitude?: number;
   /** Identifier for mark/stack/dot effects ("Fan the Flames", "Charge", ...). */
@@ -184,6 +190,7 @@ export interface Status {
 
 /** One shield grant: a breakable, optionally-timed absorb pool. */
 export interface ShieldInstance {
+  appliedByTeam?: TeamId;
   amount: number;
   /** Turns remaining; null = lasts the round. Ticks at the applier's turn-end. */
   duration: number | null;
@@ -253,6 +260,10 @@ export type TurnResolutionItem =
   | { kind: "tick"; unitId: UnitId; status: Status };
 
 export interface MatchState {
+  /** Query-only public projection. Command execution must reject it. */
+  previewOnly?: true;
+  /** Round-scoped source snapshots for effects whose summoned creator has left the board. Server-private. */
+  retiredUnits?: Record<UnitId, Unit>;
   round: number;
   /** Monotonic turn counter across the whole match. */
   turn: number;
@@ -300,6 +311,7 @@ export interface MatchState {
 
 /** A deferred effect: fires after `turns` of the caster's turn-ends elapse. */
 export interface ScheduledEntry {
+  appliedByTeam?: TeamId;
   effect: Effect[];
   caster: UnitId;
   targets: UnitId[];

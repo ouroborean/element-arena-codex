@@ -14,6 +14,7 @@
  * per-each 9%, summon 4%). The `custom` escape hatch covers the ~3% that need
  * bespoke native code.
  */
+import type { StatusRules } from "../status-rules.ts";
 import type { DamageType, StatusKind, StunScope } from "../types.ts";
 
 /** Optional stable id so a patch can address this exact node. */
@@ -105,6 +106,9 @@ export type Condition =
 //  Status specification (what applyStatus authors).
 // --------------------------------------------------------------------------- //
 export interface StatusSpec {
+  rules?: StatusRules;
+  stackKey?: string;
+  mergePolicy?: "refresh" | "replace" | "stack" | "coexist" | "charge";
   kind: StatusKind;
   magnitude?: Value;
   name?: string;

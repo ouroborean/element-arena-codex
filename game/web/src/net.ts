@@ -1,6 +1,6 @@
 /**
  * Browser transport for Quick Match: a thin, typed wrapper around the platform WebSocket that speaks the
- * shared protocol (../../net/protocol.ts). It only moves JSON messages — all match logic lives in main.ts,
+ * shared protocol (../../net/protocol.ts). It only moves JSON messages — session logic lives in pvp-controller.ts,
  * which subscribes to `onMessage` and drives the existing board rendering from the server's authoritative
  * state. Nothing here simulates the game.
  */
@@ -35,24 +35,37 @@ export class MatchSocket {
 }
 
 /**
- * Where to reach the match server. Overridable (so a GitHub-Pages-hosted client can point at any server):
- *   ?server=wss://host        query param  (highest priority)
- *   localStorage.arenaServer  persisted override
- * else ws://<page-host>:8790  the local-dev default.
+ * Deployment endpoint: <meta name="arena-server" content="wss://trusted-host">,
+ * otherwise ws(s)://<page-host>:8790. URL overrides are restricted to the trusted origin;
+ * local development may also change its port. Stored arbitrary overrides are no longer accepted.
  */
 export function serverUrl(): string {
-  const fromQuery = new URLSearchParams(location.search).get("server");
-  if (fromQuery) return fromQuery;
-  const stored = localStorage.getItem("arenaServer");
-  if (stored) return stored;
-  const host = location.hostname || "localhost";
-  const scheme = location.protocol === "https:" ? "wss" : "ws"; // match the page so an https client isn't mixed-content-blocked
-  return `${scheme}://${host}:${DEFAULT_PORT}`;
+  const configured = document.querySelector<HTMLMetaElement>('meta[name="arena-server"]')?.content;
+  return resolveServerUrl(location.href, configured);
+}
+
+/** URL parameters may select a port/path on the trusted host, never an arbitrary credential recipient. */
+export function resolveServerUrl(pageUrl: string, configured?: string): string {
+  const page = new URL(pageUrl);
+  const relative = configured?.startsWith("/") && !configured.startsWith("//");
+  const fallback = relative ? new URL(configured!, page).href.replace(/^http/, "ws") :
+    configured || `${page.protocol === "https:" ? "wss" : "ws"}://${page.hostname || "localhost"}:${DEFAULT_PORT}`;
+  const trusted = new URL(fallback);
+  if (!["ws:", "wss:"].includes(trusted.protocol) || trusted.username || trusted.password) throw new Error("Invalid configured arena server");
+  const candidate = page.searchParams.get("server");
+  if (candidate) {
+    try {
+      const url = new URL(candidate);
+      const local = ["localhost", "127.0.0.1", "[::1]"].includes(page.hostname);
+      if ((url.origin === trusted.origin || (local && url.hostname === trusted.hostname && url.protocol === trusted.protocol)) && !url.username && !url.password) return url.href;
+    } catch { /* use configured host */ }
+  }
+  return trusted.href.replace(/\/$/, "");
 }
 
 /** The http(s) origin matching serverUrl (ws→http, wss→https) — for the /profile endpoint. */
 export function httpBase(): string {
-  return serverUrl().replace(/^ws/, "http").replace(/\/+$/, "");
+  return new URL(serverUrl()).origin.replace(/^ws/, "http");
 }
 
 export interface AvatarInfo { file: string; name: string; }

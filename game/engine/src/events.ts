@@ -26,7 +26,7 @@ export type GameEvent =
   | { type: "minionSummoned"; unit: UnitId; template: string; summoner: UnitId }
   // Emitted before a skill's effects resolve; counter/reflect triggers may interrupt it.
   | { type: "skillDeclared"; caster: UnitId; skillId: string; tags: string[]; targets: UnitId[]; hidden?: boolean }
-  | { type: "healReceived"; unit: UnitId; source: UnitId | null; amount: number; overheal?: number }
+  | { type: "healReceived"; unit: UnitId; source: UnitId | null; amount: number; overheal?: number; sourceId?: string; isTick?: boolean }
   | { type: "statusApplied"; unit: UnitId; source: UnitId | null; kind: string; name?: string }
   | { type: "statusExpired"; unit: UnitId; kind: string; name?: string }
   | { type: "statusLost"; unit: UnitId; kind: string; name?: string } // a status EXPLICITLY removed (removeStatus op), distinct from natural expiry
@@ -67,6 +67,7 @@ export interface TriggeredEffect {
    *  redactState hides it from the opponent — a newly-armed reflect/trap must not be broadcast by name. */
   invisible?: boolean;
   appliedBy?: UnitId;
+  appliedByTeam?: TeamId;
   appliedTurn?: number;
   /**
    * A human-readable name handle for the registering passive/skill — used by augment surgery

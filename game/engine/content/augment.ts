@@ -11,10 +11,10 @@
  * `cost`) with the authored `HeroDef`. Every patch that mutates a skill first deep-clones it onto
  * the unit, so one hero's augment never leaks into the shared content or a teammate.
  */
-import type { MinionSkillPatch, Unit } from "../src/types.ts";
-import type { SkillInstance } from "../src/skill.ts";
 import type { Effect, NodeId } from "../src/effects/ast.ts";
 import { replaceNode } from "../src/effects/patch.ts";
+import type { SkillInstance } from "../src/skill.ts";
+import type { MinionSkillPatch, Unit } from "../src/types.ts";
 import type { HeroTrigger } from "./hero.ts";
 
 /** Fields an augment may overwrite on a skill (metadata only — effects go through patchNode/appendEffect).
@@ -92,7 +92,7 @@ export function applyPatch(unit: Unit, patch: Patch): void {
       const skills = unit.skills ?? [];
       const i = skills.findIndex((s) => s.id === patch.skillId);
       if (i >= 0) {
-        skills[i] = { ...clone(patch.skill), currentCd: 0 };
+        skills[i] = { targetSpec: skills[i]!.targetSpec, targetsEitherFaction: skills[i]!.targetsEitherFaction, ...clone(patch.skill), currentCd: 0 };
         unit.skills = skills;
       } else {
         // The named skill belongs to a MINION this hero summons, not the hero — park the replacement so it is

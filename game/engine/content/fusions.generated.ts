@@ -1819,22 +1819,31 @@ export const FUSIONS: FusionForm[] = [
     "when": {
      "and": [
       {
-       "sameUnit": [
-        "eventSource",
-        "self"
-       ]
-      },
-      {
-       "has": "regen",
-       "name": "Consecrate",
-       "of": "eventUnit"
-      },
-      {
        "not": {
-        "has": "mark",
-        "name": "Hallowed Proc Lock",
-        "of": "self"
+        "eventSourceId": "Consecrate"
        }
+      },
+      {
+       "and": [
+        {
+         "sameUnit": [
+          "eventSource",
+          "self"
+         ]
+        },
+        {
+         "has": "regen",
+         "name": "Consecrate",
+         "of": "eventUnit"
+        },
+        {
+         "not": {
+          "has": "mark",
+          "name": "Hallowed Proc Lock",
+          "of": "self"
+         }
+        }
+       ]
       }
      ]
     },
@@ -15880,6 +15889,13 @@ export const FUSIONS: FusionForm[] = [
      }
     }
    ],
+   "targetSpec": {
+    "faction": "enemies",
+    "extend": {
+     "isNamed": "target",
+     "name": "sylnomadminion"
+    }
+   },
    "currentCd": 0
   }
  },

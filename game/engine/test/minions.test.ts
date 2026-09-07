@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { grantIncome, performAction, removeDeadMinions, startRound } from "../src/scheduler.ts";
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
+import { grantIncome, removeDeadMinions, startRound } from "../src/scheduler.ts";
 import { registerMinion } from "../src/minions.ts";
 import { runEffects } from "../src/effects/interpret.ts";
 import { stackCount } from "../src/status.ts";

@@ -1,27 +1,28 @@
 /**
  * The Quick Match wire protocol — the single source of truth for the message shapes the browser client
- * and the authoritative match server exchange. Types-only + constants, so it imports NOTHING at runtime
- * (every engine import is `import type`, erased by the bundler / Node's type-stripping) and is safe to
- * pull into both the Node server and the esbuild browser bundle.
+ * and the authoritative match server exchange. Imports only generated rule constants at runtime;
+ * execution state and effect handlers are not part of this contract.
  *
  * Model: the SERVER is authoritative. It owns the seed, runs the real engine, validates every action,
- * and broadcasts the full MatchState after each phase. A client only ever sends its own committed turn /
+ * and broadcasts a per-viewer PublicMatchState after each phase. A client only ever sends its own committed turn /
  * draft choice; it never simulates the match itself (it keeps the engine solely for read-only previews of
  * the state the server sent). Turns strictly alternate — exactly one side is asked to act at a time.
  */
-import type { Action } from "../engine/src/scheduler.ts";
-import type { MatchState, TeamId, EnergyPool } from "../engine/src/types.ts";
+import type { DraftChoice } from "../application/draft.ts";
 import type { MatchOutcome } from "../engine/content/match.ts";
-import type { DraftChoice } from "../client/draft.ts";
+import { RULINGS } from "../engine/src/rulings.generated.ts";
+import type { Action } from "../engine/src/scheduler.ts";
+import type { EnergyPool, TeamId } from "../engine/src/types.ts";
+import type { PublicMatchState } from "./public-state.ts";
 
 /** Bumped on any breaking change to the messages below; the server rejects a mismatched client. */
-export const PROTOCOL_VERSION = 2;
+export const PROTOCOL_VERSION = 3;
 
 /** Default port the match server listens on (overridable via ARENA_PORT / the client's ?server=). */
 export const DEFAULT_PORT = 8790;
 
 /** Best-of-N: first side to this many round wins takes the match (server-enforced, never client-set). */
-export const ROUNDS_TO_WIN = 2;
+export const ROUNDS_TO_WIN = RULINGS.INTERACTIVE_ROUNDS_TO_WIN;
 
 /** Every drafted team is exactly this many heroes. */
 export const TEAM_SIZE = 3;
@@ -92,6 +93,7 @@ export type ClientMsg =
 //  Server → client
 // --------------------------------------------------------------------------- //
 export type ServerMsg =
+  | { t: "actionRejected"; reason: string }
   /** Your guest identity was accepted; here is the persisted profile (name + record + rating). */
   | { t: "authed"; profile: Profile }
   /** Authentication was refused (the player id exists with a different secret). */
@@ -99,10 +101,10 @@ export type ServerMsg =
   /** Acknowledged: you are waiting in the queue. */
   | { t: "queued" }
   /** Matched. `you` is your team id; `state` is the initial board; `matchId`/`token` let you rejoin on a drop. */
-  | { t: "start"; you: TeamId; opponentTeam: string[]; opponentName: string; state: MatchState; matchId: string; token: string }
+  | { t: "start"; you: TeamId; opponentTeam: string[]; opponentName: string; state: PublicMatchState; matchId: string; token: string }
   /** A successful rejoin: here is where the match stands, what you should be doing, and whether the
    *  opponent is currently disconnected (so a double-disconnect resumes with an accurate banner). */
-  | { t: "resumed"; you: TeamId; state: MatchState; control: "turn" | "wait" | "draft" | "waitDraft"; deadline?: number; opponentDisconnected: boolean; opponentName: string }
+  | { t: "resumed"; you: TeamId; state: PublicMatchState; control: "turn" | "wait" | "draft" | "waitDraft"; deadline?: number; opponentDisconnected: boolean; opponentName: string }
   /** Your opponent's connection dropped; the match is held open `graceMs` for them to return. */
   | { t: "opponentDisconnected"; graceMs: number }
   /** Your opponent reconnected — carry on. */
@@ -110,13 +112,13 @@ export type ServerMsg =
   /** A rejoin attempt failed (the match ended, or the token/match id did not match). */
   | { t: "rejoinFailed"; message: string }
   /** It is YOUR turn — plan and reply with a `turn`. `deadline` is an epoch-ms timeout. */
-  | { t: "yourTurn"; state: MatchState; deadline: number }
+  | { t: "yourTurn"; state: PublicMatchState; deadline: number }
   /** The opponent is acting; just render `state` and wait. */
-  | { t: "opponentTurn"; state: MatchState }
+  | { t: "opponentTurn"; state: PublicMatchState }
   /** It is YOUR between-round draft — reply with a `draftChoice`. */
-  | { t: "yourDraft"; state: MatchState; deadline: number }
+  | { t: "yourDraft"; state: PublicMatchState; deadline: number }
   /** The opponent is drafting; render `state` and wait. */
-  | { t: "opponentDraft"; state: MatchState }
+  | { t: "opponentDraft"; state: PublicMatchState }
   /** The match is over. `rating` is present for a ranked match: your new Elo and the change from it. */
   | { t: "matchEnd"; outcome: MatchOutcome; reason: EndReason; you: TeamId; rating?: { rating: number; delta: number } }
   /** A recoverable problem (bad team, protocol mismatch, illegal message); usually terminal for this attempt. */

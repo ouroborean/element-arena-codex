@@ -1,3 +1,5 @@
+import { initializeContent } from "../content/runtime.ts";
+initializeContent();
 import type { MatchState, Status, StatusKind, Unit } from "../src/types.ts";
 import type { SkillInstance } from "../src/skill.ts";
 import type { Effect } from "../src/effects/ast.ts";
@@ -14,6 +16,8 @@ export function skill(id: string, effects: Effect[], over: Partial<SkillInstance
     currentCd: 0,
     klass: "basic",
     tags: [],
+    // Synthetic effect fixtures deliberately admit either faction; roster policies are tested separately.
+    targetSpec: { faction: "either" },
     ...over,
   };
 }

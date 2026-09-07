@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { performAction, effectiveCooldown } from "../src/scheduler.ts";
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
+import { effectiveCooldown } from "../src/scheduler.ts";
 import { runEffects } from "../src/effects/interpret.ts";
 import { loadHero } from "../content/hero.ts"; // side-effect: registers custom handlers
 import { makeState, makeUnit, skill, status } from "./helpers.ts";

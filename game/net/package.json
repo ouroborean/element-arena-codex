@@ -3,5 +3,6 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Element Arena — shared Quick Match wire protocol (isomorphic, types-only + constants)."
+  "description": "Element Arena — public board projection and validated wire protocol.",
+  "scripts": { "test": "node --test", "typecheck": "tsc --noEmit -p tsconfig.json" }
 }

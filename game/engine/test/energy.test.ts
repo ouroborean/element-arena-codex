@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { performAction, resolveTurn } from "../src/scheduler.ts";
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
+import { resolveTurn } from "../src/scheduler.ts";
 import { makeState, makeUnit, skill } from "./helpers.ts";
 
 // A skill's GENERIC cost may be paid with energy of any color; the player chooses which via

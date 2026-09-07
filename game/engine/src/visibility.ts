@@ -15,19 +15,20 @@
  * human's view. It is PURE — it never mutates the input, and it always leaves `statuses` an array so the
  * renderer (which does `for (const s of u.statuses)`) never trips on a missing field.
  */
-import type { MatchState, Status, TeamId, Unit } from "./types.ts";
+import { effectTeam } from "./effect-source.ts";
 import type { TriggeredEffect } from "./events.ts";
+import type { MatchState, Status, TeamId, Unit } from "./types.ts";
 
 /** The team that created a status — the scope of its invisibility. Derived from the applier; if that unit
  *  has left the board, fall back to the bearer's team (an orphaned effect is treated as the bearer's own). */
 export function statusOwnerTeam(state: MatchState, status: Status, bearer: Unit): TeamId {
-  return state.units[status.appliedBy]?.team ?? bearer.team;
+  return effectTeam(state, status) ?? bearer.team;
 }
 
 /** The team that installed a dynamic watch — the scope of ITS invisibility (installWatch stamps
  *  appliedBy = the installer). Undefined if that unit is gone (then an invisible watch hides from everyone). */
 function installerTeamOf(state: MatchState, t: TriggeredEffect): TeamId | undefined {
-  return t.appliedBy ? state.units[t.appliedBy]?.team : undefined;
+  return effectTeam(state, t);
 }
 
 /** Is this unit concealed by a cloak right now? While concealed, the effects it creates and the skills it
@@ -121,8 +122,8 @@ export function redactState(state: MatchState, viewer: TeamId): MatchState {
   // A scheduled effect an Invisible foe cast queued names its skill + carries its pending payload — omit it
   // from the opponent's wire (kept for the owner, and for a viewer with True Sight).
   let scheduled = state.scheduled;
-  if (!reveal && state.scheduled.some((e) => e.invisible && state.units[e.caster]?.team !== viewer)) {
-    scheduled = state.scheduled.filter((e) => !(e.invisible && state.units[e.caster]?.team !== viewer));
+  if (!reveal && state.scheduled.some((e) => e.invisible && (e.appliedByTeam ?? state.units[e.caster]?.team) !== viewer)) {
+    scheduled = state.scheduled.filter((e) => !(e.invisible && (e.appliedByTeam ?? state.units[e.caster]?.team) !== viewer));
     changed = true;
   }
   return changed ? { ...state, units, scheduled } : state;

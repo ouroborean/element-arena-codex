@@ -6,16 +6,18 @@
  * draws come from a seeded Rng derived from state.rngState and written back, so a
  * cast is fully deterministic and replayable.
  */
-import type { MatchState, TeamId, Unit } from "../types.ts";
-import { Rng } from "../rng.ts";
-import { addShield, applyDamage, applyHeal, applyHealthLoss, bypassesAgainst, outgoingDamageMod, outgoingDamageMult, outgoingDtypeOverride, skillDamageBonus, totalShield } from "../damage.ts";
-import { applyStatus, removeStatus, stackCount } from "../status.ts";
-import { hasEssenceIncome } from "../scheduler.ts"; // runtime-only use (evalCondition) — the scheduler↔interpret cycle is benign
-import { applyRounding } from "../rulings.ts";
+import { dealDamage, grantShield, heal, inflictStatus } from "../combat.ts";
+import { applyHealthLoss, outgoingDamageMod, outgoingDamageMult, outgoingDtypeOverride, skillDamageBonus, totalShield } from "../damage.ts";
 import type { GameEvent, TriggeredEffect } from "../events.ts";
 import { MAX_TRIGGER_DEPTH } from "../events.ts";
-import type { SkillInstance } from "../skill.ts";
+import { hasEssenceIncome } from "../income.ts";
 import { getMinionTemplate } from "../minions.ts";
+import { Rng } from "../rng.ts";
+import { applyRounding } from "../rulings.ts";
+import type { SkillInstance } from "../skill.ts";
+import { statusRules } from "../status-rules.ts";
+import { applyStatus, removeStatus, stackCount } from "../status.ts";
+import type { MatchState, TeamId, Unit } from "../types.ts";
 import { skillIsInvisible } from "../visibility.ts";
 import type { Condition, Effect, Selector, StatusMatch, StatusSpec, Value } from "./ast.ts";
 import { replaceNode } from "./patch.ts";
@@ -73,8 +75,8 @@ export function hasCustom(name: string): boolean {
 // --------------------------------------------------------------------------- //
 /** aramao:Dune Step (augment aramao5) while the "Trial of the Sands" window is active redefines Aramao's
  *  positional relations: every enemy hero counts as `across`, every allied hero as `adjacent`. */
-function duneStepActive(u: Unit): boolean {
-  return !!u.augments?.includes("aramao5") && u.statuses.some((s) => s.kind === "mark" && s.name === "Trial of the Sands");
+function allPositionsActive(u: Unit): boolean {
+  return u.statuses.some((s) => statusRules(s, u).allPositions);
 }
 
 function teamUnits(state: MatchState, team: TeamId): Unit[] {
@@ -116,7 +118,7 @@ export function resolveSelector(sel: Selector, ctx: Ctx, admitUnderstudy = true)
     const enemyTeam = ctx.self.team === "A" ? "B" : "A";
     // aramao:Dune Step ("while Trial is active, ALL enemy Heroes are considered across from him"): widen the
     // otherwise slot-geometric `across` to every living enemy hero when Aramao's Dune Step window is up.
-    if (duneStepActive(ctx.self)) return teamUnits(ctx.state, enemyTeam).filter((u) => u.alive && u.kind === "hero");
+    if (allPositionsActive(ctx.self)) return teamUnits(ctx.state, enemyTeam).filter((u) => u.alive && u.kind === "hero");
     const slot = ctx.self.slot;
     if (slot === undefined) return [];
     return teamUnits(ctx.state, enemyTeam).filter((u) => u.alive && u.kind === "hero" && u.slot === slot);
@@ -124,7 +126,7 @@ export function resolveSelector(sel: Selector, ctx: Ctx, admitUnderstudy = true)
   if (sel === "adjacent") {
     // aramao:Dune Step ("...and all allied Heroes are considered adjacent to him"): widen `adjacent` to every
     // living allied hero (excluding Aramao) while the Dune Step window is up.
-    if (duneStepActive(ctx.self)) return teamUnits(ctx.state, ctx.self.team).filter((u) => u.alive && u.kind === "hero" && u.id !== ctx.self.id);
+    if (allPositionsActive(ctx.self)) return teamUnits(ctx.state, ctx.self.team).filter((u) => u.alive && u.kind === "hero" && u.id !== ctx.self.id);
     const slot = ctx.self.slot;
     if (slot === undefined) return [];
     return teamUnits(ctx.state, ctx.self.team).filter(
@@ -203,12 +205,6 @@ function hasStatusMatch(u: Unit, m: StatusMatch): boolean {
     (m.magLt === undefined || (s.magnitude ?? 0) < m.magLt)); // magLt: e.g. a NEGATIVE (reduced) outgoing_damage_mod
 }
 
-/** Anti-heal: a heal_lock blocks the heal unless the healer is the allowed one. */
-function healLocked(u: Unit, healerId: string): boolean {
-  const lock = u.statuses.find((s) => s.kind === "heal_lock");
-  if (!lock) return false;
-  return lock.unitRef === undefined ? true : lock.unitRef !== healerId;
-}
 
 function eventUnits(sel: "eventSource" | "eventTarget" | "eventUnit" | "eventCounterer", ctx: Ctx): Unit[] {
   const e = ctx.event;
@@ -254,7 +250,7 @@ export function evalValue(v: Value, ctx: Ctx): number {
       case "spendableShield": {
         // Shield spendable toward a Shield cost, counting each Chronicle Fragments stack as 10 Shield.
         const u = resolveOne(v.of, ctx);
-        return totalShield(u) + 10 * stackCount(u, "Chronicle Fragments");
+        return totalShield(u) + u.statuses.reduce((sum, s) => sum + (statusRules(s, u).shieldPerStack ?? 0) * (s.magnitude ?? 0), 0);
       }
       case "count":
         return resolveSelector(v.of, ctx).length;
@@ -458,27 +454,16 @@ export function disguiseFieldsOf(ctx: Ctx): { disguiseAs?: string; disguiseName?
  *  non-round-permanent status she applies by 1 turn (round-permanent/null effects untouched). Zero for any
  *  caster without the stack, so it is self-gating to Titania. */
 function extendedDuration(d: number | null, ctx: Ctx): number | null {
-  return d === null ? null : d + stackCount(ctx.caster, "Arcadian Advancement");
+  return d === null ? null : d + ctx.caster.statuses.reduce((sum, s) => sum + (statusRules(s, ctx.caster).durationBonusPerStack ?? 0) * (s.magnitude ?? 0), 0);
 }
 
 // A harmful NON-damage effect — the control/debuff statuses a `non_damage_ignore` buff wards off. This is the
 // harmful-status set MINUS `dot` (dots are damage, warded by `damage_ignore` instead). Kept in the engine
 // layer so applyStatus can consult it without importing the content-layer classifier.
-function isIgnorableNonDamageEffect(s: { kind: string; magnitude?: number }): boolean {
-  switch (s.kind) {
-    case "stun": case "silence": case "paralysis": case "blind": case "taunt": case "isolated":
-    case "heal_lock": case "shatter": case "heal_becomes_damage": return true;
-    case "incoming_damage_mod": case "cost_mod": case "cooldown_mod": return (s.magnitude ?? 0) > 0;
-    case "outgoing_damage_mod": return (s.magnitude ?? 0) < 0;
-    case "incoming_damage_mult": return (s.magnitude ?? 1) > 1;
-    case "outgoing_damage_mult": return (s.magnitude ?? 1) < 1;
-    default: return false;
-  }
-}
 
 function buildStatus(spec: StatusSpec, ctx: Ctx) {
   return {
-    kind: spec.kind,
+    kind: spec.kind, rules: spec.rules, stackKey: spec.stackKey, mergePolicy: spec.mergePolicy,
     magnitude: spec.magnitude === undefined ? undefined : applyRounding(evalValue(spec.magnitude, ctx)),
     name: spec.name,
     dtype: spec.dtype,
@@ -497,7 +482,7 @@ function buildStatus(spec: StatusSpec, ctx: Ctx) {
     unitRef: spec.unitRef ? resolveSelector(spec.unitRef, ctx)[0]?.id : undefined,
     onExpire: spec.onExpire,
     duration: extendedDuration(evalDuration(spec.duration, ctx), ctx),
-    appliedBy: ctx.caster.id,
+    appliedBy: ctx.caster.id, appliedByTeam: ctx.caster.team,
     appliedTurn: ctx.state.turn,
     sourceId: ctx.skillId,
     // Frozen invisibility: an isHidden skill's context (ctx.invisible) hides ALL its effects; a status-spec
@@ -521,16 +506,7 @@ export function exec(effect: Effect, ctx: Ctx): void {
       // Land one share of this damage on one defender (`src` = the credited dealer), running its full
       // mitigation and emitting its events. The damage's own character (type + bypass) stays the attacker's.
       const land = (u: Unit, amt: number, src: string): void => {
-        ctx.affected?.add(u.id);
-        const wasAlive = u.alive;
-        const r = applyDamage(u, { amount: amt, type: dtype, isNew: true, sourceId: effect.id, bypass: effect.bypass || ctx.bypassing || bypassesAgainst(dealer, u), reflected: ctx.reflected, from: src });
-        if (r.shieldAbsorbed > 0) ctx.emit({ type: "shieldDamaged", unit: u.id, source: src, amount: r.shieldAbsorbed });
-        if (r.shieldBroke) ctx.emit({ type: "shieldBroken", unit: u.id, source: src });
-        // The event's sourceId identifies what dealt the damage for reactions (eventSourceId): a damage node's
-        // own id if authored, else the casting skill's id — so a trigger can scope to one source skill even
-        // when its damage node is untagged. (The pipeline's sourceId at applyDamage stays the node id.)
-        ctx.emit({ type: "damageDealt", source: src, target: u.id, amount: r.hpLost, dtype, sourceId: effect.id ?? ctx.skillId, isNew: true });
-        if (wasAlive && r.lethal) ctx.emit({ type: "unitDied", unit: u.id, killer: src });
+        dealDamage(ctx, u, amt, { type: dtype, dealer, creditedSource: src, sourceId: effect.id, bypass: effect.bypass, precomputed: true });
       };
       // "single-target damage" is the CASTING SKILL's declared targeting, not the resolved defender count:
       // an all-enemies AOE can resolve to a single living enemy, and a forEach fans single-defender ops.
@@ -558,21 +534,7 @@ export function exec(effect: Effect, ctx: Ctx): void {
     }
     case "heal": {
       const amount = evalValue(effect.amount, ctx);
-      for (const u of effectTargets(effect.to, ctx)) {
-        if (healLocked(u, ctx.caster.id)) continue; // anti-heal (heal_lock)
-        const wasAlive = u.alive;
-        const before = u.hp;
-        const hbd = u.statuses.find((s) => s.kind === "heal_becomes_damage");
-        const r = applyHeal(u, amount, { allowOverheal: effect.overheal });
-        const overheal = Math.max(0, r.requested - r.healed);
-        // Emit on any real heal, and also on a pure overheal (target already at max) so
-        // overheal-redirect mechanics can see it. hbd's healed:0 is a damage conversion, not overheal.
-        if (r.healed > 0 || (overheal > 0 && !hbd)) ctx.emit({ type: "healReceived", unit: u.id, source: ctx.caster.id, amount: r.healed, overheal });
-        // A typed heal→damage conversion is real (reactable) damage; surface it as a damageDealt event.
-        else if (hbd?.dtype && u.hp < before) ctx.emit({ type: "damageDealt", source: ctx.caster.id, target: u.id, amount: before - u.hp, dtype: hbd.dtype, isNew: true });
-        // A heal can be lethal under inverted HP (dies at max) or heal→damage — surface the death.
-        if (wasAlive && !u.alive) ctx.emit({ type: "unitDied", unit: u.id, killer: ctx.caster.id });
-      }
+      for (const u of effectTargets(effect.to, ctx)) heal(ctx, u, amount, { allowOverheal: effect.overheal });
       return;
     }
     case "healthLoss": {
@@ -587,27 +549,12 @@ export function exec(effect: Effect, ctx: Ctx): void {
     case "grantShield": {
       const amount = applyRounding(evalValue(effect.amount, ctx));
       for (const u of effectTargets(effect.to, ctx)) {
-        addShield(u, amount, effect.duration ?? null, ctx.caster.id, ctx.state.turn, effect.id);
-        if (amount > 0) ctx.emit({ type: "shieldGranted", unit: u.id, source: ctx.caster.id, amount });
+        grantShield(ctx, u, amount, effect.duration ?? null, ctx.caster.id, ctx.state.turn, effect.id);
       }
       return;
     }
     case "applyStatus": {
-      // jarrik:dragon "Drakken": after casting it, Jarrik can no longer APPLY Cinders — while he holds the
-      // Drakken mark, his Cinders-mark applications are suppressed (the consume/trigger halves are gated in
-      // content). Mirrors the summonMinion Blue-Flame remap: one chokepoint over every base-kit apply site.
-      if (effect.status.kind === "mark" && effect.status.name === "Cinders" &&
-          ctx.caster.statuses.some((s) => s.kind === "mark" && s.name === "Drakken")) return;
-      for (const u of effectTargets(effect.to, ctx)) {
-        const st = buildStatus(effect.status, ctx);
-        // non_damage_ignore: a unit holding this buff IGNORES an ENEMY-applied harmful non-damage effect
-        // (stun/blind/taunt/debuff…) — it does not land. Damage and dots are damage_ignore's domain, not this.
-        if (ctx.caster.team !== u.team && isIgnorableNonDamageEffect(st) &&
-            u.statuses.some((s) => s.kind === "non_damage_ignore" && (!s.ignoreKinds || s.ignoreKinds.includes(st.kind)))) continue;
-        ctx.affected?.add(u.id);
-        applyStatus(u, st);
-        ctx.emit({ type: "statusApplied", unit: u.id, source: ctx.caster.id, kind: st.kind, name: st.name });
-      }
+      for (const u of effectTargets(effect.to, ctx)) inflictStatus(ctx, u, buildStatus(effect.status, ctx));
       return;
     }
     case "removeStatus": {
@@ -659,7 +606,7 @@ export function exec(effect: Effect, ctx: Ctx): void {
           name: effect.name,
           magnitude: amount,
           duration,
-          appliedBy: ctx.caster.id,
+          appliedBy: ctx.caster.id, appliedByTeam: ctx.caster.team,
           appliedTurn: ctx.state.turn,
           sourceId: ctx.skillId,
           // Inherit the invisible execution context, exactly like buildStatus — an isHidden skill that lays
@@ -771,7 +718,7 @@ export function exec(effect: Effect, ctx: Ctx): void {
     case "schedule": {
       const targets = (effect.to ? resolveSelector(effect.to, ctx) : ctx.targets).map((u) => u.id);
       ctx.state.scheduled.push({
-        effect: effect.effect, caster: ctx.caster.id, targets,
+        effect: effect.effect, caster: ctx.caster.id, appliedByTeam: ctx.caster.team, targets,
         turns: effect.delayTurns, appliedTurn: ctx.state.turn, skillId: ctx.skillId,
         // Invisible from either the execution context (isHidden skill) OR this node (a hidden-target prep).
         invisible: effect.invisible || ctx.invisible || undefined,
@@ -791,9 +738,8 @@ export function exec(effect: Effect, ctx: Ctx): void {
 function summonMinion(ctx: Ctx, templateName: string, hpOverride: number | null): void {
   // jarrik:plasma "Blue Flame Spirits": while Jarrik carries the mark, every Cinderling he would summon (from
   // any base-kit path) is minted as an Azure Sparkling instead.
-  if (templateName === "Cinderling" && ctx.caster.statuses.some((s) => s.kind === "mark" && s.name === "Blue Flame Spirits")) {
-    templateName = "Azure Sparkling";
-  }
+  const replacement = ctx.caster.statuses.map(s => statusRules(s, ctx.caster).replaceSummon).find(r => r?.from === templateName);
+  if (replacement) templateName = replacement.to;
   const team = ctx.state.teams[ctx.caster.team];
   const minionCount = team.units.filter((id) => ctx.state.units[id]?.kind === "minion").length;
   if (minionCount >= 6) return; // MINION_CAP
@@ -805,7 +751,7 @@ function summonMinion(ctx: Ctx, templateName: string, hpOverride: number | null)
     id, kind: "minion", name: tmpl?.name ?? templateName, team: ctx.caster.team,
     hp: maxHp, maxHp, shields: [],
     baseElement: element, currentElement: element,
-    statuses: (tmpl?.statuses ?? []).map((s) => ({ ...s, appliedBy: ctx.caster.id, appliedTurn: ctx.state.turn, invisible: ctx.invisible || s.invisible || undefined })),
+    statuses: (tmpl?.statuses ?? []).map((s) => ({ ...s, appliedBy: ctx.caster.id, appliedByTeam: ctx.caster.team, appliedTurn: ctx.state.turn, invisible: ctx.invisible || s.invisible || undefined })),
     alive: true, summoner: ctx.caster.id,
     templateAlias: tmpl?.templateAlias,
     skills: (tmpl?.skills ?? []).map((s) => ({ ...s, currentCd: 0 })),

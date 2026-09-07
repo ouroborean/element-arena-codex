@@ -1,3 +1,4 @@
+import { previewState } from "../net/public-state.ts";
 /**
  * A headless test client for the Quick Match server. It authenticates a guest identity, joins the queue
  * with a team, and — once matched — plays the whole match automatically with the engine's own AI
@@ -11,10 +12,10 @@
  *
  * Needs Node 24+ (native .ts execution + global WebSocket).
  */
-import { defaultPolicy } from "../engine/content/match.ts";
 import { autoDraft } from "../client/draft.ts";
-import { parseMessage, PROTOCOL_VERSION, DEFAULT_PORT, type ClientMsg, type ServerMsg } from "../net/protocol.ts";
+import { defaultPolicy } from "../engine/content/match.ts";
 import type { TeamId } from "../engine/src/types.ts";
+import { DEFAULT_PORT, parseMessage, PROTOCOL_VERSION, type ClientMsg, type ServerMsg } from "../net/protocol.ts";
 
 // ---- args ----------------------------------------------------------------- //
 function arg(name: string, fallback?: string): string | undefined {
@@ -90,7 +91,7 @@ ws.addEventListener("message", (ev) => {
       log(`MATCHED — you are Team ${msg.you} vs "${msg.opponentName}" [${msg.opponentTeam.join(", ")}] (match ${msg.matchId})`);
       break;
     case "yourTurn": {
-      const actions = defaultPolicy(msg.state, you!);
+      const actions = defaultPolicy(previewState(msg.state), you!);
       turns++;
       log(`turn ${turns}: submitting ${actions.length} action(s)`);
       send({ t: "turn", actions }); // genericPay omitted — the engine auto-allocates generic for a bot
@@ -99,7 +100,7 @@ ws.addEventListener("message", (ev) => {
     case "opponentTurn":
       break; // the opponent is acting; nothing to do
     case "yourDraft": {
-      const choices = autoDraft(msg.state, you!);
+      const choices = autoDraft(previewState(msg.state), you!);
       log(`between-round draft: ${choices.length ? choices.map(describeDraft).join(", ") : "hold all"}`);
       send({ t: "draftChoice", choices });
       break;

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { performAction } from "../src/scheduler.ts";
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
 import { redactState } from "../src/visibility.ts";
 import "../content/hero.ts"; // side-effect: registers custom handlers (harmless; keeps parity with other suites)
 import { makeState, makeUnit, skill, status } from "./helpers.ts";

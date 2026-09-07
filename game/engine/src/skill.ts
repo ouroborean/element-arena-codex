@@ -15,6 +15,14 @@ export interface EnergyCost {
 }
 
 export interface SkillInstance extends SkillDef {
+  /** Public query snapshot supplied by a server projection; never present in authoritative content. */
+  preview?: { targets: string[]; highlights: string[]; targeting: SkillDef["targeting"]; cost: EnergyCost; usable: boolean };
+  /** Authoritative selection policy. Legacy content defaults to its Helpful/Harmful intent. */
+  targetSpec?: {
+    faction: "allies" | "enemies" | "either";
+    /** Additional candidates, evaluated with each candidate bound as target. */
+    extend?: Condition;
+  };
   cost: EnergyCost;
   cooldown: number;
   /** Turns until usable again; 0 = ready. */

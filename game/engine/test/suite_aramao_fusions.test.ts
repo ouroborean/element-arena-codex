@@ -2,7 +2,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { performAction, endTurn } from "../src/scheduler.ts";
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
+import { endTurn } from "../src/scheduler.ts";
 import { emit } from "../src/effects/interpret.ts"; // side-effect: registers custom handlers via hero.ts
 import { fusionForm, FUSIONS } from "../content/fusions.generated.ts";
 import { loadHero } from "../content/hero.ts";

@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { performAction, endTurn, startRound } from "../src/scheduler.ts";
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
+import { endTurn, startRound } from "../src/scheduler.ts";
 import { loadHero } from "../content/hero.ts"; // side-effect: registers handlers + minion templates
 import { heroById } from "../content/match.ts";
 import { makeState, makeUnit, skill, status } from "./helpers.ts";

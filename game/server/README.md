@@ -2,12 +2,14 @@
 
 An **authoritative** match server for PvP "Quick Match". It matchmakes two players from a FIFO queue,
 then runs the **real engine** between them: it owns the RNG seed, validates every move through
-`performAction`, and broadcasts the full `MatchState` after each phase. Clients never simulate the match —
+`performAction`, and broadcasts a viewer-specific `PublicMatchState` after each phase. Clients never simulate the match —
 they submit their own turn / draft choice and render the state the server sends.
 
 Dependency-free (a hand-rolled RFC 6455 WebSocket in `ws.ts`), so it runs on a bare `node` like the engine.
 
 ## Run
+
+For versioned client/server builds, CI promotion, draining, rollback, and the one-time nginx/systemd migration, see [../ops/README.md](../ops/README.md). The commands below run directly from source for development.
 
 ```bash
 node game/server/index.ts        # listens on :8790 (override with ARENA_PORT)
@@ -17,8 +19,11 @@ Player profiles persist to a SQLite file (`arena.db` in the cwd by default; over
 `:memory:` for an ephemeral store). It uses the built-in `node:sqlite` — no dependency, no flag.
 
 Then open the web client (served from the repo root, see `game/web/README.md`) and press **Quick Match**
-with a full team of 3. The client dials `ws://<page-host>:8790` by default; override with
-`?server=wss://host` on the page URL or `localStorage.arenaServer`.
+with a full team of 3. The client dials `ws(s)://<page-host>:8790` by default. For a separate
+deployment host configure `<meta name="arena-server" content="wss://host">` in the page,
+and set `ARENA_ALLOWED_ORIGINS` on the server to its frontend origin (comma-separated).
+Arbitrary URL/localStorage overrides no longer receive account credentials. Protocol v3
+requires rebuilding and deploying the client and server together; see [../ARCHITECTURE.md](../ARCHITECTURE.md).
 
 ## Shape
 

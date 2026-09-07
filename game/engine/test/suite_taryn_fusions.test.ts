@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { performAction, endTurn, startRound } from "../src/scheduler.ts";
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
+import { endTurn, startRound } from "../src/scheduler.ts";
 import { emit } from "../src/effects/interpret.ts";
 import { applyFusion } from "../content/fusion.ts";
 import { fusionForm } from "../content/fusions.generated.ts";

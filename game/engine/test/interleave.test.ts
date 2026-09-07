@@ -10,7 +10,7 @@ import assert from "node:assert/strict";
 import { pendingTicks, resolveTurn, endTurn } from "../src/scheduler.ts";
 import { makeState, makeUnit, status, skill } from "./helpers.ts";
 
-test("pendingTicks: the active team's eligible dot/regen ticks, skipping birth-turn and the other team", () => {
+test("pendingTicks: the active team's eligible dot/regen ticks, including immediate ticks and excluding next-turn ticks and the other team", () => {
   const caster = makeUnit({ id: "u1", team: "A" });
   const ally = makeUnit({ id: "u2", team: "A", statuses: [
     status("regen", { magnitude: 3, appliedBy: "u1", appliedTurn: 1 }), // A applied, before this turn -> eligible
@@ -18,7 +18,7 @@ test("pendingTicks: the active team's eligible dot/regen ticks, skipping birth-t
   ] });
   const enemy = makeUnit({ id: "e", team: "B", statuses: [
     status("dot", { magnitude: 5, appliedBy: "u1", appliedTurn: 1 }),   // eligible
-    status("dot", { magnitude: 7, appliedBy: "u1", appliedTurn: 2 }),   // birth turn == current turn -> skipped
+    status("dot", { magnitude: 7, appliedBy: "u1", appliedTurn: 2, firstTickNextTurn: true }),   // birth turn == current turn -> skipped
   ] });
   const state = makeState([caster, ally], [enemy]);
   state.turn = 2;

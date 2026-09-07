@@ -1,5 +1,5 @@
 {
-  "_note": "Machine-readable defaults for every rule the export never states. One entry per open question with a chosen default, a confidence, whether it needs the designer, and its evidence. Code and golden tests read these so a flip is a one-line change with a measurable diff, not an archaeology project. Edit deliberately; each flip changes game behaviour.",
+  "_note": "Authored rulings and executable runtime defaults. Run npm run generate after changing runtime; CI verifies generated constants.",
   "_confidence_scale": "CONFIRMED = answered by the designer (oracle); HIGH = grounded in glossary/data; MED = inferred from strong signal; LOW = genuine guess, on the designer list",
   "_oracle": "Faithful reconstruction, no original source available (DECISIONS.md D1). Description is the fidelity ceiling; designer rulings resolve the rest. CONFIRMED entries are designer-answered and authoritative.",
   "rulings": {
@@ -12,7 +12,7 @@
     },
     "ROUNDS_PER_MATCH": {
       "question": "How many rounds in a match, and is it fixed or first-to-N?",
-      "default": "Up to 5 rounds; match ends early when one team has won a majority.",
+      "default": "Local matches default to first to 3 wins (up to 5 rounds). Quick Match is an explicit first-to-2 preset (up to 3 rounds). Both are defined in runtime.",
       "confidence": "LOW",
       "designer_question": true,
       "evidence": "Structure CONFIRMED (best-of-N battles); the exact N is still open. 5 augments/hero hints at up to 5 rounds."
@@ -26,14 +26,14 @@
     },
     "FIRST_PLAYER": {
       "question": "Who acts first / how is initiative decided each turn?",
-      "default": "Both teams plan simultaneously each turn (simultaneous commit). Turn 1 of round 1 uses a seeded coin flip for any order-dependent tie; thereafter the same seed drives all ties.",
+      "default": "Teams take alternating turns. Team A opens each fresh round; online seats are securely randomized at match setup. The opening side receives reduced income.",
       "confidence": "LOW",
       "designer_question": true,
       "evidence": "blackknight0 'acts alone' and keeperaurora1 ally-count scaling imply a commit-then-resolve turn, but initiative is unstated."
     },
     "RESOLUTION_ORDER": {
       "question": "In what order do a turn's committed actions resolve?",
-      "default": "Player assignment (staging) order IS resolution order, interleaved between the two sides by initiative. Locked at commit.",
+      "default": "The active team commits actions in resolution order and may interleave its eligible periodic ticks. Opposing teams do not resolve simultaneously.",
       "confidence": "MED",
       "designer_question": false,
       "evidence": "keeperaurora1 (20/30/45 by ally act-count) and blackknight0 ('acts alone') only make sense if staging order is resolution order."
@@ -171,5 +171,17 @@
       "designer_question": false,
       "evidence": "riverdaughtercurrent0 ships a hand-written per-skill loop guard in the export, proving the original engine hit reflect cycles."
     }
+  },
+  "runtime": {
+    "DURATION_ANCHOR": "applier",
+    "ENERGY_POOL_SCOPE": "team",
+    "ENERGY_INCOME": "essence-swaps-generic",
+    "HP_CARRYOVER": "reset",
+    "PERMANENT_SCOPE": "round",
+    "DEFAULT_STACK_POLICY": "refresh",
+    "ROUNDING": "floor",
+    "IMMORTAL_FLOORS_NON_DAMAGE": true,
+    "DEFAULT_ROUNDS_TO_WIN": 3,
+    "INTERACTIVE_ROUNDS_TO_WIN": 2
   }
 }

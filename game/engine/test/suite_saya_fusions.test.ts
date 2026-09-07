@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { performAction, endTurn, effectiveCost } from "../src/scheduler.ts";
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
+import { endTurn, effectiveCost } from "../src/scheduler.ts";
 import { emit, runEffects } from "../src/effects/interpret.ts";
 import { loadHero } from "../content/hero.ts"; // side-effect: registers handlers + fusion custom fns
 import { heroById } from "../content/match.ts"; // side-effect: registers minion templates (roster.generated)

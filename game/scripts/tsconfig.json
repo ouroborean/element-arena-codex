@@ -10,8 +10,15 @@
     "noUncheckedIndexedAccess": true,
     "noEmit": true,
     "skipLibCheck": true,
-    "types": ["node"],
-    "typeRoots": ["../engine/node_modules/@types"]
+    "types": [
+      "node"
+    ]
   },
-  "include": [".", "../engine/src", "../engine/content", "../client", "../net"]
+  "include": [
+    ".",
+    "../engine/src",
+    "../engine/content",
+    "../client",
+    "../net"
+  ]
 }

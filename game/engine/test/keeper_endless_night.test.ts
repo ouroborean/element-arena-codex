@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { emit } from "../src/effects/interpret.ts";
-import { performAction } from "../src/scheduler.ts";
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
 import { totalShield } from "../src/damage.ts";
 import { redactState } from "../src/visibility.ts";
 import { applyFusion } from "../content/fusion.ts";

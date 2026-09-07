@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { endTurn, performAction, startTurn } from "../src/scheduler.ts";
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
+import { endTurn, startTurn } from "../src/scheduler.ts";
 import { applyStatus } from "../src/status.ts";
 import { makeState, makeUnit, skill, status } from "./helpers.ts";
 
