@@ -1,3 +1,5 @@
+import { grantShield, heal, inflictStatus } from "../src/combat.ts";
+import { applyStatus } from "../src/status.ts";
 /**
  * Native handlers for the `custom` nodes the AUGMENT authors reached for (the clauses no Patch op
  * or DSL node expresses). Two registries: effect-level customs run in the interpreter (ctx, args)
@@ -10,13 +12,11 @@
  * of one skill) — those do the closest observable thing and are logged as fidelity debt in
  * ../design/ENGINE_GAPS.md. None is a silent no-op except where the base rule itself is unencoded.
  */
-import { registerCustom, resolveSelector, runInContext, evalCondition } from "../src/effects/interpret.ts";
-import { registerAugmentCustom, mutableSkill } from "./augment.ts";
-import { applyStatus, removeStatus } from "../src/status.ts";
-import { applyHeal, addShield } from "../src/damage.ts";
+import type { Condition, Selector, StatusSpec } from "../src/effects/ast.ts";
+import { registerCustom, resolveSelector, runInContext } from "../src/effects/interpret.ts";
 import { getMinionTemplate } from "../src/minions.ts";
-import type { Unit, Status } from "../src/types.ts";
-import type { Selector, Condition, StatusSpec } from "../src/effects/ast.ts";
+import type { Status, Unit } from "../src/types.ts";
+import { mutableSkill, registerAugmentCustom } from "./augment.ts";
 
 const num = (v: unknown, d = 0): number => (typeof v === "number" ? v : d);
 const scopedCost = (unit: Unit, skillId: string): Status | undefined =>
@@ -37,14 +37,14 @@ registerCustom("increaseMaxHp", (ctx, a) => raiseMaxHp(ctx, (a.of as Selector) ?
 // ignoreDamageType — type-scoped damage immunity (the engine's damage_ignore carries a dtype scope).
 registerCustom("ignoreDamageType", (ctx, a) => {
   for (const u of resolveSelector((a.to as Selector) ?? "self", ctx)) {
-    applyStatus(u, { kind: "damage_ignore", dtype: a.dtype as Status["dtype"], duration: (a.duration as number | null) ?? null, appliedBy: ctx.self.id, appliedTurn: ctx.state.turn });
+    inflictStatus(ctx, u, { kind: "damage_ignore", dtype: a.dtype as Status["dtype"], duration: (a.duration as number | null) ?? null, appliedBy: ctx.self.id, appliedByTeam: ctx.self.team, appliedTurn: ctx.state.turn });
   }
 });
 
 // grantStunImmunity — a "Stun Immunity" mark honoured by scheduler.isStunnedFor.
 registerCustom("grantStunImmunity", (ctx, a) => {
   for (const u of resolveSelector((a.to as Selector) ?? "self", ctx)) {
-    applyStatus(u, { kind: "mark", name: "Stun Immunity", duration: (a.duration as number | null) ?? null, appliedBy: ctx.self.id, appliedTurn: ctx.state.turn });
+    inflictStatus(ctx, u, { kind: "mark", name: "Stun Immunity", duration: (a.duration as number | null) ?? null, appliedBy: ctx.self.id, appliedByTeam: ctx.self.team, appliedTurn: ctx.state.turn });
   }
 });
 
@@ -52,7 +52,7 @@ registerCustom("grantStunImmunity", (ctx, a) => {
 registerCustom("scopedCostMod", (ctx, a) => {
   const skillId = a.skillId as string;
   const mag = num(a.magnitude ?? a.amount, 0);
-  applyStatus(ctx.self, { kind: "cost_mod", skillId, magnitude: mag, duration: (a.duration as number | null) ?? null, appliedBy: ctx.self.id, appliedTurn: ctx.state.turn });
+  inflictStatus(ctx, ctx.self, { kind: "cost_mod", skillId, magnitude: mag, duration: (a.duration as number | null) ?? null, appliedBy: ctx.self.id, appliedByTeam: ctx.self.team, appliedTurn: ctx.state.turn });
 });
 
 // scopedCostDiscountOnUse — deepen a skillId-scoped discount by `perUse` each use, floored at -max.
@@ -62,7 +62,7 @@ registerCustom("scopedCostDiscountOnUse", (ctx, a) => {
   const skillId = a.skillId as string;
   const cur = scopedCost(ctx.self, skillId)?.magnitude ?? 0;
   const next = Math.max(-num(a.max, 2), cur - num(a.perUse, 1));
-  applyStatus(ctx.self, { kind: "cost_mod", skillId, magnitude: next, duration: null, appliedBy: ctx.self.id, appliedTurn: ctx.state.turn });
+  inflictStatus(ctx, ctx.self, { kind: "cost_mod", skillId, magnitude: next, duration: null, appliedBy: ctx.self.id, appliedByTeam: ctx.self.team, appliedTurn: ctx.state.turn });
 });
 
 // jealousyBasicsToGeneric — titania5 "Jealousy": when an ALLY triggers Prance, the OTHER ally (not the
@@ -75,7 +75,7 @@ registerCustom("jealousyBasicsToGeneric", (ctx, a) => {
   for (const ally of others) {
     for (const sk of ally.skills ?? []) {
       if (sk.klass !== "basic") continue;
-      applyStatus(ally, { kind: "cost_currency_remap", skillId: sk.id, duration: dur, appliedBy: ctx.self.id, appliedTurn: ctx.state.turn });
+      inflictStatus(ctx, ally, { kind: "cost_currency_remap", skillId: sk.id, duration: dur, appliedBy: ctx.self.id, appliedByTeam: ctx.self.team, appliedTurn: ctx.state.turn });
     }
   }
 });
@@ -85,7 +85,7 @@ registerCustom("jealousyBasicsToGeneric", (ctx, a) => {
 registerCustom("healIfExpiredStatusNamed", (ctx, a) => {
   const e = ctx.event;
   if (!e || (e.type !== "statusExpired" && e.type !== "statusLost") || e.kind !== (a.kind as string) || e.name !== (a.name as string)) return;
-  for (const u of resolveSelector((a.to as Selector) ?? "self", ctx)) applyHeal(u, num(a.amount));
+  for (const u of resolveSelector((a.to as Selector) ?? "self", ctx)) heal(ctx, u, num(a.amount));
 });
 
 // healTeamIfDidNotAct — at the caster's own team turn-end, heal the team if the caster did not act.
@@ -93,7 +93,7 @@ registerCustom("healTeamIfDidNotAct", (ctx, a) => {
   const e = ctx.event;
   if (!e || e.type !== "turnEnd" || e.team !== ctx.self.team) return;
   if (ctx.state.actedThisTurn.includes(ctx.self.id)) return;
-  for (const u of resolveSelector({ faction: "allies" }, ctx)) applyHeal(u, num(a.amount));
+  for (const u of resolveSelector({ faction: "allies" }, ctx)) heal(ctx, u, num(a.amount));
 });
 
 // healAllyAcrossFromHolder — heal the caster's hero teammate standing in the target's slot.
@@ -103,7 +103,7 @@ registerCustom("healAllyAcrossFromHolder", (ctx, a) => {
   const ally = ctx.state.teams[ctx.self.team].units
     .map((id) => ctx.state.units[id])
     .find((u) => !!u && u.alive && u.kind === "hero" && u.slot === holder.slot);
-  if (ally) applyHeal(ally, num(a.amount));
+  if (ally) heal(ctx, ally, num(a.amount));
 });
 
 // jumpStatusOnExpire — when a named status lapses, (re)apply it to a random ally lacking it.
@@ -114,7 +114,7 @@ registerCustom("jumpStatusOnExpire", (ctx, a) => {
   if (!spec) return;
   const lacking = resolveSelector({ faction: "allies" }, ctx).filter((u) => !u.statuses.some((s) => s.kind === spec.kind && s.name === spec.name));
   const pick = ctx.rng.shuffle(lacking).slice(0, 1)[0];
-  if (pick) applyStatus(pick, { kind: spec.kind, name: spec.name, magnitude: typeof spec.magnitude === "number" ? spec.magnitude : undefined, dtype: spec.dtype, duration: (spec.duration as number | null) ?? null, appliedBy: ctx.self.id, appliedTurn: ctx.state.turn });
+  if (pick) inflictStatus(ctx, pick, { kind: spec.kind, name: spec.name, magnitude: typeof spec.magnitude === "number" ? spec.magnitude : undefined, dtype: spec.dtype, duration: (spec.duration as number | null) ?? null, appliedBy: ctx.self.id, appliedByTeam: ctx.self.team, appliedTurn: ctx.state.turn });
 });
 
 // regainFrostCoveredNextTurn — when the holder LOSES a named status (Flashfreeze: Gommar consuming
@@ -139,7 +139,7 @@ registerCustom("replenishShieldWhileSkillReady", (ctx, a) => {
   if (!skill || skill.currentCd > 0) return;
   const name = a.shieldName as string | undefined;
   if (name !== undefined) ctx.self.shields = ctx.self.shields.filter((sh) => sh.id !== name);
-  addShield(ctx.self, num(a.amount), null, ctx.self.id, ctx.state.turn, name);
+  grantShield(ctx, ctx.self, num(a.amount), null, ctx.self.id, ctx.state.turn, name);
 });
 
 // applyRandomSkill — cast a random skill from a set (by `by`, at `on`), running its effects inline.
@@ -203,7 +203,7 @@ registerAugmentCustom("retunePassiveThreshold", (unit, a) => {
 // roundStart trigger re-applies it each battle (and once immediately for the drafted round).
 registerAugmentCustom("scaleCoilDamage", (unit, a) => {
   const bonus = num(a.perCoilBonus);
-  applyStatus(unit, { kind: "coil_damage_bonus", magnitude: bonus, duration: null, appliedBy: unit.id, appliedTurn: 0 });
+  applyStatus(unit, { kind: "coil_damage_bonus", magnitude: bonus, duration: null, appliedBy: unit.id, appliedByTeam: unit.team, appliedTurn: 0 });
   unit.triggers = [...(unit.triggers ?? []), {
     on: "roundStart", owner: unit.id, source: "Link Coils", origin: "augment",
     effect: [{ op: "applyStatus", to: "self", status: { kind: "coil_damage_bonus", magnitude: bonus, duration: null } }],
@@ -232,7 +232,7 @@ registerAugmentCustom("relaxSerumTargeting", (unit, a) => {
 // the drafted round). (Shields aren't source-tagged, so the cap applies to all of Keeper's shield — see note.)
 registerAugmentCustom("capShieldAbsorbPerHit", (unit, a) => {
   const max = num(a.max);
-  applyStatus(unit, { kind: "shield_absorb_cap", magnitude: max, duration: null, appliedBy: unit.id, appliedTurn: 0 });
+  applyStatus(unit, { kind: "shield_absorb_cap", magnitude: max, duration: null, appliedBy: unit.id, appliedByTeam: unit.team, appliedTurn: 0 });
   unit.triggers = [...(unit.triggers ?? []), {
     on: "roundStart", owner: unit.id, source: "Good Pacing", origin: "augment",
     effect: [{ op: "applyStatus", to: "self", status: { kind: "shield_absorb_cap", magnitude: max, duration: null } }],
@@ -257,7 +257,7 @@ registerAugmentCustom("channelCopies", (unit, a) => {
 // reads to divide a single-target hit evenly across Jarrik + the opposing-team bearers of the "Cinders" mark.
 // Round-scoped, so a static roundStart trigger re-applies it each battle (and once immediately for the draft).
 registerAugmentCustom("splitIncomingSingleTargetDamageAcrossCinders", (unit) => {
-  applyStatus(unit, { kind: "split_incoming", name: "Cinders", duration: null, appliedBy: unit.id, appliedTurn: 0 });
+  applyStatus(unit, { kind: "split_incoming", name: "Cinders", duration: null, appliedBy: unit.id, appliedByTeam: unit.team, appliedTurn: 0 });
   unit.triggers = [...(unit.triggers ?? []), {
     on: "roundStart", owner: unit.id, source: "Blackened Soul", origin: "augment",
     effect: [{ op: "applyStatus", to: "self", status: { kind: "split_incoming", name: "Cinders", duration: null } }],

@@ -29,9 +29,13 @@ The left panel is your shared **energy pool**; **Surrender** concedes. First to 
 
 **Bot Match** plays the local `defaultPolicy` AI. **Quick Match** plays a real opponent over the network —
 start the match server first (`node game/server/index.ts`, see `game/server/README.md`), then press Quick
-Match with a full team; the client dials `ws://<page-host>:8790` (override with `?server=wss://host`).
+Match with a full team; the client dials `ws(s)://<page-host>:8790`. Configure a separate trusted host
+with `<meta name="arena-server" content="wss://host">`; arbitrary URL/localStorage overrides are
+ignored. See [../ARCHITECTURE.md](../ARCHITECTURE.md) for protocol-v3 and identity-migration details.
 
 ## Build
+
+Production releases are built separately with both the client and server; see [../ops/README.md](../ops/README.md). This avoids overwriting an existing tracked bundle during release verification.
 
 ```bash
 cd game/web

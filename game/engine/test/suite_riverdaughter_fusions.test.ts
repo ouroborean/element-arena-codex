@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { performAction, endTurn, startTurn } from "../src/scheduler.ts";
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
+import { endTurn, startTurn } from "../src/scheduler.ts";
 import { emit } from "../src/effects/interpret.ts";
 import { loadHero } from "../content/hero.ts"; // side-effect: registers handlers + minion templates
 import { heroById } from "../content/match.ts"; // side-effect: imports ROSTER (registers Slime template)

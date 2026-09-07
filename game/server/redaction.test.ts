@@ -12,6 +12,7 @@ import "../engine/content/fusion_effects.ts";
 import "../engine/content/augment_effects.ts";
 import type { MatchState, TeamId } from "../engine/src/types.ts";
 import { Match, type MatchClient } from "./session.ts";
+import type { PublicMatchState } from "../net/public-state.ts";
 import type { ServerMsg } from "../net/protocol.ts";
 
 class Recorder implements MatchClient {
@@ -20,10 +21,10 @@ class Recorder implements MatchClient {
   messages: ServerMsg[] = [];
   constructor(team: string[]) { this.team = team; }
   send(msg: ServerMsg): void { this.messages.push(msg); }
-  lastState(t: ServerMsg["t"]): MatchState | undefined {
+  lastState(t: ServerMsg["t"]): PublicMatchState | undefined {
     for (let i = this.messages.length - 1; i >= 0; i--) {
       const m = this.messages[i];
-      if (m && m.t === t && "state" in m) return (m as { state: MatchState }).state;
+      if (m && m.t === t && "state" in m) return m.state;
     }
     return undefined;
   }
@@ -46,7 +47,7 @@ test("wireState redacts per seat — a team's Invisible status is hidden from th
 
   const aSeen = a.lastState("resumed")!;
   const bSeen = b.lastState("resumed")!;
-  const hasWard = (s: MatchState): boolean => s.units[aUnit]!.statuses.some((x) => x.name === "Ghost Ward");
+  const hasWard = (s: PublicMatchState): boolean => s.units[aUnit]!.statuses.some((x) => x.name === "Ghost Ward");
 
   assert.ok(hasWard(aSeen), "the owner (A) receives its own Invisible status");
   assert.ok(!hasWard(bSeen), "the opponent (B) does NOT receive A's Invisible status");

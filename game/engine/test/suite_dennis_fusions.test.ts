@@ -2,7 +2,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { performAction, endTurn, startTurn, grantIncome, startRound } from "../src/scheduler.ts";
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
+import { endTurn, startTurn, grantIncome, startRound } from "../src/scheduler.ts";
 import { emit, runEffects } from "../src/effects/interpret.ts";
 import { fusionForm, FUSIONS } from "../content/fusions.generated.ts";
 import { loadHero } from "../content/hero.ts"; // side-effect: registers handlers

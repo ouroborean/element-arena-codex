@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { performAction, effectiveCost, endTurn } from "../src/scheduler.ts";
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
+import { effectiveCost, endTurn } from "../src/scheduler.ts";
 import { emit } from "../src/effects/interpret.ts"; // side-effect: also pulls in custom-handler registration via hero.ts
 import { loadHero } from "../content/hero.ts";
 import { heroById } from "../content/match.ts";

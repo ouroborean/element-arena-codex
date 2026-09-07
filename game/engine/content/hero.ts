@@ -7,12 +7,10 @@
  * so a typo in an authored effect is a compile error. It can move to its own package
  * later without touching the engine.
  */
-import type { TeamId, Unit } from "../src/types.ts";
-import type { SkillInstance } from "../src/skill.ts";
 import type { TriggeredEffect } from "../src/events.ts";
-import "./custom_effects.ts"; // side-effect: registers the roster's `custom` handlers
-import "./augment_effects.ts"; // side-effect: registers the augments' `custom` handlers
-import "./fusion_effects.ts"; // side-effect: registers implemented fusion `custom` handlers (by cluster)
+import type { SkillInstance } from "../src/skill.ts";
+import type { TeamId, Unit } from "../src/types.ts";
+import { initializeContent } from "./runtime.ts";
 
 /** A trigger authored on a hero, minus `owner` (bound to the unit id at load time). */
 export type HeroTrigger = Omit<TriggeredEffect, "owner">;
@@ -39,6 +37,7 @@ export interface HeroDef {
 
 /** Instantiate a hero onto a team: fresh HP, fresh per-unit cooldowns. */
 export function loadHero(def: HeroDef, team: TeamId, id: string = def.id): Unit {
+  initializeContent();
   return {
     id,
     kind: "hero",

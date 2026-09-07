@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { performAction, startRound, startTurn, endTurn, effectiveCost } from "../src/scheduler.ts";
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
+import { startRound, startTurn, endTurn, effectiveCost } from "../src/scheduler.ts";
 import { emit, runEffects } from "../src/effects/interpret.ts";
 import { loadHero } from "../content/hero.ts";
 import { heroById } from "../content/match.ts";

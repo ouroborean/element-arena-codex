@@ -6,7 +6,8 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { reserveEnergy, reservationTotal, canPayAfter, canUsePlanned, performAction } from "../src/scheduler.ts";
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
+import { reserveEnergy, reservationTotal, canPayAfter, canUsePlanned } from "../src/scheduler.ts";
 import { makeState, makeUnit, skill } from "./helpers.ts";
 
 const cost = (generic: number, specific: number) => ({ generic, specific });

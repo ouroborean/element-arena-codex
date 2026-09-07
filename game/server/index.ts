@@ -8,18 +8,17 @@
  * A player's SEAT in a match outlives any single socket: on a drop the match holds a grace window, and a
  * new socket presenting the seat's rejoin token (a `rejoin` message) rebinds and resumes it.
  */
+import { randomInt, randomUUID } from "node:crypto";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
-import { randomUUID } from "node:crypto";
-import { attachWebSocketServer, type WsConn } from "./ws.ts";
-import { Match, type MatchClient, type RatingChanges } from "./session.ts";
-import { AccountStore, START_RATING, elo, type ResultKind } from "./accounts.ts";
-import { parseMessage, PROTOCOL_VERSION, TEAM_SIZE, DEFAULT_PORT, type ClientMsg, type ServerMsg } from "../net/protocol.ts";
-import type { TeamId } from "../engine/src/types.ts";
 import { ROSTER } from "../engine/content/roster.generated.ts";
-// Register every native effect handler so fused/augmented/custom skills resolve server-side.
-import "../engine/content/custom_effects.ts";
-import "../engine/content/fusion_effects.ts";
-import "../engine/content/augment_effects.ts";
+import type { TeamId } from "../engine/src/types.ts";
+import { DEFAULT_PORT, PROTOCOL_VERSION, TEAM_SIZE, type ClientMsg, type ServerMsg } from "../net/protocol.ts";
+import { parseClientMessage } from "../net/validation.ts";
+import { RELEASE_ID } from "../net/release.ts";
+import { AccountStore, START_RATING, elo, type ResultKind } from "./accounts.ts";
+import { RateLimiter, originAllowed, reportError, clientAddress } from "./security.ts";
+import { Match, type MatchClient, type RatingChanges } from "./session.ts";
+import { attachWebSocketServer, type WsConn } from "./ws.ts";
 
 const HEARTBEAT_MS = 30_000;
 const MAX_CONNS = 4096; // a coarse global cap so a client can't farm unbounded sockets
@@ -87,6 +86,8 @@ class Conn {
   name?: string;
   rating?: number; // from the authenticated profile
   ranked = false; // which queue this connection is in
+  authenticating = false;
+  messages = new RateLimiter(120, 1000, 1);
   queuedAt = 0; // epoch-ms it entered the queue (drives the ranked rating window)
   seat?: Seat; // when playing (invariant while current: seat.owner === this && seat.conn === this.ws)
 
@@ -100,6 +101,15 @@ class Conn {
 }
 
 export class MatchServer {
+  private draining = false;
+  setDraining(value: boolean): void {
+    this.draining = value;
+    if (value) for (const conn of [...this.queue, ...this.rankedQueue]) {
+      this.dequeue(conn);
+      conn.send({ t: "error", message: "Server update in progress. Please retry shortly." });
+    }
+  }
+  deploymentStatus() { return { draining: this.draining, activeMatches: this.matches.size }; }
   private queue: Conn[] = []; // casual (Quick Match), FIFO
   private rankedQueue: Conn[] = []; // ranked, rating-window matchmaking
   private rankedActive = new Set<string>(); // playerIds currently in a ranked queue OR match — at most one each
@@ -107,6 +117,8 @@ export class MatchServer {
   private matches = new Map<string, Match>();
   private seats = new Map<string, Seat>(); // by rejoin token
   private store: AccountStore;
+  private authLimit = new RateLimiter(30, 60000);
+  private globalAuthLimit = new RateLimiter(300, 60000, 1);
 
   constructor(store: AccountStore) {
     this.store = store;
@@ -122,8 +134,9 @@ export class MatchServer {
   }
 
   private route(conn: Conn, raw: string): void {
-    const msg = parseMessage<ClientMsg>(raw);
-    if (!msg) return;
+    if (!conn.messages.allow("connection")) { conn.ws.destroy(); return; }
+    const msg = parseClientMessage(raw);
+    if (!msg) { conn.send({ t: "error", message: "Malformed command" }); return; }
     try {
       switch (msg.t) {
         case "auth": void this.authenticate(conn, msg); return;
@@ -137,27 +150,33 @@ export class MatchServer {
           conn.seat?.match.handleMessage(conn.seat, msg);
           return;
       }
-    } catch {
-      /* a malformed message must never crash the server; drop it */
+    } catch (error) {
+      console.error("[arena] command failed", { type: msg.t, error });
+      conn.send({ t: "error", message: "Command failed" });
     }
   }
 
   /** Verify (or create) the connection's guest identity and bind it for this session. */
   private async authenticate(conn: Conn, msg: Extract<ClientMsg, { t: "auth" }>): Promise<void> {
-    if (msg.protocolVersion !== PROTOCOL_VERSION) { conn.send({ t: "authError", message: "protocol mismatch" }); return; }
+    if (conn.authenticating || conn.playerId || !this.authLimit.allow(conn.ws.remoteAddress) || !this.globalAuthLimit.allow("auth")) { conn.send({ t: "authError", message: "Too many sign-in attempts" }); return; }
+    conn.authenticating = true;
+    if (msg.protocolVersion !== PROTOCOL_VERSION) { conn.authenticating = false; conn.send({ t: "authError", message: `Protocol mismatch: server requires v${PROTOCOL_VERSION}. Refresh the page to load the updated client.` }); return; }
     try {
       const profile = await this.store.authenticate(msg.playerId, msg.secret, msg.name);
       if (!profile) { conn.send({ t: "authError", message: "that player id is taken by someone else" }); return; }
+      if (!this.conns.has(conn)) return;
       conn.playerId = profile.playerId;
       conn.name = profile.name;
       conn.rating = profile.rating;
       conn.send({ t: "authed", profile });
-    } catch {
-      conn.send({ t: "authError", message: "sign-in failed, please retry" }); // a DB fault must not crash the server
-    }
+    } catch (error) {
+      reportError("authenticate", error);
+      conn.send({ t: "authError", message: "sign-in failed, please retry" });
+    } finally { conn.authenticating = false; }
   }
 
   private enqueue(conn: Conn, msg: Extract<ClientMsg, { t: "queue" }>): void {
+    if (this.draining) { conn.send({ t: "error", message: "Server update in progress. Please retry shortly." }); return; }
     if (conn.phase !== "idle") return; // already queued or in a match
     if (msg.protocolVersion !== PROTOCOL_VERSION) {
       conn.send({ t: "error", message: `protocol mismatch (server v${PROTOCOL_VERSION})` });
@@ -238,6 +257,7 @@ export class MatchServer {
    * arrival). Runs on each ranked enqueue and on a periodic tick so widening windows eventually match anyone.
    */
   matchmakeRanked(): void {
+    if (this.draining) return;
     const now = Date.now();
     const q = this.rankedQueue;
     q.sort((a, b) => (a.rating ?? START_RATING) - (b.rating ?? START_RATING));
@@ -266,7 +286,7 @@ export class MatchServer {
     cb.seat = seatB;
     this.seats.set(seatA.token, seatA);
     this.seats.set(seatB.token, seatB);
-    const seed = Math.floor(Math.random() * 1e9); // server-authoritative seed — the client never sets it
+    const seed = randomInt(1, 0x100000000); // server-authoritative seed — the client never sets it
     const match = new Match(seatA, seatB, seed);
     seatA.match = seatB.match = match;
     this.matches.set(matchId, match);
@@ -351,17 +371,26 @@ export class MatchServer {
 }
 
 const CORS = {
-  "access-control-allow-origin": "*", // the static client is served from a different origin (GitHub Pages / :8140)
   "access-control-allow-methods": "POST, GET, OPTIONS",
   "access-control-allow-headers": "content-type",
 };
 
 /** Start the HTTP+WS server. Returns the underlying http server + a stop() (used by tests; pass port 0 for ephemeral). */
-export function startServer(port = Number(process.env.ARENA_PORT) || DEFAULT_PORT): { stop: () => void; server: MatchServer; http: ReturnType<typeof createServer> } {
+export function startServer(port = Number(process.env.ARENA_PORT ?? DEFAULT_PORT)): { stop: () => void; server: MatchServer; http: ReturnType<typeof createServer> } {
   const store = new AccountStore();
   const matchServer = new MatchServer(store);
+  const requestLimit = new RateLimiter(60, 60000);
+  const globalRequestLimit = new RateLimiter(600, 60000, 1);
   const http = createServer((req: IncomingMessage, res: ServerResponse) => {
-    if (req.method === "OPTIONS") { res.writeHead(204, CORS); res.end(); return; }
+    if (req.method === "GET" && req.url === "/healthz") {
+      const status = matchServer.deploymentStatus();
+      res.writeHead(200, { "content-type": "application/json", "cache-control": "no-store" });
+      res.end(JSON.stringify({ ok: true, ready: !status.draining, releaseId: RELEASE_ID, protocolVersion: PROTOCOL_VERSION, deploymentControls: true, ...status }));
+      return;
+    }
+    if (!originAllowed(req)) { res.writeHead(403); res.end(); return; }
+    const cors = { ...CORS, ...(req.headers.origin ? { "access-control-allow-origin": req.headers.origin, "vary": "Origin" } : {}) };
+    if (req.method === "OPTIONS") { res.writeHead(204, cors); res.end(); return; }
     // Account endpoints (all POST, JSON body ≤ 4KB, text/plain to dodge a CORS preflight):
     //   /profile  {playerId, secret, name}          create-or-verify a guest identity (name + record)
     //   /register {username, password, name}         claim a real account -> a fresh {playerId, secret}
@@ -369,6 +398,7 @@ export function startServer(port = Number(process.env.ARENA_PORT) || DEFAULT_POR
     //   /save     {playerId, secret, name?, avatar?, progress?}  persist synced profile fields
     //   /claim    {playerId, secret, username, password}         attach a login to an existing guest identity
     if (req.method === "POST" && ["/profile", "/register", "/login", "/save", "/claim"].includes(req.url ?? "")) {
+      if (!requestLimit.allow(clientAddress(req)) || !globalRequestLimit.allow("http")) { res.writeHead(429, { ...cors, "retry-after": "60" }); res.end(); return; }
       let body = "";
       req.on("data", (c) => { body += c; if (body.length > 4096) req.destroy(); });
       req.on("end", async () => {
@@ -392,21 +422,21 @@ export function startServer(port = Number(process.env.ARENA_PORT) || DEFAULT_POR
             [status, payload] = r.ok ? [200, { profile: r.profile, playerId: r.playerId, secret: r.secret }] : [400, { error: r.error }];
           }
         } catch { /* keep the 400 bad-request default */ }
-        res.writeHead(status, { ...CORS, "content-type": "application/json" });
+        res.writeHead(status, { ...cors, "content-type": "application/json" });
         res.end(JSON.stringify(payload));
       });
       return;
     }
     // A tiny health endpoint; the match itself runs over the WebSocket upgrade.
-    res.writeHead(req.url === "/" ? 200 : 404, { ...CORS, "content-type": "text/plain" });
+    res.writeHead(req.url === "/" ? 200 : 404, { ...cors, "content-type": "text/plain" });
     res.end(req.url === "/" ? "Element Arena match server — connect via WebSocket." : "not found");
   });
-  attachWebSocketServer(http, (conn) => matchServer.accept(conn));
+  attachWebSocketServer(http, (conn) => matchServer.accept(conn), originAllowed, clientAddress);
   const beat = setInterval(() => matchServer.heartbeat(), HEARTBEAT_MS);
   beat.unref?.(); // don't keep the process alive on the heartbeat alone
   const rankedTick = setInterval(() => matchServer.matchmakeRanked(), RANKED_TICK_MS);
   rankedTick.unref?.(); // widening rating windows pair waiters even without a new join
-  http.listen(port, () => {
+  http.listen(port, process.env.ARENA_HOST ?? "0.0.0.0", () => {
     const addr = http.address();
     const bound = addr && typeof addr === "object" ? addr.port : port;
     console.log(`[arena] Quick Match server listening on :${bound}`);
@@ -424,4 +454,9 @@ export function startServer(port = Number(process.env.ARENA_PORT) || DEFAULT_POR
 }
 
 // Only auto-start when run directly (so tests can import the pieces without opening a port).
-if (import.meta.main) startServer();
+if (import.meta.main) {
+  const app = startServer();
+  // Only an OS-authorized operator can drain. Existing turns/rejoins continue; new queues stop.
+  process.on("SIGUSR2", () => app.server.setDraining(true));
+  process.on("SIGHUP", () => app.server.setDraining(false));
+}

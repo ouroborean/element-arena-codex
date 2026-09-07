@@ -1,63 +1,35 @@
+import { createIdentityStore, type Identity } from "./identity.ts";
+import { RULINGS } from "../../engine/src/rulings.generated.ts";
+import { createPvpController } from "./pvp-controller.ts";
 /**
  * Element Arena — browser client entry. Builds a match and drives the engine's async loop, resolving the
  * human team's turn from board clicks (a Promise that settles when "Resolve turn" is pressed) and the AI
  * team from `defaultPolicy`. Between rounds each team auto-drafts an upgrade for now — an interactive draft
  * UI is the next increment. All rendering goes through view.ts; interaction is event-delegated on data-*.
  */
-import type { MatchState, TeamId, Unit, Status, TurnResolutionItem } from "../../engine/src/types.ts";
-import type { Action } from "../../engine/src/scheduler.ts";
-import type { SkillInstance } from "../../engine/src/skill.ts";
-import { canPay, effectiveCost, canUsePlanned, canPayAfter, reserveEnergy, pendingTicks } from "../../engine/src/scheduler.ts";
-import { redactState } from "../../engine/src/visibility.ts";
-import { buildMatch, defaultPolicy, type Draft } from "../../engine/content/match.ts";
-import { ROSTER } from "../../engine/content/roster.generated.ts";
-import { asProgress, creditWin, heroUnlocked, fusionUnlocked, advancedAugmentsUnlocked, type Progress } from "../../engine/content/progression.ts";
-import { HERO_META } from "./herometa.generated.ts";
-import { runMatch, type AsyncProvider } from "../../client/loop.ts";
-import { autoDraft, applyDraftChoices, hasDraftOptions, draftableHeroes, type DraftChoice } from "../../client/draft.ts";
+import { applyDraftChoices, autoDraft, draftableHeroes, hasDraftOptions } from "../../application/draft.ts";
+import { runMatch, type AsyncProvider } from "../../application/loop.ts";
 import { highlightFor, isSingleTargetPick } from "../../client/targeting.ts";
-import { renderApp, renderSetup, renderLogin, renderClaim } from "./view.ts";
+import { buildMatch, defaultPolicy, type Draft } from "../../engine/content/match.ts";
+import { advancedAugmentsUnlocked, asProgress, creditWin, fusionUnlocked, heroUnlocked, unlockedProgress, type Progress } from "../../engine/content/progression.ts";
+import { ROSTER } from "../../engine/content/roster.generated.ts";
+import type { Action } from "../../engine/src/scheduler.ts";
+import { canPay, canPayAfter, canUsePlanned, effectiveCost, pendingTicks, reserveEnergy } from "../../engine/src/scheduler.ts";
+import type { SkillInstance } from "../../engine/src/skill.ts";
+import type { MatchState, TeamId, TurnResolutionItem, Unit } from "../../engine/src/types.ts";
+import { redactState } from "../../engine/src/visibility.ts";
+import { MAX_NAME_LEN, PROTOCOL_VERSION, type Profile, type WireTurnOrder } from "../../net/protocol.ts";
 import { playTurn } from "./anim.ts";
-import { energyIcon, elementRank, avatarUrl } from "./assets.ts";
-import { ELEMENT_BY_ID } from "./elementid.generated.ts";
+import { avatarUrl, elementRank, energyIcon } from "./assets.ts";
 import { cbEnabled, cbEnergyEl, toggleColorblind } from "./colorblind.ts";
-import { glossHtml, initGloss, closeTransientGloss } from "./glossary.ts";
-import { showCoach, positionCoach, hideCoach, coachActive } from "./tutorial.ts";
-import { MatchSocket, serverUrl, fetchProfile, fetchAvatars, register, login, claimAccount, saveProfile, type AvatarInfo } from "./net.ts";
-import { PROTOCOL_VERSION, MAX_NAME_LEN, type ServerMsg, type Profile, type WireTurnOrder } from "../../net/protocol.ts";
+import { ELEMENT_BY_ID } from "./elementid.generated.ts";
+import { closeTransientGloss, glossHtml, initGloss } from "./glossary.ts";
+import { HERO_META } from "./herometa.generated.ts";
+import { claimAccount, fetchAvatars, fetchProfile, login, register, saveProfile, serverUrl, type AvatarInfo } from "./net.ts";
+import { coachActive, hideCoach, positionCoach, showCoach } from "./tutorial.ts";
+import { renderApp, renderClaim, renderLogin, renderSetup } from "./view.ts";
 
-export interface UiState {
-  you: TeamId;
-  phase: "plan" | "busy" | "over";
-  phaseLabel: string;
-  targeting?: { unitId: string; skillId: string; skillName: string; single: boolean };
-  examine?: { unitId: string; skillId: string; reason: string }; // read-only inspect of an unusable skill
-  inspectUnit?: string; // a unit whose full kit is shown in the upper area (click any portrait outside targeting)
-  legalTargets: Set<string>;
-  planned: Map<string, Action>;
-  plannedSkill: Map<string, string>; // unitId -> chosen skill id (to highlight its tile)
-  // The end-of-turn generic-payment allocation panel: how much of each color pays the turn's generic.
-  energyPanel?: { actions: Action[]; generic: number; avail: Record<string, number>; alloc: Record<string, number> };
-  // The end-of-turn resolution-order panel (bot matches): the queued skills + this turn's pending dot/regen
-  // ticks, arranged top-to-bottom; the player drags to change the order they resolve in.
-  orderPanel?: { items: OrderItem[] };
-  // The between-round fusion/augment draft: which of your heroes' options are shown, and the resolver to
-  // settle once you commit a choice (or hold).
-  draft?: { side: TeamId; inspect: string | null; picks: Map<string, DraftChoice>; resolve: () => void };
-  overlay?: string;
-  /** A thin fixed banner over the board (e.g. "opponent disconnected — waiting…"). */
-  notice?: string;
-  /** The opponent's display name in a networked match (shown in the midbar). */
-  opponentName?: string;
-  resolveTurn?: (actions: Action[]) => void;
-  /** The local player's unlock progress, refreshed each render so the draft panel can lock/annotate options. */
-  progress?: Progress;
-}
-
-/** One row of the resolution-order panel: a queued skill, or one of this turn's pending dot/regen ticks. */
-export type OrderItem =
-  | { kind: "action"; action: Action }
-  | { kind: "tick"; unitId: string; status: Status };
+import type { OrderItem, UiState } from "./ui-state.ts";
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const ALL_IDS = ROSTER.map((h) => h.id);
@@ -78,19 +50,8 @@ let setup: { picked: string[]; oppo: string[]; inspect: string | null; augfuse?:
 // A live Quick Match (PvP) session. Non-null only in networked play; in bot mode it stays null and the
 // local runMatch loop drives everything. When set, the turn/draft/concede commit points send to the server
 // instead of resolving locally, and the server's state broadcasts drive the board.
-/** What a match socket should do once its guest identity is authenticated. */
-type Intent = { kind: "queue"; team: string[]; ranked: boolean } | { kind: "rejoin"; matchId: string; token: string };
-let pvp:
-  | { sock: MatchSocket; you: TeamId; over: boolean; started: boolean; token?: string; matchId?: string; reconnecting: boolean; attempts: number; intent: Intent; opponentName?: string }
-  | null = null;
-const MAX_RECONNECT_ATTEMPTS = 6;
-const RECONNECT_DELAY_MS = 2500;
-const STORED_MATCH_KEY = "arenaMatch"; // sessionStorage: lets a page reload rejoin an in-progress match
-
 // ── guest identity (persistent, client-held) ────────────────────────────────────────────────────────── //
 let profile: Profile | null = null; // the authoritative profile from the server (name + record), when reachable
-interface Identity { playerId: string; secret: string; name: string; }
-let cachedCreds: { playerId: string; secret: string } | null = null; // memoized so a session keeps ONE identity even if storage is blocked
 
 /** A random token that works even outside a secure context (crypto.randomUUID is undefined over LAN http). */
 function uuid(): string {
@@ -98,38 +59,32 @@ function uuid(): string {
   if (c?.randomUUID) return c.randomUUID();
   const b = new Uint8Array(16);
   if (c?.getRandomValues) c.getRandomValues(b);
-  else for (let i = 0; i < 16; i++) b[i] = Math.floor(Math.random() * 256);
+  else throw new Error("Secure randomness is required to create an account identity");
   return "g-" + Array.from(b, (x) => x.toString(16).padStart(2, "0")).join("");
 }
 
-/** Local-testing override: `?player=<key>` gives this window its OWN deterministic guest identity, so two
+/** Local-testing override: `?player=<key>` gives this window its OWN stored random guest identity, so two
  *  tabs in the SAME browser become DISTINCT players the server will pair against each other (it never
  *  self-pairs one identity). Stable per key, so a reload keeps the same seat; it does not touch the normal
- *  persisted `arenaIdentity`. Use for manual PvP testing (see game/scripts/local-pvp-web.*). */
-function identityOverride(): Identity | null {
-  const key = (() => { try { return new URLSearchParams(location.search).get("player"); } catch { return null; } })();
-  if (!key) return null;
-  const k = key.slice(0, 40);
-  const name = (() => { try { return localStorage.getItem(`arenaName:${k}`) || `Player ${k}`; } catch { return `Player ${k}`; } })();
-  return { playerId: `local-${k}`, secret: `local-secret-${k}`, name };
-}
-
+ *  persisted identity. Use for manual PvP testing (see game/scripts/local-pvp-web.*). */
+const localPlayer = ["localhost", "127.0.0.1", "[::1]"].includes(location.hostname)
+  ? new URLSearchParams(location.search).get("player")?.slice(0, 40) : undefined;
+const identityStorage = (() => { try { return localStorage; } catch { return undefined; } })();
+const identityOrigin = new URL(serverUrl()).origin;
+const migrateLegacyIdentity = (() => {
+  try {
+    if (new URLSearchParams(location.search).has("server")) return false;
+    const oldServer = identityStorage?.getItem("arenaServer");
+    return !oldServer || new URL(oldServer).origin === identityOrigin;
+  } catch { return false; }
+})();
+const identityStore = createIdentityStore(identityStorage, identityOrigin, uuid, localPlayer || undefined, migrateLegacyIdentity);
 function identity(): Identity {
-  const override = identityOverride();
-  if (override) return override;
-  if (!cachedCreds) {
-    try { const c = JSON.parse(localStorage.getItem("arenaIdentity") ?? "null"); if (c?.playerId && c?.secret) cachedCreds = c; } catch { /* blocked */ }
-    if (!cachedCreds) {
-      cachedCreds = { playerId: uuid(), secret: uuid() };
-      try { localStorage.setItem("arenaIdentity", JSON.stringify(cachedCreds)); } catch { /* private mode — the memo keeps it stable this session */ }
-    }
-  }
-  const name = (() => { try { return localStorage.getItem("arenaName") || "Guest"; } catch { return "Guest"; } })();
-  return { ...cachedCreds, name };
+  const name = (() => { try { return localStorage.getItem(localPlayer ? `arenaName:${localPlayer}` : "arenaName") || (localPlayer ? `Player ${localPlayer}` : "Guest"); } catch { return "Guest"; } })();
+  return identityStore.get(name);
 }
 function setStoredName(name: string): void {
-  const key = (() => { try { return new URLSearchParams(location.search).get("player"); } catch { return null; } })();
-  const storeKey = key ? `arenaName:${key.slice(0, 40)}` : "arenaName"; // keep `?player=` windows' names distinct
+  const storeKey = localPlayer ? `arenaName:${localPlayer}` : "arenaName";
   try { localStorage.setItem(storeKey, name.slice(0, MAX_NAME_LEN)); } catch { /* ignore */ }
   syncProfile({ name: name.slice(0, MAX_NAME_LEN) }); // persist the display name to the account too
 }
@@ -150,16 +105,10 @@ let loginState: { mode: "login" | "register"; error?: string; busy?: boolean } =
 let claimForm: { error?: string; busy?: boolean } | null = null; // the "save your account" modal (guest → registered)
 
 /** Store a server-issued (register/login) or guest identity so all later auth reuses it across reloads. */
-function setStoredIdentity(playerId: string, secret: string): void {
-  cachedCreds = { playerId, secret };
-  try { localStorage.setItem("arenaIdentity", JSON.stringify(cachedCreds)); } catch { /* ignore */ }
-}
+function setStoredIdentity(playerId: string, secret: string): void { identityStore.set(playerId, secret); }
 /** Has this browser a stored identity already (a returning guest or logged-in account)? The ?player= test
  *  path also counts, so local 2-tab PvP skips the login gate. */
-function hasStoredIdentity(): boolean {
-  if (identityOverride()) return true;
-  try { const c = JSON.parse(localStorage.getItem("arenaIdentity") ?? "null"); return !!(c?.playerId && c?.secret); } catch { return false; }
-}
+function hasStoredIdentity(): boolean { return !!localPlayer || identityStore.has(); }
 /** Persist a changed profile field (name/avatar) to the account and fold the server's echo back into `profile`. */
 function syncProfile(patch: { name?: string; avatar?: string; progress?: unknown }): void {
   const id = identity();
@@ -168,8 +117,9 @@ function syncProfile(patch: { name?: string; avatar?: string; progress?: unknown
 /** On a WIN (any match type — vs-bot and PvP both count), credit unlock progress for the heroes YOU fielded:
  *  every augment each had equipped this match and its fusion element. Update `profile.progress` optimistically
  *  (so gates/UI see it at once) and persist to the account. A guest without a profile simply earns nothing. */
-/** The local player's unlock progress, coerced from the account blob (empty for a guest with no profile). */
-function myProgress(): Progress { return asProgress(profile?.progress); }
+/** The local player's unlock progress, coerced from the account blob (empty for a guest with no profile). During
+ *  the tutorial everything reads as unlocked, so its scripted "fuse your hero" step isn't blocked by the gate. */
+function myProgress(): Progress { return tutorial ? unlockedProgress() : asProgress(profile?.progress); }
 function awardOnWin(won: boolean): string[] {
   if (!won || !profile) return [];
   const before = asProgress(profile.progress);
@@ -200,7 +150,7 @@ function unlockBanner(unlocks: string[]): string {
 /** Sign out: drop the stored identity + local prefs and return to the login screen. */
 function logout(): void {
   try { for (const k of ["arenaIdentity", "arenaName", "arenaAvatar"]) localStorage.removeItem(k); } catch { /* ignore */ }
-  cachedCreds = null; profile = null; setup = null; avatarPickerOpen = false;
+  identityStore.clear(); profile = null; setup = null; avatarPickerOpen = false;
   loginState = { mode: "login" }; screen = "login"; renderLoginScreen();
 }
 function renderLoginScreen(): void { app.innerHTML = renderLogin(loginState); }
@@ -222,6 +172,13 @@ const ui: UiState = {
   you: "A", phase: "busy", phaseLabel: "starting…",
   legalTargets: new Set(), planned: new Map(), plannedSkill: new Map(),
 };
+const pvpController = createPvpController({
+  ui, getBoard: () => state, setBoard: board => { state = board; }, setProfile: p => { profile = p; },
+  hideSetup: () => { setup = null; }, render, showSetup, saveLastTeam, authMsg, awardOnWin, unlockBanner, escHtml,
+  showModal: html => { app.innerHTML = `<div class="overlay"><div class="modal">${html}</div></div>`; },
+});
+const { startQuickMatch, cancelQuickMatch, tryResumeStoredMatch, pvpBusy } = pvpController;
+
 
 // A floating popup describing an effect icon, shown on hover/tap.
 const fxpop = document.createElement("div");
@@ -653,7 +610,7 @@ app.addEventListener("click", (e) => {
     if (d.draftClear) { picks.delete(d.draftClear); render(); return; } // un-choose one hero
     if (d.draftConfirm) { // commit every hero's pick at once (an empty batch = hold all)
       const choices = [...picks.values()];
-      if (pvp) { pvp.sock.send({ t: "draftChoice", choices }); pvpBusy("Applying your upgrades…"); }
+      if (pvpController.session) { pvpController.session.sock.send({ t: "draftChoice", choices }); pvpBusy("Applying your upgrades…"); }
       else { for (const res of applyDraftChoices(state, ui.draft.side, choices)) logDraft(res); finishDraft(); }
     }
     return;
@@ -714,13 +671,13 @@ app.addEventListener("click", (e) => {
   if (d.surrender) { ui.overlay = SURRENDER_MENU; render(); return; }
   if (d.keep) { ui.overlay = undefined; render(); return; }
   if (d.forfeit) { // forfeit the whole MATCH → back to team select
-    if (pvp) { pvp.sock.send({ t: "surrender" }); pvpBusy("Forfeiting…"); }
+    if (pvpController.session) { pvpController.session.sock.send({ t: "surrender" }); pvpBusy("Forfeiting…"); }
     else location.reload();
     return;
   }
   if (d.concedeRound) { // concede only the CURRENT round → the between-round draft
     ui.overlay = undefined;
-    if (pvp) { pvp.sock.send({ t: "concedeRound" }); pvpBusy("Conceding round…"); }
+    if (pvpController.session) { pvpController.session.sock.send({ t: "concedeRound" }); pvpBusy("Conceding round…"); }
     else concedeRoundLocal();
     return;
   }
@@ -896,10 +853,10 @@ function commitTurn(actions: Action[] = [...ui.planned.values()]): void {
 }
 
 function finalizeTurn(actions: Action[], alloc: Record<string, number> | undefined): void {
-  if (pvp) { // networked: hand the committed turn (+ any explicit interleave) to the authoritative server
+  if (pvpController.session) { // networked: hand the committed turn (+ any explicit interleave) to the authoritative server
     const order = pendingTurnOrder ? toWireOrder(pendingTurnOrder) : undefined;
     pendingTurnOrder = undefined;
-    pvp.sock.send({ t: "turn", actions, genericPay: alloc, order });
+    pvpController.session.sock.send({ t: "turn", actions, genericPay: alloc, order });
     pvpBusy("Waiting for opponent…");
     return;
   }
@@ -940,7 +897,7 @@ async function startMatch(draft: Draft): Promise<void> {
   // No pre-loop render: runMatch → startRound → the human provider renders "Round 1 · your move" first,
   // so we skip the momentary "Round 0" frame.
   const outcome = await runMatch(state, (st, side) => (side === ui.you ? human(st, side) : ai(st, side)), {
-    roundsToWin: 2,
+    roundsToWin: RULINGS.INTERACTIVE_ROUNDS_TO_WIN,
     animate: true, // capture per-skill board snapshots so the turn plays back in step (see onResults)
     hooks: {
       onRoundStart: () => render(), // renders the board synchronously at round 1 (no "Round 0" frame, no delay)
@@ -1052,7 +1009,7 @@ async function startTutorial(): Promise<void> {
   tutTurn = 0;
   tutorial = { steps: TUT_SCRIPT, i: 0 };
   await runMatch(state, (st, side) => (side === "A" ? human(st, side) : ai(st, side)), {
-    roundsToWin: 2,
+    roundsToWin: RULINGS.INTERACTIVE_ROUNDS_TO_WIN,
     hooks: {
       onRoundStart: () => render(),
       onTurnStart: (_st, side) => { if (side === "A") tutTurn += 1; },
@@ -1069,179 +1026,6 @@ async function startTutorial(): Promise<void> {
       }
     },
   }).catch(() => { /* finishTutorial reloads out of the loop */ });
-}
-
-// ── Quick Match (PvP, server-authoritative) ─────────────────────────────────────────────────────────── //
-/** A standalone centred modal that works before any board exists (searching / errors / connection loss). */
-function showModal(html: string): void { app.innerHTML = `<div class="overlay"><div class="modal">${html}</div></div>`; }
-function showSearching(text: string): void {
-  showModal(`<h2>Quick Match</h2><p>${escHtml(text)}</p>
-    <div class="modal-foot"><button data-quick-cancel="1">Cancel</button></div>`);
-}
-
-function storeMatch(matchId: string, token: string): void {
-  try { sessionStorage.setItem(STORED_MATCH_KEY, JSON.stringify({ matchId, token })); } catch { /* private mode */ }
-}
-function clearStoredMatch(): void {
-  try { sessionStorage.removeItem(STORED_MATCH_KEY); } catch { /* ignore */ }
-}
-
-/** A dropped socket. A reconnect/resume attempt retries; a first in-match drop starts reconnecting; only a
- *  fresh (never-started, no token) connect failure is a flat "can't reach the server". */
-function onDrop(): void {
-  if (!pvp || pvp.over) return;
-  if (pvp.reconnecting) { setTimeout(attemptReconnect, RECONNECT_DELAY_MS); return; } // a reconnect/resume attempt itself dropped → retry
-  if (!pvp.started) { pvp.over = true; pvp = null; showModal(`<h2>Can't reach the server</h2><p>No match server at <code>${escHtml(serverUrl())}</code>. Start it with <code>node game/server/index.ts</code>.</p><button onclick="location.reload()">Back</button>`); return; }
-  pvp.reconnecting = true; pvp.attempts = 0;
-  attemptReconnect();
-}
-
-/** Wire a match socket: authenticate first; the `authed` handler then acts on pvp.intent (queue/rejoin). */
-function wireSocket(sock: MatchSocket): void {
-  sock.onOpen = () => sock.send(authMsg());
-  sock.onMessage = handleServerMsg;
-  sock.onError = () => { /* wait for close */ };
-  sock.onClose = onDrop;
-}
-
-/** Open a fresh socket and present the rejoin token to resume the in-progress match. */
-function attemptReconnect(): void {
-  if (!pvp || pvp.over || !pvp.reconnecting) return;
-  if (++pvp.attempts > MAX_RECONNECT_ATTEMPTS || !pvp.token || !pvp.matchId) {
-    pvp.over = true; pvp = null; clearStoredMatch();
-    showModal(`<h2>Connection lost</h2><p>Couldn't reconnect to the match.</p><button onclick="location.reload()">Back to team select</button>`);
-    return;
-  }
-  showModal(`<h2>Reconnecting…</h2><p>Attempt ${pvp.attempts} of ${MAX_RECONNECT_ATTEMPTS}…</p>`);
-  const sock = new MatchSocket(serverUrl());
-  pvp.sock = sock;
-  pvp.intent = { kind: "rejoin", matchId: pvp.matchId, token: pvp.token };
-  wireSocket(sock);
-}
-
-/** Connect, join the (ranked or casual) queue with `team`, and let server messages drive the match. */
-function startQuickMatch(team: string[], ranked = false): void {
-  saveLastTeam(team); // repopulate this team on return from the match
-  const sock = new MatchSocket(serverUrl());
-  pvp = { sock, you: "A", over: false, started: false, reconnecting: false, attempts: 0, intent: { kind: "queue", team, ranked } };
-  setup = null;
-  wireSocket(sock);
-  showSearching(ranked ? "Connecting to Ranked…" : "Connecting…");
-}
-
-/** On page load, silently try to rejoin an in-progress match (survives an accidental reload). */
-function tryResumeStoredMatch(): boolean {
-  let stored: { matchId?: unknown; token?: unknown };
-  try { stored = JSON.parse(sessionStorage.getItem(STORED_MATCH_KEY) ?? "null") ?? {}; } catch { clearStoredMatch(); return false; }
-  if (typeof stored.matchId !== "string" || typeof stored.token !== "string") return false;
-  const matchId = stored.matchId, token = stored.token;
-  const sock = new MatchSocket(serverUrl());
-  pvp = { sock, you: "A", over: false, started: false, token, matchId, reconnecting: true, attempts: 0, intent: { kind: "rejoin", matchId, token } };
-  wireSocket(sock);
-  showModal(`<h2>Reconnecting…</h2><p>Rejoining your match…</p>`);
-  return true;
-}
-
-function cancelQuickMatch(): void {
-  const keep = pvp?.intent.kind === "queue" ? pvp.intent.team : []; // keep the team the player had queued with
-  pvp?.sock.send({ t: "cancelQueue" });
-  pvp?.sock.close();
-  pvp = null;
-  showSetup(keep);
-}
-
-/** Open the between-round draft modal for a side (shared by yourDraft and a reconnect resumed at draft). */
-function openPvpDraft(side: TeamId): void {
-  ui.phase = "busy"; ui.phaseLabel = "choose your upgrade"; ui.overlay = undefined; ui.energyPanel = undefined;
-  ui.draft = { side, inspect: draftableHeroes(state, side)[0]?.id ?? null, picks: new Map(), resolve: () => {} };
-  render();
-}
-
-/** Enter local planning for a networked turn — mirrors the bot-mode human provider, minus the local promise. */
-function enterPvpPlanning(): void {
-  ui.phase = "plan";
-  ui.phaseLabel = "your move";
-  ui.planned.clear(); ui.plannedSkill.clear();
-  ui.targeting = undefined; ui.examine = undefined; ui.legalTargets = new Set();
-  ui.energyPanel = undefined; ui.overlay = undefined; ui.draft = undefined;
-  render();
-}
-
-function pvpBusy(label: string): void {
-  ui.phase = "busy"; ui.phaseLabel = label;
-  ui.targeting = undefined; ui.examine = undefined; ui.energyPanel = undefined; ui.legalTargets = new Set();
-  ui.planned.clear(); ui.plannedSkill.clear(); ui.draft = undefined; ui.overlay = undefined;
-  render();
-}
-
-/** Resume the board at the given control state — shared by yourTurn/opponentTurn/… and a reconnect. */
-function applyControl(control: "turn" | "wait" | "draft" | "waitDraft"): void {
-  const foe = ui.opponentName ?? "Opponent";
-  if (control === "turn") enterPvpPlanning();
-  else if (control === "draft") openPvpDraft(pvp!.you);
-  else if (control === "waitDraft") pvpBusy(`${foe} is choosing an upgrade…`);
-  else pvpBusy(`${foe} is acting…`);
-}
-
-function handleServerMsg(msg: ServerMsg): void {
-  if (!pvp) return;
-  switch (msg.t) {
-    case "authed":
-      profile = msg.profile; // freshest name + record
-      if (pvp.intent.kind === "queue") pvp.sock.send({ t: "queue", team: pvp.intent.team, ranked: pvp.intent.ranked, protocolVersion: PROTOCOL_VERSION });
-      else pvp.sock.send({ t: "rejoin", matchId: pvp.intent.matchId, token: pvp.intent.token, protocolVersion: PROTOCOL_VERSION });
-      break;
-    case "authError":
-      pvp.over = true; pvp.sock.close(); pvp = null; clearStoredMatch();
-      showModal(`<h2>Sign-in problem</h2><p>${escHtml(msg.message)}</p><button onclick="location.reload()">Back</button>`);
-      break;
-    case "queued": showSearching(pvp.intent.kind === "queue" && pvp.intent.ranked ? "Searching for a ranked opponent…" : "Searching for an opponent…"); break;
-    case "start":
-      pvp.started = true; pvp.you = msg.you; ui.you = msg.you; state = msg.state; pvp.opponentName = msg.opponentName; ui.opponentName = msg.opponentName;
-      pvp.token = msg.token; pvp.matchId = msg.matchId; storeMatch(msg.matchId, msg.token);
-      pvpBusy(`Matched vs ${msg.opponentName} — get ready…`);
-      break;
-    case "resumed":
-      pvp.started = true; pvp.reconnecting = false; pvp.attempts = 0;
-      pvp.you = msg.you; ui.you = msg.you; state = msg.state; pvp.opponentName = msg.opponentName; ui.opponentName = msg.opponentName;
-      ui.notice = msg.opponentDisconnected ? `${msg.opponentName} disconnected — waiting for them to reconnect…` : undefined;
-      applyControl(msg.control);
-      break;
-    case "opponentTurn": state = msg.state; pvpBusy(`${ui.opponentName ?? "Opponent"} is acting…`); break;
-    case "yourTurn": state = msg.state; enterPvpPlanning(); break;
-    case "opponentDraft": state = msg.state; pvpBusy(`${ui.opponentName ?? "Opponent"} is choosing an upgrade…`); break;
-    case "yourDraft": state = msg.state; openPvpDraft(pvp.you); break; // a player always drafts for its own team
-    case "opponentDisconnected": ui.notice = `${ui.opponentName ?? "Opponent"} disconnected — waiting for them to reconnect…`; render(); break;
-    case "opponentReconnected": ui.notice = undefined; render(); break;
-    case "matchEnd": {
-      pvp.over = true; clearStoredMatch(); ui.notice = undefined;
-      const won = msg.outcome.winner === msg.you;
-      const unlocked = awardOnWin(won); // credit unlock progress for a PvP win (read off the client's final board mirror)
-      const title = msg.outcome.winner === null ? "Stalemate" : won ? "Victory 🏆" : "Defeat";
-      const why = msg.reason === "opponent-left" ? " Your opponent left the match." : msg.reason === "forfeit" ? " (by surrender)" : "";
-      const rating = msg.rating
-        ? `<p style="font-size:15px">Rating <b>${msg.rating.rating}</b> <span style="color:${msg.rating.delta >= 0 ? "#6c6" : "#e66"}">(${msg.rating.delta >= 0 ? "+" : ""}${msg.rating.delta})</span></p>`
-        : "";
-      showModal(`<h2>${title}</h2>
-        <p>Team ${msg.outcome.winner ?? "—"} wins ${msg.outcome.roundsWon.A}–${msg.outcome.roundsWon.B} over ${msg.outcome.rounds} round${msg.outcome.rounds === 1 ? "" : "s"}.${why}</p>
-        ${rating}
-        ${unlockBanner(unlocked)}
-        <button onclick="location.reload()">Back to team select</button>`);
-      pvp.sock.close();
-      break;
-    }
-    case "rejoinFailed": {
-      const wasStarted = pvp.started;
-      pvp.over = true; pvp.sock.close(); pvp = null; clearStoredMatch();
-      if (wasStarted) showModal(`<h2>Match ended</h2><p>${escHtml(msg.message)}</p><button onclick="location.reload()">Back to team select</button>`);
-      else showSetup(); // a stale stored match on page load — just return to team select
-      break;
-    }
-    case "error":
-      pvp.over = true; pvp.sock.close(); clearStoredMatch();
-      showModal(`<h2>Quick Match</h2><p>${escHtml(msg.message)}</p><button onclick="location.reload()">Back</button>`);
-      break;
-  }
 }
 
 // Start at team select — unless a match from this tab is still in progress (an accidental reload), which we rejoin.

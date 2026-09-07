@@ -2,7 +2,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import "../content/fusion_effects.ts"; // register the implemented fusion handlers
 import { emit, runEffects } from "../src/effects/interpret.ts";
-import { performAction, tickTriggersForTeam, startRound, effectiveCost, endTurn, legalTargets, grantIncome, tickDots } from "../src/scheduler.ts";
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
+import { tickTriggersForTeam, startRound, effectiveCost, endTurn, legalTargets, grantIncome, tickDots } from "../src/scheduler.ts";
 import { Rng } from "../src/rng.ts";
 import { stackCount, rawStackCount, applyStatus } from "../src/status.ts";
 import { applyDamage, outgoingDtypeOverride } from "../src/damage.ts";

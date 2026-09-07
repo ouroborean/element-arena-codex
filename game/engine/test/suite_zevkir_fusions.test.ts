@@ -7,7 +7,8 @@ import { applyFusion } from "../content/fusion.ts";
 import { fusionForm } from "../content/fusions.generated.ts";
 import type { FusionForm } from "../content/fusion.ts";
 import { makeState, makeUnit } from "./helpers.ts";
-import { performAction, startTurn, endTurn, tickDots } from "../src/scheduler.ts";
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
+import { startTurn, endTurn, tickDots } from "../src/scheduler.ts";
 import { stackCount } from "../src/status.ts";
 import type { Unit } from "../src/types.ts";
 

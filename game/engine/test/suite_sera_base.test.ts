@@ -3,7 +3,8 @@ import assert from "node:assert/strict";
 import { loadHero } from "../content/hero.ts"; // side-effect: registers handlers
 import { heroById } from "../content/match.ts";
 import { makeState, makeUnit, status } from "./helpers.ts";
-import { performAction, effectiveCost } from "../src/scheduler.ts";
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
+import { effectiveCost } from "../src/scheduler.ts";
 import { emit, runEffects } from "../src/effects/interpret.ts";
 import { stackCount } from "../src/status.ts";
 import { totalShield } from "../src/damage.ts";

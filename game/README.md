@@ -16,7 +16,23 @@ that makes the metagame expressible: **skills are declarative data with
 individually addressable effect nodes, not functions**, because augments and fusion
 passives are ordered *patches* to named sibling skills.
 
-## Where we are — Phase 0 (rules charter & content pipeline) — ✅ complete
+## Current development workflow
+
+The game now has a TypeScript engine, authored heroes/fusions/augments, local and network match adapters, a browser client, and an authoritative server. See [ARCHITECTURE.md](ARCHITECTURE.md) for the current module map, extension rules, protocol-v3 deployment notes, and remaining limitations.
+
+Run from the repository root with Node 24.18+ and Python 3.12+:
+
+```sh
+npm ci
+npm run generate
+npm run check
+npm run build
+node game/server/index.ts
+```
+
+Serve the repository root separately (for example, `python -m http.server 8000`) and open `/game/web/`. The sections below record the original content-pipeline milestone, not the current implementation status.
+
+## Historical Phase 0 (rules charter & content pipeline)
 
 | Artifact | What it is | State |
 |---|---|---|
@@ -34,7 +50,7 @@ reference in all 762 descriptions resolves or is adjudicated, and a novel bad re
 or id collision fails the build. `content/frozen/` is the clean canonical source with a
 14-mutation audit trail in `frozen/CHANGES.md`.
 
-Nothing here is TypeScript yet. The P0 pipeline is stack-neutral Python that
+At that milestone there was no TypeScript yet. The P0 pipeline is stack-neutral Python that
 extends the existing `data_export` tooling; the engine language/monorepo decision
 is deferred to P1 (the roadmap recommends isomorphic TypeScript).
 

@@ -1,14 +1,12 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { emit } from "../src/effects/interpret.ts";
-import {
-  performAction,
-  startTurn,
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
+import { startTurn,
   endTurn,
   startRound,
   canUse,
-  legalTargets,
-} from "../src/scheduler.ts";
+  legalTargets } from "../src/scheduler.ts";
 import { applyDamage } from "../src/damage.ts";
 import { Rng } from "../src/rng.ts";
 import { loadHero } from "../content/hero.ts"; // side-effect: registers handlers + hero triggers

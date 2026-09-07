@@ -8,6 +8,7 @@
  *     end of the APPLIER's turn — but NOT on the turn it was born, so "for 1 turn"
  *     survives the opponent's upcoming turn and expires at the applier's next turn-end.
  */
+import { effectTeam } from "./effect-source.ts";
 import type { MatchState, Status, TeamId, Unit, UnitId } from "./types.ts";
 
 export interface ExpiredStatus {
@@ -18,12 +19,14 @@ export interface ExpiredStatus {
 /** Two statuses address the same effect if kind (+name for named effects) match. */
 function sameSlot(a: Status, b: Status): boolean {
   if (a.kind !== b.kind) return false;
-  if (a.kind === "mark" || a.kind === "stack" || a.kind === "dot" || a.kind === "stack_read_mod") return a.name === b.name;
+  if (b.mergePolicy === "coexist" || b.mergePolicy === "charge") return false;
+  if (a.stackKey !== undefined || b.stackKey !== undefined) return a.stackKey === b.stackKey;
+  if (a.kind === "mark" || a.kind === "stack" || a.kind === "dot" || a.kind === "regen" || a.kind === "stack_read_mod") return a.name === b.name;
   // A skill-scoped cost/cooldown mod (or instant_cast / currency remap) occupies its own slot per skill.
   if (a.kind === "cost_mod" || a.kind === "cooldown_mod" || a.kind === "instant_cast" || a.kind === "cost_currency_remap"
     || a.kind === "skill_damage_bonus" || a.kind === "skill_targeting_override") return a.skillId === b.skillId;
   // Concurrent channels of one skill occupy distinct slots by instanceId (undefined = the single-slot default).
-  if (a.kind === "channeling") return a.instanceId === b.instanceId;
+  if (a.kind === "channeling") return a.name === b.name && a.instanceId === b.instanceId;
   // Elemental Essence is a COUNTABLE resource ("gains 3 Elemental Essence", "consumes 3 Elemental Essence"):
   // every grant is its own charge, so it never shares a slot (each applyStatus pushes a distinct charge and
   // grantIncome consumes exactly one per income tick).
@@ -41,35 +44,19 @@ export function applyStatus(unit: Unit, status: Status): void {
     unit.statuses.push({ ...status });
     return;
   }
-  if (status.kind === "stack") {
-    existing.magnitude = (existing.magnitude ?? 0) + (status.magnitude ?? 1);
-    // A fresh stack refreshes the shared duration to the longer of the two.
-    existing.duration = longerDuration(existing.duration, status.duration);
-    existing.appliedTurn = status.appliedTurn;
-    return;
+  const next = { ...status };
+  const accumulating = status.mergePolicy === "stack" || (!status.mergePolicy && (status.kind === "stack" || status.stacks));
+  if (accumulating) {
+    next.magnitude = (existing.magnitude ?? 0) + (status.magnitude ?? (status.kind === "stack" ? 1 : 0));
+    if (status.kind === "stack") next.duration = longerDuration(existing.duration, status.duration);
   }
-  if (status.stacks) {
-    // "This effect stacks": a re-applied named dot/effect ACCUMULATES magnitude (and refreshes duration/source)
-    // instead of the default refresh.
-    existing.magnitude = (existing.magnitude ?? 0) + (status.magnitude ?? 0);
-    existing.duration = status.duration;
-    existing.appliedBy = status.appliedBy;
-    existing.appliedTurn = status.appliedTurn;
-    existing.sourceId = status.sourceId;
-    return;
+  // Preserve the established broadest-scope rule only for scoped targeting gates.
+  if (status.mergePolicy !== "replace" && (status.kind === "stun" || status.kind === "invulnerable")) {
+    next.scope = existing.scope === undefined || status.scope === undefined ? undefined : status.scope;
   }
-  // Refresh.
-  existing.duration = status.duration;
-  if (status.magnitude !== undefined) existing.magnitude = status.magnitude;
-  existing.appliedBy = status.appliedBy;
-  existing.appliedTurn = status.appliedTurn;
-  existing.sourceId = status.sourceId;
-  existing.invisible = status.invisible; // a re-application under a (non-)invisible context updates concealment
-  // Merge scope: the BROADER stun/invulnerable wins — an unscoped (full) status must not be narrowed by a
-  // scoped refresh, and a scoped status IS broadened to unscoped when a full one lands (gommar5: the "also
-  // stunned" full stun over the AoE except-Strategic stun must fully stun him, not leave Ice Body castable).
-  existing.scope = existing.scope === undefined || status.scope === undefined ? undefined : status.scope;
-
+  // Preserve identity for an in-flight tick plan, but replace the COMPLETE payload (including absent fields).
+  for (const key of Object.keys(existing)) delete (existing as unknown as Record<string, unknown>)[key];
+  Object.assign(existing, next);
 }
 
 function longerDuration(a: number | null, b: number | null): number | null {
@@ -118,8 +105,7 @@ export function tickDurationsForTeam(state: MatchState, team: TeamId): ExpiredSt
   for (const unit of Object.values(state.units)) {
     const kept: Status[] = [];
     for (const s of unit.statuses) {
-      const owner = state.units[s.appliedBy];
-      const appliedByTeam = owner ? owner.team === team : false;
+      const appliedByTeam = effectTeam(state, s) === team;
       // A dot/regen ticks on its apply turn (tickDots counts it too), so its duration must decrement then as
       // well — otherwise a duration-N ticking effect would land N+1 ticks. A firstTickNextTurn dot/regen skips
       // the apply turn (and so does its duration). Every OTHER status keeps the birth-turn skip (a 1-turn

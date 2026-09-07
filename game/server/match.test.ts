@@ -1,3 +1,4 @@
+import { previewState } from "../net/public-state.ts";
 /**
  * Integration tests for a server-authoritative Match, driven by scripted client doubles (no sockets).
  * A double implements MatchClient and reacts to the server's prompts on a microtask — because the match
@@ -47,7 +48,7 @@ class Double implements MatchClient {
     if (this.silent) return;
     // Reply on a microtask: the match sets pendingTurn AFTER this synchronous send returns.
     if (msg.t === "yourTurn" || (msg.t === "resumed" && msg.control === "turn")) {
-      const state = msg.state;
+      const state = previewState(msg.state);
       queueMicrotask(() => this.match.handleMessage(this, { t: "turn", ...this.turnFor(state) }));
     } else if (msg.t === "yourDraft") {
       queueMicrotask(() => this.match.handleMessage(this, { t: "draftChoice", choices: [] }));

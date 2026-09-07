@@ -40,6 +40,18 @@ test("acceptKey matches the RFC 6455 example", () => {
   assert.equal(acceptKey("dGhlIHNhbXBsZSBub25jZQ=="), "s3pPLMBiTxaQ9kYGzzhZRbK+xOo=");
 });
 
+test("server decoder requires masked client frames and rejects reserved bits", () => {
+  for (const reserved of [false, true]) {
+    const errors: string[] = [], texts: string[] = [];
+    const decoder = new FrameDecoder({ onText: s => texts.push(s), onPing() {}, onPong() {}, onClose() {}, onError: e => errors.push(e) }, 32768, true);
+    const frame = reserved ? maskFrame(1, Buffer.from("hello")) : encodeFrame(1, Buffer.from("hello"));
+    if (reserved) frame[0]! |= 0x40;
+    decoder.push(frame);
+    assert.equal(texts.length, 0);
+    assert.match(errors[0]!, reserved ? /reserved/ : /masked/);
+  }
+});
+
 test("encodeFrame — 7-bit length header (text, unmasked, FIN)", () => {
   const f = encodeFrame(0x1, Buffer.from("hi"));
   assert.equal(f[0], 0x81, "FIN + text opcode");

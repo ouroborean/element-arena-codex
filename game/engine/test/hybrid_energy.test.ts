@@ -5,7 +5,8 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { canPay, canPayAfter, reserveEnergy, performAction } from "../src/scheduler.ts";
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
+import { canPay, canPayAfter, reserveEnergy } from "../src/scheduler.ts";
 import { elementComponents, hybridsFor } from "../src/elements.ts";
 import { makeState, makeUnit, skill } from "./helpers.ts";
 

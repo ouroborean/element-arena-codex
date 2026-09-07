@@ -1,3 +1,12 @@
+import { canPay, canPayAfter, effectiveCooldown, effectiveCost, pay, reserveEnergy } from "./energy.ts";
+import { isStunnedFor, skillBypasses } from "./skill-policy.ts";
+import { effectiveTargeting, legalTargets, resolveTargets } from "./targeting.ts";
+import { livingHeroes, otherTeam, team, unitsOf } from "./units.ts";
+export * from "./energy.ts";
+export { hasEssenceIncome, MIDDLE_SLOT } from "./income.ts";
+export * from "./skill-policy.ts";
+export * from "./targeting.ts";
+export * from "./units.ts";
 /**
  * The turn scheduler — the phase machine that makes a match runnable.
  *
@@ -14,31 +23,19 @@
  * duration logic already keys on. ENERGY_INCOME's base rate is provisional (ruling
  * still open) and lives behind one constant.
  */
-import type { EnergyPool, MatchState, Status, TeamId, Unit } from "./types.ts";
-import type { SkillInstance } from "./skill.ts";
-import type { Value } from "./effects/ast.ts";
-import { emit, evalConditionReadOnly, evalSkillCondition, evalTargetPredicate, evalValueReadOnly, resolveDeclaration, runEffects } from "./effects/interpret.ts";
-import { applyDamage, applyHeal, outgoingDtypeOverride, tickShieldsForTeam } from "./damage.ts";
+import { dealDamage, heal } from "./combat.ts";
+import { tickShieldsForTeam } from "./damage.ts";
+import { effectSource, effectTeam, retireSource } from "./effect-source.ts";
+import { emit, evalConditionReadOnly, resolveDeclaration, runEffects } from "./effects/interpret.ts";
+import { hasEssenceIncome, MIDDLE_SLOT } from "./income.ts";
 import { Rng } from "./rng.ts";
+import type { SkillInstance } from "./skill.ts";
 import { applyStatus, clearRoundStatuses, removeStatus, tickDurationsForTeam } from "./status.ts";
+import type { MatchState, Status, TeamId, Unit } from "./types.ts";
 import { isConcealed } from "./visibility.ts";
-import { hybridsFor } from "./elements.ts";
 
 /** Provisional base income (ENERGY_INCOME, ruling open): +1 generic per living hero. */
 const GENERIC_PER_LIVING_HERO = 1;
-
-function team(state: MatchState, id: TeamId) {
-  return state.teams[id];
-}
-function otherTeam(id: TeamId): TeamId {
-  return id === "A" ? "B" : "A";
-}
-function unitsOf(state: MatchState, id: TeamId): Unit[] {
-  return team(state, id).units.map((u) => state.units[u]).filter((u): u is Unit => !!u);
-}
-function livingHeroes(state: MatchState, id: TeamId): Unit[] {
-  return unitsOf(state, id).filter((u) => u.kind === "hero" && u.alive);
-}
 
 /** Remove minions matching a predicate from the field (delete unit + team slot). */
 function removeMinionsWhere(state: MatchState, pred: (u: Unit) => boolean): void {
@@ -48,6 +45,7 @@ function removeMinionsWhere(state: MatchState, pred: (u: Unit) => boolean): void
     for (const id of team.units) {
       const u = state.units[id];
       if (u && u.kind === "minion" && pred(u)) {
+        retireSource(state, u);
         delete state.units[id];
         continue;
       }
@@ -87,6 +85,7 @@ export function startRound(state: MatchState, firstTeam: TeamId = "A"): void {
   // for now leave the field as-is (summon passives are a later increment).
   // Fresh battle: clear last round's minions; round-start passives re-summon them.
   removeMinionsWhere(state, () => true);
+  state.retiredUnits = undefined;
   // Fresh battle: energy pools start EMPTY every round. Nothing carries over — not generic,
   // and not leftover element energy from a form the team has since fused away (that stale
   // energy was the source of the phantom-colour pool display). Income re-accrues from turn
@@ -100,11 +99,11 @@ export function startRound(state: MatchState, firstTeam: TeamId = "A"): void {
 }
 
 /** A team has lost the round when it has no living heroes. Returns the winner, or null. */
-export function roundWinner(state: MatchState): TeamId | null {
+export function roundWinner(state: MatchState, tieWinner: TeamId = state.activeTeam): TeamId | null {
   if (state.concededRound) return otherTeam(state.concededRound); // a conceded round goes to the opponent
   const aDead = livingHeroes(state, "A").length === 0;
   const bDead = livingHeroes(state, "B").length === 0;
-  if (aDead && bDead) return state.activeTeam; // simultaneous wipe → active team takes it
+  if (aDead && bDead) return tieWinner; // simultaneous wipe → resolving team takes it
   if (aDead) return "B";
   if (bDead) return "A";
   return null;
@@ -122,14 +121,9 @@ export function endRound(state: MatchState, winner: TeamId, roundsToWin: number)
 // --------------------------------------------------------------------------- //
 
 /** The middle formation slot (0..2). Its hero permanently generates elemental income (see grantIncome). */
-export const MIDDLE_SLOT = 1;
 
 /** A hero has Elemental Essence income this turn if it holds a charge OR sits in the middle slot (a
  *  permanent source), and isn't Silenced. The middle-slot rule needs no charge and consumes none. */
-export function hasEssenceIncome(hero: Unit): boolean {
-  if (hero.statuses.some((s) => s.kind === "silence")) return false;
-  return hero.slot === MIDDLE_SLOT || hero.statuses.some((s) => s.kind === "elemental_essence");
-}
 
 /**
  * Grant energy income to a team (ENERGY_INCOME, CONFIRMED). Each living hero yields 1
@@ -241,31 +235,7 @@ export function startTurn(state: MatchState): void {
  * duration-N dot deals exactly N ticks over the applier's next N turns.
  */
 export function tickDots(state: MatchState, id: TeamId): void {
-  for (const u of Object.values(state.units)) {
-    if (!u.alive) continue;
-    for (const s of u.statuses) {
-      if (s.kind !== "dot" && s.kind !== "regen") continue;
-      const owner = state.units[s.appliedBy];
-      const byThisTeam = owner ? owner.team === id : false;
-      // A ticking effect COUNTS THE TURN IT WAS APPLIED by default — "heals 10 each turn for 2 turns" / "5
-      // affliction each turn" fire on the caster's very turn (its turn-end): appliedTurn <= state.turn. An
-      // effect flagged firstTickNextTurn ("then N for the NEXT M turns") instead skips the apply turn (< ). The
-      // paired duration decrement (tickDurationsForTeam) matches, so a duration-N effect lands exactly N ticks.
-      const started = s.firstTickNextTurn ? s.appliedTurn < state.turn : s.appliedTurn <= state.turn;
-      if (!(byThisTeam && started)) continue;
-      if (s.kind === "regen") {
-        applyHeal(u, s.magnitude ?? 0);
-        continue;
-      }
-      const wasAlive = u.alive;
-      // A gated outgoing dtype override (e.g. Stinking Marsh, live on the applier's raw-stack state) converts
-      // this DoT's damage type too — DoT ticks don't pass through the damage op, so apply it here.
-      const dtype = (owner ? outgoingDtypeOverride(owner) : undefined) ?? s.dtype ?? "affliction";
-      const r = applyDamage(u, { amount: s.magnitude ?? 0, type: dtype, sourceId: s.name });
-      emit(state, { type: "damageDealt", source: s.appliedBy, target: u.id, amount: r.hpLost, dtype, sourceId: s.name, isTick: true });
-      if (wasAlive && r.lethal) emit(state, { type: "unitDied", unit: u.id, killer: s.appliedBy });
-    }
-  }
+  for (const tick of pendingTicks(state, id)) applyOneTick(state, tick.unitId, tick.status);
 }
 
 /**
@@ -280,9 +250,8 @@ export function pendingTicks(state: MatchState, team: TeamId): { unitId: string;
     if (!u.alive) continue;
     for (const s of u.statuses) {
       if (s.kind !== "dot" && s.kind !== "regen") continue;
-      const owner = state.units[s.appliedBy];
-      const byThisTeam = owner ? owner.team === team : false;
-      if (!(byThisTeam && s.appliedTurn < state.turn)) continue; // same gate as tickDots (skip the birth turn)
+      const byThisTeam = effectTeam(state, s) === team;
+      if (!(byThisTeam && (s.firstTickNextTurn ? s.appliedTurn < state.turn : s.appliedTurn <= state.turn))) continue; // same gate as tickDots (skip the birth turn)
       out.push({ unitId: u.id, status: s });
     }
   }
@@ -296,25 +265,22 @@ export function pendingTicks(state: MatchState, team: TeamId): { unitId: string;
  */
 function applyOneTick(state: MatchState, unitId: string, s: Status): void {
   const u = state.units[unitId];
-  if (!u || !u.alive) return;
-  const owner = state.units[s.appliedBy];
-  if (s.kind === "regen") { applyHeal(u, s.magnitude ?? 0); return; }
-  const wasAlive = u.alive;
-  const dtype = (owner ? outgoingDtypeOverride(owner) : undefined) ?? s.dtype ?? "affliction";
-  const r = applyDamage(u, { amount: s.magnitude ?? 0, type: dtype, sourceId: s.name });
-  emit(state, { type: "damageDealt", source: s.appliedBy, target: u.id, amount: r.hpLost, dtype, sourceId: s.name, isTick: true });
-  if (wasAlive && r.lethal) emit(state, { type: "unitDied", unit: u.id, killer: s.appliedBy });
+  if (!u?.alive || !u.statuses.includes(s)) return;
+  const owner = effectSource(state, s.appliedBy);
+  const ctx = { state, caster: owner ?? { ...u, id: s.appliedBy }, skillId: s.name, emit: (e: import("./events.ts").GameEvent) => emit(state, e) };
+  if (s.kind === "regen") { heal(ctx, u, s.magnitude ?? 0, { isTick: true }); return; }
+  dealDamage(ctx, u, s.magnitude ?? 0, { type: s.dtype ?? "affliction", isTick: true, sourceId: s.name });
 }
 
 /** Fire deferred effects whose delay has elapsed (anchored to the caster's turn-end). */
 function fireScheduled(state: MatchState, id: TeamId): void {
   const remaining: typeof state.scheduled = [];
   for (const e of state.scheduled) {
-    const owner = state.units[e.caster];
-    if (owner && owner.team === id && e.appliedTurn < state.turn) {
+    const owner = effectSource(state, e.caster);
+    if ((e.appliedByTeam ?? owner?.team) === id && e.appliedTurn < state.turn) {
       e.turns -= 1;
       if (e.turns <= 0) {
-        const caster = state.units[e.caster];
+        const caster = effectSource(state, e.caster);
         if (caster) {
           const targets = e.targets.map((t) => state.units[t]).filter((t): t is Unit => !!t);
           runEffects(state, e.effect, { caster, targets, skillId: e.skillId });
@@ -333,8 +299,8 @@ export function tickTriggersForTeam(state: MatchState, team: TeamId): void {
     if (!u.triggers) continue;
     u.triggers = u.triggers.filter((t) => {
       if (t.duration === undefined || t.duration === null) return true; // static, or round-permanent (cleared at round start)
-      const owner = t.appliedBy ? state.units[t.appliedBy] : undefined;
-      if (owner && owner.team === team && t.appliedTurn !== undefined && t.appliedTurn < state.turn) {
+      const ownerTeam = effectTeam(state, t);
+      if (ownerTeam === team && t.appliedTurn !== undefined && t.appliedTurn < state.turn) {
         t.duration -= 1;
         if (t.duration <= 0) return false; // window closed
       }
@@ -356,7 +322,7 @@ export function endTurn(state: MatchState): void {
     emit(state, { type: "statusExpired", unit: unitId, kind: status.kind, name: status.name });
     if (status.onExpire && status.onExpire.length) {
       const u = state.units[unitId];
-      const caster = state.units[status.appliedBy] ?? u;
+      const caster = effectSource(state, status.appliedBy) ?? u;
       if (u && caster) runEffects(state, status.onExpire, { caster, targets: [u], skillId: status.sourceId });
     }
   }
@@ -379,6 +345,8 @@ export interface Action {
 }
 
 export type ActionRejection =
+  | "preview-state"
+  | "inactive-team" | "already-acted" | "passive-skill" | "invalid-target-count"
   | "unit-dead"
   | "unit-not-found"
   | "skill-not-found"
@@ -395,167 +363,6 @@ export interface ActionResult {
   countered?: boolean;
 }
 
-function isStunnedFor(unit: Unit, skill: SkillInstance): boolean {
-  // An "Unstunnable" skill (ayana:divine Verse of Ascension) is castable even while its caster is stunned.
-  if (skill.tags.includes("Unstunnable")) return false;
-  // A "Stun Immunity" mark (granted by some augments) makes the unit immune to all stuns.
-  if (unit.statuses.some((s) => s.kind === "mark" && s.name === "Stun Immunity")) return false;
-  return unit.statuses.some((s) => {
-    if (s.kind !== "stun") return false;
-    if (!s.scope) return true; // unscoped stun stops every skill
-    const hasTag = skill.tags.includes(s.scope.tag);
-    return s.scope.mode === "only" ? hasTag : !hasTag;
-  });
-}
-
-// Does this unit's invulnerable block the given (harmful) skill? An unscoped invulnerable blocks every harmful
-// skill; a scoped one ("invulnerable to Strategic skills" / "…to non-Strategic skills") blocks only skills that
-// match its {tag, mode} — same tag/mode test as a scoped stun. A unit with several invulnerables blocks if ANY
-// applies.
-function invulnerableBlocks(unit: Unit, skill: SkillInstance): boolean {
-  return unit.statuses.some((s) => {
-    if (s.kind !== "invulnerable") return false;
-    if (!s.scope) return true;
-    const hasTag = skill.tags.includes(s.scope.tag);
-    return s.scope.mode === "only" ? hasTag : !hasTag;
-  });
-}
-
-/** Whether a skill Bypasses (ignores Invulnerability + DR + Shield): the static Bypassing tag, OR a live
- *  `bypassingIf` condition (gommar:night Midnight Mountain Bypasses while Stealthed). */
-function skillBypasses(state: MatchState, caster: Unit, skill: SkillInstance): boolean {
-  return skill.tags.includes("Bypassing") ||
-    (skill.bypassingIf != null && evalConditionReadOnly(state, caster, skill.bypassingIf));
-}
-
-/** Total energy in a pool. */
-export function poolTotal(pool: EnergyPool): number {
-  let t = 0;
-  for (const k of Object.keys(pool)) t += pool[k] ?? 0;
-  return t;
-}
-
-/**
- * A skill's cost after cost mods. `cost_mod` statuses apply a flat delta (spilling onto specific);
- * per-cast `skill.costMods` (keeper3 "Plot Twist") apply a delta gated by a live Condition (needs `state`);
- * a `cost_currency_remap` status (titania5 "Jealousy") moves the remaining Specific cost onto Generic so
- * any color pays it.
- *
- * ALWAYS pass `state` when you have it: conditional `costMods` can only be evaluated with it, so the 2-arg
- * form silently omits them — every UI/display caller MUST pass `state` or it will show a cost the engine
- * won't charge. `state` stays optional only so pure cost_mod-status unit tests (no costMods) can stay 2-arg.
- */
-export function effectiveCost(caster: Unit, skill: SkillInstance, state?: MatchState): SkillInstance["cost"] {
-  let delta = 0, genDelta = 0, specDelta = 0;
-  // Global cost_mods (no skillId) apply to every skill; scoped ones only to their skill.
-  for (const s of caster.statuses) {
-    if (s.kind !== "cost_mod" || (s.skillId && s.skillId !== skill.id)) continue;
-    // A tag-scoped cost_mod (titania Hallucinogenic Spores: "non-Strategic skills cost +1") applies only to
-    // skills matching its scope — same tag/mode test as a scoped stun.
-    if (s.scope && (s.scope.mode === "only") !== skill.tags.includes(s.scope.tag)) continue;
-    delta += s.magnitude ?? 0;
-    genDelta += s.genericDelta ?? 0; // per-channel deltas (scratch3 "-1 Generic AND -1 Specific"): applied
-    specDelta += s.specificDelta ?? 0; // to each channel independently, floored, with NO spill.
-  }
-  // Per-cast conditional cost mods carried on the skill, re-evaluated live at each cast.
-  if (state && skill.costMods) {
-    const val = (v: number | Value): number => (typeof v === "number" ? v : evalValueReadOnly(state, caster, v));
-    for (const m of skill.costMods) {
-      if (m.when && !evalConditionReadOnly(state, caster, m.when)) continue;
-      if (m.magnitude !== undefined) delta += val(m.magnitude); // scalar (spills generic->specific)
-      if (m.genericDelta !== undefined) genDelta += val(m.genericDelta); // per-channel, independent, floored, no spill
-      if (m.specificDelta !== undefined) specDelta += val(m.specificDelta);
-    }
-  }
-  const remap = caster.statuses.some((s) => s.kind === "cost_currency_remap" && (!s.skillId || s.skillId === skill.id));
-  if (delta === 0 && genDelta === 0 && specDelta === 0 && !remap) return skill.cost;
-  let generic = skill.cost.generic + delta;
-  let specific = skill.cost.specific;
-  if (generic < 0) {
-    specific += generic; // spill the leftover scalar discount onto the specific cost
-    generic = 0;
-  }
-  generic = Math.max(0, generic + genDelta); // per-channel: independent, floored, no cross-channel spill
-  specific = Math.max(0, specific + specDelta);
-  if (remap && specific > 0) { // Specific → Generic: any color may now pay the remapped portion
-    generic += specific;
-    specific = 0;
-  }
-  return { generic, specific };
-}
-
-/** The cooldown a skill goes on when used, after the caster's cooldown_mod statuses (floored at 0). */
-export function effectiveCooldown(caster: Unit, skill: SkillInstance): number {
-  let delta = 0;
-  for (const s of caster.statuses) if (s.kind === "cooldown_mod") delta += s.magnitude ?? 0;
-  return Math.max(0, skill.cooldown + delta);
-}
-
-/** Can the pool cover a cost for a skill of `element`? A specific cost is paid from `element`'s own energy
- *  PLUS any hybrid whose components include `element` (Mirror energy pays a Water or Shadow cost). */
-export function canPay(pool: EnergyPool, element: string, cost: SkillInstance["cost"]): boolean {
-  let specificHave = pool[element] ?? 0;
-  for (const h of hybridsFor(element)) specificHave += pool[h] ?? 0;
-  if (specificHave < cost.specific) return false;
-  // Generic is payable by anything left after the specific reservation.
-  return poolTotal(pool) - cost.specific >= cost.generic;
-}
-
-/** Can a pool cover a whole SET of specific demands (Record of element→count), where each demand draws from
- *  its own colour first, then greedily from hybrids containing it? Sound (a success is a real assignment);
- *  a base cost stays exact, a hybrid cost is covered only by its own colour (hybridsFor(hybrid) is empty). */
-function specificsCoverable(pool: EnergyPool, demands: Record<string, number>): boolean {
-  const p: EnergyPool = { ...pool };
-  for (const el of Object.keys(demands)) {
-    let need = demands[el] ?? 0;
-    const takeBase = Math.min(need, p[el] ?? 0); p[el] = (p[el] ?? 0) - takeBase; need -= takeBase;
-    for (const h of hybridsFor(el)) { if (need <= 0) break; const t = Math.min(need, p[h] ?? 0); p[h] = (p[h] ?? 0) - t; need -= t; }
-    if (need > 0) return false;
-  }
-  return true;
-}
-
-/** The energy a set of QUEUED (not-yet-resolved) actions sets aside: specific per caster-element, and
- *  total generic (which any color may ultimately pay). Used by the client to plan a whole turn's spend. */
-export interface EnergyReservation { specific: Record<string, number>; generic: number; }
-export function reserveEnergy(state: MatchState, actions: readonly { unit: string; skillId: string }[]): EnergyReservation {
-  const specific: Record<string, number> = {};
-  let generic = 0;
-  for (const a of actions) {
-    const u = state.units[a.unit];
-    const sk = (u?.skills ?? []).find((s) => s.id === a.skillId);
-    if (!u || !sk) continue;
-    const c = effectiveCost(u, sk, state);
-    generic += c.generic;
-    if (c.specific > 0) specific[u.currentElement] = (specific[u.currentElement] ?? 0) + c.specific;
-  }
-  return { specific, generic };
-}
-
-/** Total energy a reservation consumes (all specific colors + generic). */
-export function reservationTotal(r: EnergyReservation): number {
-  let t = r.generic;
-  for (const k of Object.keys(r.specific)) t += r.specific[k] ?? 0;
-  return t;
-}
-
-/**
- * Can `caster` still pay `cost` from `pool` AFTER `reserved` (other actions already queued this turn) is set
- * aside? This is the exact JOINT-feasibility test, not a greedy subtraction: because generic is fully
- * fungible, a set is payable iff (a) every color has enough for its own specific demands, and (b) the total
- * pool covers all specific + all generic. So `caster`'s skill fits iff its color still has room for its
- * specific AND the leftover total covers its generic — regardless of how generic is later allocated.
- */
-export function canPayAfter(pool: EnergyPool, caster: Unit, cost: SkillInstance["cost"], reserved: EnergyReservation): boolean {
-  // All specific demands (others' + this cast's) must be coverable together — base first, then hybrids that
-  // contain the colour — and the total pool must still cover every specific + every generic.
-  const demands: Record<string, number> = { ...reserved.specific };
-  if (cost.specific > 0) demands[caster.currentElement] = (demands[caster.currentElement] ?? 0) + cost.specific;
-  if (!specificsCoverable(pool, demands)) return false;
-  let totalSpec = 0; for (const k of Object.keys(demands)) totalSpec += demands[k] ?? 0;
-  return poolTotal(pool) >= totalSpec + reserved.generic + cost.generic;
-}
-
 /** Client planning gate: can `caster` use `skill` GIVEN the actions already queued this turn? `canUse` (not
  *  on cooldown / stunned / has a legal target / affordable at all) AND still affordable once every OTHER
  *  queued action's cost is reserved — so a hero can't queue a skill whose energy is already spoken for. */
@@ -566,156 +373,23 @@ export function canUsePlanned(state: MatchState, caster: Unit, skill: SkillInsta
 }
 
 /**
- * Deduct a cost: specific from the element; generic from the player's chosen colors first (`alloc`,
- * a mutable remaining-budget consumed across the turn), then the default generic-first order for any
- * remainder. Any color may pay generic; specific is never taken from the generic pool.
- */
-function pay(pool: EnergyPool, element: string, cost: SkillInstance["cost"], alloc?: EnergyPool): void {
-  // Specific: the caster's own colour first, then greedily from any hybrid that contains it (Mirror covers a
-  // Water/Shadow cost). Cap the base draw so a colour short of its cost pulls the remainder from hybrids
-  // instead of going negative.
-  let spec = cost.specific;
-  const fromBase = Math.min(spec, pool[element] ?? 0);
-  pool[element] = (pool[element] ?? 0) - fromBase; spec -= fromBase;
-  for (const h of hybridsFor(element)) { if (spec <= 0) break; const t = Math.min(spec, pool[h] ?? 0); pool[h] = (pool[h] ?? 0) - t; spec -= t; }
-  let generic = cost.generic;
-  if (alloc) {
-    for (const k of Object.keys(alloc)) {
-      if (generic <= 0) break;
-      const take = Math.min(generic, alloc[k] ?? 0, pool[k] ?? 0);
-      pool[k] = (pool[k] ?? 0) - take;
-      alloc[k] = (alloc[k] ?? 0) - take;
-      generic -= take;
-    }
-  }
-  const order = ["generic", ...Object.keys(pool).filter((k) => k !== "generic")];
-  for (const k of order) {
-    if (generic <= 0) break;
-    const take = Math.min(generic, pool[k] ?? 0);
-    pool[k] = (pool[k] ?? 0) - take;
-    generic -= take;
-  }
-}
-
-/** A skill's effective targeting, honoring a temporary skill_targeting_override (bannerAffectsAllEnemies). */
-export function effectiveTargeting(state: MatchState, caster: Unit, skill: SkillInstance): SkillInstance["targeting"] {
-  const o = caster.statuses.find((s) => s.kind === "skill_targeting_override" && s.skillId === skill.id);
-  if (o?.name) return o.name as SkillInstance["targeting"];
-  // Live widening: a normally single-target skill that becomes a faction-wide AoE in some state reports the
-  // widened category while its `when` holds, so the client + resolveTargets stay in sync with the effect tree.
-  const w = skill.widenTargeting;
-  if (w && evalConditionReadOnly(state, caster, w.when)) return w.to;
-  return skill.targeting;
-}
-
-function resolveTargets(state: MatchState, caster: Unit, skill: SkillInstance, chosen?: string[]): Unit[] {
-  // "Twisted Nightmares" (xyris3): while the caster is marked, its all-* skills hit only one.
-  const narrowed = caster.statuses.some((s) => s.kind === "mark" && s.name === "Twisted Nightmares");
-  const maybeNarrow = (us: Unit[]): Unit[] => (narrowed && us.length > 1 ? us.slice(0, 1) : us);
-  switch (effectiveTargeting(state, caster, skill)) {
-    case "self":
-      return [caster];
-    case "none":
-      return [];
-    case "all-enemies":
-      return maybeNarrow(unitsOf(state, otherTeam(caster.team)).filter((u) => u.alive));
-    case "all-allies":
-      return maybeNarrow(unitsOf(state, caster.team).filter((u) => u.alive));
-    case "all":
-      return maybeNarrow([...unitsOf(state, "A"), ...unitsOf(state, "B")].filter((u) => u.alive));
-    case "single": {
-      const ids = chosen ?? [];
-      const picked = ids.map((id) => state.units[id]).filter((u): u is Unit => !!u && (u.alive || !!skill.canTargetDead));
-      if (picked.length > 0) return picked;
-      // default: first living enemy
-      const enemy = unitsOf(state, otherTeam(caster.team)).find((u) => u.alive);
-      return enemy ? [enemy] : [];
-    }
-  }
-}
-
-function hasStatus(u: Unit, kind: string): boolean {
-  return u.statuses.some((s) => s.kind === kind);
-}
-
-/**
- * Apply targeting legality to a skill's candidate targets (glossary rules):
- *  - Invulnerable blocks NEW Harmful targeting; Isolated blocks Helpful — unless the
- *    skill is Bypassing.
- *  - Taunt forces a single-target Harmful skill onto the taunter.
- *  - Blind retargets a single-target skill to a random valid unit (rng).
- */
-export function legalTargets(state: MatchState, caster: Unit, skill: SkillInstance, chosen: Unit[], rng: Rng): Unit[] {
-  const harmful = skill.tags.includes("Harmful");
-  const helpful = skill.tags.includes("Helpful");
-  const bypass = skillBypasses(state, caster, skill);
-  // Reanimation (maggie:reanimation): while marked, the reanimated ally may only target Maggie
-  // (the mark's applier) or enemies affected by Bramblelash.
-  const reanimated = caster.statuses.find((s) => s.kind === "mark" && s.name === "Reanimated");
-  const reanimatedOk = (u: Unit): boolean =>
-    !reanimated ||
-    (reanimated.appliedBy != null && u.id === reanimated.appliedBy) ||
-    u.statuses.some((s) => s.kind === "mark" && s.name === "Bramblelash");
-  const isLegal = (u: Unit): boolean =>
-    (u.alive || !!skill.canTargetDead) && // revives (keeper5/keeper3) may select a dead ally
-    !(skill.cannotTargetSelf && u.id === caster.id) && // xyris5 "cannot target Xyris"
-    reanimatedOk(u) &&
-    // targetKind restricts by unit kind (e.g. Feed -> a minion, the Eagle); targetFilter OR-extends it with
-    // a per-candidate predicate (syl:winter Feed also admits "any stunned ally").
-    (!skill.targetKind || u.kind === skill.targetKind ||
-      (skill.targetFilter != null && evalTargetPredicate(state, caster, u, skill.targetFilter))) &&
-    // scratch Bump Those Numbers: a Deal can't affect a unit that already bears the round-scoped lock mark.
-    !(skill.excludeMarkedTargets != null && u.statuses.some((s) => s.kind === "mark" && s.name === skill.excludeMarkedTargets)) &&
-    // hector5 Emergency Clinic: a Serum may only target Dennis by name — unless he has died (no living unit of
-    // that name remains on Hector's team), which lifts the restriction ("may use Serums on others once dead").
-    (!skill.targetMustBeName || u.name === skill.targetMustBeName ||
-      (!!skill.targetNameRelaxIfNamedDead && !team(state, caster.team).units.some((id) => { const x = state.units[id]; return !!x && x.alive && x.name === skill.targetMustBeName; }))) &&
-    !(u.id !== caster.id && hasStatus(u, "untargetable")) && // others can't target it; self can
-    !(harmful && !bypass && invulnerableBlocks(u, skill)) &&
-    !(helpful && !bypass && hasStatus(u, "isolated"));
-
-  if (effectiveTargeting(state, caster, skill) !== "single") return chosen.filter(isLegal);
-
-  // Taunt (single-target Harmful): forced onto the taunter.
-  if (harmful) {
-    const taunt = caster.statuses.find((s) => s.kind === "taunt" && s.unitRef);
-    if (taunt?.unitRef) {
-      const forced = state.units[taunt.unitRef];
-      return forced && isLegal(forced) ? [forced] : [];
-    }
-  }
-  // Auto-target-by-mark (zephyrex Ominous Rumble): while a living enemy bears the named mark, this skill is
-  // forcibly aimed at it (else the chosen target stands). Taunt above still wins.
-  if (skill.autoTargetMark) {
-    const marked = unitsOf(state, otherTeam(caster.team)).find((u) => u.statuses.some((s) => s.kind === "mark" && s.name === skill.autoTargetMark) && isLegal(u));
-    if (marked) return [marked];
-  }
-  // Blind: choose a random valid target from the relevant side (excluding units immune to Blinded targeting).
-  if (hasStatus(caster, "blind")) {
-    const side = harmful ? unitsOf(state, otherTeam(caster.team)) : helpful ? unitsOf(state, caster.team) : chosen;
-    const pool = side.filter((u) => isLegal(u) && !u.statuses.some((s) => s.kind === "mark" && s.name === "Blind-Untargetable"));
-    return pool.length ? [rng.pick(pool)] : [];
-  }
-  return chosen.filter(isLegal);
-}
-
-/**
  * Read-only preview: could `caster` legally use `skill` right now? Runs the same gates as
  * performAction (alive / cooldown / stun / requires / has a legal target / can pay) WITHOUT
  * mutating state — for an action provider or a client greying out unusable skills.
  */
 export function canUse(state: MatchState, caster: Unit, skill: SkillInstance): boolean {
+  if (state.previewOnly && skill.preview) return skill.preview.usable;
   if (!caster.alive) return false;
+  if (skill.klass === "passive") return false;
   if (skill.currentCd > 0) return false;
   if (isStunnedFor(caster, skill)) return false;
-  if (skill.requires && !evalSkillCondition(state, caster, skill.requires)) return false;
+  if (skill.requires && !evalConditionReadOnly(state, caster, skill.requires)) return false;
   const rng = Rng.fromState(state.rngState); // a throwaway clone; we never write it back (read-only)
   const needsTarget = effectiveTargeting(state, caster, skill) === "single" && (skill.tags.includes("Harmful") || skill.tags.includes("Helpful"));
   if (needsTarget) {
     // Probe the proper side's FULL roster (heroes AND minions) so a kind-restricted skill (Feed → minion)
     // finds its target — not resolveTargets' "first living enemy" default, which a targetKind filter rejects.
-    const side = skill.tags.includes("Harmful") ? otherTeam(caster.team) : caster.team;
-    const cands = unitsOf(state, side).filter((u) => u.alive);
+    const cands = Object.values(state.units);
     if (legalTargets(state, caster, skill, cands, rng).length === 0) return false;
   }
   return canPay(team(state, caster.team).energy, caster.currentElement, effectiveCost(caster, skill, state));
@@ -723,14 +397,21 @@ export function canUse(state: MatchState, caster: Unit, skill: SkillInstance): b
 
 /** Validate + perform one action: legality → pay → run effects → set cooldown. */
 export function performAction(state: MatchState, action: Action): ActionResult {
+  if (state.previewOnly) return { ok: false, reason: "preview-state" };
   const caster = state.units[action.unit];
   if (!caster) return { ok: false, reason: "unit-not-found" };
   if (!caster.alive) return { ok: false, reason: "unit-dead" };
+  if (caster.team !== state.activeTeam) return { ok: false, reason: "inactive-team" };
   const skill = (caster.skills ?? []).find((s) => s.id === action.skillId);
   if (!skill) return { ok: false, reason: "skill-not-found" };
   if (skill.currentCd > 0) return { ok: false, reason: "on-cooldown" };
   if (isStunnedFor(caster, skill)) return { ok: false, reason: "stunned" };
-  if (skill.requires && !evalSkillCondition(state, caster, skill.requires)) return { ok: false, reason: "requirements-not-met" };
+  if (skill.klass === "passive") return { ok: false, reason: "passive-skill" };
+  if (skill.requires && !evalConditionReadOnly(state, caster, skill.requires)) return { ok: false, reason: "requirements-not-met" };
+  if (state.actedThisTurn.includes(caster.id)) return { ok: false, reason: "already-acted" };
+  if (effectiveTargeting(state, caster, skill) === "single" && (action.targets?.length ?? 0) > 1) {
+    return { ok: false, reason: "invalid-target-count" };
+  }
 
   // Was the caster concealed at cast time? Captured BEFORE the veil-break below (a Harmful cast strips a
   // caster's veiled), so a skill struck from stealth is reported Invisible for its OWN cast even though the
@@ -743,7 +424,6 @@ export function performAction(state: MatchState, action: Action): ActionResult {
   // Targeting legality (before paying cost — an illegal action can't be declared).
   const rng = Rng.fromState(state.rngState);
   const targets = legalTargets(state, caster, skill, resolveTargets(state, caster, skill, action.targets), rng);
-  state.rngState = rng.state;
   // A single-target skill needs a legal target when it is Harmful/Helpful, OR when the player explicitly chose
   // one that turned out illegal (e.g. xyris5's own-self choice under cannotTargetSelf) — rather than silently
   // redirecting or (Strategic) landing on the caster via the effect's `target` fallback.
@@ -756,6 +436,7 @@ export function performAction(state: MatchState, action: Action): ActionResult {
   if (!canPay(pool, caster.currentElement, cost)) {
     return { ok: false, reason: "insufficient-energy" };
   }
+  state.rngState = rng.state;
   pay(pool, caster.currentElement, cost, state.genericPay);
   if (!state.actedThisTurn.includes(caster.id)) state.actedThisTurn.push(caster.id); // ledger: this unit acted
 
@@ -861,11 +542,26 @@ export function resolveTurn(state: MatchState, actions: Action[]): ActionResult[
   let results: ActionResult[];
   if (order) {
     results = [];
+    const usedActions = new Set<number>();
+    const usedTicks = new Set<Status>();
+    const action = (index: number) => {
+      if (usedActions.has(index) || !actions[index]) return;
+      usedActions.add(index);
+      results.push(performAction(state, actions[index]!));
+    };
+    const tick = (unitId: string, status: Status) => {
+      if (usedTicks.has(status) || !pendingTicks(state, state.activeTeam).some(t => t.unitId === unitId && t.status === status)) return;
+      usedTicks.add(status);
+      applyOneTick(state, unitId, status);
+    };
     for (const item of order) {
-      if (item.kind === "action") { const a = actions[item.index]; if (a) results.push(performAction(state, a)); }
-      else applyOneTick(state, item.unitId, item.status);
+      if (item.kind === "action") action(item.index);
+      else tick(item.unitId, item.status);
     }
-    state.dotsTicked = true; // endTurn must not re-tick what we just applied
+    for (let i = 0; i < actions.length; i++) action(i);
+    // Include newly applied immediate ticks and anything omitted from the requested order.
+    for (const t of pendingTicks(state, state.activeTeam)) tick(t.unitId, t.status);
+    state.dotsTicked = true;
   } else {
     results = actions.map((a) => performAction(state, a));
   }

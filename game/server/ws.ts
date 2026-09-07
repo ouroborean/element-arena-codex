@@ -3,7 +3,7 @@
  * relay without pulling in `ws`, so the server runs with a bare `node` like the rest of the repo.
  *
  * Scope: text frames only (our protocol is JSON), server→client frames unmasked, client→server frames
- * unmasked-or-masked, ping/pong keepalive, and clean close. Fragmented messages are reassembled; frames
+ * masked, ping/pong keepalive, and clean close. Fragmented messages are reassembled; frames
  * larger than `maxBytes` fail the connection (a memory-abuse guard). Binary frames are ignored.
  *
  * The frame codec (`encodeFrame` + `FrameDecoder`) is pure and unit-tested in ws.test.ts.
@@ -61,10 +61,12 @@ export class FrameDecoder {
   private failed = false;
   private hooks: DecoderHooks;
   private maxBytes: number;
+  private requireMask: boolean;
 
-  constructor(hooks: DecoderHooks, maxBytes = 4 * 1024 * 1024) {
+  constructor(hooks: DecoderHooks, maxBytes = 4 * 1024 * 1024, requireMask = false) {
     this.hooks = hooks;
     this.maxBytes = maxBytes;
+    this.requireMask = requireMask;
   }
 
   push(chunk: Buffer): void {
@@ -83,6 +85,8 @@ export class FrameDecoder {
     const fin = (b0 & 0x80) !== 0;
     const opcode = b0 & 0x0f;
     const masked = (b1 & 0x80) !== 0;
+    if (this.requireMask && !masked) return this.fail("client frames must be masked");
+    if ((b0 & 0x70) !== 0) return this.fail("reserved frame bits are not supported");
     let len = b1 & 0x7f;
     let offset = 2;
     if (len === 126) {
@@ -165,6 +169,7 @@ export class FrameDecoder {
 
 /** A live WebSocket connection: `send` a JSON string, and register message/close handlers. */
 export class WsConn {
+  readonly remoteAddress: string;
   onMessage?: (msg: string) => void;
   onClose?: () => void;
   /** Heartbeat liveness — set false before each ping, flipped true again on the client's pong. */
@@ -173,15 +178,16 @@ export class WsConn {
   private decoder: FrameDecoder;
   private socket: Duplex;
 
-  constructor(socket: Duplex) {
+  constructor(socket: Duplex, clientAddress?: string) {
     this.socket = socket;
+    this.remoteAddress = clientAddress ?? (socket as Duplex & { remoteAddress?: string }).remoteAddress ?? "unknown";
     this.decoder = new FrameDecoder({
       onText: (s) => this.onMessage?.(s),
       onPing: (p) => this.rawSend(OP_PONG, p),
       onPong: () => { this.isAlive = true; },
       onClose: () => this.close(),
       onError: () => this.destroy(),
-    });
+    }, 32768, true);
     socket.on("data", (d: Buffer) => this.decoder.push(d));
     socket.on("close", () => this.markClosed());
     socket.on("error", () => this.markClosed());
@@ -240,8 +246,12 @@ export class WsConn {
  * Attach WebSocket handling to an http.Server: perform the RFC 6455 handshake on every valid upgrade and
  * hand a live `WsConn` to `onConnection`. Non-WebSocket upgrades are dropped.
  */
-export function attachWebSocketServer(server: Server, onConnection: (conn: WsConn) => void): void {
+export function attachWebSocketServer(server: Server, onConnection: (conn: WsConn) => void, allow: (req: IncomingMessage) => boolean = () => true, address?: (req: IncomingMessage) => string): void {
   server.on("upgrade", (req: IncomingMessage, socket: Duplex, head: Buffer) => {
+    if (!allow(req)) {
+      socket.end("HTTP/1.1 403 Forbidden\r\nConnection: close\r\n\r\n");
+      return;
+    }
     const key = req.headers["sec-websocket-key"];
     // A conformant WebSocket upgrade is a GET with Upgrade: websocket, Sec-WebSocket-Version: 13, and a
     // non-empty Sec-WebSocket-Key. Reject anything else with a 400 rather than a bogus 101.
@@ -261,7 +271,7 @@ export function attachWebSocketServer(server: Server, onConnection: (conn: WsCon
         "Connection: Upgrade\r\n" +
         `Sec-WebSocket-Accept: ${acceptKey(key)}\r\n\r\n`,
     );
-    const conn = new WsConn(socket);
+    const conn = new WsConn(socket, address?.(req));
     onConnection(conn);
     conn.feed(head);
   });

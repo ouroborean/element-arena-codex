@@ -17,8 +17,9 @@
  *   Damage Ignore -> incoming mods -> [Shatter voids DR+Shield] -> DR -> Shield
  *   -> apply to HP (Immortal floors at 1).
  */
-import type { DamageType, MatchState, ShieldInstance, Status, StatusKind, TeamId, Unit } from "./types.ts";
+import { effectTeam } from "./effect-source.ts";
 import { applyRounding, RULINGS } from "./rulings.ts";
+import type { DamageType, MatchState, ShieldInstance, StatusKind, TeamId, Unit } from "./types.ts";
 
 /** Total shield currently on a unit. */
 export function totalShield(u: Unit): number {
@@ -67,8 +68,7 @@ export function tickShieldsForTeam(state: MatchState, team: TeamId): void {
   for (const u of Object.values(state.units)) {
     const kept: ShieldInstance[] = [];
     for (const sh of u.shields) {
-      const owner = state.units[sh.appliedBy];
-      const byTeam = owner ? owner.team === team : false;
+      const byTeam = effectTeam(state, sh) === team;
       if (byTeam && sh.duration !== null && sh.appliedTurn < state.turn) {
         const next = sh.duration - 1;
         if (next <= 0) continue; // expired

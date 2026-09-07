@@ -4,6 +4,9 @@ __pycache__/
 Thumbs.db
 node_modules/
 *.tsbuildinfo
+test-results.log
+typecheck-results.log
+game/web/.verify/
 game/web/tools/effect_context.json
 game/web/tools/batches/
 

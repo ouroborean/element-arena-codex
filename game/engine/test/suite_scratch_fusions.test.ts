@@ -5,7 +5,8 @@ import { fileURLToPath } from "node:url";
 import { loadHero } from "../content/hero.ts";
 import { heroById } from "../content/match.ts";
 import { makeState, makeUnit, skill } from "./helpers.ts";
-import { performAction, endTurn, effectiveCost } from "../src/scheduler.ts";
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
+import { endTurn, effectiveCost } from "../src/scheduler.ts";
 import { fusionForm, FUSIONS } from "../content/fusions.generated.ts";
 import type { MatchState, Unit } from "../src/types.ts";
 

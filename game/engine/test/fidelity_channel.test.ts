@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { performAction, runChannels, effectiveCost } from "../src/scheduler.ts";
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
+import { runChannels, effectiveCost } from "../src/scheduler.ts";
 import { emit } from "../src/effects/interpret.ts";
 import { applyAugment } from "../content/augment.ts";
 import { augmentById } from "../content/augments.generated.ts";

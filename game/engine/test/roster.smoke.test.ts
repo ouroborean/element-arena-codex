@@ -3,7 +3,8 @@ import assert from "node:assert/strict";
 import { ROSTER } from "../content/roster.generated.ts";
 import { loadHero } from "../content/hero.ts";
 import { emit, runEffects } from "../src/effects/interpret.ts";
-import { performAction, startRound } from "../src/scheduler.ts";
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
+import { startRound } from "../src/scheduler.ts";
 import type { MatchState, Unit } from "../src/types.ts";
 import { makeState, makeUnit } from "./helpers.ts";
 

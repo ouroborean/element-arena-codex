@@ -1,13 +1,14 @@
-# @arena/engine — rules engine kernel (P1)
+# @arena/engine — rules engine
 
 The deterministic, serializable core of the game. No framework, no DOM, no I/O — it
-takes a `MatchState` and effect inputs and produces a new state. The same code will
-run on the client (prediction) and the server (authority).
+takes a `MatchState` and mutates it through deterministic commands/effects. Local
+bot games and the authoritative server use the full engine; network clients receive
+a public query-only projection, not a playable state. See [../ARCHITECTURE.md](../ARCHITECTURE.md).
 
 ## Run
 
 ```bash
-node --test          # 289 golden tests, zero install (Node 24 type-strips TS)
+node --test          # full engine regression suite (Node 24.18+ type-strips TS)
 npm run typecheck    # strict tsc --noEmit (needs `npm i` once, for typescript)
 ```
 

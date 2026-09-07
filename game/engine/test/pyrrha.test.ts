@@ -3,7 +3,8 @@ import assert from "node:assert/strict";
 import { pyrrha } from "../content/heroes/pyrrha.ts";
 import { loadHero } from "../content/hero.ts";
 import { runEffects } from "../src/effects/interpret.ts";
-import { endTurn, performAction } from "../src/scheduler.ts";
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
+import { endTurn } from "../src/scheduler.ts";
 import { totalShield } from "../src/damage.ts";
 import { makeState, makeUnit, skill } from "./helpers.ts";
 

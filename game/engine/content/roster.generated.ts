@@ -481,6 +481,13 @@ export const MINIONS: MinionTemplate[] = [
       ]
      }
     ],
+    "targetSpec": {
+     "faction": "enemies",
+     "extend": {
+      "isNamed": "target",
+      "name": "sylnomadminion"
+     }
+    },
     "currentCd": 0
    }
   ],
@@ -543,6 +550,13 @@ export const MINIONS: MinionTemplate[] = [
       ]
      }
     ],
+    "targetSpec": {
+     "faction": "enemies",
+     "extend": {
+      "isNamed": "target",
+      "name": "sylnomadminion"
+     }
+    },
     "currentCd": 0
    },
    {
@@ -584,6 +598,33 @@ export const MINIONS: MinionTemplate[] = [
       ]
      }
     ],
+    "targetSpec": {
+     "faction": "enemies",
+     "extend": {
+      "and": [
+       {
+        "fused": "winter",
+        "of": "summoner"
+       },
+       {
+        "isFaction": "target",
+        "faction": "ally"
+       },
+       {
+        "has": "stun",
+        "of": "target"
+       },
+       {
+        "not": {
+         "sameUnit": [
+          "target",
+          "self"
+         ]
+        }
+       }
+      ]
+     }
+    },
     "currentCd": 0
    }
   ],
@@ -646,6 +687,13 @@ export const MINIONS: MinionTemplate[] = [
       ]
      }
     ],
+    "targetSpec": {
+     "faction": "enemies",
+     "extend": {
+      "isNamed": "target",
+      "name": "sylnomadminion"
+     }
+    },
     "currentCd": 0
    },
    {
@@ -687,6 +735,33 @@ export const MINIONS: MinionTemplate[] = [
       ]
      }
     ],
+    "targetSpec": {
+     "faction": "enemies",
+     "extend": {
+      "and": [
+       {
+        "fused": "winter",
+        "of": "summoner"
+       },
+       {
+        "isFaction": "target",
+        "faction": "ally"
+       },
+       {
+        "has": "stun",
+        "of": "target"
+       },
+       {
+        "not": {
+         "sameUnit": [
+          "target",
+          "self"
+         ]
+        }
+       }
+      ]
+     }
+    },
     "currentCd": 0
    },
    {
@@ -1748,6 +1823,50 @@ export const MINIONS: MinionTemplate[] = [
       ]
      }
     ],
+    "targetSpec": {
+     "faction": "enemies",
+     "extend": {
+      "and": [
+       {
+        "isFaction": "target",
+        "faction": "ally"
+       },
+       {
+        "isKind": "target",
+        "kind": "minion"
+       },
+       {
+        "unitIn": [
+         "target",
+         {
+          "any": [
+           {
+            "faction": "allies",
+            "template": "Prisma Crimson"
+           },
+           {
+            "faction": "allies",
+            "template": "Prisma Azure"
+           },
+           {
+            "faction": "allies",
+            "template": "Prisma Saffron"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "not": {
+         "sameUnit": [
+          "target",
+          "self"
+         ]
+        }
+       }
+      ]
+     }
+    },
     "currentCd": 0
    }
   ],
@@ -2068,6 +2187,50 @@ export const MINIONS: MinionTemplate[] = [
       }
      }
     ],
+    "targetSpec": {
+     "faction": "enemies",
+     "extend": {
+      "and": [
+       {
+        "isFaction": "target",
+        "faction": "ally"
+       },
+       {
+        "isKind": "target",
+        "kind": "minion"
+       },
+       {
+        "unitIn": [
+         "target",
+         {
+          "any": [
+           {
+            "faction": "allies",
+            "template": "Prisma Crimson"
+           },
+           {
+            "faction": "allies",
+            "template": "Prisma Azure"
+           },
+           {
+            "faction": "allies",
+            "template": "Prisma Saffron"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "not": {
+         "sameUnit": [
+          "target",
+          "self"
+         ]
+        }
+       }
+      ]
+     }
+    },
     "currentCd": 0
    }
   ],
@@ -2368,6 +2531,50 @@ export const MINIONS: MinionTemplate[] = [
       }
      }
     ],
+    "targetSpec": {
+     "faction": "enemies",
+     "extend": {
+      "and": [
+       {
+        "isFaction": "target",
+        "faction": "ally"
+       },
+       {
+        "isKind": "target",
+        "kind": "minion"
+       },
+       {
+        "unitIn": [
+         "target",
+         {
+          "any": [
+           {
+            "faction": "allies",
+            "template": "Prisma Crimson"
+           },
+           {
+            "faction": "allies",
+            "template": "Prisma Azure"
+           },
+           {
+            "faction": "allies",
+            "template": "Prisma Saffron"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "not": {
+         "sameUnit": [
+          "target",
+          "self"
+         ]
+        }
+       }
+      ]
+     }
+    },
     "currentCd": 0
    }
   ],
@@ -8863,6 +9070,40 @@ export const ROSTER: HeroDef[] = [
       ]
      }
     ],
+    "targetSpec": {
+     "faction": "enemies",
+     "extend": {
+      "and": [
+       {
+        "isFaction": "target",
+        "faction": "ally"
+       },
+       {
+        "isKind": "target",
+        "kind": "minion"
+       },
+       {
+        "or": [
+         {
+          "isNamed": "target",
+          "name": "Boulder"
+         },
+         {
+          "and": [
+           {
+            "fused": "spore"
+           },
+           {
+            "isNamed": "target",
+            "name": "Stonecap Mushroom"
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    },
     "currentCd": 0
    },
    {
@@ -10228,6 +10469,32 @@ export const ROSTER: HeroDef[] = [
       ]
      }
     ],
+    "targetSpec": {
+     "faction": "enemies",
+     "extend": {
+      "and": [
+       {
+        "fused": "evil"
+       },
+       {
+        "isFaction": "target",
+        "faction": "ally"
+       },
+       {
+        "isKind": "target",
+        "kind": "hero"
+       },
+       {
+        "not": {
+         "sameUnit": [
+          "target",
+          "self"
+         ]
+        }
+       }
+      ]
+     }
+    },
     "currentCd": 0
    },
    {
@@ -11096,6 +11363,9 @@ export const ROSTER: HeroDef[] = [
       "to": "target"
      }
     ],
+    "targetSpec": {
+     "faction": "either"
+    },
     "currentCd": 0
    },
    {
@@ -12455,6 +12725,9 @@ export const ROSTER: HeroDef[] = [
       "from": "caster"
      }
     ],
+    "targetSpec": {
+     "faction": "either"
+    },
     "currentCd": 0
    },
    {
@@ -12557,6 +12830,9 @@ export const ROSTER: HeroDef[] = [
       "from": "caster"
      }
     ],
+    "targetSpec": {
+     "faction": "either"
+    },
     "currentCd": 0
    },
    {
@@ -12660,6 +12936,9 @@ export const ROSTER: HeroDef[] = [
       "from": "caster"
      }
     ],
+    "targetSpec": {
+     "faction": "either"
+    },
     "currentCd": 0
    },
    {
@@ -12774,6 +13053,9 @@ export const ROSTER: HeroDef[] = [
       }
      }
     ],
+    "targetSpec": {
+     "faction": "either"
+    },
     "currentCd": 0
    }
   ],

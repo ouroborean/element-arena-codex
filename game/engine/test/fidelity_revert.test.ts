@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { performAction, effectiveCost, effectiveTargeting } from "../src/scheduler.ts";
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
+import { effectiveCost, effectiveTargeting } from "../src/scheduler.ts";
 import { runEffects } from "../src/effects/interpret.ts";
 import { removeStatus } from "../src/status.ts";
 import "../content/hero.ts"; // side-effect: registers the fusion custom handlers

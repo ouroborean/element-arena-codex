@@ -1,3 +1,5 @@
+import { matchFlow, type MatchOutcome } from "../src/match-flow.ts";
+export type { MatchOutcome } from "../src/match-flow.ts";
 /**
  * The match-setup layer: turn a drafted team into a playable MatchState, and drive it
  * through the RULINGS.md phase machine to a winner.
@@ -11,10 +13,10 @@
  * (e.g. defaultPolicy) for automated play.
  */
 import type { Action } from "../src/scheduler.ts";
+import { canUse, targetCandidates } from "../src/scheduler.ts";
 import type { MatchState, TeamId, Unit } from "../src/types.ts";
-import { canUse, endRound, endTurn, resolveTurn, roundWinner, startRound, startTurn } from "../src/scheduler.ts";
-import { loadHero } from "./hero.ts";
 import type { HeroDef } from "./hero.ts";
+import { loadHero } from "./hero.ts";
 import { ROSTER } from "./roster.generated.ts";
 
 const BY_ID = new Map<string, HeroDef>(ROSTER.map((h) => [h.id, h]));
@@ -91,12 +93,6 @@ export function buildMatch(draft: Draft): MatchState {
 /** Supplies one team's committed actions for a turn (player input, or a bot policy). */
 export type ActionProvider = (state: MatchState, side: TeamId) => Action[];
 
-export interface MatchOutcome {
-  /** null = the turn cap was hit with no wipe (a stalemate — surfaced, never hidden). */
-  winner: TeamId | null;
-  rounds: number;
-  roundsWon: Record<TeamId, number>;
-}
 
 /**
  * Play a whole match to a best-of-N decision. Each round is a fresh battle; within a round
@@ -118,28 +114,14 @@ export function playMatch(
     onBetweenRounds?: (state: MatchState, roundWinner: TeamId) => void;
   } = {},
 ): MatchOutcome {
-  const roundsToWin = opts.roundsToWin ?? 3;
-  const maxTurns = opts.maxTurns ?? 400;
-  let matchWinner: TeamId | null = null;
-
-  while (matchWinner === null) {
-    startRound(state); // fresh battle: HP/cooldown reset, round-scoped state cleared, summon passives
-    let roundWon: TeamId | null = null;
-    for (let t = 0; t < maxTurns && roundWon === null; t++) {
-      startTurn(state);
-      resolveTurn(state, provide(state, state.activeTeam));
-      roundWon = roundWinner(state);
-      if (roundWon === null) endTurn(state); // hand the turn over; a wipe ends the round immediately
-    }
-    if (roundWon === null) {
-      // Turn cap hit without a decision — report the stalemate rather than spinning.
-      return { winner: null, rounds: state.round, roundsWon: { A: state.teams.A.roundsWon, B: state.teams.B.roundsWon } };
-    }
-    matchWinner = endRound(state, roundWon, roundsToWin);
-    // The between-round AUGMENT_OR_FUSE draft: apply upgrades that carry into the next battle.
-    if (matchWinner === null) opts.onBetweenRounds?.(state, roundWon);
+  const flow = matchFlow(state, opts);
+  let step = flow.next();
+  while (!step.done) {
+    const phase = step.value;
+    if (phase.type === "betweenRounds") opts.onBetweenRounds?.(state, phase.winner);
+    step = flow.next(phase.type === "actions" ? provide(state, phase.side) : undefined);
   }
-  return { winner: matchWinner, rounds: state.round, roundsWon: { A: state.teams.A.roundsWon, B: state.teams.B.roundsWon } };
+  return step.value;
 }
 
 /** Living units on a side, in slot/list order. */
@@ -164,17 +146,11 @@ export function defaultPolicy(state: MatchState, side: TeamId): Action[] {
     const pick = usable.find((s) => s.tags.includes("Harmful")) ?? usable[0]!;
     let targets: string[] | undefined;
     if (pick.targeting === "single") {
-      if (pick.tags.includes("Harmful")) {
-        const enemy = enemies[0];
-        if (!enemy) continue; // nothing to hit
-        targets = [enemy.id];
-      } else {
-        // Helpful OR a neither-tagged Strategic/utility skill (Hector's Serums "inject Dennis", not the enemy):
-        // aim at a friendly unit, never an enemy.
-        const allies = living(state, side).filter((u) => u.id !== actor.id);
-        const ally = allies.slice().sort((a, b) => a.hp - b.hp)[0] ?? actor;
-        targets = [ally.id];
-      }
+      const candidates = targetCandidates(state, actor, pick);
+      const preferred = candidates.filter(u => pick.tags.includes("Harmful") ? u.team !== actor.team : u.team === actor.team);
+      const target = (preferred.length ? preferred : candidates).slice().sort((a,b) => a.hp - b.hp)[0];
+      if (!target) continue;
+      targets = [target.id];
     }
     actions.push({ unit: actor.id, skillId: pick.id, targets });
   }

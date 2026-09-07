@@ -4,7 +4,8 @@ import { emit } from "../src/effects/interpret.ts";
 import { loadHero } from "../content/hero.ts"; // side-effect: registers handlers + minion templates
 import { heroById } from "../content/match.ts";
 import { makeState, makeUnit } from "./helpers.ts";
-import { performAction, startTurn, endTurn, tickDots, effectiveCost } from "../src/scheduler.ts";
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
+import { startTurn, endTurn, tickDots, effectiveCost } from "../src/scheduler.ts";
 import { stackCount } from "../src/status.ts";
 import type { Unit } from "../src/types.ts";
 

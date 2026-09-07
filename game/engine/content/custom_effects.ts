@@ -1,3 +1,4 @@
+import { heal, inflictStatus } from "../src/combat.ts";
 /**
  * Native handlers for the `custom` escape-hatch nodes the roster authors reached for
  * (the ~3% of skills the declarative DSL can't express). Each is transcribed from its
@@ -8,12 +9,12 @@
  * Importing this module registers all handlers; content/hero.ts does that side-effect
  * import so any consumer of the roster gets them.
  */
-import { registerCustom, resolveSelector, runInContext } from "../src/effects/interpret.ts";
-import { applyStatus, removeStatus, stackCount } from "../src/status.ts";
-import { applyHeal, spendShield } from "../src/damage.ts";
-import type { Unit } from "../src/types.ts";
+import { spendShield } from "../src/damage.ts";
 import type { Selector } from "../src/effects/ast.ts";
+import { registerCustom, resolveSelector, runInContext } from "../src/effects/interpret.ts";
 import type { SkillInstance } from "../src/skill.ts";
+import { removeStatus, stackCount } from "../src/status.ts";
+import type { Unit } from "../src/types.ts";
 
 // saya5 "Stroke of Genius" — sets the caster's OTHER skills to a flat 1-energy cost.
 // Faithful: per ENERGY_INCOME/cost model, a skill's SPECIFIC cost is paid in the caster's
@@ -38,9 +39,9 @@ registerCustom("setSkillCosts", (ctx, args) => {
 registerCustom("grantEssenceIfSkillReceivedWithin", (ctx, args) => {
   const turns = (args.turns as number) ?? 1;
   for (const u of resolveSelector((args.to as Selector) ?? "self", ctx)) {
-    applyStatus(u, {
+    inflictStatus(ctx, u, {
       kind: "mark", name: "Wind Step Window", duration: turns,
-      appliedBy: ctx.self.id, appliedTurn: ctx.state.turn,
+      appliedBy: ctx.self.id, appliedByTeam: ctx.self.team, appliedTurn: ctx.state.turn,
     });
   }
 });
@@ -73,9 +74,9 @@ registerCustom("decaySkillCost", (ctx, args) => {
   if (!skill) return;
   const floorDelta = -(skill.cost.specific - min); // discount can zero the specific cost, no further
   const cur = ctx.self.statuses.find((s) => s.kind === "cost_mod" && s.skillId === skillId)?.magnitude ?? 0;
-  applyStatus(ctx.self, {
+  inflictStatus(ctx, ctx.self, {
     kind: "cost_mod", skillId, magnitude: Math.max(floorDelta, cur - amount),
-    duration: null, appliedBy: ctx.self.id, appliedTurn: ctx.state.turn,
+    duration: null, appliedBy: ctx.self.id, appliedByTeam: ctx.self.team, appliedTurn: ctx.state.turn,
   });
 });
 
@@ -96,9 +97,9 @@ registerCustom("cooldownMod", (ctx, args) => {
   const duration = (args.duration as number | null) ?? null;
   const name = args.name as string | undefined;
   for (const u of resolveSelector((args.to as Selector) ?? "target", ctx)) {
-    applyStatus(u, {
+    inflictStatus(ctx, u, {
       kind: "cooldown_mod", magnitude: delta, name, duration,
-      appliedBy: ctx.self.id, appliedTurn: ctx.state.turn,
+      appliedBy: ctx.self.id, appliedByTeam: ctx.self.team, appliedTurn: ctx.state.turn,
     });
   }
 });
@@ -130,13 +131,13 @@ registerCustom("exileActingAlone", (ctx, args) => {
     return true;
   });
   if (iActed && !otherAllyActed) {
-    applyStatus(ctx.self, {
+    inflictStatus(ctx, ctx.self, {
       kind: "mark", name: mark, duration: markDuration,
-      appliedBy: ctx.self.id, appliedTurn: ctx.state.turn,
+      appliedBy: ctx.self.id, appliedByTeam: ctx.self.team, appliedTurn: ctx.state.turn,
     });
-    applyStatus(ctx.self, {
+    inflictStatus(ctx, ctx.self, {
       kind: "elemental_essence", duration: null,
-      appliedBy: ctx.self.id, appliedTurn: ctx.state.turn,
+      appliedBy: ctx.self.id, appliedByTeam: ctx.self.team, appliedTurn: ctx.state.turn,
     });
   } else {
     removeStatus(ctx.self, "mark", mark);
@@ -150,9 +151,9 @@ registerCustom("aoeBecomesSingleTarget", (ctx, args) => {
   const markName = (args.markName as string) ?? "Twisted Nightmares";
   const duration = (args.duration as number | null) ?? null;
   for (const u of resolveSelector((args.of as Selector) ?? "target", ctx)) {
-    applyStatus(u, {
+    inflictStatus(ctx, u, {
       kind: "mark", name: markName, duration,
-      appliedBy: ctx.self.id, appliedTurn: ctx.state.turn,
+      appliedBy: ctx.self.id, appliedByTeam: ctx.self.team, appliedTurn: ctx.state.turn,
     });
   }
 });
@@ -168,7 +169,7 @@ registerCustom("consumeShield", (ctx, args) => {
       // keeper:crystal — Chronicle Fragments count as 10 Shield each; cover the shortfall with WHOLE stacks
       // (a Fragment can't be split). Non-Keeper callers hold 0 Fragments, so this is a no-op for them.
       const need = Math.min(stackCount(u, "Chronicle Fragments"), Math.ceil(shortfall / 10));
-      if (need > 0) { applyStatus(u, { kind: "stack", name: "Chronicle Fragments", magnitude: -need, duration: null, appliedBy: u.id, appliedTurn: ctx.state.turn }); fromFragments = need * 10; }
+      if (need > 0) { inflictStatus(ctx, u, { kind: "stack", name: "Chronicle Fragments", magnitude: -need, duration: null, appliedBy: u.id, appliedTurn: ctx.state.turn }); fromFragments = need * 10; }
     }
     // Announce a SUCCESSFUL consume (real Shield spent and/or Fragments cashed) so keeper:aurora Stellar Story
     // grants Essence only on an actual consume, not on every skill cast.
@@ -239,12 +240,12 @@ registerCustom("augmentIfHelpful_healAndInvuln", (ctx, args) => {
   const src = ctx.state.units[e.caster];
   const sk = (src?.skills ?? []).find((s) => s.id === e.skillId);
   if (!sk || !sk.tags.includes("Helpful")) return;
-  const heal = (args.heal as number) ?? 0;
+  const healAmount = (args.heal as number) ?? 0;
   const dur = (args.invulnerableDuration as number) ?? 1;
   for (const id of e.targets) {
     const u = ctx.state.units[id];
     if (!u) continue;
-    if (heal > 0) applyHeal(u, heal);
-    applyStatus(u, { kind: "invulnerable", duration: dur, appliedBy: ctx.self.id, appliedTurn: ctx.state.turn });
+    if (healAmount > 0) heal(ctx, u, healAmount);
+    inflictStatus(ctx, u, { kind: "invulnerable", duration: dur, appliedBy: ctx.self.id, appliedByTeam: ctx.self.team, appliedTurn: ctx.state.turn });
   }
 });

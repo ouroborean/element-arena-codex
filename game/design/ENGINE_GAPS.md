@@ -1,4 +1,6 @@
-# Engine gaps — what authoring the roster revealed
+# Engine gaps — historical authoring log
+
+For current boundaries and known limitations, see [../ARCHITECTURE.md](../ARCHITECTURE.md). Entries below are dated development milestones; counts of pending handlers describe their point in time, not the current backlog. The current runtime installs fusion handlers through `engine/content/fusion_effects.ts` and its responsibility-based modules, and the full-content smoke suite checks handler coverage.
 
 ## P3 content — augments LANDED (2026-08-17); fusions in progress
 

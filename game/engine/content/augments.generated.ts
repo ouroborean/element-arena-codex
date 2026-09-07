@@ -2534,6 +2534,13 @@ export const AUGMENTS: Augment[] = [
        ]
       }
      ],
+     "targetSpec": {
+      "faction": "enemies",
+      "extend": {
+       "isNamed": "target",
+       "name": "sylnomadminion"
+      }
+     },
      "currentCd": 0
     }
    }
@@ -4012,6 +4019,40 @@ export const AUGMENTS: Augment[] = [
        ]
       }
      ],
+     "targetSpec": {
+      "faction": "enemies",
+      "extend": {
+       "and": [
+        {
+         "isFaction": "target",
+         "faction": "ally"
+        },
+        {
+         "isKind": "target",
+         "kind": "minion"
+        },
+        {
+         "or": [
+          {
+           "isNamed": "target",
+           "name": "Boulder"
+          },
+          {
+           "and": [
+            {
+             "fused": "spore"
+            },
+            {
+             "isNamed": "target",
+             "name": "Stonecap Mushroom"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     },
      "currentCd": 0
     }
    }
@@ -5694,6 +5735,9 @@ export const AUGMENTS: Augment[] = [
        "to": "target"
       }
      ],
+     "targetSpec": {
+      "faction": "either"
+     },
      "currentCd": 0
     }
    }
@@ -7931,6 +7975,50 @@ export const AUGMENTS: Augment[] = [
        }
       }
      ],
+     "targetSpec": {
+      "faction": "enemies",
+      "extend": {
+       "and": [
+        {
+         "isFaction": "target",
+         "faction": "ally"
+        },
+        {
+         "isKind": "target",
+         "kind": "minion"
+        },
+        {
+         "unitIn": [
+          "target",
+          {
+           "any": [
+            {
+             "faction": "allies",
+             "template": "Prisma Crimson"
+            },
+            {
+             "faction": "allies",
+             "template": "Prisma Azure"
+            },
+            {
+             "faction": "allies",
+             "template": "Prisma Saffron"
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "not": {
+          "sameUnit": [
+           "target",
+           "self"
+          ]
+         }
+        }
+       ]
+      }
+     },
      "currentCd": 0
     }
    }

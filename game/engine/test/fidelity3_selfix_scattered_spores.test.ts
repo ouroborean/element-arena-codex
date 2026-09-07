@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { performAction } from "../src/scheduler.ts";
+import { castForEffectTest as performAction } from "./effect-fixture.ts";
 import { emit } from "../src/effects/interpret.ts";
 import { loadHero } from "../content/hero.ts"; // side-effect: registers handlers + minion templates
 import { heroById } from "../content/match.ts";
@@ -73,11 +73,11 @@ test("Scattered Spores: roland1 on a NON-Stonecap minion deals NO AoE (isNamed g
   const e1Before = e1.hp;
   const e2Before = e2.hp;
   const res = performAction(state, { unit: "roland", skillId: "roland1", targets: ["peb"] });
-  assert.equal(res.ok, true, "roland1 on the Pebble is a legal, payable action");
+  assert.equal(res.reason, "no-legal-target", "an unrelated allied minion cannot be launched");
 
   assert.equal(e1.hp, e1Before, "enemy 1 took NO 15 Affliction — the target was not a Stonecap");
   assert.equal(e2.hp, e2Before, "enemy 2 took NO 15 Affliction — the AoE did not fire");
-  assert.equal(pebble.alive, false, "sanity: roland1 still launched + destroyed the ally minion it struck");
+  assert.equal(pebble.alive, true, "an illegal target is untouched");
 });
 
 // --------------------------------------------------------------------------------------------------- //
